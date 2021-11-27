@@ -1,5 +1,5 @@
 import React from "react";
-import logo from "./logo.svg";
+import logo from "./banana_PNG835.png";
 import "./App.css";
 
 function App() {
@@ -15,7 +15,7 @@ function App() {
     <div className="App">
       <header className="App-header">
         <img src={logo} className="App-logo" alt="logo" />
-        <p>{!data ? "Loading..." : data}</p>
+        <p>{!data ? "B&C Engine loading..." : data}</p>
       </header>
     </div>
   );
