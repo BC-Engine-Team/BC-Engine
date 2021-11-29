@@ -10,7 +10,7 @@
     "test": "echo \"Error: no test specified\"",
     "start": "cd server && node app.js",
     "start-all": "concurrently \"cd client && npm start\" \"cd server && node app.js\"",
-    "build": "npm install && cd client && npm install && npm run build"
+    "build": "npm install && cd server && node app.js && cd ../client && npm install && npm run build"
   },
   "keywords": [],
   "author": "",
