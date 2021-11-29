@@ -8,9 +8,9 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node app.js",
-    "start-all": "concurrently \"cd ../client && npm start\" \"node app.js\"",
-    "build": "cd ../client && npm install && npm run build"
+    "start": "cd server && node app.js",
+    "start-all": "concurrently \"cd client && npm start\" \"cd server && node app.js\"",
+    "build": "npm install && cd client && npm install && npm run build"
   },
   "keywords": [],
   "author": "",
