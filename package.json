@@ -7,7 +7,7 @@
     "node": "16.13.0"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "echo \"Error: no test specified\"",
     "start": "cd server && node app.js",
     "start-all": "concurrently \"cd client && npm start\" \"cd server && node app.js\"",
     "build": "npm install && cd client && npm install && npm run build"
