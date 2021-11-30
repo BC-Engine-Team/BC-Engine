@@ -1,43 +1,18 @@
-import { useState } from 'react'
+import InputField from '../form/InputField'
+import { Link } from 'react-router-dom'
 
 const Login = () => {
-    const [email, setEmail] = useState('')
-    const [password, setPassword] = useState("")
-    const [passwordConfirmation, setPasswordConfirmation] = useState("")
-
-    const handleSubmit = (event) => {
-       
-    }
-
     return (
-        <div>
-            <form>
-                <input 
-                    type="email"
-                    name="email"
-                    placeholder="Enter Email"
-                    value={ email }
-                    onChange={(e) => setEmail(e.target.value)} />
+        <div className="card shadow p-3 m-5">
+            <h1 className="display-1 font-weight-bold text-center mt-5">Login</h1>
+                <form>
+                    <InputField name="Email" placeholder="Enter email"/>
+
+                    <InputField name="Password" placeholder="Enter password" />
                 
-                <input 
-                    type="password"
-                    name="password"
-                    placeholder="Enter password"
-                    value={ password }
-                    onChange={(e) => setPassword(e.target.value)} />
-
-                <input 
-                    type="confirmPassword"
-                    name="password"
-                    placeholder="Confirm password"
-                    value={ passwordConfirmation }
-                    onChange={(e) => setPasswordConfirmation(e.target.value)} />
-
-                <input 
-                    type="submit"
-                    name="submitBTN" />
-            </form>
-        </div>
+                    <Link to='/dashboard' className="submitButton btn btn-light px-4 shadow-sm border mb-5 d-flex justify-content-center" name="submitBTN">Login</Link>
+                </form>
+            </div>
     )
 }
 
