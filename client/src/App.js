@@ -1,23 +1,21 @@
 import React from "react";
-import logo from "./banana_PNG835.png";
 import "./App.css";
-import Login from "./components/auth/Login";
-import { Route } from "react-router-dom";
-import { Redirect } from 'react-router'
+import Login from "./components/pages/Login";
+import Dashboard from "./components/pages/Dashboard";
+import { Navigate, Routes, Route, BrowserRouter } from "react-router-dom";
 
 function App() {
-  const [data, setData] = React.useState(null);
-
-  React.useEffect(() => {
-    fetch("/api")
-      .then((res) => res.json())
-      .then((data) => setData(data.message));
-  }, []);
-
   return (
     <div className="container">
-      <Login/>
-      <Route exact path="/" render={() => (<Redirect to="/login"/>)}></Route>
+      <BrowserRouter>
+      <Navigate to="/login" />
+        <Routes>
+          <Route exact path="/" >
+            <Route path="login" element={<Login />} />
+            <Route path="dashboard" element={<Dashboard />} />
+          </Route>
+        </Routes>
+    </BrowserRouter>
     </div>
   );
 }
