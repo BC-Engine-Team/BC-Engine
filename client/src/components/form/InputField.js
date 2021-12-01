@@ -12,7 +12,7 @@ const InputField = (props) => {
     }
 
     return (
-        <div className="form-group m-5">
+        <div className="form-group">
             <label className="pb-2" for={state.name}>{state.name}</label>
             <input 
                 className="form-control"
