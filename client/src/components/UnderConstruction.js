@@ -2,7 +2,7 @@ import { useState } from 'react'
 import logo from '../Images/underConstruction.gif'
 
 const UnderConstruction = (props) => {
-    const [state] = useState(props)
+    const [state] = useState(props);
 
     return (
         <div className="text-center">

@@ -1,6 +1,6 @@
 import React from 'react'
-import NavB from '../NavB'
-import UnderConstruction from '../UnderConstruction'
+import UnderConstruction from '../components/UnderConstruction'
+import NavB from '../components/NavB'
 
 const Reports = () => {
     return (

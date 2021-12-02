@@ -1,15 +1,16 @@
 import React from "react";
 import "./App.css";
-import Login from "./components/pages/Login";
-import Dashboard from "./components/pages/Dashboard";
-import Reports from "./components/pages/Reports";
-import Users from "./components/pages/Users";
-import Manage from "./components/pages/Manage";
+import Dashboard from "./pages/Dashboard";
+import Reports from "./pages/Reports";
+import Users from "./pages/Users";
+import Manage from "./pages/Manage";
 import { Navigate, Routes, Route, BrowserRouter } from "react-router-dom";
+import Login from "./pages/Login";
 
 function App() {
   return (
     <div>
+      {/* Routes to pages */}
       <BrowserRouter>
         <Routes>
           <Route exact path="/" element={<Navigate replace to="login" />}/>
@@ -25,4 +26,3 @@ function App() {
 }
 
 export default App;
-// element={<Navigate replace to="login" />}
