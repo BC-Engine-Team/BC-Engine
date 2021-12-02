@@ -4,8 +4,8 @@ import Dashboard from "./pages/Dashboard";
 import Reports from "./pages/Reports";
 import Users from "./pages/Users";
 import Manage from "./pages/Manage";
-import { Navigate, Routes, Route, BrowserRouter } from "react-router-dom";
 import Login from "./pages/Login";
+import { Navigate, Routes, Route, BrowserRouter } from "react-router-dom";
 
 function App() {
   return (

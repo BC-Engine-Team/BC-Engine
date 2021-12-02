@@ -9,17 +9,28 @@ import { useNavigate } from 'react-router-dom'
 
 const Login = () => {
     const [validated, setValidated] = useState(false);
-    const [change, setChange] = useState({email: "a@a.com", password: "0"});
-    
-    let form = undefined;
-    let navigate = useNavigate();
 
+    const [change, setChange] = useState({
+        email: "a@a.com",
+        password: "0"
+    });
+
+    const [errorMessage] = useState({
+        email: "This field cannot be empty!",
+        password: "This field cannot be empty!",
+    })
+
+    let navigate = useNavigate();
+    
     const handleSubmit = (event) => {
-      form = event.currentTarget;
-      if (form.checkValidity() === false) {
-        event.preventDefault();
-        event.stopPropagation();
-      }
+        const form = event.currentTarget;
+        if (form.checkValidity() === false) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
+        else {
+            navigate("/dashboard");
+        }
 
       setValidated(true);
     };
@@ -42,14 +53,7 @@ const Login = () => {
                         noValidate 
                         className="mt-5 mx-5" 
                         validated={validated} 
-                        onSubmit={(e) => {
-
-                            if (e.checkValidity() === true){
-                                navigate(`/dashboard`);
-                            }
-
-                            handleSubmit(e);
-                        }}>
+                        onSubmit={handleSubmit}>
 
                         <Form.Group className="mb-4" controlId="floatingEmail">
                             <FloatingLabel controlId="floatingEmail" label="Email address" className="mb-3" >
@@ -61,7 +65,7 @@ const Login = () => {
                                 />
 
                                 <Form.Control.Feedback type="invalid">
-                                    Please provide a valid email.
+                                    {errorMessage.email}
                                 </Form.Control.Feedback>
                             </FloatingLabel>
                         </Form.Group>
@@ -76,7 +80,7 @@ const Login = () => {
                                 />
 
                                 <Form.Control.Feedback type="invalid">
-                                    Please provide a valid password.
+                                    {errorMessage.password}
                                 </Form.Control.Feedback>
                             </FloatingLabel>
                         </Form.Group>
@@ -87,15 +91,12 @@ const Login = () => {
                                 className="btn btn-light py-1 px-5 shadow-sm border submitButton">
                                 Login
                             </Button>
-                            {/* <Link to='/dashboard' type="submit" className="btn btn-light py-1 px-5 shadow-sm border submitButton">Login</Link> */}
                         </div>
 
                     </Form>
                 </div>
             </div>
-        </div>
-
-        
+        </div>  
     )
 }
 
