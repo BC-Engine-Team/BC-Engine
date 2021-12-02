@@ -1,7 +1,7 @@
 import { useState } from 'react'
 
 const InputField = (props) => {
-    const [state, setState] = useState(props)
+    const [state, setState] = useState(props);
     
     const handleChange = (val) => {
         setState({
@@ -13,8 +13,9 @@ const InputField = (props) => {
 
     return (
         <div className="form-group">
-            <label className="pb-2" for={state.name}>{state.name}</label>
+            <label className="pb-2" htmlFor={state.name}>{state.name}</label>
             <input 
+                required
                 className="form-control"
                 type={state.name}
                 name={state.name}

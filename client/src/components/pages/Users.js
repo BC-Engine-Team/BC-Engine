@@ -2,13 +2,13 @@ import React from 'react'
 import NavB from '../NavB'
 import UnderConstruction from '../UnderConstruction'
 
-const Dashboard = () => {
+const Users = () => {
     return (
         <div>
             <NavB />
-            <UnderConstruction pageName="Dashboard"/>
+            <UnderConstruction pageName="Users"/>
         </div>
     )
 }
 
-export default Dashboard
+export default Users

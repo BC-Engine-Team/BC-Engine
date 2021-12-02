@@ -17,6 +17,7 @@
   "license": "ISC",
   "dependencies": {
     "concurrently": "^6.4.0",
-    "express": "^4.17.1"
+    "express": "^4.17.1",
+    "react-router-bootstrap": "^0.26.0"
   }
 }
