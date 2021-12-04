@@ -8,7 +8,7 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\"",
-    "start": "docker-compose up -d && cd server && node app.js",
+    "start": "docker-compose up -d && timeout 8 && cd server && node app.js",
     "start-all": "concurrently \"cd client && npm start\" \"cd server && node app.js\"",
     "build": "npm install && cd client && npm install && npm run build"
   },
