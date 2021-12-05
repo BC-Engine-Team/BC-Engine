@@ -1,6 +1,7 @@
 version: '3.8'
 
 services:
+
   mysqldb:
     image: mysql/mysql-server
     restart: always
@@ -14,6 +15,7 @@ services:
       - db-config:/etc/mysql
       - ./dump.sql:/docker-entrypoint-initdb.d/
       - ./db/backup/files/:/data_backup/data
+    
   
 volumes:
   db-config:
