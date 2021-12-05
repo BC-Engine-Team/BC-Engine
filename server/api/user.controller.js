@@ -46,3 +46,63 @@ exports.findAll = (req, res) => {
             });
         });
 };
+
+exports.findAdmins = (req, res) => {
+    User.getAdmins()
+        .then(data => {
+            res.send(data);
+        })
+        .catch(err => {
+            res.status(500).send({
+                message: err.message || "Some erro occured while fetching admins."
+            });
+        });
+};
+
+// Begining of Authenticate a user
+exports.authenticateUserWithEmail = (req, res) => {
+    const user = req.body;
+    return new Promise((resolve, reject) => {
+        try {
+            User.findOne({
+            where: {
+                user_email: user.email 
+            }
+        })
+        .then(async (response) => {
+            if (!response) {
+                res.status(500).send({
+                    message: "Some error occured while authenticating."
+                });
+                resolve(false);
+
+            } else {
+                if (!response.dataValues.password || 
+                    !await response.validPassword(user.password, 
+                    response.dataValues.password)) {
+                        res.status(401).send({
+                            message: "Failed to authenticate."
+                        });
+                        resolve(false);
+                } else {
+                    res.send(response.dataValues)
+                    resolve(response.dataValues)
+                }
+            }
+        })
+        } catch (error) {
+            const response = {
+                status: 500,
+                data: {},
+                error: {
+                    message: error.message || "user match failed"
+                }
+            };
+            res.status(500).send(response);
+            reject(response);
+        }
+    });
+
+    
+};
+

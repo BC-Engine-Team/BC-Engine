@@ -13,7 +13,6 @@ module.exports = (sequelize, DataTypes) => {
         email: {
             field: 'user_email',
             type: DataTypes.STRING,
-            
             allowNull: false
         },
         password: {
@@ -28,6 +27,46 @@ module.exports = (sequelize, DataTypes) => {
             field: 'user_role',
             type: DataTypes.STRING
         }
-    });
+        
+    },
+    {
+        hooks: {
+            beforeCreate: async (user) => {
+                if(user.password){
+                    const salt = await bcrypt.genSaltSync(10, 'a');
+                    user.password = bcrypt.hashSync(user.password, salt);
+                }
+            },
+            beforeUpdate:async (user) => {
+                if(user.password){
+                    const salt = await bcrypt.genSaltSync(10, 'a');
+                    user.password = bcrypt.hashSync(user.password, salt);
+                }
+            }
+        },
+        instanceMethods: {
+            validatePassword: (password) => {
+                return bcrypt.compareSync(password, this.password);
+            },
+            getAdmins: () => {
+                return this.findAll({
+                    where: {
+                        role: 'admin'
+                    }
+                });
+            }
+        }
+    }
+    );
+    User.prototype.validPassword = async (password, hash) => {
+        return await bcrypt.compareSync(password, hash);    
+    }
+    User.prototype.getAdmins = function(){
+        return this.findAll({
+            where: {
+                role: 'admin'
+            }
+        });
+    }
     return User;
 };
