@@ -47,16 +47,19 @@ exports.findAll = (req, res) => {
         });
 };
 
-exports.findAdmins = (req, res) => {
-    User.getAdmins()
-        .then(data => {
-            res.send(data);
-        })
-        .catch(err => {
-            res.status(500).send({
-                message: err.message || "Some erro occured while fetching admins."
-            });
-        });
+// fetch all users with admin role
+exports.getAdmins = (req, res) => {
+    User.findAll({
+        where: {
+            role: 'admin'
+        }
+    })
+    .then((data) => {
+        res.send(data);
+    })
+    .catch((err) => {
+        console.log(err);
+    });
 };
 
 // Begining of Authenticate a user

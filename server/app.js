@@ -13,13 +13,41 @@ app.use(bodyParser.urlencoded({extended: true}));
 
 // Initializing Sequelize (ORM) to create users table
 const mysqldb = require("./data_access_layer/mysqldb");
+const User = mysqldb.users;
+
 mysqldb.sequelize.sync()
-  .catch(err =>{
+  .then((data) => {
+    console.log("Table and model synced successfully!: " + data);
+    return User.bulkCreate([
+      {
+        email: 'first@benoit-cote.com', 
+        password: 'verySecurePassword', 
+        name: 'Marc Benoit', 
+        role: 'admin'
+      },
+      {
+        email: 'second@benoit-cote.com', 
+        password: 'verySecurePassword', 
+        name: 'JC Benoit', 
+        role: 'employee'
+      }],
+      {
+        validate: true,
+        individualHooks: true
+      });
+  })
+  .then((data) => {
+    data.forEach((e) => {
+      console.log(e.toJSON());
+    });
+  })
+  .catch((err) =>{
     if(err){
       console.log(err.message);
       console.log(err.stack);
     }
-  })
+  });
+
 
 
 // Handles GET requests on '{HOST}:{PORT}/api'

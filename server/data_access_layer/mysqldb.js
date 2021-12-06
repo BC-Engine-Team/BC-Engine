@@ -11,18 +11,15 @@ const sequelize = new Sequelize(myDbConfig.DB, myDbConfig.USER, myDbConfig.PASSW
     min: myDbConfig.pool.min,
     acquire: myDbConfig.pool.acquire,
     idle: myDbConfig.pool.idle
-  },
-  dialectOptions: {
-    useUTC: false
   }
 });
-console.log("in mysqldb.js" );
 
 const db = {};
 
 db.Sequelize = Sequelize;
 db.sequelize = sequelize;
 
+// Add any tables to the database here
 db.users = require("./models/user.model")(sequelize, Sequelize);
 
 module.exports = db;

@@ -13,7 +13,8 @@ module.exports = (sequelize, DataTypes) => {
         email: {
             field: 'user_email',
             type: DataTypes.STRING,
-            allowNull: false
+            allowNull: false,
+            unique: true
         },
         password: {
             field: 'user_password',
@@ -47,13 +48,6 @@ module.exports = (sequelize, DataTypes) => {
         instanceMethods: {
             validatePassword: (password) => {
                 return bcrypt.compareSync(password, this.password);
-            },
-            getAdmins: () => {
-                return this.findAll({
-                    where: {
-                        role: 'admin'
-                    }
-                });
             }
         }
     }
@@ -61,12 +55,6 @@ module.exports = (sequelize, DataTypes) => {
     User.prototype.validPassword = async (password, hash) => {
         return await bcrypt.compareSync(password, hash);    
     }
-    User.prototype.getAdmins = function(){
-        return this.findAll({
-            where: {
-                role: 'admin'
-            }
-        });
-    }
+    
     return User;
 };

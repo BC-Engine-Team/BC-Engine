@@ -12,10 +12,12 @@ module.exports = app => {
     // Fetch all users
     router.get("/", users.findAll);
 
-    // 
+    // Authenticate user
     router.post("/authenticate", users.authenticateUserWithEmail);
 
+    // Fetch admins
     router.get("/admins", users.getAdmins);
 
+    
     app.use('/api/users', router);
 };
