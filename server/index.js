@@ -70,6 +70,28 @@ app.post("/register", (req, res) => {
     });
 });
 
+const verifyJWT = (req, res, next) => {
+    const token = req.headers["x-access-token"]
+
+    if(!token){
+        res.send("You need a valid token, please login again!");
+    }
+    else{
+        jwt.verify(token, "jwtSecret", (err, decoded) => {
+            if(err){
+                res.json({auth: false, message: "U failed to authenticate"});
+            }
+            else{
+                req.userId = decoded.id;
+                next();
+            }
+        });
+    }
+}
+
+app.get('/isUserAuth', verifyJWT, (req, res) => {
+    res.send("You are authenticated, congrats!!");
+});
 
 
 app.get("/login", (req, res) => {
@@ -80,7 +102,6 @@ app.get("/login", (req, res) => {
         res.send({loggedIn: false});
     }
 });
-
 
 
 
