@@ -1,6 +1,7 @@
 const path = require('path');
 const express = require("express");
 const bodyParser = require("body-parser");
+const users = require('./routes/user.routes');
 
 const PORT = process.env.PORT || 3001;
 
@@ -16,7 +17,7 @@ const mysqldb = require("./data_access_layer/mysqldb");
 const User = mysqldb.users;
 
 mysqldb.sequelize.sync()
-  .then((data) => {
+  .then( async (data) => {
     console.log("Table and model synced successfully!: " + data);
     return User.bulkCreate([
       {
@@ -57,12 +58,12 @@ app.get("/api", (req, res) => {
 
 
 // Temporary User routes CRUD?
-require("./api/user.routes")(app);
+app.use('/users', users);
 
 // Static endpoint (Delivery of the React SPA)
-app.get('*', (req, res) => {
-  res.sendFile(path.resolve(__dirname, '../../client/public', 'index.html'));
-});
+// app.get('*', (req, res) => {
+//   res.sendFile(path.resolve(__dirname, '../../client/public', 'index.html'));
+// });
 
 
 app.listen(PORT, () => {
