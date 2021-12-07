@@ -1,7 +1,7 @@
 {
   "name": "bcenginenodereactdemo",
   "version": "1.0.0",
-  "description": "",
+  "description": "This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).",
   "main": "index.js",
   "engines": {
     "node": "16.13.0"
@@ -10,13 +10,28 @@
     "test": "echo \"Error: no test specified\"",
     "start": "cd server && node app.js",
     "start-all": "concurrently \"cd client && npm start\" \"cd server && node app.js\"",
-    "build": "npm install && cd client && npm install && npm run build"
+    "build": "npm install && cd client && npm install && npm run build",
+    "devStart": "nodemon server/app.js",
+    "devStartAuth": "nodemon server/authServer.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
     "concurrently": "^6.4.0",
-    "express": "^4.17.1"
+    "dotenv": "^10.0.0",
+    "express": "^4.17.1",
+    "jsonwebtoken": "^8.5.1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Funnyadd/BC-Engine.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Funnyadd/BC-Engine/issues"
+  },
+  "homepage": "https://github.com/Funnyadd/BC-Engine#readme",
+  "devDependencies": {
+    "nodemon": "^2.0.15"
   }
 }
