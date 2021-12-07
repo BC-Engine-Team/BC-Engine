@@ -7,10 +7,11 @@
     "node": "16.13.0"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\"",
-    "start": "cd server && node app.js",
-    "start-dev": "docker-compose up -d && timeout 15 && cd server && nodemon app.js",
-    "start-all": "concurrently \"cd client && npm start\" \"cd server && node app.js\"",
+    "test": "jest --coverage",
+    "test:watch": "jest --watch",
+    "start": "cd server && node server.js",
+    "start-dev": "docker-compose up -d && timeout 15 && cd server && nodemon server.js",
+    "start-all": "concurrently \"cd client && npm start\" \"cd server && node server.js\"",
     "build": "npm install && cd client && npm install && npm run build"
   },
   "keywords": [],
@@ -29,6 +30,9 @@
     "sequelize": "^6.12.0-alpha.1"
   },
   "devDependencies": {
-    "nodemon": "^2.0.15"
+    "nodemon": "^2.0.15",
+    "jest": "^27.4.3",
+    "sequelize-mock": "^0.10.2",
+    "supertest": "^6.1.6"
   }
 }
