@@ -4,9 +4,8 @@ const Op = mysqldb.Sequelize.Op;
 
 // Create and Save a new User
 exports.create = (req, res) => {
-    // Validate request
-    console.log(req.body);
-    
+
+    // Validate request    
     if(!req.body.email){
         res.status(400).send({
             message: "Content cannot be empty."
@@ -58,7 +57,9 @@ exports.getAdmins = (req, res) => {
         res.send(data);
     })
     .catch((err) => {
-        console.log(err);
+        res.status(500).send({
+           message: err.message || "Some error occured while fetching admins." 
+        });
     });
 };
 

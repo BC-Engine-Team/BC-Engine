@@ -4,7 +4,7 @@ const User = mysqldb.users;
 module.exports = app => {
     const users = require("./user.controller");
 
-    var router = require("express").Router();
+    const router = require("express").Router();
 
     // Create new User
     router.post("/", users.create);
