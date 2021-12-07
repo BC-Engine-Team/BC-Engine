@@ -11,8 +11,7 @@
     "start": "cd server && node app.js",
     "start-all": "concurrently \"cd client && npm start\" \"cd server && node app.js\"",
     "build": "npm install && cd client && npm install && npm run build",
-    "devStart": "nodemon server/app.js",
-    "devStartAuth": "nodemon server/authServer.js"
+    "devStart": "nodemon server/authService.js"
   },
   "keywords": [],
   "author": "",
