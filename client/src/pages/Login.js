@@ -16,8 +16,8 @@ const Login = () => {
 
     const [InvalidCredential, setInvalidCredential] = useState("");
 
-    const [email, setEmail] = useState("first@benoit-cote.com");
-    const [password, setPassword] = useState("verySecurePassword");
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
 
     const [errorMessage] = useState({
         email: "This field cannot be empty!",
