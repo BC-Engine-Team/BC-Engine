@@ -55,7 +55,6 @@ exports.getAdmins = (req, res) => {
 exports.authenticateUserWithEmail = (req, res) => {
     const login = req.body;
     let authUser = {};
-    
 
     if(!login.email){
         res.status(400).send({
@@ -67,17 +66,26 @@ exports.authenticateUserWithEmail = (req, res) => {
     userService.authenticateUser(login)
         .then(response => {
             authUser = response;
+            if(!authUser) {
+                res.send({
+                    auth: false,
+                    message: "No user found"
+                });
+                return;
+            }
+
             var [accessToken, refreshToken] = authService.getTokens(authUser);
             res.send({
                 authenticatedUser: authUser,
                 aToken: accessToken,
-                rToken: refreshToken
+                rToken: refreshToken,
+                auth: true
             })
             return;
         })
         .catch(err => {
             res.status(500).send(err);
-        })
+        });
 };
 
 

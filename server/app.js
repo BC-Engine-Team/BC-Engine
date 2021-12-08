@@ -5,13 +5,24 @@ const logger = require('morgan');
 const users = require('./routes/user.routes');
 
 
-module.exports =  (database) => {
+module.exports = (database) => {
   const app = express();
 
   app.use(express.static(path.resolve(__dirname, '../client/build', 'index.html')));
   app.use(bodyParser.json());
   app.use(bodyParser.urlencoded({extended: true}));
   app.use(logger('dev'));
+
+  app.use(function(req, res, next) {
+    res.header('Access-Control-Allow-Origin', 'http://localhost:3000');
+    res.header('Access-Control-Allow-Credentials', true);
+    res.header('Access-Control-Allow-Methods', 'DELETE, PUT, POST, GET');
+    res.header(
+      'Access-Control-Allow-Headers',
+      'Origin, X-Requested-With, Content-Type, Accept'
+    );
+    next();
+  });
 
   // Initializing Sequelize (ORM) to create users table and fill it
   if(database){
@@ -28,8 +39,11 @@ module.exports =  (database) => {
   //   res.sendFile(path.resolve(__dirname, '../../client/public', 'index.html'));
   // });
 
-  // Temporary User routes CRUD?
+  // User routes CRUD
   app.use('/users', users);
 
   return app;
 };
+
+
+
