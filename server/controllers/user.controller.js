@@ -34,8 +34,6 @@ exports.create = (req, res) => {
 
 // Fetch all Users from db
 exports.findAll = (req, res) => {
-
-
     userService.getAllUsers()
         .then(response => {
             res.send(response);
@@ -71,7 +69,9 @@ exports.authenticateUserWithEmail = (req, res) => {
     userService.authenticateUser(login)
         .then(response => {
             authUser = response;
+            console.log(authUser);
             var [accessToken, refreshToken] = authService.getTokens(authUser);
+            console.log(accessToken);
             res.send({
                 authenticatedUser: authUser,
                 aToken: accessToken,
