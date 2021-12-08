@@ -3,9 +3,7 @@ const authService = require('../services/auth.service');
 
 // Create and Save a new User
 exports.create = (req, res) => {
-    // Validate request
-    console.log(req.body);
-    
+    // Validate request    
     if(!req.body.email){
         res.status(400).send({
             message: "Content cannot be empty."
@@ -24,7 +22,6 @@ exports.create = (req, res) => {
     // Call service to save User to db
     userService.createUser(user)
         .then(response => {
-            console.log(response);
             res.send(response);
         })
         .catch(err => {
@@ -64,6 +61,7 @@ exports.authenticateUserWithEmail = (req, res) => {
         res.status(400).send({
             message: "Content cannot be empty."
         });
+        return;
     }
 
     userService.authenticateUser(login)
@@ -79,13 +77,13 @@ exports.authenticateUserWithEmail = (req, res) => {
 
             console.log(authUser);
             var [accessToken, refreshToken] = authService.getTokens(authUser);
-            console.log(accessToken);
             res.send({
                 authenticatedUser: authUser,
                 aToken: accessToken,
                 rToken: refreshToken,
                 auth: true
             });
+            return;
         })
         .catch(err => {
             res.status(500).send(err);

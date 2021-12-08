@@ -24,10 +24,14 @@
     "cors": "^2.8.5",
     "dotenv": "^10.0.0",
     "express": "^4.17.1",
+    "faker": "^5.5.3",
+    "jest-cli": "^27.4.3",
     "jsonwebtoken": "^8.5.1",
+    "morgan": "^1.10.0",
     "mysql2": "^2.3.3",
     "react-router-bootstrap": "^0.26.0",
-    "sequelize": "^6.12.0-alpha.1"
+    "sequelize": "^6.12.0-alpha.1",
+    "sequelize-cli": "^6.3.0"
   },
   "devDependencies": {
     "nodemon": "^2.0.15",
