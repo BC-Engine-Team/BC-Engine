@@ -44,42 +44,33 @@ exports.authenticateToken = (req, res, next) => {
       return res.sendStatus(401);
     }
  
-    jwt.verify(token, ACCESS_TOKEN_SECRET, (err, user) => {
+    jwt.verify(token, ACCESS_TOKEN_SECRET, (err) => {
       if(err){
         return res.sendStatus(403);
       }
-      req.user = user;
       next();
     });
 };
 
-function checkToken(req){
-   
+exports.refreshToken = (req, res) => {
+    const refreshToken = req.body.token; 
+    if(refreshToken == null){
+        return res.sendStatus(401);
+    }
+    if(!refreshTokens.includes(refreshToken)){
+        return res.sendStatus(403);
+    }
+    jwt.verify(refreshToken, REFRESH_TOKEN_SECRET, (err, user) => {
+        if(err){
+        return res.sendStatus(403)
+        }
+        const accessToken = generateAccessToken({ email: user.email });
+        res.json({ accessToken: accessToken });
+    })
 };
 
-
-
-// post request to resend an accesstoken when the old access token is expired
-app.post('/token', (req, res) => {
-  const refreshToken = req.body.token; 
-  if(refreshToken == null){
-    return res.sendStatus(401);
-  }
-  if(!refreshTokens.includes(refreshToken)){
-    return res.sendStatus(403);
-  }
-  jwt.verify(refreshToken, REFRESH_TOKEN_SECRET, (err, user) => {
-    if(err){
-      return res.sendStatus(403)
-    }
-    const accessToken = generateAccessToken({ name: user.name });
-    res.json({ accessToken: accessToken });
-  })
-})
-
-
-// //request to log the user out and erase the token
-// app.delete('/logout', (req, res) => {
-//   refreshTokens = refreshTokens.filter(token => token != req.body.token)
-//   res.sendStatus(204)
-// });
+exports.logout = (req, res) => {
+    if(!req.body.token) res.sendStatus(400);
+    refreshTokens = refreshTokens.filter(t => t != req.body.token);
+    res.sendStatus(204);
+};

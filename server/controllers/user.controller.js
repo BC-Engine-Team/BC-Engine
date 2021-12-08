@@ -71,7 +71,6 @@ exports.authenticateUserWithEmail = (req, res) => {
     userService.authenticateUser(login)
         .then(response => {
             authUser = response;
-            console.log(authUser);
             var [accessToken, refreshToken] = authService.getTokens(authUser);
             res.send({
                 authenticatedUser: authUser,
@@ -82,7 +81,6 @@ exports.authenticateUserWithEmail = (req, res) => {
         .catch(err => {
             res.status(500).send(err);
         })
-
-    
 };
+
 
