@@ -75,10 +75,12 @@ exports.authenticateUserWithEmail = (req, res) => {
             res.send({
                 authenticatedUser: authUser,
                 aToken: accessToken,
-                rToken: refreshToken
+                rToken: refreshToken,
+                auth: true
             })
         })
         .catch(err => {
+            console.log(err);
             res.status(500).send(err);
         })
 };
