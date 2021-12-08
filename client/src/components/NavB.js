@@ -26,7 +26,7 @@ const NavB = (props) => {
 
         Axios.delete("http://localhost:3001/users/logout", {data: data, headers: {}})
         .then((response) => {
-            if(response.status == 204) {              
+            if(response.status === 204) {              
                 navigate("/login");
             }       
         });
@@ -69,7 +69,7 @@ const NavB = (props) => {
                     <Navbar.Collapse id="basic-navbar-nav">
 
                         { // if user is admin, show all tabs else, show only dsahboard and reports
-                        role == "admin" ?
+                        role === "admin" ?
                             <Nav className="me-auto">
                                 <LinkContainer to="/dashboard" className="px-2">
                                     <Nav.Link>Dashboard</Nav.Link>
