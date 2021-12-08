@@ -1,16 +1,20 @@
-//import { Link } from 'react-router-dom'
-import NavB from '../components/NavB'
-import Form from 'react-bootstrap/Form'
-import FloatingLabel from 'react-bootstrap/esm/FloatingLabel'
 import { useState } from 'react'
-import Button from 'react-bootstrap/Button'
 import { useNavigate } from 'react-router-dom'
 import Axios from 'axios'
+
+import NavB from '../components/NavB'
+
+import Form from 'react-bootstrap/Form'
+import FloatingLabel from 'react-bootstrap/esm/FloatingLabel'
+import Button from 'react-bootstrap/Button'
+import Alert from 'react-bootstrap/Alert'
+
 
 
 const Login = () => {
     const [validated, setValidated] = useState(false);
-    const [loginStatus, setLoginStatus] = useState(false)
+
+    const [InvalidCredential, setInvalidCredential] = useState("");
 
     const [email, setEmail] = useState("first@benoit-cote.com");
     const [password, setPassword] = useState("verySecurePassword");
@@ -24,38 +28,6 @@ const Login = () => {
 
     Axios.defaults.withCredentials = true;
 
-    const authentification = () => {
-        Axios.post("http://localhost:3001/users/authenticate", {
-            email: email,
-            password: password,
-        }).then((response) => {
-            console.log(response);
-            if(!response.data.auth) {
-                setLoginStatus(false);
-            } else {
-                localStorage.setItem("token", response.data.atoken)
-                setLoginStatus(true);
-            }
-        });
-    }
-
-    const userAuthentificated = () => {
-        Axios.get("http://localhost:3001/token", {headers: {
-
-        }}).then((response) => {
-            console.log(response);
-        })
-    }
-
-    const handleSubmits = () => {
-       
-        authentification();
-       
-
-        setValidated(true);
-        return false;
-    };
-   
     const handleSubmit = (event) => {
         const form = event.currentTarget;
         if (form.checkValidity() === false) {
@@ -63,8 +35,30 @@ const Login = () => {
             event.stopPropagation();
         }
         else {
-            authentification();
-            //navigate("/dashboard");
+            event.preventDefault();
+            
+            let data = {
+                email: email,
+                password: password,
+            }
+    
+            Axios.post("http://localhost:3001/users/authenticate", data)
+            .then((response) => {
+                console.log(response);
+
+                if(response.data.auth === true) {
+                    localStorage.setItem("accessToken", response.data.aToken);
+                    localStorage.setItem("refreshToken", response.data.rToken);
+                    localStorage.setItem("username", response.data.authenticatedUser.name);
+                    localStorage.setItem("role", response.data.authenticatedUser.role);
+
+                    navigate("/dashboard");
+                }
+                else
+                {
+                    setInvalidCredential("Incorrect email or password.");
+                }
+            });
         }
 
       setValidated(true);
@@ -83,7 +77,15 @@ const Login = () => {
                         className="mt-5 mx-5" 
                         validated={validated} 
                         onSubmit={handleSubmit}>
-
+                        
+                        {
+                            InvalidCredential.length > 0 ? 
+                            <Alert variant="danger">
+                                {InvalidCredential}
+                            </Alert> :
+                            <></>
+                        }
+                        
                         <Form.Group className="mb-4" controlId="floatingEmail">
                             <FloatingLabel controlId="floatingEmail" label="Email address" className="mb-3" >
                                 <Form.Control 
@@ -124,24 +126,6 @@ const Login = () => {
 
                     </Form>
                 </div>
-
-                <input  required
-                        type="email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}/>
-
-                <input  required 
-                        type="password" 
-                        value={password} 
-                        onChange={(e) => setPassword(e.target.value)} />
-                
-                <Button 
-                    type="submit" 
-                    onClick={handleSubmits}
-                    className="btn btn-light py-1 px-5 shadow-sm border submitButton">
-                    Login
-                </Button>
-                <h1>{loginStatus}</h1>
             </div>
         </div>  
     )

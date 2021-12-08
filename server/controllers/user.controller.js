@@ -69,6 +69,14 @@ exports.authenticateUserWithEmail = (req, res) => {
     userService.authenticateUser(login)
         .then(response => {
             authUser = response;
+            if(!authUser) {
+                res.send({
+                    auth: false,
+                    message: "No user found"
+                });
+                return;
+            }
+
             console.log(authUser);
             var [accessToken, refreshToken] = authService.getTokens(authUser);
             console.log(accessToken);
@@ -77,12 +85,11 @@ exports.authenticateUserWithEmail = (req, res) => {
                 aToken: accessToken,
                 rToken: refreshToken,
                 auth: true
-            })
+            });
         })
         .catch(err => {
-            console.log(err);
             res.status(500).send(err);
-        })
+        });
 };
 
 
