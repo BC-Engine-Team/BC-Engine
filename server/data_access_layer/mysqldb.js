@@ -22,8 +22,8 @@ db.sequelize = sequelize;
 // Add any tables to the database here
 db.users = require("./models/user.model")(sequelize, Sequelize);
 
-db.sync = () => {
-  db.sequelize.sync()
+db.sync = async () => {
+  await db.sequelize.sync({force: true})
     .then((data) => {
       return db.users.bulkCreate([
         {
