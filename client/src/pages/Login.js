@@ -1,19 +1,23 @@
-//import { Link } from 'react-router-dom'
+import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import Axios from 'axios'
+
 import NavB from '../components/NavB'
+
 import Form from 'react-bootstrap/Form'
 import FloatingLabel from 'react-bootstrap/esm/FloatingLabel'
-import { useState } from 'react'
 import Button from 'react-bootstrap/Button'
-import { useNavigate } from 'react-router-dom'
+import Alert from 'react-bootstrap/Alert'
+
 
 
 const Login = () => {
     const [validated, setValidated] = useState(false);
 
-    const [change, setChange] = useState({
-        email: "a@a.com",
-        password: "0"
-    });
+    const [InvalidCredential, setInvalidCredential] = useState("");
+
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
 
     const [errorMessage] = useState({
         email: "This field cannot be empty!",
@@ -21,7 +25,9 @@ const Login = () => {
     })
 
     let navigate = useNavigate();
-    
+
+    Axios.defaults.withCredentials = true;
+
     const handleSubmit = (event) => {
         const form = event.currentTarget;
         if (form.checkValidity() === false) {
@@ -29,18 +35,35 @@ const Login = () => {
             event.stopPropagation();
         }
         else {
-            navigate("/dashboard");
+            event.preventDefault();
+            
+            let data = {
+                email: email,
+                password: password,
+            }
+    
+            Axios.post("http://localhost:3001/users/authenticate", data)
+            .then((response) => {
+                console.log(response);
+
+                if(response.data.auth === true) {
+                    localStorage.setItem("accessToken", response.data.aToken);
+                    localStorage.setItem("refreshToken", response.data.rToken);
+                    localStorage.setItem("username", response.data.authenticatedUser.name);
+                    localStorage.setItem("role", response.data.authenticatedUser.role);
+
+                    navigate("/dashboard");
+                }
+                else
+                {
+                    setInvalidCredential("Incorrect email or password.");
+                }
+            });
         }
 
       setValidated(true);
+      return false;
     };
-
-    const handleChange = (mail, pass) => {
-        setChange({
-            email : mail,
-            password : pass,
-        })
-    }
 
     return (
         <div>
@@ -54,14 +77,22 @@ const Login = () => {
                         className="mt-5 mx-5" 
                         validated={validated} 
                         onSubmit={handleSubmit}>
-
+                        
+                        {
+                            InvalidCredential.length > 0 ? 
+                            <Alert variant="danger">
+                                {InvalidCredential}
+                            </Alert> :
+                            <></>
+                        }
+                        
                         <Form.Group className="mb-4" controlId="floatingEmail">
                             <FloatingLabel controlId="floatingEmail" label="Email address" className="mb-3" >
                                 <Form.Control 
                                     required
                                     type="email"
-                                    value={change.email}
-                                    onChange={(e) => handleChange(e.target.value, change.password)}
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
                                 />
 
                                 <Form.Control.Feedback type="invalid">
@@ -75,8 +106,8 @@ const Login = () => {
                                 <Form.Control 
                                     required 
                                     type="password" 
-                                    value={change.password} 
-                                    onChange={(e) => handleChange(change.email, e.target.value)}
+                                    value={password} 
+                                    onChange={(e) => setPassword(e.target.value)}
                                 />
 
                                 <Form.Control.Feedback type="invalid">

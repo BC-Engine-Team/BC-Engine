@@ -49,8 +49,6 @@ mysqldb.sequelize.sync()
     }
   });
 
-
-
 // Handles GET requests on '{HOST}:{PORT}/api'
 app.get("/api", (req, res) => {
     res.json({ message: "Hello from B&C Engine!" });
