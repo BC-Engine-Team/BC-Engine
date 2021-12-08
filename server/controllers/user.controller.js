@@ -67,7 +67,7 @@ exports.authenticateUserWithEmail = (req, res) => {
         .then(response => {
             authUser = response;
             if(!authUser) {
-                res.send({
+                res.status(401).send({
                     auth: false,
                     message: "No user found"
                 });
