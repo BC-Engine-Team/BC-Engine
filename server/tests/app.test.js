@@ -7,6 +7,7 @@ const getUsers = jest.fn();
 
 const dbMock = new SequelizeMock();
 const mysqldb = require('../data_access_layer/mysqldb');
+const { response } = require('express');
 
 const app = makeApp(mysqldb);
 
@@ -18,16 +19,20 @@ describe("Test API endpoints", () => {
         await mysqldb.sync();
     });
 
+    afterEach(() => {
+        process.exit;
+    });
+
     describe("GET /api", () => {
 
-        test("should respond with a 200 status code", async () => {
-            const response = await request.get("/api");
-            expect(response.statusCode).toBe(200);
+        test("should respond with a 200 status code", () => {
+            return request.get("/api").expect(200);
         });
     
-        test("should specify json in the context type header", async () => {
-            const response = await request.get("/api");
-            expect(response.headers['content-type']).toEqual(expect.stringContaining("json"));
+        test("should specify json in the context type header", () => {
+            return request.get("/api")
+                .then(res => expect(res.headers['content-type'])
+                .toEqual(expect.stringContaining("json")));
         });
     
         test("response should have message", async () => {
@@ -79,19 +84,19 @@ describe("Test API endpoints", () => {
         });
 
         describe("given non existent email or wrong password", () => {
-            test("should respond with 500 status code", async () => {
+            test("should respond with 401 status code", async () => {
                 const response = await request.post("/users/authenticate").send({
                     email: "first@benoit-cote.co",
                     password: "verySecurePassword"
                 });
-                expect(response.statusCode).toBe(500);
+                expect(response.statusCode).toBe(401);
             });
-            test("should respond with 500 status code", async () => {
+            test("should respond with 401 status code", async () => {
                 const response = await request.post("/users/authenticate").send({
                     email: "first@benoit-cote.com",
                     password: "verySecurePasswor"
                 });
-                expect(response.statusCode).toBe(500);
+                expect(response.statusCode).toBe(401);
             });
         });
 
@@ -109,7 +114,6 @@ describe("Test API endpoints", () => {
 
         describe("given no email", () => {
             test("should return 400 and message", async () => {
-                await mysqldb.sequelize.drop();
                 const response = await request.post("/users/authenticate").send({
                     
                     password: "verySecurePassword"
