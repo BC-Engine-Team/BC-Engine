@@ -70,7 +70,7 @@ const Login = () => {
         <NavB page="login"/>
             <div className="container">
                 <div className="card shadow p-3 m-5">
-                    <h1 className="display-1 font-weight-bold text-center mt-5">Login</h1>
+                    <h1 className="display-1 font-weight-bold text-center mt-5 mb-4">Login</h1>
                     
                     <Form 
                         noValidate 
@@ -119,7 +119,7 @@ const Login = () => {
                         <div className="d-flex justify-content-center mt-5 mb-4">
                             <Button 
                                 type="submit" 
-                                className="btn btn-light py-1 px-5 shadow-sm border submitButton">
+                                className="btn btn-light py-2 px-5 my-1 shadow-sm border submitButton">
                                 Login
                             </Button>
                         </div>
