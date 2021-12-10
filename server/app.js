@@ -2,7 +2,7 @@ const path = require('path');
 const express = require("express");
 const bodyParser = require("body-parser");
 const logger = require('morgan');
-const users = require('./routes/user.routes');
+const userRoutes = require('./routes/user.routes');
 
 
 module.exports =  (database) => {
@@ -42,6 +42,9 @@ module.exports =  (database) => {
   // app.get('*', (req, res) => {
   //   res.sendFile(path.resolve(__dirname, '../../client/public', 'index.html'));
   // });
+
+  // User routes CRUD
+  app.use('/users', userRoutes);
 
   return app;
 };

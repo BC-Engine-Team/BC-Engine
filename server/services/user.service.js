@@ -3,7 +3,7 @@ const mysqldb = require("../data_access_layer/mysqldb");
 const User = mysqldb.users;
 const Op = mysqldb.Sequelize.Op;
 
-exports.createUser = (user) => {
+exports.createUser = async (user) => {
     return new Promise((resolve, reject) => {
         User.create(user)
             .then(async data => {
@@ -24,7 +24,7 @@ exports.createUser = (user) => {
     
 };
 
-exports.getAllUsers = () => {
+exports.getAllUsers = async () => {
     return new Promise((resolve, reject) => {
         User.findAll()
             .then(async data => {
@@ -44,7 +44,7 @@ exports.getAllUsers = () => {
     });
 };
 
-exports.getAdmins = () => {
+exports.getAdmins = async () => {
     return new Promise((resolve, reject) => {
         User.findAll({
             where: {
@@ -68,7 +68,7 @@ exports.getAdmins = () => {
     });
 };
 
-exports.authenticateUser = (user) => {
+exports.authenticateUser = async (user) => {
     return new Promise((resolve, reject) => {
         User.findOne({
             where: {
