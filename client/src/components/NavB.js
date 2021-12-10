@@ -99,7 +99,7 @@ const NavB = (props) => {
                             <Navbar.Text className="me-3">
                                 Hello, {username}
                             </Navbar.Text>
-                            <Nav.Link onClick={logout}>Sign out</Nav.Link>
+                            <Nav.Link id="sign_out" onClick={logout}>Sign out</Nav.Link>
                         </Nav>
 
                     </Navbar.Collapse>
