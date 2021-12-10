@@ -2,7 +2,8 @@ const userService = require('../services/user.service');
 const authService = require('../services/auth.service');
 
 // Create and Save a new User
-exports.create = (req, res) => {
+exports.create = async (req, res) => {
+    console.log(req.body.email);
     // Validate request    
     if(!req.body.email){
         res.status(400).send({
@@ -20,7 +21,7 @@ exports.create = (req, res) => {
     };
 
     // Call service to save User to db
-    userService.createUser(user)
+    await userService.createUser(user)
         .then(response => {
             res.send(response);
         })
@@ -30,7 +31,7 @@ exports.create = (req, res) => {
 };
 
 // Fetch all Users from db
-exports.findAll = (req, res) => {
+exports.findAll = async (req, res) => {
     userService.getAllUsers()
         .then(response => {
             res.send(response);
@@ -41,7 +42,7 @@ exports.findAll = (req, res) => {
 };
 
 // fetch all users with admin role
-exports.getAdmins = (req, res) => {
+exports.getAdmins = async (req, res) => {
     userService.getAdmins()
         .then(response => {
             res.send(response);
@@ -52,7 +53,7 @@ exports.getAdmins = (req, res) => {
 };
 
 // Begining of Authenticate a user
-exports.authenticateUserWithEmail = (req, res) => {
+exports.authenticateUserWithEmail = async (req, res) => {
     const login = req.body;
     let authUser = {};
 
