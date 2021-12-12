@@ -181,7 +181,6 @@ describe("Test UserController", () => {
                 userSpy = jest.spyOn(UserService, 'authenticateUser')
                 .mockRejectedValue(new Error("Error with the user service"));
                 const response = await request.post("/users/authenticate").send(reqUser);
-                console.log(response);
                 expect(response.statusCode).toBe(500);
                 expect(response.error.text).toBe("Error with the user service");
                 

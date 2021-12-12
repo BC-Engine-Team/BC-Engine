@@ -8,9 +8,10 @@ let refreshTokens = []
 
 exports.getTokens = (user) => {
     // Generate JWTs for the authenticated user
-    const accessToken = jwt.sign(user, process.env.ACCESS_TOKENSECRET, {expiresIn: '20s'});
+    const accessToken = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, {expiresIn: '20s'});
     const refreshToken = jwt.sign(user, process.env.REFRESH_TOKEN_SECRET);
   
+
     //it acts as the database for the token, of course it is going to be different
     refreshTokens.push(refreshToken);
   
@@ -27,7 +28,6 @@ exports.authenticateToken = async (req, res, next) => {
 
     jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
       if(err){
-        console.log("still in the real implementation")
         return res.sendStatus(403);
       }
       req.user = user;
@@ -65,6 +65,7 @@ exports.logout = async (req, res) => {
     res.sendStatus(204);
 };
 
+// for testing purposes
 exports.setRefreshTokens = (rToken) => {
   refreshTokens = [rToken];
 };
