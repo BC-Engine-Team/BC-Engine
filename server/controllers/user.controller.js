@@ -3,13 +3,14 @@ const authService = require('../services/auth.service');
 
 // Create and Save a new User
 exports.create = async (req, res) => {
-    console.log(req.body.email);
+    if(!req.user.role === "admin") return res.status(403).send();
+    
     // Validate request    
     if(!req.body.email){
-        res.status(400).send({
+        return res.status(400).send({
             message: "Content cannot be empty."
         });
-        return;
+        
     }
 
     // Create a User
@@ -23,16 +24,17 @@ exports.create = async (req, res) => {
     // Call service to save User to db
     await userService.createUser(user)
         .then(response => {
-            res.send(response);
+            return res.send(response);
         })
         .catch(err => {
-            res.status(500).send(err);
+            return res.send(err);
         });
 };
 
 // Fetch all Users from db
 exports.findAll = async (req, res) => {
-    userService.getAllUsers()
+    if(!req.user.role === "admin") res.status(403).send();
+    await userService.getAllUsers()
         .then(response => {
             res.send(response);
         })
@@ -43,7 +45,8 @@ exports.findAll = async (req, res) => {
 
 // fetch all users with admin role
 exports.getAdmins = async (req, res) => {
-    userService.getAdmins()
+    if(!req.user.role === "admin") res.status(403).send();
+    await userService.getAdmins()
         .then(response => {
             res.send(response);
         })
@@ -54,38 +57,38 @@ exports.getAdmins = async (req, res) => {
 
 // Begining of Authenticate a user
 exports.authenticateUserWithEmail = async (req, res) => {
-    const login = req.body;
+    const user = req.body;
     let authUser = {};
 
-    if(!login.email){
+    if(!user.email){
         res.status(400).send({
             message: "Content cannot be empty."
         });
         return;
     }
 
-    userService.authenticateUser(login)
+    await userService.authenticateUser(user)
         .then(response => {
             authUser = response;
-            if(!authUser) {
-                res.status(401).send({
+            if(authUser == null || !authUser) {
+                return res.status(401).send({
                     auth: false,
                     message: "No user found"
                 });
-                return;
             }
 
             var [accessToken, refreshToken] = authService.getTokens(authUser);
-            res.send({
+            return res
+            .header('authorization', refreshToken)
+            .send({
                 authenticatedUser: authUser,
                 aToken: accessToken,
-                rToken: refreshToken,
                 auth: true
             })
-            return;
         })
         .catch(err => {
-            res.status(500).send(err);
+            console.log(err);
+            return res.status(500).send(err.message);
         });
 };
 

@@ -1,4 +1,3 @@
-const { response } = require("express");
 const mysqldb = require("../data_access_layer/mysqldb");
 const User = mysqldb.users;
 const Op = mysqldb.Sequelize.Op;

@@ -34,14 +34,14 @@ module.exports = (sequelize, DataTypes) => {
         hooks: {
             beforeCreate: async (user) => {
                 if(user.password){
-                    const salt = await bcrypt.genSaltSync(10, 'a');
-                    user.password = bcrypt.hashSync(user.password, salt);
+                    const salt = await bcrypt.genSalt(10, 'a');
+                    user.password = await bcrypt.hash(user.password, salt);
                 }
             },
             beforeUpdate:async (user) => {
                 if(user.password){
-                    const salt = await bcrypt.genSaltSync(10, 'a');
-                    user.password = bcrypt.hashSync(user.password, salt);
+                    const salt = await bcrypt.genSalt(10, 'a');
+                    user.password = await bcrypt.hash(user.password, salt);
                 }
             }
         },
@@ -53,7 +53,7 @@ module.exports = (sequelize, DataTypes) => {
     }
     );
     User.prototype.validPassword = async (password, hash) => {
-        return await bcrypt.compareSync(password, hash);    
+        await bcrypt.compare(password, hash);    
     }
     
     return User;
