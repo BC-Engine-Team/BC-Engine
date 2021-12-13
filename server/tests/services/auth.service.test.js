@@ -2,7 +2,6 @@ const makeApp = require('../../app');
 const AuthService = require('../../services/auth.service');
 const UserService = require('../../services/user.service');
 const jwt = require('jsonwebtoken');
-const { NextFunction, Request, Response } = require('express');
 
 var { expect, jest } = require('@jest/globals');
 const supertest = require('supertest');
