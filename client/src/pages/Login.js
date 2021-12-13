@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Axios from 'axios'
+import Cookies from 'universal-cookie'
 
 import NavB from '../components/NavB'
 
@@ -47,10 +48,11 @@ const Login = () => {
                 console.log(response);
 
                 if(response.data.auth === true) {
-                    localStorage.setItem("accessToken", response.data.aToken);
-                    localStorage.setItem("refreshToken", response.data.rToken);
-                    localStorage.setItem("username", response.data.authenticatedUser.name);
-                    localStorage.setItem("role", response.data.authenticatedUser.role);
+                    const cookies = new Cookies();
+                    cookies.set("accessToken", response.data.aToken, {path: "/", expires: new Date(new Date().getTime() + 15 * 60 * 1000), httpOnly: true});
+                    cookies.set("refreshToken", response.data.rToken, {path: "/", httpOnly: true});
+                    cookies.set("username", response.data.authenticatedUser.name, {path: "/", httpOnly: true});
+                    cookies.set("role", response.data.authenticatedUser.role, {path: "/", httpOnly: true});
 
                     navigate("/dashboard");
                 }

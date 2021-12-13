@@ -6,25 +6,36 @@ import logo from '../Images/logo.png'
 import { useState } from 'react'
 import Axios from 'axios'
 import { useNavigate } from 'react-router-dom'
+import Cookies from 'universal-cookie'
 
 const NavB = (props) => {
     const [page] = useState(props);
+    const cookies = new Cookies();
 
-    let username = localStorage.getItem("username");
-    let role = localStorage.getItem("role");
+    let username;
+    let role;
+
+    if (page.page !== "login") {
+        username = cookies.get("username");
+        role = cookies.get("role");
+    }
 
     Axios.defaults.withCredentials = true;
 
     let navigate = useNavigate();
 
     const logout = () => {
-        let refreshToken = localStorage.getItem("refreshToken");
+        let refreshToken = cookies.get("refreshToken");
+        cookies.remove("refreshToken");
+        cookies.remove("accessToken");
+        cookies.remove("username");
+        cookies.remove("role");
 
-        let data = {
-            token: refreshToken
+        let header = {
+            data: refreshToken
         }
 
-        Axios.delete("http://localhost:3001/users/logout", {data: data, headers: {}})
+        Axios.delete("http://localhost:3001/users/logout", {data: header, headers: {}})
         .then((response) => {
             if(response.status === 204) {              
                 navigate("/login");
