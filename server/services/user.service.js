@@ -4,8 +4,10 @@ const Op = mysqldb.Sequelize.Op;
 
 exports.createUser = async (user) => {
     return new Promise((resolve, reject) => {
+        console.log(user);
         User.create(user)
             .then(async data => {
+                console.log("in User model promise" + data.dataValues);
                 if(data) resolve(data.dataValues);
                 resolve(false);
             })

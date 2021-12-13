@@ -10,7 +10,6 @@ exports.create = async (req, res) => {
         return res.status(400).send({
             message: "Content cannot be empty."
         });
-        
     }
 
     // Create a User
