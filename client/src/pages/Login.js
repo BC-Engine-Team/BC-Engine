@@ -25,6 +25,8 @@ const Login = () => {
         password: "This field cannot be empty!",
     })
 
+    const cookies = new Cookies();
+
     let navigate = useNavigate();
 
     Axios.defaults.withCredentials = true;
@@ -48,11 +50,16 @@ const Login = () => {
                 console.log(response);
 
                 if(response.data.auth === true) {
-                    const cookies = new Cookies();
-                    cookies.set("accessToken", response.data.aToken, {path: "/", expires: new Date(new Date().getTime() + 15 * 60 * 1000), httpOnly: true});
-                    cookies.set("refreshToken", response.data.rToken, {path: "/", httpOnly: true});
-                    cookies.set("username", response.data.authenticatedUser.name, {path: "/", httpOnly: true});
-                    cookies.set("role", response.data.authenticatedUser.role, {path: "/", httpOnly: true});
+
+                    let aToken = response.data.aToken.toString();
+                    let rToken = response.data.rToken.toString();
+                    let username = response.data.authenticatedUser.name.toString();
+                    let role = response.data.authenticatedUser.role.toString();
+                   
+                    cookies.set("accessToken", aToken, {path: "/", expires: new Date(new Date().getTime() + 15 * 60 * 1000)});
+                    cookies.set("refreshToken", rToken, {path: "/"});
+                    cookies.set("username", username, {path: "/"});
+                    cookies.set("role", role, {path: "/"});
 
                     navigate("/dashboard");
                 }

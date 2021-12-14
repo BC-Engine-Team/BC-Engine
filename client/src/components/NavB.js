@@ -26,21 +26,28 @@ const NavB = (props) => {
 
     const logout = () => {
         let refreshToken = cookies.get("refreshToken");
-        cookies.remove("refreshToken");
-        cookies.remove("accessToken");
-        cookies.remove("username");
-        cookies.remove("role");
 
-        let header = {
-            data: refreshToken
+        if(refreshToken == undefined) {
+            navigate("/login");
         }
-
-        Axios.delete("http://localhost:3001/users/logout", {data: header, headers: {}})
-        .then((response) => {
-            if(response.status === 204) {              
-                navigate("/login");
-            }       
-        });
+        else {
+            cookies.remove("refreshToken");
+            cookies.remove("accessToken");
+            cookies.remove("username");
+            cookies.remove("role");
+    
+            let header = {
+                token: refreshToken
+            }
+    
+            Axios.delete("http://localhost:3001/users/logout", {data: header, headers: {}})
+            .then((response) => {
+                if(response.status === 204) {              
+                    navigate("/login");
+                }       
+            });
+        }
+        
     }
 
     //For Login page navBar
