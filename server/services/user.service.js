@@ -1,5 +1,5 @@
 const mysqldb = require("../data_access_layer/mysqldb");
-const User = mysqldb.users;
+const User = mysqldb['mysqldb'].users;
 const Op = mysqldb.Sequelize.Op;
 
 exports.createUser = async (user) => {

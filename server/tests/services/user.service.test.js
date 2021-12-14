@@ -1,7 +1,7 @@
 const UserService = require('../../services/user.service');
 const AuthService = require('../../services/auth.service');
-const mysqldb = require("../../data_access_layer/mysqldb");
-const UserModel = mysqldb.users;
+const databases = require("../../data_access_layer/mysqldb");
+const UserModel = databases['mysqldb'].users;
 
 var { expect, jest } = require('@jest/globals');
 

@@ -16,8 +16,29 @@ module.exports = (database) => {
   
   // Initializing Sequelize (ORM) to create users table and fill it
   if(database){
-    database.sync();
+    database.sync('mysqldb');
+
+    database['mssql_pat'].employees.findAll()
+      .then(async data => {
+        if(data){   
+          console.log(data);  
+        } 
+        console.log("NO DATA");
+      })
+      .catch(err =>{
+        const response = {
+            status: 500,
+            data: {},
+            error: {
+                message: err.message || "some error occured"
+            }
+        }
+        console.log(response);
+    });
   }
+
+  
+
   app.use(function(req, res, next) {
     res.header('Access-Control-Allow-Origin', 'http://localhost:3000');
     res.header('Access-Control-Allow-Credentials', true);
