@@ -14,69 +14,48 @@ import { mdiPencilOutline } from '@mdi/js';
 import Axios from 'axios';
 
 const Users = () => {
-
+    let counter = 0;
     let navigate = useNavigate();
     const cookies = new Cookies();
 
-    const [users, 
-        //setUsers - for future use
-    ] = useState([
-        {
-            id: 1,
-            name: "Jean",
-            email: "Jean@benoit-cote.com",
-            role: "admin"
-        },
-        {
-            id: 2,
-            name: "Josee",
-            email: "Josee@benoit-cote.com",
-            role: "employee"
-        },
-        {
-            id: 3,
-            name: "Josee",
-            email: "Josee@benoit-cote.com",
-            role: "employee"
-        },
-        {
-            id: 4,
-            name: "Josee",
-            email: "Josee@benoit-cote.com",
-            role: "employee"
-        },
-        {
-            id: 5,
-            name: "Josee",
-            email: "Josee@benoit-cote.com",
-            role: "employee"
-        },
-        {
-            id: 6,
-            name: "Josee",
-            email: "Josee@benoit-cote.com",
-            role: "employee"
-        },
-        {
-            id: 7,
-            name: "Josee",
-            email: "Josee@benoit-cote.com",
-            role: "employee"
-        },
-    ]);
-
-    
+    const [users, setUsers] = useState([{name: "", email: "", role: ""}]);
 
     const handleAddUser = () => {
-        
     }
 
     const handleEditUser = (email) => {
-
+       
     }
 
     const handleDeleteUser = (email) => {
+        
+    }
 
+    const handleRefresh = () => {
+        let header = {
+            'authorization': "Bearer " + cookies.get("accessToken")
+        }
+    
+        Axios.defaults.withCredentials = true;
+    
+        Axios.get("http://localhost:3001/users/", {headers: header})
+        .then((response) => {
+            console.log(response.data);
+            setUsers(response.data)
+        })
+        .catch((error) => {
+            if(error.response) {
+                if(error.response.status === 403 || error.response.status === 401) {
+                    console.log(error.response.satus + " - Error trying to reach B&C Engine");
+                }
+                else {
+                    console.log("Could not reach b&C Engine...");
+                }
+            }
+            else if(error.request) {
+                console.log("Could not reach b&C Engine...");
+            }
+        });
     }
 
     useEffect(() => {
@@ -87,17 +66,10 @@ const Users = () => {
             navigate("/dashboard");
         } 
 
-        let header = {
-            'authorization': "Bearer " + cookies.get("accessToken")
-        }
-    
-        Axios.defaults.withCredentials = true;
-    
-        Axios.get("http://localhost:3001/users/", {headers: header})
-        .then((response) => {
-            console.log(response);
-        });
-    });
+        handleRefresh();        
+
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
 
     return (
@@ -107,7 +79,8 @@ const Users = () => {
                 <div className="card shadow m-5">
                     <Table responsive="xl">
                         <thead className='bg-light'>
-                            <tr>
+                            <tr key="0">
+
                                 <th>
                                     <div className="justify-content-center d-flex">
                                         #
@@ -125,20 +98,25 @@ const Users = () => {
                                         </Button>
                                     </div>
                                 </th>
+
                             </tr>
                         </thead>
-                        <tbody style={{height: 50}} className='overflow-scroll'>
+
+                        <tbody>
                             {users.map (u => {
+                                counter++;
                                 return (
-                                    <tr>
-                                        <td >
+                                    <tr key={counter}>
+
+                                        <td>
                                             <div className="justify-content-center d-flex">
-                                                {u.id}
+                                                {counter}
                                             </div>
                                         </td>
                                         <td>{u.name}</td>
                                         <td>{u.email}</td>
                                         <td>{u.role}</td>
+
                                         <td className="py-1">
                                             <div className="d-flex justify-content-center">
                                                 <button className="btnEdit btn-edit" onClick={handleEditUser(u.email)}>
@@ -154,6 +132,7 @@ const Users = () => {
                                                         size={1}
                                                         horizontal/>
                                                 </button>
+
                                                 <button className="btnDelete btn-delete" onClick={handleDeleteUser(u.email)}>
                                                     <Icon path={mdiDelete} 
                                                         className="mdi mdi-delete" 
@@ -169,8 +148,9 @@ const Users = () => {
                                                 </button>
                                             </div>
                                         </td>
+
                                     </tr>
-                                )
+                                );
                             })}
                         </tbody>
                     </Table>

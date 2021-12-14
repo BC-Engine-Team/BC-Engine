@@ -16,7 +16,8 @@ const Manage = () => {
         else if(cookies.get("role") !== "admin") {
             navigate("/dashboard");
         } 
-    });
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     return (
         <div>

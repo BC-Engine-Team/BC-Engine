@@ -1,0 +1,28 @@
+.card-users {
+  
+  >.mdi-second {
+    display: none;
+  }
+
+  >.mdi-main {
+    display: block;
+  }
+  
+  &:hover {
+    background-color: lighten($edit-blue, 45%);
+    
+    >.mdi-edit-empty {
+      display: inline-block;
+    }
+    
+    >.mdi-edit {
+      display: none;
+    }
+  }
+  
+
+  
+  &:focus {
+    box-shadow: 0 0 0 4px lighten(rgb(13, 109, 253), 40%);
+  }
+}

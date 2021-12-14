@@ -28,7 +28,7 @@ $edit-blue: rgb(13, 109, 253);
   }
   
   &:hover {
-    background-color: lighten($edit-blue, 45%);
+    background-color: lighten(rgb(13, 109, 253), 45%);
     
     >.mdi-edit-empty {
       display: block;
