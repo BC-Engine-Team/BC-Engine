@@ -1,41 +1,44 @@
+//const dotenv = require('dotenv').config();
+
 const jwt = require('jsonwebtoken');
-require('dotenv').config();
 
-// should reference variables in .env
-const ACCESS_TOKEN_SECRET="773ab1b4d3e80db2d7ab5b227e28d4007985017a165fad9bd602692d8302ee23a9b8f8d2d29b65c375a9d8673a8bada595a5c72c776352fb9eac74c756680db9";
-const REFRESH_TOKEN_SECRET="c208182c162568cb40fba6ee43762c47d2b9d7689b4c2dfec7020213f79e8a855e6f1d2aeb2d65da21b5c564e7950d4ea6cfb579416ccf570c9ee87dc5c119ea";
+const ACCESS_TOKEN_SECRET="5a31e2610f69c20c60ca6956fd2d3aadb29d61dfb87f6a90216b5792c27a57782dd6b9a19c46c3b54b1ba286d7e0b5d85fbc362503f7175679b9df57734f5e85"
+const REFRESH_TOKEN_SECRET="d984a56cb27b7275cc0c5feb27d17eab945b935f775455537db8c25b8aaa45f4c66b5e1d009d90c13249b33a0172416612aff8555b3f40a27203b40a0a5ede92"
 
+// Refresh tokens should be stored in the db  or 
+//the expiry date of each user's refresh token can be stored with the user
 let refreshTokens = []
 
 exports.getTokens = (user) => {
-    //Authenticate the user
-    const accessToken = generateAccessToken(user);
+    // Generate JWTs for the authenticated user
+    const accessToken = jwt.sign(user, ACCESS_TOKEN_SECRET, {expiresIn: '900s'});
     const refreshToken = jwt.sign(user, REFRESH_TOKEN_SECRET);
-    console.log(accessToken)
   
+
     //it acts as the database for the token, of course it is going to be different
     refreshTokens.push(refreshToken);
   
     return [accessToken, refreshToken];
 };
 
-exports.authenticateToken = (req, res, next) => {
+exports.authenticateToken = async (req, res, next) => {
     const authHeader = req.headers['authorization'];
     const token = authHeader && authHeader.split(' ')[1];
  
     if(token == null){
-      return res.sendStatus(401);
+      return res.sendStatus(403);
     }
- 
-    jwt.verify(token, ACCESS_TOKEN_SECRET, (err) => {
+
+    jwt.verify(token, ACCESS_TOKEN_SECRET, (err, user) => {
       if(err){
-        return res.sendStatus(403);
+        return res.sendStatus(401);
       }
+      req.user = user;
       next();
     });
 };
 
-exports.refreshToken = (req, res) => {
+exports.refreshToken = async (req, res) => {
     const refreshToken = req.body.token; 
     if(refreshToken == null){
         return res.sendStatus(401);
@@ -43,22 +46,29 @@ exports.refreshToken = (req, res) => {
     if(!refreshTokens.includes(refreshToken)){
         return res.sendStatus(403);
     }
-    jwt.verify(refreshToken, REFRESH_TOKEN_SECRET, (err, user) => {
+    jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, user) => {
         if(err){
-          res.sendStatus(403);
+          return res.sendStatus(403);
         }
         const accessToken = generateAccessToken({ email: user.email });
-        res.json({ accessToken: accessToken });
-    })
+        return res.json({ accessToken: accessToken });
+    });
 };
 
-exports.logout = (req, res) => {
-    if(!req.body.token) res.sendStatus(400);
-    refreshTokens = refreshTokens.filter(t => t != req.body.token);
-    res.sendStatus(204);
+exports.logout = async (req, res) => {
+    const authHeader = req.headers['authorization'];
+    const token = authHeader && authHeader.split(' ')[1];
+
+    if(token == null || !refreshTokens.find(t => t == token)){
+      return res.sendStatus(403);
+    }
+    refreshTokens = refreshTokens.filter(t => t != token);
+
+    return res.sendStatus(204);
 };
 
-//function to generate the access token
-function generateAccessToken(user){
-  return jwt.sign(user, ACCESS_TOKEN_SECRET, { expiresIn: '900s'} );
-}
+// for testing purposes
+exports.setRefreshTokens = (rToken) => {
+  refreshTokens = [rToken];
+};
+
