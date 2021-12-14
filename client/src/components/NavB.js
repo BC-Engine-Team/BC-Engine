@@ -6,7 +6,6 @@ import logo from '../Images/logo.png'
 import { useState } from 'react'
 import Axios from 'axios'
 import { useNavigate } from 'react-router-dom'
-import { config } from 'dotenv'
 
 const NavB = (props) => {
     const [page] = useState(props);
