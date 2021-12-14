@@ -19,8 +19,9 @@ module.exports = (database) => {
     res.header('Access-Control-Allow-Methods', 'DELETE, PUT, POST, GET');
     res.header(
       'Access-Control-Allow-Headers',
-      'Origin, X-Requested-With, Content-Type, Accept'
+      'Origin, X-Requested-With, Content-Type, Accept, Authorization'
     );
+    res.header('Access-Control-Expose-Headers', 'Authorization');
     next();
   });
 

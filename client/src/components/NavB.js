@@ -6,6 +6,7 @@ import logo from '../Images/logo.png'
 import { useState } from 'react'
 import Axios from 'axios'
 import { useNavigate } from 'react-router-dom'
+import { config } from 'dotenv'
 
 const NavB = (props) => {
     const [page] = useState(props);
@@ -19,16 +20,22 @@ const NavB = (props) => {
 
     const logout = () => {
         let refreshToken = localStorage.getItem("refreshToken");
+        
 
-        let data = {
-            token: refreshToken
-        }
+        let conf = {
+            headers: {
+                authorization: "Bearer " + refreshToken
+            }
+        };
 
-        Axios.delete("http://localhost:3001/users/logout", {data: data, headers: {}})
+        Axios.delete("http://localhost:3001/users/logout", conf)
         .then((response) => {
             if(response.status === 204) {              
                 navigate("/login");
             }       
+        })
+        .catch((error) => {
+            console.log(error);
         });
     }
 
