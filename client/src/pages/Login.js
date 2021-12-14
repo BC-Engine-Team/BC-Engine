@@ -48,7 +48,7 @@ const Login = () => {
 
                 if(response.data.auth === true) {
                     localStorage.setItem("accessToken", response.data.aToken);
-                    localStorage.setItem("refreshToken", response.headers['authorization']);
+                    localStorage.setItem("refreshToken", response.data.rToken);
                     localStorage.setItem("username", response.data.authenticatedUser.name);
                     localStorage.setItem("role", response.data.authenticatedUser.role);
 
@@ -58,18 +58,6 @@ const Login = () => {
                 {
                     setInvalidCredential("Incorrect email or password.");
                 }
-            })
-            .catch((error) => {
-                if (error.response) {
-                    if(error.response.status === 403 || error.response.status === 401){
-                        setInvalidCredential("Incorrect email or password.");
-                    }
-                  } else if (error.request) {
-                    // The request was made but no response was received
-                    // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
-                    // http.ClientRequest in node.js
-                    setInvalidCredential("Could not reach B&C Engine...");
-                  }
             });
         }
 

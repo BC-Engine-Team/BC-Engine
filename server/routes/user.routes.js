@@ -21,7 +21,7 @@ router.post("/refresh", authService.refreshToken);
 router.delete("/logout", authService.logout);
 
 // Send users modification 
-router.put("/modify", authService);
+//router.put("/modify", authService);
 
 // Delete user selected
 //router.delete("/users/delete/{id}");

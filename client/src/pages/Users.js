@@ -6,7 +6,6 @@ import Table from 'react-bootstrap/Table'
 import NavB from '../components/NavB'
 
 import Form from 'react-bootstrap/Form'
-import FloatingLabel from 'react-bootstrap/esm/FloatingLabel'
 import Button from 'react-bootstrap/Button'
 import Alert from 'react-bootstrap/Alert'
 
@@ -25,21 +24,28 @@ const Users = () => {
         email: "This field cannot be empty!",
         newPassword: "This field cannot be empty!",
         confirmNewPassword: "This field cannot be empty!",
-        role: "You need to select a role"
+        role: "You need to select a role!"
     });
 
-    Axios.defaults.withCredentials = true;
+
+    //Axios.defaults.withCredentials = true;
 
     const onSubmitModification = (event) => {
         const form = event.currentTarget;
-        if(form.checkValidity() === false){
-            event.preventDefault();
-            event.stopPropagation();
-        }
-        else
+        if(form.checkValidity() === false || !email.endsWith("benoit-cote.com") || newPassword.localeCompare(confirmNewPassword))
         {
             event.preventDefault();
-
+            event.stopPropagation();
+            if(!/^@benoit-cote.com$/.test(email) && email.length > 0){
+                errorMessage.email = "This is not the correct email format"
+            }
+            if(newPassword != confirmNewPassword){
+                errorMessage.confirmNewPassword = "Please, make sure that the confirm password is the same as the new password entered above"
+            }
+        }
+        
+        else
+        {
             let user = {
                 email: email,
                 newPassword: newPassword,
@@ -47,31 +53,27 @@ const Users = () => {
                 role: role
             };
 
-            Axios.put("http://localhost:3001/users/modify/{email}", user).then((response) =>{
+            Axios.put("http://localhost:3001/users/modify", user).then((response) =>{
 
                 if(response.data === true)
                 {
                     console.log("User modified successfully!");
                 }
-                else
-                {
-                    setInvalidCredential("Incorrect email address")
-                    console.log("Incorrect email address");
-                }
-
                 console.log(response)
                 })
                 .catch((error) => {
                     if(error.response){
-                        if(error.response.status === 401){
-                            setInvalidCredential("Unauthorized");
+                        if(error.response.status === 401 || error.response.status === 403){
+                            setInvalidCredential("Incorrect email address");
                         }
                     }
-                });
-            
-                setValidated(true);
-                return false;
-        }   
+                    else if(error.request){
+                        setInvalidCredential("Can't send the request to modify the user");
+                    }
+                });        
+        }  
+        setValidated(true);
+        return false; 
     }
         
 
@@ -119,12 +121,11 @@ const Users = () => {
 
             <div className="container">
                 <div className="card shadow p-3 m-5">
+
                     <Form noValidate 
                           className="mt-5 mx-5" 
                           validated={validated}
-                          onSubmit={onSubmitModification}
-                          
-                          >
+                          onSubmit={onSubmitModification}>
 
                         {
                             InvalidCredential.length > 0 ? 
@@ -136,7 +137,7 @@ const Users = () => {
 
 
                         <Form.Group className="mb-4" controlId="floatingEmail">
-                            <FloatingLabel controlId="floatingEmail" label="Email" className="mb-3" >
+                            <Form.Label>Email</Form.Label>
                                 <Form.Control 
                                     required
                                     type="email"
@@ -147,12 +148,12 @@ const Users = () => {
                                 <Form.Control.Feedback type="invalid">
                                     {errorMessage.email}
                                 </Form.Control.Feedback>
-                            </FloatingLabel>
+                            
                         </Form.Group>
 
 
                         <Form.Group className="mb-5" controlId="floatingNewPassword">
-                            <FloatingLabel controlId="floatingNewPassword" label="New Password" className="mb-3" >
+                            <Form.Label>New Password</Form.Label>
                                 <Form.Control 
                                     required 
                                     type="password" 
@@ -163,12 +164,12 @@ const Users = () => {
                                 <Form.Control.Feedback type="invalid">
                                     {errorMessage.newPassword}
                                 </Form.Control.Feedback>
-                            </FloatingLabel>
+                            
                         </Form.Group>
 
 
                         <Form.Group className="mb-4" controlId="floatingConfirmNewPassword">
-                            <FloatingLabel controlId="floatingConfirmNewPassword" label="Confirm New Password" className="mb-3" >
+                            <Form.Label>Confirm New Password</Form.Label>
                                 <Form.Control 
                                     required
                                     type="password"
@@ -179,7 +180,6 @@ const Users = () => {
                                 <Form.Control.Feedback type="invalid">
                                     {errorMessage.confirmNewPassword}
                                 </Form.Control.Feedback>
-                            </FloatingLabel>
                         </Form.Group>
 
 
@@ -191,7 +191,7 @@ const Users = () => {
                                              value={role} 
                                              onChange={(e) => setRole(e.target.value)}>
 
-                                    <option>Select Role</option>
+                                    <option value="">Select User</option>
                                     <option value="Admin">Admin</option>
                                     <option value="User">User</option>
                                 </Form.Select>
