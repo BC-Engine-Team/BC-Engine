@@ -1,5 +1,4 @@
 import React from "react";
-import "./App.css";
 import Dashboard from "./pages/Dashboard";
 import Reports from "./pages/Reports";
 import Users from "./pages/Users";
