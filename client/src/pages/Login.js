@@ -61,7 +61,6 @@ const Login = () => {
                     cookies.set("username", username, {path: "/"});
                     cookies.set("role", role, {path: "/"});
 
-
                     navigate("/dashboard");
                 }
                 else
