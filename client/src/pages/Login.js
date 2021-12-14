@@ -52,7 +52,7 @@ const Login = () => {
                 if(response.data.auth === true) {
 
                     let aToken = response.data.aToken.toString();
-                    let rToken = response.data.rToken.toString();
+                    let rToken = response.headers['authorization'].toString();
                     let username = response.data.authenticatedUser.name.toString();
                     let role = response.data.authenticatedUser.role.toString();
                    
@@ -61,12 +61,25 @@ const Login = () => {
                     cookies.set("username", username, {path: "/"});
                     cookies.set("role", role, {path: "/"});
 
+
                     navigate("/dashboard");
                 }
                 else
                 {
                     setInvalidCredential("Incorrect email or password.");
                 }
+            })
+            .catch((error) => {
+                if (error.response) {
+                    if(error.response.status === 403 || error.response.status === 401){
+                        setInvalidCredential("Incorrect email or password.");
+                    }
+                  } else if (error.request) {
+                    // The request was made but no response was received
+                    // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
+                    // http.ClientRequest in node.js
+                    setInvalidCredential("Could not reach B&C Engine...");
+                  }
             });
         }
 

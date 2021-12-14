@@ -36,18 +36,22 @@ const NavB = (props) => {
             cookies.remove("username");
             cookies.remove("role");
     
-            let header = {
-                token: refreshToken
-            }
+            let conf = {
+                headers: {
+                    authorization: "Bearer " + refreshToken
+                }
+            };
     
-            Axios.delete("http://localhost:3001/users/logout", {data: header, headers: {}})
+            Axios.delete("http://localhost:3001/users/logout", conf)
             .then((response) => {
                 if(response.status === 204) {              
                     navigate("/login");
                 }       
+            })
+            .catch((error) => {
+                console.log(error);
             });
         }
-        
     }
 
     //For Login page navBar
