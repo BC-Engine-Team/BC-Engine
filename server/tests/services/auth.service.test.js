@@ -18,7 +18,7 @@ const resUser = {
     role: "admin",
     updatedAt: new Date("2020-12-20"),
     createdAt: new Date("2020-12-20")
-}
+};
 
 const reqUser = {
     email: "valid@email.com",
@@ -72,7 +72,7 @@ describe("authenticateToken", () => {
             const userSpy = jest.spyOn(UserService, 'getAllUsers')
                 .mockImplementation(() => new Promise((resolve) => {
                     resolve(resUser);
-            }));
+                }));
 
             const [aToken, rToken] = AuthService.getTokens(resUser);
 
@@ -89,7 +89,7 @@ describe("authenticateToken", () => {
             const response = await request.get("/users")
                 .set("authorization", `Bearer invalidToken`);
             expect(response.status).toBe(401);
-
+        });
         it("should return 403 Forbidden", async () =>{
             const response = await request.get("/users")
                 .set("authorization", `invalidToken`);
