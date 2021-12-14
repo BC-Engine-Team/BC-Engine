@@ -69,20 +69,25 @@ exports.authenticateUserWithEmail = async (req, res) => {
 
     await userService.authenticateUser(user)
         .then(response => {
-            authUser = response;
-            if(authUser == null || !authUser) {
+            if(response == null || !response) {
                 return res.status(401).send({
                     auth: false,
                     message: "No user found"
                 });
             }
 
-            console.log(authUser);
+            authUser = response.dataValues;
             var [accessToken, refreshToken] = authService.getTokens(authUser);
+
+            const returnUser = {
+                email: authUser.email,
+                name: authUser.name,
+                role: authUser.role
+            };
             return res
             .header('authorization', refreshToken)
             .send({
-                authenticatedUser: authUser,
+                authenticatedUser: returnUser,
                 aToken: accessToken,
                 auth: true
             });

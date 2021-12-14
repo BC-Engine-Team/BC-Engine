@@ -8,11 +8,12 @@ router.post("/", authService.authenticateToken, users.create);
 
 // Fetch all users with authentication
 router.get("/", authService.authenticateToken, users.findAll);
+
 // Authenticate user
 router.post("/authenticate", users.authenticateUserWithEmail);
 
 // Fetch admins
-router.get("/admins", users.getAdmins);
+router.get("/admins",  authService.authenticateToken, users.getAdmins);
 
 // Refresh JWT
 router.post("/refresh", authService.refreshToken);
