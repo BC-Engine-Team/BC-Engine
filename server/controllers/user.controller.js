@@ -74,6 +74,7 @@ exports.authenticateUserWithEmail = async (req, res) => {
                     message: "No user found"
                 });
             }
+
             authUser = response.dataValues;
             var [accessToken, refreshToken] = authService.getTokens(authUser);
 
@@ -89,7 +90,6 @@ exports.authenticateUserWithEmail = async (req, res) => {
                 aToken: accessToken,
                 auth: true
             });
-            return;
         })
         .catch(err => {
             return res.status(500).send(err.message);
