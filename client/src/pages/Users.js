@@ -11,6 +11,7 @@ import { mdiDeleteEmpty } from '@mdi/js';
 import { mdiDelete } from '@mdi/js';
 import { mdiPencil } from '@mdi/js';
 import { mdiPencilOutline } from '@mdi/js';
+import Axios from 'axios';
 
 const Users = () => {
 
@@ -64,6 +65,8 @@ const Users = () => {
         },
     ]);
 
+    
+
     const handleAddUser = () => {
         
     }
@@ -83,6 +86,17 @@ const Users = () => {
         else if(cookies.get("role") !== "admin") {
             navigate("/dashboard");
         } 
+
+        let header = {
+            'authorization': "Bearer " + cookies.get("accessToken")
+        }
+    
+        Axios.defaults.withCredentials = true;
+    
+        Axios.get("http://localhost:3001/users/", {headers: header})
+        .then((response) => {
+            console.log(response);
+        });
     });
 
 
