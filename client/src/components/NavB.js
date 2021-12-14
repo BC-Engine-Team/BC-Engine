@@ -27,7 +27,7 @@ const NavB = (props) => {
     const logout = () => {
         let refreshToken = cookies.get("refreshToken");
 
-        if(refreshToken == undefined) {
+        if (refreshToken === undefined) {
             navigate("/login");
         }
         else {
