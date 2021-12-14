@@ -13,13 +13,15 @@ const reqUser = {
 };
 
 const resUser = {
-    userId: "validUUID",
-    email: "valid@email.com",
-    password: "validPassword",
-    name: "validName",
-    role: "admin",
-    updatedAt: new Date("2020-12-20"),
-    createdAt: new Date("2020-12-20")
+    dataValues: {
+        userId: "validUUID",
+        email: "valid@email.com",
+        password: "validPassword",
+        name: "validName",
+        role: "validRole",
+        updatedAt: new Date("2020-12-20"),
+        createdAt: new Date("2020-12-20")
+    }
 }
 
 describe("createUser", () => {
@@ -30,7 +32,11 @@ describe("createUser", () => {
                     resolve(resUser);
                 }));
             const serviceResponse = await UserService.createUser(reqUser);
-            console.log(serviceResponse);
+            expect(serviceResponse).toEqual({
+                email: resUser.dataValues.email,
+                name: resUser.dataValues.name,
+                role: resUser.dataValues.role
+            });
         })
     });
 });

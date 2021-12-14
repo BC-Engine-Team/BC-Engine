@@ -28,6 +28,18 @@ const resUser = {
     createdAt: new Date("2020-12-20")
 };
 
+const resUser2 = {
+    dataValues: {
+        userId: "validUUID",
+        email: "valid@email.com",
+        password: "validPassword",
+        name: "validName",
+        role: "validRole",
+        updatedAt: new Date("2020-12-20"),
+        createdAt: new Date("2020-12-20")
+    }
+};
+
 
 var sandbox = sinon.createSandbox();
 auth = require('../../services/auth.service');
@@ -98,7 +110,7 @@ describe("Test UserController", () => {
             it("(C2.1.1): should respond with 200 status code", async () => {
                 userSpy = jest.spyOn(UserService, 'authenticateUser')
                     .mockImplementation(() => new Promise((resolve) => {
-                        resolve(true);
+                        resolve(resUser2);
                     }));
                 const response = await request.post("/users/authenticate")
                     .send(reqUser);

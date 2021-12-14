@@ -35,9 +35,6 @@ module.exports =  (database) => {
     res.json({ message: "Hello from B&C Engine!" });
   });
 
-  // Temporary User routes CRUD?
-  app.use('/users', users);
-
   // Static endpoint (Delivery of the React SPA)
   // app.get('*', (req, res) => {
   //   res.sendFile(path.resolve(__dirname, '../../client/public', 'index.html'));

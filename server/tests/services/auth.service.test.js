@@ -85,10 +85,10 @@ describe("authenticateToken", () => {
     });
 
     describe("given invalid token in header", () =>{
-        it("should return 403 Forbidden", async () =>{
+        it("should return 401 Forbidden", async () =>{
             const response = await request.get("/users")
                 .set("authorization", `Bearer invalidToken`);
-            expect(response.status).toBe(403);
+            expect(response.status).toBe(401);
         });
 
         it("should return 403 Forbidden", async () =>{

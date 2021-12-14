@@ -58,7 +58,6 @@ exports.getAdmins = async (req, res) => {
 exports.authenticateUserWithEmail = async (req, res) => {
     const user = req.body;
     let authUser = {};
-    
 
     if(!user.email){
         res.status(400).send({
@@ -75,7 +74,6 @@ exports.authenticateUserWithEmail = async (req, res) => {
                     message: "No user found"
                 });
             }
-
             authUser = response.dataValues;
             var [accessToken, refreshToken] = authService.getTokens(authUser);
 
