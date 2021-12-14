@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Axios from 'axios'
+import Cookies from 'universal-cookie'
 
 import NavB from '../components/NavB'
 
@@ -23,6 +24,8 @@ const Login = () => {
         email: "This field cannot be empty!",
         password: "This field cannot be empty!",
     })
+
+    const cookies = new Cookies();
 
     let navigate = useNavigate();
 
@@ -47,10 +50,16 @@ const Login = () => {
                 console.log(response);
 
                 if(response.data.auth === true) {
-                    localStorage.setItem("accessToken", response.data.aToken);
-                    localStorage.setItem("refreshToken", response.data.rToken);
-                    localStorage.setItem("username", response.data.authenticatedUser.name);
-                    localStorage.setItem("role", response.data.authenticatedUser.role);
+
+                    let aToken = response.data.aToken.toString();
+                    let rToken = response.headers['authorization'].toString();
+                    let username = response.data.authenticatedUser.name.toString();
+                    let role = response.data.authenticatedUser.role.toString();
+                   
+                    cookies.set("accessToken", aToken, {path: "/", expires: new Date(new Date().getTime() + 15 * 60 * 1000)});
+                    cookies.set("refreshToken", rToken, {path: "/"});
+                    cookies.set("username", username, {path: "/"});
+                    cookies.set("role", role, {path: "/"});
 
                     navigate("/dashboard");
                 }

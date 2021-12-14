@@ -1,10 +1,9 @@
-import { useState } from 'react'
-import Axios from 'axios'
-
-import React from 'react'
 import Table from 'react-bootstrap/Table'
+import React, { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import Cookies from 'universal-cookie'
 import NavB from '../components/NavB'
-
+import Axios from 'axios'
 import Form from 'react-bootstrap/Form'
 import Button from 'react-bootstrap/Button'
 import Alert from 'react-bootstrap/Alert'
@@ -77,6 +76,17 @@ const Users = () => {
     }
         
 
+    let navigate = useNavigate();
+    const cookies = new Cookies();
+
+    useEffect(() => {
+        if (cookies.get("accessToken") === undefined) {
+            navigate("/login");
+        }
+        else if(cookies.get("role") !== "admin") {
+            navigate("/dashboard");
+        } 
+    });
 
     return (
         <div>
