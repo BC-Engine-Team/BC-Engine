@@ -135,6 +135,8 @@ describe("Test UserController", () => {
                 const response = await supertest(app).get("/users");
 
                 expect(response.status).toBe(200);
+                expect(userSpy).toHaveBeenCalledTimes(1);
+                expect(JSON.stringify(response.body)).toEqual(JSON.stringify(ListUser));
             });
         });
     });

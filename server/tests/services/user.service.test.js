@@ -78,7 +78,6 @@ describe("View All Users", () => {
             ));
 
             const serviceResponse = await UserService.getAllUsers();
-            console.log(serviceResponse)
             expect(serviceResponse.length).toBe(3);
         });
     });
