@@ -1,5 +1,6 @@
 const UserService = require('../../services/user.service');
 const AuthService = require('../../services/auth.service');
+const EmpService = require('../../services/emp.service');
 const UserController = require('../../controllers/user.controller');
 const sinon = require('sinon');
 
@@ -16,6 +17,12 @@ const reqUser = {
     password: "validPassword",
     name: "validName",
     role: "admin"
+};
+
+const reqEmp = {
+    email: "emp@benoit-cote.com",
+    firstName: "FName",
+    lastName: "LName"
 };
 
 const resUser = {
@@ -43,10 +50,15 @@ const resUser2 = {
 
 var sandbox = sinon.createSandbox();
 auth = require('../../services/auth.service');
-sandbox.stub(auth, 'authenticateToken')
+let authStub = sandbox.stub(auth, 'authenticateToken')
     .callsFake(function(req, res, next) {
         req.user = reqUser;
         
+        return next();
+    });
+let empStub = sandbox.stub(EmpService, 'checkEmail')
+    .callsFake(function(req, res, next){
+        req.emp = reqEmp;
         return next();
     });
 const makeApp = require('../../app');
@@ -78,24 +90,44 @@ describe("Test UserController", () => {
     });
     
     describe("(C1): Create a User", () => {
-        describe("(C1.1): given a valid user and JWT", () => {
-
-            it("(C1.1.1): should respond with a 200 status code", async () => {
+        let expectedUser = {
+            email: resUser.email,
+            name: resUser.name,
+            role: resUser.role
+        };
+        describe("(C1.1): given user is authenticated and valid user body", () => {
+            it("(C1.1.1): should respond with a 200 status code with filtered user body", async () => {
                 userSpy = jest.spyOn(UserService, 'createUser')
                     .mockImplementation(() => new Promise((resolve) => {
-                        resolve(resUser);
+                        resolve(expectedUser);
                     }));
-
+                const authSpy = jest.spyOn(authStub, 'authenticateToken');
                 const response = await supertest(app).post("/users")
                     .set("authorization", "Bearer validToken")
                     .send(reqUser);
 
                 expect(response.status).toBe(200);
                 expect(userSpy).toHaveBeenCalledTimes(1);
-                expect(JSON.stringify(response.body)).toEqual(JSON.stringify(resUser));
-                
+                expect(authSpy).toHaveBeenCalledTimes(1);
+                expect(JSON.stringify(response.body)).toEqual(JSON.stringify(expectedUser));
             });
         });
+
+        describe("(C1.2) given authenticated and invalid user body", () => {
+            it("should return 400 with message when no email", async () => {
+    
+            });
+            it("should return 400 with message when no password", async () => {
+    
+            });
+            it("should return 400 with message when no role", async () => {
+    
+            });
+            it("should return 400 with message when email doesn't finish by benoit-cote.com", async () => {
+    
+            });
+        });
+        
     });
     
     describe("(C2): Authenticating a User)", () => {
@@ -200,8 +232,6 @@ describe("Test UserController", () => {
         });
     });
 
-        
-    
 });
 
     // describe("GET /users/", () => {
