@@ -13,7 +13,7 @@ var app;
 var auth;
 
 const reqUser = {
-    email: "valid@email.com",
+    email: "valid@benoit-cote.com",
     password: "validPassword",
     name: "validName",
     role: "admin"
@@ -47,20 +47,20 @@ const resUser2 = {
     }
 };
 
-
-var sandbox = sinon.createSandbox();
-auth = require('../../services/auth.service');
-let authStub = sandbox.stub(auth, 'authenticateToken')
+let sandbox = sinon.createSandbox();
+let authStub = sandbox.stub(AuthService, 'authenticateToken')
     .callsFake(function(req, res, next) {
+        console.log("in original authstub...");
         req.user = reqUser;
-        
         return next();
-    });
+});
+
 let empStub = sandbox.stub(EmpService, 'checkEmail')
     .callsFake(function(req, res, next){
         req.emp = reqEmp;
         return next();
-    });
+});
+
 const makeApp = require('../../app');
 app = makeApp();
 const request = supertest(app);
@@ -79,10 +79,11 @@ describe("Test UserController", () => {
     });
 
     afterEach(() => {
-        sandbox.restore();
+        // sandbox.restore();
         jest.resetAllMocks();
         jest.clearAllMocks();
         userSpy.mockClear();
+        sandbox.resetHistory();
     });
 
     afterAll(() => {
@@ -90,41 +91,104 @@ describe("Test UserController", () => {
     });
     
     describe("(C1): Create a User", () => {
+
+        let authenticateTokenStub;
+
         let expectedUser = {
             email: resUser.email,
             name: resUser.name,
             role: resUser.role
         };
+
         describe("(C1.1): given user is authenticated and valid user body", () => {
             it("(C1.1.1): should respond with a 200 status code with filtered user body", async () => {
                 userSpy = jest.spyOn(UserService, 'createUser')
                     .mockImplementation(() => new Promise((resolve) => {
                         resolve(expectedUser);
                     }));
-                const authSpy = jest.spyOn(authStub, 'authenticateToken');
+
                 const response = await supertest(app).post("/users")
                     .set("authorization", "Bearer validToken")
                     .send(reqUser);
 
                 expect(response.status).toBe(200);
                 expect(userSpy).toHaveBeenCalledTimes(1);
-                expect(authSpy).toHaveBeenCalledTimes(1);
+                expect(authStub.called).toBeTruthy();
+                expect(empStub.called).toBeTruthy();
                 expect(JSON.stringify(response.body)).toEqual(JSON.stringify(expectedUser));
             });
         });
 
         describe("(C1.2) given authenticated and invalid user body", () => {
             it("should return 400 with message when no email", async () => {
-    
+
+                let requestUser = {
+                    password: reqUser.password,
+                    name: reqUser.name,
+                    role: reqUser.role
+                };
+
+                const response = await request.post("/users")
+                    .set("authorization", "Bearer validToken")
+                    .send(requestUser);
+
+                expect(response.status).toBe(400);
+                expect(response.body.message).toBe("Content cannot be empty.")
+                expect(userSpy).toHaveBeenCalledTimes(0);
+                expect(authStub.called).toBeTruthy();
+                expect(empStub.called).toBeTruthy();
             });
             it("should return 400 with message when no password", async () => {
-    
+                let requestUser = {
+                    email: reqUser.email,
+                    name: reqUser.name,
+                    role: reqUser.role
+                };
+
+                const response = await request.post("/users")
+                    .set("authorization", "Bearer validToken")
+                    .send(requestUser);
+
+                expect(response.status).toBe(400);
+                expect(response.body.message).toBe("Content cannot be empty.")
+                expect(userSpy).toHaveBeenCalledTimes(0);
+                expect(authStub.called).toBeTruthy();
+                expect(empStub.called).toBeTruthy();
             });
             it("should return 400 with message when no role", async () => {
-    
+                let requestUser = {
+                    email: reqUser.email,
+                    password: reqUser.password,
+                    name: reqUser.name
+                };
+
+                const response = await request.post("/users")
+                    .set("authorization", "Bearer validToken")
+                    .send(requestUser);
+
+                expect(response.status).toBe(400);
+                expect(response.body.message).toBe("Content cannot be empty.")
+                expect(userSpy).toHaveBeenCalledTimes(0);
+                expect(authStub.called).toBeTruthy();
+                expect(empStub.called).toBeTruthy();
             });
             it("should return 400 with message when email doesn't finish by benoit-cote.com", async () => {
-    
+                let requestUser = {
+                    email: "wrong@format.email",
+                    password: reqUser.password,
+                    name: reqUser.name,
+                    role: reqUser.role
+                };
+
+                const response = await request.post("/users")
+                    .set("authorization", "Bearer validToken")
+                    .send(requestUser);
+
+                expect(response.status).toBe(400);
+                expect(response.body.message).toBe("Invalid email format.")
+                expect(userSpy).toHaveBeenCalledTimes(0);
+                expect(authStub.called).toBeTruthy();
+                expect(empStub.called).toBeTruthy();
             });
         });
         
@@ -234,34 +298,4 @@ describe("Test UserController", () => {
 
 });
 
-    // describe("GET /users/", () => {
-    //     describe("given no token is passed", () =>{
-            
-    //         it("should return 401", async () => {
-    //             const response = await request.get("/users");
-    //             expect(response.statusCode).toBe(401);
-    //         });
-            
-    //     });
-
-    //     describe("given a token is passed", () => {
-    //         it("should return 200", async () => {
-    //             const resp = await request.post("/users/authenticate").send({
-    //                 email: "first@benoit-cote.com",
-    //                 password: "verySecurePassword"
-    //             });
-    //             const aToken = resp.body.aToken;
-    //             request.get("/users")
-    //                 .set("authorization", `Bearer ${aToken}`)
-    //                 .expect(200);
-    //         });
-
-    //         it("should return 403", async () => {
-    //             const response = await request.get("/users").set("authorization", "Bearer aToken");
-    //             expect(response.statusCode).toBe(403);
-    //         });
-    //     });
-
-        
-    // });
 

@@ -4,12 +4,18 @@ const authService = require('../services/auth.service');
 // Create and Save a new User
 exports.create = async (req, res) => {
     if(!req.user.role === "admin") return res.status(403).send();
-    
+    console.log(req.user.email);
     // Validate request    
-    if(!req.body.email){
+    if(!req.body.email || !req.body.password 
+        || !req.body.role){
         return res.status(400).send({
             message: "Content cannot be empty."
         });
+    }
+    if(!req.body.email.endsWith("@benoit-cote.com")){
+        return res.status(400).send({
+            message: "Invalid email format."
+        })
     }
 
     // Create a User
