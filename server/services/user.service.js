@@ -127,3 +127,29 @@ exports.authenticateUser = async (user) => {
         });
     });
 };
+
+
+exports.modifyUser = async (user) => {
+
+    return new Promise((resolve, reject) => {
+
+        User.update(user, {where: {email: user.email}})
+            .then(async data => {
+                if(data) {
+                    resolve("User modified successfully");
+                }
+                resolve("User has failed to modified");
+            })
+            .catch(err => {
+                const response = {
+                    status: 500,
+                    data: {},
+                    error: {
+                        message: err.message || "some error occured"
+                    }
+                }
+                reject(response);
+            });
+
+    });
+};

@@ -70,7 +70,7 @@ const Login = () => {
             }).catch((error) => {
 
                 if(error.response){
-                    if(error.response.status == 403 || error.response.status === 401){
+                    if(error.response.status === 403 || error.response.status === 401){
                         setInvalidCredential("Incorrect email or password.");
                     }
                     else {
