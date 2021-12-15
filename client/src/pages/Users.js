@@ -1,135 +1,36 @@
-import Table from 'react-bootstrap/Table'
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Cookies from 'universal-cookie'
 import NavB from '../components/NavB'
-import Axios from 'axios'
-import Form from 'react-bootstrap/Form'
+import Table from 'react-bootstrap/Table'
 import Button from 'react-bootstrap/Button'
-import Alert from 'react-bootstrap/Alert'
+import '../DeleteButton.scss'
+import '../EditButton.scss'
+import Icon from '@mdi/react'
+import { mdiDeleteEmpty } from '@mdi/js';
+import { mdiDelete } from '@mdi/js';
+import { mdiPencil } from '@mdi/js';
+import { mdiPencilOutline } from '@mdi/js';
+import Axios from 'axios';
 
 
 const Users = () => {
 
-    const [validated, setValidated] = useState(false);
-    const [InvalidCredential, setInvalidCredential] = useState("");
-
-    const [email, setEmail] = useState("");
-    const [newPassword, setNewPassword] = useState("");
-    const [confirmNewPassword, setConfirmNewPassword] = useState("");
-    const [role, setRole] = useState("");
-
-    const [errorMessage] = useState({
-        email: "This field cannot be empty!",
-        newPassword: "This field cannot be empty!",
-        confirmNewPassword: "This field cannot be empty!",
-        role: "You need to select a role!"
-    });
-
-
-    //Axios.defaults.withCredentials = true;
-
-    const onSubmitModification = (event) => {
-        const form = event.currentTarget;
-        if(form.checkValidity() === false || !email.endsWith("benoit-cote.com") || newPassword.localeCompare(confirmNewPassword))
-        {
-            event.preventDefault();
-            event.stopPropagation();
-            if(!/^@benoit-cote.com$/.test(email) && email.length > 0){
-                errorMessage.email = "This is not the correct email format"
-            }
-            if(newPassword != confirmNewPassword){
-                errorMessage.confirmNewPassword = "Please, make sure that the confirm password is the same as the new password entered above"
-            }
-        }
-        
-        else
-        {
-            let user = {
-                email: email,
-                newPassword: newPassword,
-                confirmNewPassword: confirmNewPassword,
-                role: role
-            };
-
-            Axios.put("http://localhost:3001/users/modify", user).then((response) =>{
-
-                if(response.data === true)
-                {
-                    console.log("User modified successfully!");
-                }
-                console.log(response)
-                })
-                .catch((error) => {
-                    if(error.response){
-                        if(error.response.status === 401 || error.response.status === 403){
-                            setInvalidCredential("Incorrect email address");
-                        }
-                    }
-                    else if(error.request){
-                        setInvalidCredential("Can't send the request to modify the user");
-                    }
-                });        
-        }  
-        setValidated(true);
-        return false; 
-    }
-        
+    let counter = 0;
 
     let navigate = useNavigate();
     const cookies = new Cookies();
 
-    useEffect(() => {
-        if (cookies.get("accessToken") === undefined) {
-            navigate("/login");
-        }
-        else if(cookies.get("role") !== "admin") {
-            navigate("/dashboard");
-        } 
-    });
-
-    return (
-        <div>
-            <NavB />
-            <div className="container">
-                <div className="card shadow p-3 m-5">
-                    <Table striped bordered hover size="sm">
-                        <thead>
-                            <tr>
-                                <th>Name</th>
-                                <th>Email</th>
-                                <th>Role</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>Mark Benoit</td>
-                                <td>mark@benoitetcote.com</td>
-                                <td>Admin</td>
-                                <td><Button variant="outline-primary">Modify User</Button>{' '}</td>
-                                <td><Button variant="outline-danger">Delete User</Button>{' '}</td>
-                            </tr>
-                            <tr>
-                                <td>Alexander Benoit</td>
-                                <td>alexander@benoitetcote.com</td>
-                                <td>Employee</td>
-                                <td><Button variant="outline-primary">Modify User</Button>{' '}</td>
-                                <td><Button variant="outline-danger">Delete User</Button>{' '}</td>
-                            </tr>
-                            <tr>
-                                <td>Raphael Cote</td>
-                                <td>raphael@benoitetcote.com</td>
-                                <td>Admin</td>
-                                <td><Button variant="outline-primary">Modify User</Button>{' '}</td>
-                                <td><Button variant="outline-danger">Delete User</Button>{' '}</td>
-                            </tr>
-                        </tbody>
-                    </Table>
-                </div>
-            </div>
 
 
-            <div className="container">
+    const [users, setUsers] = useState([{name: "", email: "", role: ""}]);
+
+    const handleAddUser = () => {
+    }
+
+    const handleEditUser = (email) => {
+       return(
+        <div className="container">
                 <div className="card shadow p-3 m-5">
 
                     <Form noValidate 
@@ -223,9 +124,217 @@ const Users = () => {
 
                     </Form>
                 </div>
+        </div>
+       )
+    }
+
+    const handleDeleteUser = (email) => {
+        
+    }
+
+
+    const handleRefresh = () => {
+        let header = {
+            'authorization': "Bearer " + cookies.get("accessToken")
+        }
+    
+        Axios.defaults.withCredentials = true;
+    
+        Axios.get("http://localhost:3001/users/", {headers: header})
+        .then((response) => {
+            console.log(response.data);
+            setUsers(response.data)
+        })
+        .catch((error) => {
+            if(error.response) {
+                if(error.response.status === 403 || error.response.status === 401) {
+                    console.log(error.response.satus + " - Error trying to reach B&C Engine");
+                }
+                else {
+                    console.log("Could not reach b&C Engine...");
+                }
+            }
+            else if(error.request) {
+                console.log("Could not reach b&C Engine...");
+            }
+        });
+    }
+
+    useEffect(() => {
+        if (cookies.get("accessToken") === undefined) {
+            navigate("/login");
+        }
+        else if(cookies.get("role") !== "admin") {
+            navigate("/dashboard");
+        } 
+
+        handleRefresh();        
+
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
+
+
+    const [validated, setValidated] = useState(false);
+    const [InvalidCredential, setInvalidCredential] = useState("");
+
+    const [email, setEmail] = useState("");
+    const [newPassword, setNewPassword] = useState("");
+    const [confirmNewPassword, setConfirmNewPassword] = useState("");
+    const [role, setRole] = useState("");
+
+    const [errorMessage] = useState({
+        email: "This field cannot be empty!",
+        newPassword: "This field cannot be empty!",
+        confirmNewPassword: "This field cannot be empty!",
+        role: "You need to select a role!"
+    });
+
+
+    //Axios.defaults.withCredentials = true;
+
+    const onSubmitModification = (event) => {
+        const form = event.currentTarget;
+        if(form.checkValidity() === false || !email.endsWith("benoit-cote.com") || newPassword.localeCompare(confirmNewPassword))
+        {
+            event.preventDefault();
+            event.stopPropagation();
+            if(!/^@benoit-cote.com$/.test(email) && email.length > 0){
+                errorMessage.email = "This is not the correct email format"
+            }
+            if(newPassword != confirmNewPassword){
+                errorMessage.confirmNewPassword = "Please, make sure that the confirm password is the same as the new password entered above"
+            }
+        }
+        
+        else
+        {
+            let user = {
+                email: email,
+                newPassword: newPassword,
+                confirmNewPassword: confirmNewPassword,
+                role: role
+            };
+
+            Axios.put("http://localhost:3001/users/modify", user).then((response) =>{
+
+                if(response.data === true)
+                {
+                    console.log("User modified successfully!");
+                }
+                console.log(response)
+                })
+                .catch((error) => {
+                    if(error.response){
+                        if(error.response.status === 401 || error.response.status === 403){
+                            setInvalidCredential("Incorrect email address");
+                        }
+                    }
+                    else if(error.request){
+                        setInvalidCredential("Can't send the request to modify the user");
+                    }
+                });        
+        }  
+        setValidated(true);
+        return false; 
+    }
+        
+
+    return (
+        <div>
+            <NavB />
+            <div className="container">
+                <div className="card shadow m-5">
+                    <Table responsive="xl">
+                        <thead className='bg-light'>
+                            <tr key="0">
+
+                                <th>
+                                    <div className="justify-content-center d-flex">
+                                        #
+                                    </div>
+                                </th>
+                                <th>NAME</th>
+                                <th>EMAIL</th>
+                                <th>ROLE</th>
+                                <th>
+                                    <div className="d-flex justify-content-center">
+                                        <Button 
+                                            className="btn py-0 shadow-sm border " 
+                                            onClick={handleAddUser}>
+                                            Add User
+                                        </Button>
+                                    </div>
+                                </th>
+
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            {users.map (u => {
+                                counter++;
+                                return (
+                                    <tr key={counter}>
+
+                                        <td>
+                                            <div className="justify-content-center d-flex">
+                                                {counter}
+                                            </div>
+                                        </td>
+                                        <td>{u.name}</td>
+                                        <td>{u.email}</td>
+                                        <td>{u.role}</td>
+
+                                        <td className="py-1">
+                                            <div className="d-flex justify-content-center">
+                                                <button className="btnEdit btn-edit" onClick={handleEditUser(u.email)}>
+                                                    <Icon path={mdiPencil} 
+                                                        className="mdi mdi-edit" 
+                                                        title="edit Button"
+                                                        size={1}
+                                                        horizontal/>
+                            
+                                                    <Icon path={mdiPencilOutline}
+                                                        className="mdi mdi-edit-empty" 
+                                                        title="edit Button empty"
+                                                        size={1}
+                                                        horizontal/>
+                                                </button>
+
+                                                <button className="btnDelete btn-delete" onClick={handleDeleteUser(u.email)}>
+                                                    <Icon path={mdiDelete} 
+                                                        className="mdi mdi-delete" 
+                                                        title="delete Button"
+                                                        size={1}
+                                                        horizontal/>
+                            
+                                                    <Icon path={mdiDeleteEmpty}
+                                                        className="mdi mdi-delete-empty" 
+                                                        title="delete Button empty"
+                                                        size={1}
+                                                        horizontal/>
+                                                </button>
+                                            </div>
+                                        </td>
+
+                                    </tr>
+                                );
+                            })}
+                        </tbody>
+                    </Table>
+                </div>
             </div>
         </div>
     )
 }
                     
 export default Users
+
+
+
+
+
+
+
+
+

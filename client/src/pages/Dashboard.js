@@ -12,7 +12,8 @@ const Dashboard = () => {
         if (cookies.get("accessToken") === undefined) {
             navigate("/login");
         }
-    });
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     return (
         <div>

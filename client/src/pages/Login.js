@@ -73,11 +73,15 @@ const Login = () => {
                     if(error.response.status == 403 || error.response.status === 401){
                         setInvalidCredential("Incorrect email or password.");
                     }
-                }
-                else if(error.request){
-                    setInvalidCredential("Could not reach B&C Engine")
-                }
-
+                    else {
+                        setInvalidCredential("Could not reach B&C Engine...");
+                    }
+                } else if (error.request) {
+                    // The request was made but no response was received
+                    // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
+                    // http.ClientRequest in node.js
+                    setInvalidCredential("Could not reach B&C Engine...");
+                  }
             });
         }
 
