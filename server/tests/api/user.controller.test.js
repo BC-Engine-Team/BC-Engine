@@ -40,6 +40,30 @@ const resUser2 = {
     }
 };
 
+const ListUser = [
+    {
+        dataValues: {
+            email: "a@email.com",
+            name: "a",
+            role: "employee",
+        }
+    },
+    {
+        dataValues: {
+            email: "b@email.com",
+            name: "b",
+            role: "admin"
+        }
+    },
+    {
+        dataValues: {
+            email: "c@email.com",
+            name: "c",
+            role: "admin"
+        }
+    }
+];
+
 
 var sandbox = sinon.createSandbox();
 auth = require('../../services/auth.service');
@@ -94,6 +118,23 @@ describe("Test UserController", () => {
                 expect(userSpy).toHaveBeenCalledTimes(1);
                 expect(JSON.stringify(response.body)).toEqual(JSON.stringify(resUser));
                 
+            });
+        });
+    });
+
+    describe("View all Users", () => {
+        describe("Given a token passed", () => {
+            it("Should respond with a 200 status code", async () => {
+                userSpy = jest.spyOn(UserService, 'getAllUsers')
+                .mockImplementation(() => new Promise(
+                    (resolve) => {
+                        resolve(ListUser);
+                    }
+                ));
+
+                const response = await supertest(app).get("/users");
+
+                expect(response.status).toBe(200);
             });
         });
     });
