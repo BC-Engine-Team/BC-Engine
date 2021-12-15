@@ -4,8 +4,6 @@ const bodyParser = require("body-parser");
 const logger = require('morgan');
 const userRoutes = require('./routes/user.routes');
 
-
-
 module.exports = (database) => {
   const app = express();
 
@@ -24,10 +22,10 @@ module.exports = (database) => {
   app.use(function(req, res, next) {
     res.header('Access-Control-Allow-Origin', 'http://localhost:3000');
     res.header('Access-Control-Allow-Credentials', true);
-    res.header('Access-Control-Allow-Methods', 'DELETE, PUT, POST, GET');
+    res.header('Access-Control-Allow-Methods', 'DELETE, PUT, POST, GET, OPTIONS, HEAD');
     res.header(
       'Access-Control-Allow-Headers',
-      'Origin, X-Requested-With, Content-Type, Accept, Authorization'
+      'Access-Control-Allow-Headers, x-requested-with, Content-Type, Accept, Access-Control-Request-Method, Access-Control-Request-Headers, Authorization'
     );
     res.header('Access-Control-Expose-Headers', 'Authorization');
     next();
