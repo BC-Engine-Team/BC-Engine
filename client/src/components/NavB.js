@@ -48,6 +48,7 @@ const NavB = (props) => {
     
             Axios.delete("http://localhost:3001/users/logout", conf)
             .then((response) => {
+
                 if(response.status === 204) {     
                     cookies.remove("refreshToken");
                     cookies.remove("accessToken");

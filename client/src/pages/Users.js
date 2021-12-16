@@ -1,4 +1,3 @@
-import React from 'react'
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Cookies from 'universal-cookie'
@@ -14,7 +13,6 @@ import { mdiDelete } from '@mdi/js';
 import { mdiPencil } from '@mdi/js';
 import { mdiPencilOutline } from '@mdi/js';
 import Axios from 'axios';
-
 import Form from 'react-bootstrap/Form'
 import FloatingLabel from 'react-bootstrap/esm/FloatingLabel'
 import Alert from 'react-bootstrap/Alert'
@@ -43,6 +41,7 @@ const Users = () => {
             form: "container-form-enabled-form",
         });
     }
+
 
     const enableBackButton = () => {
         setBackEnabled({
@@ -485,7 +484,6 @@ const Users = () => {
                                     className={backEnabled.backButton}
                                     style={{display: 'inline-block'}}
                                     onClick={handleGoBack}>
-                                    
                                     Go back
                                 </Button>
                                 

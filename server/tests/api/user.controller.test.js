@@ -8,6 +8,7 @@ const { afterEach, afterAll } = require('jest-circus');
 var { expect, jest } = require('@jest/globals');
 const { mocked } = require('jest-mock');
 const supertest = require('supertest');
+var MockExpressResponse = require('mock-express-response');
 
 var app;
 var auth;
@@ -23,6 +24,23 @@ const reqEmp = {
     email: "emp@benoit-cote.com",
     firstName: "FName",
     lastName: "LName"
+}
+const reqUserAdmin = {
+    user: {
+        email: "valid@email.com",
+        password: "validPassword",
+        name: "validName",
+        role: "admin"
+    }
+}
+
+const reqUserEmployee = {
+    user: {
+        email: "valid@email.com",
+        password: "validPassword",
+        name: "validName",
+        role: "employee"
+    }
 };
 
 const resUser = {
@@ -71,6 +89,7 @@ const ListUser = [
     }
 ];
 
+
 let sandbox = sinon.createSandbox();
 let authStub = sandbox.stub(AuthService, 'authenticateToken')
     .callsFake(function(req, res, next){
@@ -87,6 +106,7 @@ let empStub = sandbox.stub(EmpService, 'checkEmail')
 const makeApp = require('../../app');
 app = makeApp();
 const request = supertest(app);
+const res = new MockExpressResponse();
 
 describe("Test UserController", () => {
     let userSpy = jest.spyOn(UserService, 'authenticateUser')
@@ -235,6 +255,40 @@ describe("Test UserController", () => {
             });
         });
     });
+
+    describe("View all Users", () => {
+        describe("Given a token passed", () => {
+            it("Should respond with a 200 status code", async () => {
+                userSpy = jest.spyOn(UserService, 'getAllUsers')
+                .mockImplementation(() => new Promise(
+                    (resolve) => {
+                        resolve(ListUser);
+                    }
+                ));
+
+                const response = await supertest(app).get("/users");
+
+                expect(response.status).toBe(200);
+                expect(userSpy).toHaveBeenCalledTimes(1);
+                expect(JSON.stringify(response.body)).toEqual(JSON.stringify(ListUser));
+            });
+
+            it("Should respond with a 403 status code", async () => {
+                let response = await UserController.findAll(reqUserEmployee, res);
+                expect(response.statusCode).toBe(403);
+            });
+
+            it("Should respond with a 500 status code", async () => {
+                userSpy = jest.spyOn(UserService, 'getAllUsers')
+                .mockImplementation(async () => {
+                    await Promise.reject({status: 500});
+                });
+
+                const response = await supertest(app).get("/users");
+                expect(response.status).toBe(500);
+            });
+        });
+    });
     
     describe("(C2): Authenticating a User)", () => {
 
@@ -337,7 +391,5 @@ describe("Test UserController", () => {
             })
         });
     });
-
 });
-
 
