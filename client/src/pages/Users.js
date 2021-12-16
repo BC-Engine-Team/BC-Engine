@@ -42,7 +42,12 @@ const Users = () => {
 
     const disableForm = () => {
         setValidated(false);
-        setForm({});
+        Array.from(document.querySelectorAll("input")).forEach(
+            input => (input.value = "")
+        );
+        Array.from(document.querySelectorAll("select")).forEach(
+            select => (select.value = "")
+        );
         setFormEnabled({
             table: "container",
             form: "d-none",
@@ -56,8 +61,6 @@ const Users = () => {
         setFormTitle("Add User");
         setFormSubmit("Add");
         setForm({});
-        setEmail("");
-        setPassword1("");
 
     }
 
@@ -309,7 +312,7 @@ const Users = () => {
                                         type="email"
                                         defaultValue={email}
                                         onChange={(e) => setField('email', e.target.value)}
-                                        autoComplete='off'
+                                        autoComplete='new-email'
                                         disabled={emailEnable}
                                         isInvalid={!!errors.email}
                                     />
@@ -327,7 +330,7 @@ const Users = () => {
                                         type="password" 
                                         defaultValue={password1}
                                         onChange={(e) => setField('password1', e.target.value)}
-                                        autoComplete='off'
+                                        autoComplete='new-password'
                                         isInvalid={!!errors.password1}
                                     />
 
