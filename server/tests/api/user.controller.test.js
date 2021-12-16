@@ -166,19 +166,11 @@ describe("Test UserController", () => {
 
             it("Should respond with a 500 status code", async () => {
                 userSpy = jest.spyOn(UserService, 'getAllUsers')
-                // .mockRejectedValue({
-                //     status: 500,
-                //     data: {},
-                //     error: {
-                //         message: "some error occured"
-                //     }
-                // });
                 .mockImplementation(async () => {
                     await Promise.reject({status: 500});
                 });
 
                 const response = await supertest(app).get("/users");
-                //let response = await UserController.findAll(reqUserAdmin, res);
                 expect(response.status).toBe(500);
             });
         });
@@ -285,39 +277,4 @@ describe("Test UserController", () => {
             })
         });
     });
-
-        
-    
 });
-
-    // describe("GET /users/", () => {
-    //     describe("given no token is passed", () =>{
-            
-    //         it("should return 401", async () => {
-    //             const response = await request.get("/users");
-    //             expect(response.statusCode).toBe(401);
-    //         });
-            
-    //     });
-
-    //     describe("given a token is passed", () => {
-    //         it("should return 200", async () => {
-    //             const resp = await request.post("/users/authenticate").send({
-    //                 email: "first@benoit-cote.com",
-    //                 password: "verySecurePassword"
-    //             });
-    //             const aToken = resp.body.aToken;
-    //             request.get("/users")
-    //                 .set("authorization", `Bearer ${aToken}`)
-    //                 .expect(200);
-    //         });
-
-    //         it("should return 403", async () => {
-    //             const response = await request.get("/users").set("authorization", "Bearer aToken");
-    //             expect(response.statusCode).toBe(403);
-    //         });
-    //     });
-
-        
-    // });
-

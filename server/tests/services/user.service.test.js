@@ -68,7 +68,7 @@ describe("createUser", () => {
 
 describe("View All Users", () => {
     describe("given a list of users", () => {
-        it("Should return the full list of user with all their information", async() => {
+        it("Should return the full list of users with all their information", async() => {
 
             jest.spyOn(UserModel, 'findAll')
             .mockImplementation(() => new Promise(
