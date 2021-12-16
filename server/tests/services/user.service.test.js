@@ -12,24 +12,29 @@ const reqUser = {
     role: "admin"
 };
 
-const ListUser = 
-    [
-        {dataValues: {
+const ListUser = [
+    {
+        dataValues: {
             email: "a@email.com",
             name: "a",
             role: "employee",
-        }},
-        {dataValues:{
+        }
+    },
+    {
+        dataValues: {
             email: "b@email.com",
             name: "b",
             role: "admin"
-        }},
-        {dataValues:{
+        }
+    },
+    {
+        dataValues: {
             email: "c@email.com",
             name: "c",
             role: "admin"
-        }}
-    ]
+        }
+    }
+];
 
 
 const resUser = {
@@ -64,12 +69,15 @@ describe("createUser", () => {
 describe("View All Users", () => {
     describe("given a list of users", () => {
         it("Should return the full list of user with all their information", async() => {
-            const userSpy = jest.spyOn(UserModel, 'findAll')
-            .mockImplementation(() => new Promise((resolve) => {
-                resolve(ListUser);
-            }));
+
+            jest.spyOn(UserModel, 'findAll')
+            .mockImplementation(() => new Promise(
+                (resolve) => {
+                    resolve(ListUser);
+                }
+            ));
+
             const serviceResponse = await UserService.getAllUsers();
-            console.log(serviceResponse)
             expect(serviceResponse.length).toBe(3);
         });
     });
