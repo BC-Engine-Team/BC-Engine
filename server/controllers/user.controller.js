@@ -38,6 +38,9 @@ exports.findAll = async (req, res) => {
             return res.status(200).send(response);
         })
         .catch(err => {
+
+            console.log(err)
+            console.log(res)
             return res.status(500).send(err);
         });
 };

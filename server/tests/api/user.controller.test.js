@@ -164,19 +164,23 @@ describe("Test UserController", () => {
                 expect(response.statusCode).toBe(403);
             });
 
-            // it("Should respond with a 500 status code", async () => {
-            //     userSpy = jest.spyOn(UserService, 'getAllUsers')
-            //     .mockRejectedValue({
-            //         status: 500,
-            //         data: {},
-            //         error: {
-            //             message: "some error occured"
-            //         }
-            //     });
+            it("Should respond with a 500 status code", async () => {
+                userSpy = jest.spyOn(UserService, 'getAllUsers')
+                // .mockRejectedValue({
+                //     status: 500,
+                //     data: {},
+                //     error: {
+                //         message: "some error occured"
+                //     }
+                // });
+                .mockImplementation(async () => {
+                    await Promise.reject({status: 500});
+                });
 
-            //     let response = await UserController.findAll(reqUserAdmin, res);
-            //     expect(response.statusCode).toBe(500);
-            // });
+                const response = await supertest(app).get("/users");
+                //let response = await UserController.findAll(reqUserAdmin, res);
+                expect(response.status).toBe(500);
+            });
         });
     });
     
