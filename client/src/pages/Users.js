@@ -84,6 +84,9 @@ const Users = () => {
         });
     }
 
+    let navigate = useNavigate();
+    const cookies = new Cookies();
+
     useEffect(() => {
         if (cookies.get("accessToken") === undefined) {
             navigate("/login");
@@ -96,7 +99,6 @@ const Users = () => {
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
-
 
     return (
         <div>
