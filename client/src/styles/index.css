@@ -1,0 +1,86 @@
+.container {
+  max-width: 800px !important;
+}
+
+.mainContainer {
+  display: flex;
+}
+
+.card {
+  border-radius: 1rem;
+  border: 0;
+}  
+
+.submitButton {
+  font-size: 20px;
+  background-color: lightgrey;
+}
+
+input, select {
+  border-radius: 0.7rem !important;
+}
+
+.form-check-input {
+  border-radius: 0.25rem !important;
+}
+
+.container-form-enabled-form,
+.container-form-enabled-table {
+  max-width: 800px !important;
+  width: 50%;
+  float: left;
+}
+
+.uForm {
+  height: 650px !important;
+}
+
+.uTable {
+  height: 650px !important;
+  overflow-y: auto;
+}
+
+thead {
+  position: sticky;
+  position: -webkit-sticky;
+  top: 0;
+  background-color: lightgrey;
+  z-index: 10;
+}
+
+@media (max-width: 1000px) {
+  .mainContainer {
+    display: block !important;
+  }
+
+  .container-form-enabled-form,
+  .container-form-enabled-table {
+    width: 100%;
+    padding-right: var(--bs-gutter-x,.75rem);
+    padding-left: var(--bs-gutter-x,.75rem);
+    margin-right: auto;
+    margin-left: auto;
+    float: none;
+  }
+}
+
+/* width */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: lightgrey;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 20px;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}

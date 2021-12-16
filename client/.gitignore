@@ -2,12 +2,15 @@
 
 # dependencies
 /node_modules
-/package-lock.json
+package-lock.json
 /.pnp
 .pnp.js
 
 # testing
 /coverage
+
+# environement
+/.env
 
 # production
 /build

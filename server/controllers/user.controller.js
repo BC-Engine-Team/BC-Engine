@@ -2,15 +2,14 @@ const userService = require('../services/user.service');
 const authService = require('../services/auth.service');
 
 // Create and Save a new User
-exports.create = (req, res) => {
-    // Validate request
-    console.log(req.body);
+exports.create = async (req, res) => {
+    if(!req.user.role === "admin") return res.status(403).send();
     
+    // Validate request    
     if(!req.body.email){
-        res.status(400).send({
+        return res.status(400).send({
             message: "Content cannot be empty."
         });
-        return;
     }
 
     // Create a User
@@ -22,19 +21,19 @@ exports.create = (req, res) => {
     };
 
     // Call service to save User to db
-    userService.createUser(user)
+    await userService.createUser(user)
         .then(response => {
-            console.log(response);
-            res.send(response);
+            return res.send(response);
         })
         .catch(err => {
-            res.status(500).send(err);
+            return res.send(err);
         });
 };
 
 // Fetch all Users from db
-exports.findAll = (req, res) => {
-    userService.getAllUsers()
+exports.findAll = async (req, res) => {
+    if(!req.user.role === "admin") res.status(403).send();
+    await userService.getAllUsers()
         .then(response => {
             res.send(response);
         })
@@ -44,8 +43,9 @@ exports.findAll = (req, res) => {
 };
 
 // fetch all users with admin role
-exports.getAdmins = (req, res) => {
-    userService.getAdmins()
+exports.getAdmins = async (req, res) => {
+    if(!req.user.role === "admin") res.status(403).send();
+    await userService.getAdmins()
         .then(response => {
             res.send(response);
         })
@@ -55,41 +55,71 @@ exports.getAdmins = (req, res) => {
 };
 
 // Begining of Authenticate a user
-exports.authenticateUserWithEmail = (req, res) => {
-    const login = req.body;
+exports.authenticateUserWithEmail = async (req, res) => {
+    const user = req.body;
     let authUser = {};
-    
 
-    if(!login.email){
+    if(!user.email){
         res.status(400).send({
             message: "Content cannot be empty."
         });
+        return;
     }
 
-    userService.authenticateUser(login)
+    await userService.authenticateUser(user)
         .then(response => {
-            authUser = response;
-            if(!authUser) {
-                res.send({
+            if(response == null || !response) {
+                return res.status(401).send({
                     auth: false,
                     message: "No user found"
                 });
-                return;
             }
 
-            console.log(authUser);
+            authUser = response.dataValues;
             var [accessToken, refreshToken] = authService.getTokens(authUser);
-            console.log(accessToken);
-            res.send({
-                authenticatedUser: authUser,
+
+            const returnUser = {
+                email: authUser.email,
+                name: authUser.name,
+                role: authUser.role
+            };
+            return res
+            .header('authorization', refreshToken)
+            .send({
+                authenticatedUser: returnUser,
                 aToken: accessToken,
-                rToken: refreshToken,
                 auth: true
             });
         })
         .catch(err => {
-            res.status(500).send(err);
+            return res.status(500).send(err.message);
         });
 };
 
+
+exports.modifyUser = async(req, res) => {
+    if(!req.user.role === "admin") return res.status(403).send();
+
+    // Validate request    
+    if(!req.body.email){
+        return res.status(400).send({
+            message: "Content cannot be empty."
+        });
+    }
+
+    const user = {
+        email: req.body.email,
+        password: req.body.password,
+        role: req.body.role
+    };
+
+    await userService.modifyUser(user)
+        .then(response => {
+            return res.send(response);
+        })
+        .catch(err => {
+            return res.send(err);
+        });
+
+} 
 

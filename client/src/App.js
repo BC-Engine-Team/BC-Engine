@@ -1,11 +1,11 @@
 import React from "react";
-import "./App.css";
 import Dashboard from "./pages/Dashboard";
 import Reports from "./pages/Reports";
 import Users from "./pages/Users";
 import Manage from "./pages/Manage";
 import Login from "./pages/Login";
 import { Navigate, Routes, Route, BrowserRouter } from "react-router-dom";
+
 
 function App() {
   return (

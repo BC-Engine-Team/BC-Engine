@@ -1,13 +1,20 @@
-const { response } = require("express");
 const mysqldb = require("../data_access_layer/mysqldb");
 const User = mysqldb.users;
 const Op = mysqldb.Sequelize.Op;
 
-exports.createUser = (user) => {
+exports.createUser = async (user) => {
     return new Promise((resolve, reject) => {
         User.create(user)
             .then(async data => {
-                if(data) resolve(data.dataValues);
+                if(data) {
+                    let returnData = {
+                        email: data.dataValues.email,
+                        name: data.dataValues.name,
+                        role: data.dataValues.role
+                    };
+                    
+                    resolve(returnData);
+                }
                 resolve(false);
             })
             .catch(err => {
@@ -24,11 +31,22 @@ exports.createUser = (user) => {
     
 };
 
-exports.getAllUsers = () => {
+exports.getAllUsers = async () => {
     return new Promise((resolve, reject) => {
         User.findAll()
             .then(async data => {
-                if(data) resolve(data);
+                if(data){
+                    console.log(data);
+                    let returnData = [];
+                    for(let u=0; u<data.length;u++){
+                        returnData.push({
+                            email: data[u].dataValues.email,
+                            name: data[u].dataValues.name,
+                            role: data[u].dataValues.role
+                        });
+                    }
+                    resolve(returnData);
+                } 
                 resolve(false);
             })
             .catch(err =>{
@@ -44,7 +62,7 @@ exports.getAllUsers = () => {
     });
 };
 
-exports.getAdmins = () => {
+exports.getAdmins = async () => {
     return new Promise((resolve, reject) => {
         User.findAll({
             where: {
@@ -52,7 +70,17 @@ exports.getAdmins = () => {
             }
         })
         .then(async data => {
-            if(data) resolve(data);
+            if(data){
+                let returnData = [];
+                for(let u=0; u<data.length;u++){
+                    returnData.push({
+                        email: data[u].dataValues.email,
+                        name: data[u].dataValues.name,
+                        role: data[u].dataValues.role
+                    });
+                }
+                resolve(returnData);
+            } 
             resolve(false);
         })
         .catch(err =>{
@@ -68,7 +96,7 @@ exports.getAdmins = () => {
     });
 };
 
-exports.authenticateUser = (user) => {
+exports.authenticateUser = async (user) => {
     return new Promise((resolve, reject) => {
         User.findOne({
             where: {
@@ -79,11 +107,11 @@ exports.authenticateUser = (user) => {
             if(!data){
                 resolve(false);
             } else{
-                if(!data.dataValues.password ||
-                    !await data.validPassword(user.password, data.dataValues.password)){
+                if(!data.password ||
+                    !await data.validPassword(user.password, data.password)){
                         resolve(false);
                 } else {
-                    resolve(data.dataValues);
+                    resolve(data);
                 }
             }
         })
@@ -97,5 +125,33 @@ exports.authenticateUser = (user) => {
             }
             reject(response);
         });
+    });
+};
+
+
+exports.modifyUser = async (user) => {
+
+    return new Promise((resolve, reject) => {
+
+        User.update(user, 
+                   {where: {email: user.email},
+                   individualHooks: true})
+            .then(async data => {
+                if(data) {
+                    resolve("User modified successfully");
+                }
+                resolve("User has failed to modified");
+            })
+            .catch(err => {
+                const response = {
+                    status: 500,
+                    data: {},
+                    error: {
+                        message: err.message || "some error occured"
+                    }
+                }
+                reject(response);
+            });
+
     });
 };
