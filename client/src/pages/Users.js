@@ -15,34 +15,52 @@ import { mdiPencilOutline } from '@mdi/js';
 import Axios from 'axios';
 import Form from 'react-bootstrap/Form'
 import Alert from 'react-bootstrap/Alert'
+import { placeholder } from 'sequelize/dist/lib/operators'
 
 
 const Users = () => {
 
+    //this is to declare the cookies
     let navigate = useNavigate();
     const cookies = new Cookies();
 
+    //this is to declare the users and the counter that returns the list of all users in the user menu
     const [users, setUsers] = useState([{name: "", email: "", role: ""}]);
     let counter = 0;
 
+    //this is to validate if the entries are valid or not
+    const [validated, setValidated] = useState(false);
+    const [InvalidCredential, setInvalidCredential] = useState("");
 
-    const [email, setEmail] = useState("");
+
+    //this is to declare the value of my entries I can modify
     const [newPassword, setNewPassword] = useState("");
     const [confirmNewPassword, setConfirmNewPassword] = useState("");
     const [role, setRole] = useState("");
 
-    const [validated, setValidated] = useState(false);
-    const [InvalidCredential, setInvalidCredential] = useState("");
 
+
+    //this is to declare the value of the form title and fill the current role
     const FormTitle = useState("Edit User");
+    const [email, setEmail] = useState("");
 
 
+    //this is the error message
+    const [errorMessage] = useState({
+        newPassword: "This field cannot be empty!",
+        confirmNewPassword: "This field cannot be empty!",
+        role: "You need to select a role!"
+    });
+
+
+    //this is to declare the form layout
     const [formEnabled, setFormEnabled] = useState({
         table: "container", 
         form: "d-none",
     });
 
 
+    //this is when the form layout is activated
     const enableForm = () => {
         setFormEnabled({
             table: "container-form-enabled-table",
@@ -50,6 +68,7 @@ const Users = () => {
         });
     }
 
+    //this is when the form layout is deactivated
     const disableForm = () => {
         setFormEnabled({
             table: "container",
@@ -57,21 +76,29 @@ const Users = () => {
         });
     }
 
+    //this is what happens when the user click on the add user menu
     const handleAddUser = () => {
-         console.log("Add user");
-         enableForm();
+        console.log("Add user");
+         //enableForm();
     }
 
+
+    //this is what happens when the user click on the modify menu
     const handleEditUser = (email, role) => {
         console.log("Edit user with email: " + email);
         enableForm();
+        setEmail(email);
+        setRole(role);
     }
 
+
+    //this is what happens when the user click on the delete menu
     const handleDeleteUser = (email) => {
         console.log("Delete user with email: " + email);
     }
 
-
+    
+    //this is what happens when the user refresh the page
     const handleRefresh = () => {
         let header = {
             'authorization': "Bearer " + cookies.get("accessToken")
@@ -112,14 +139,7 @@ const Users = () => {
 
 
 
-
-    const [errorMessage] = useState({
-        email: "This field cannot be empty!",
-        newPassword: "This field cannot be empty!",
-        confirmNewPassword: "This field cannot be empty!",
-        role: "You need to select a role!"
-    });
-
+    //this is the when the user click on the save changes
     const onUpdateClick = (event) => {
         let header = {
             'authorization': "Bearer " + cookies.get("accessToken")
@@ -153,7 +173,10 @@ const Users = () => {
         });    
         setValidated(true);
         return false;     
-    }  
+    }
+
+
+    
     
 
 
@@ -242,8 +265,10 @@ const Users = () => {
                         </Table>
                     </div>
                 </div>
+
                 <div className={formEnabled.form}>
                     <div className="card shadow m-5 uForm">
+
                         <CloseButton onClick={disableForm}
                                      className='position-absolute top-0 end-0 m-4'/>
                         <div className="container">
@@ -270,7 +295,7 @@ const Users = () => {
                                             type="email"
                                             value={email}
                                             onChange={(e) => setEmail(e.target.value)}
-                                            disabled=""/>
+                                            disabled="disable"/>
 
                                         <Form.Control.Feedback type="invalid">
                                             {errorMessage.email}
@@ -315,12 +340,12 @@ const Users = () => {
                                         <Form.Select required
                                                     size="sm" 
                                                     aria-label="Default select example" 
-                                                    value={role} 
+                                                    value={role}
                                                     onChange={(e) => setRole(e.target.value)}>
 
                                             <option value="">Select User</option>
                                             <option value="admin">admin</option>
-                                            <option value="user">user</option>
+                                            <option value="employee">employee</option>
                                         </Form.Select>
 
                                         <Form.Control.Feedback type="invalid">
