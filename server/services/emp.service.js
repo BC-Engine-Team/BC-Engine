@@ -7,7 +7,6 @@ exports.checkEmail = async (req, res, next) => {
             email: req.body.email
         }
     }).then(async data => {
-        console.log(data);
         if(data){
             req.emp = {};
             let empName = data.dataValues.firstName + " " + data.dataValues.lastName;
