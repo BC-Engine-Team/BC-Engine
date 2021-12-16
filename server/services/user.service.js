@@ -133,7 +133,9 @@ exports.modifyUser = async (user) => {
 
     return new Promise((resolve, reject) => {
 
-        User.update(user, {where: {email: user.email}})
+        User.update(user, 
+                   {where: {email: user.email},
+                   individualHooks: true})
             .then(async data => {
                 if(data) {
                     resolve("User modified successfully");

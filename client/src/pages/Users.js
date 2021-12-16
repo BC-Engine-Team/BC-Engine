@@ -19,22 +19,29 @@ import Alert from 'react-bootstrap/Alert'
 
 const Users = () => {
 
-    let counter = 0;
-
     let navigate = useNavigate();
     const cookies = new Cookies();
 
-
-
     const [users, setUsers] = useState([{name: "", email: "", role: ""}]);
+    let counter = 0;
+
+
+    const [email, setEmail] = useState("");
+    const [newPassword, setNewPassword] = useState("");
+    const [confirmNewPassword, setConfirmNewPassword] = useState("");
+    const [role, setRole] = useState("");
+
+    const [validated, setValidated] = useState(false);
+    const [InvalidCredential, setInvalidCredential] = useState("");
+
+    const FormTitle = useState("Edit User");
+
+
     const [formEnabled, setFormEnabled] = useState({
         table: "container", 
         form: "d-none",
     });
 
-    const [users, setUsers] = useState([
-        {name: "", email: "", role: ""}
-    ]);
 
     const enableForm = () => {
         setFormEnabled({
@@ -51,14 +58,13 @@ const Users = () => {
     }
 
     const handleAddUser = () => {
-        console.log("Add user");
-        enableForm();
+         console.log("Add user");
+         enableForm();
     }
 
-    const handleEditUser = (email) => {
+    const handleEditUser = (email, role) => {
         console.log("Edit user with email: " + email);
         enableForm();
-
     }
 
     const handleDeleteUser = (email) => {
@@ -102,20 +108,10 @@ const Users = () => {
         } 
 
         handleRefresh();        
-
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
 
 
-
-    const [validated, setValidated] = useState(false);
-    const [InvalidCredential, setInvalidCredential] = useState("");
-
-    const [email, setEmail] = useState("");
-    const [newPassword, setNewPassword] = useState("");
-    const [confirmNewPassword, setConfirmNewPassword] = useState("");
-    const [role, setRole] = useState("");
 
     const [errorMessage] = useState({
         email: "This field cannot be empty!",
@@ -124,51 +120,41 @@ const Users = () => {
         role: "You need to select a role!"
     });
 
-
-
     const onUpdateClick = (event) => {
-        const form = event.currentTarget;
-        if(form.checkValidity() === false || !email.endsWith("benoit-cote.com") || newPassword.localeCompare(confirmNewPassword))
-        {
-            event.preventDefault();
-            event.stopPropagation();
-            if(!/^@benoit-cote.com$/.test(email) && email.length > 0){
-                errorMessage.email = "This is not the correct email format"
-            }
-            if(newPassword !== confirmNewPassword){
-                errorMessage.confirmNewPassword = "Please, make sure that the confirm password is the same as the new password entered above"
-            }
+        let header = {
+            'authorization': "Bearer " + cookies.get("accessToken")
         }
     
-        else
-        {
-            let user = {
-                email: email,
-                password: confirmNewPassword,
-                role: role
-            };
+        Axios.defaults.withCredentials = true;
+    
+        let user = {
+            email: email,
+            password: confirmNewPassword,
+            role: role
+        };
 
-            await Axios.put(`http://localhost:3001/users/modify/${email}`, user).then((response) =>{
+        Axios.put(`http://localhost:3001/users/modify/${email}`, user, {headers: header}).then((response) =>{
+            if(response.data === true)
+            {
+                console.log("User modified successfully!");
+            }
 
-                if(response.data === true)
-                {
-                    console.log("User modified successfully!");
+            console.log(response)
+        })
+        .catch((error) => {
+            if(error.response){
+                if(error.response.status === 401 || error.response.status === 403){
+                    setInvalidCredential("Incorrect email address");
                 }
-                console.log(response)
-                }).catch((error) => {
-                    if(error.response){
-                        if(error.response.status === 401 || error.response.status === 403){
-                            setInvalidCredential("Incorrect email address");
-                        }
-                    }
-                    else if(error.request){
-                        setInvalidCredential("Can't send the request to modify the user");
-                    }
-                });        
-        }  
+            }
+            else if(error.request){
+                setInvalidCredential("Can't send the request to modify the user");
+            }
+        });    
         setValidated(true);
-        return false; 
-    }
+        return false;     
+    }  
+    
 
 
     return (
@@ -219,7 +205,7 @@ const Users = () => {
 
                                             <td className="py-1">
                                                 <div className="d-flex justify-content-center">
-                                                    <button className="btnEdit btn-edit" onClick={() => handleEditUser(u.email)}>
+                                                    <button className="btnEdit btn-edit" onClick={() => handleEditUser(u.email, u.role)}>
                                                         <Icon path={mdiPencil} 
                                                             className="mdi mdi-edit" 
                                                             title="edit Button"
@@ -258,105 +244,102 @@ const Users = () => {
                 </div>
                 <div className={formEnabled.form}>
                     <div className="card shadow m-5 uForm">
-                        <CloseButton onClick={disableForm}/>
-                    </div>
-                </div>
-            </div>
-
-
-            <div className="container">
-                <div className="card shadow p-3 m-5">
-
-                    <Form noValidate 
-                        className="mt-5 mx-5" 
-                        validated={validated}
-                        onSubmit={onUpdateClick}>
-
-                        {
-                            InvalidCredential.length > 0 ? 
-                            <Alert variant="danger">
-                                {InvalidCredential}
-                            </Alert> :
-                            <></>
-                        }
-
-
-                        <Form.Group className="mb-4" controlId="floatingEmail">
-                            <Form.Label>Email</Form.Label>
-                                <Form.Control 
-                                    required
-                                    type="email"
-                                    value={email}
-                                    onChange={(e) => setEmail(e.target.value)}
-                                />
-
-                                <Form.Control.Feedback type="invalid">
-                                    {errorMessage.email}
-                                </Form.Control.Feedback>
+                        <CloseButton onClick={disableForm}
+                                     className='position-absolute top-0 end-0 m-4'/>
+                        <div className="container">
                             
-                        </Form.Group>
+
+                            <Form noValidate 
+                                  className="mt-5 mx-5" 
+                                  validated={validated}
+                                  onSubmit={onUpdateClick}>
+                                  <h1 className="display-4 text-center mb-5">{FormTitle}</h1>
+                                    {
+                                        InvalidCredential.length > 0 ? 
+                                        <Alert variant="danger">
+                                                {InvalidCredential}
+                                        </Alert> :
+                                        <></>
+                                    }
+                                
+
+                                <Form.Group className="mb-4" controlId="floatingEmail">
+                                    <Form.Label>Email</Form.Label>
+                                        <Form.Control 
+                                            required
+                                            type="email"
+                                            value={email}
+                                            onChange={(e) => setEmail(e.target.value)}
+                                            disabled=""/>
+
+                                        <Form.Control.Feedback type="invalid">
+                                            {errorMessage.email}
+                                        </Form.Control.Feedback>
+                                                
+                                </Form.Group>
 
 
-                        <Form.Group className="mb-5" controlId="floatingNewPassword">
-                            <Form.Label>New Password</Form.Label>
-                                <Form.Control 
-                                    required 
-                                    type="password" 
-                                    value={newPassword} 
-                                    onChange={(e) => setNewPassword(e.target.value)}
-                                />
+                                <Form.Group className="mb-4" controlId="floatingNewPassword">
+                                    <Form.Label>New Password</Form.Label>
+                                        <Form.Control 
+                                            required 
+                                            type="password" 
+                                            value={newPassword} 
+                                            onChange={(e) => setNewPassword(e.target.value)}
+                                        />
 
-                                <Form.Control.Feedback type="invalid">
-                                    {errorMessage.newPassword}
-                                </Form.Control.Feedback>
-                            
-                        </Form.Group>
-
-
-                        <Form.Group className="mb-4" controlId="floatingConfirmNewPassword">
-                            <Form.Label>Confirm New Password</Form.Label>
-                                <Form.Control 
-                                    required
-                                    type="password"
-                                    value={confirmNewPassword}
-                                    onChange={(e) => setConfirmNewPassword(e.target.value)}
-                                />
-
-                                <Form.Control.Feedback type="invalid">
-                                    {errorMessage.confirmNewPassword}
-                                </Form.Control.Feedback>
-                        </Form.Group>
+                                        <Form.Control.Feedback type="invalid">
+                                            {errorMessage.newPassword}
+                                        </Form.Control.Feedback>
+                                    
+                                </Form.Group>
 
 
-                        <Form.Group className="mb-4" controlId="floatingModifyRole">
-                                <Form.Label>Role</Form.Label>
-                                <Form.Select required
-                                            size="sm" 
-                                            aria-label="Default select example" 
-                                            value={role} 
-                                            onChange={(e) => setRole(e.target.value)}>
+                                <Form.Group className="mb-4" controlId="floatingConfirmNewPassword">
+                                    <Form.Label>Confirm New Password</Form.Label>
+                                        <Form.Control 
+                                            required
+                                            type="password"
+                                            value={confirmNewPassword}
+                                            onChange={(e) => setConfirmNewPassword(e.target.value)}
+                                        />
 
-                                    <option value="">Select User</option>
-                                    <option value="Admin">Admin</option>
-                                    <option value="User">User</option>
-                                </Form.Select>
-
-                                <Form.Control.Feedback type="invalid">
-                                    {errorMessage.role}
-                                </Form.Control.Feedback>
-                        </Form.Group>
+                                        <Form.Control.Feedback type="invalid">
+                                            {errorMessage.confirmNewPassword}
+                                        </Form.Control.Feedback>
+                                </Form.Group>
 
 
+                                <Form.Group className="mb-4" controlId="floatingModifyRole">
+                                        <Form.Label>Role</Form.Label>
+                                        <Form.Select required
+                                                    size="sm" 
+                                                    aria-label="Default select example" 
+                                                    value={role} 
+                                                    onChange={(e) => setRole(e.target.value)}>
 
-                        <div className="d-flex justify-content-center mt-5 mb-4">
-                            <Button 
-                                type="submit" 
-                                className="btn btn-light py-2 px-5 my-1 shadow-sm border submitButton">
-                                Save Changes
-                            </Button>
+                                            <option value="">Select User</option>
+                                            <option value="admin">admin</option>
+                                            <option value="user">user</option>
+                                        </Form.Select>
+
+                                        <Form.Control.Feedback type="invalid">
+                                            {errorMessage.role}
+                                        </Form.Control.Feedback>
+                                </Form.Group>
+
+
+
+                                <div className="d-flex justify-content-center mt-5 mb-4">
+                                    <Button 
+                                        type="submit" 
+                                        className="btn btn-light py-2 px-5 my-1 shadow-sm border submitButton">
+                                        Save Changes
+                                    </Button>
+                                </div>
+                            </Form>
                         </div>
-
-                    </Form>
+                    </div>
                 </div>
             </div>
         </div>
