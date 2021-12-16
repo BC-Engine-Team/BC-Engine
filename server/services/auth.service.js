@@ -39,23 +39,23 @@ exports.authenticateToken = async (req, res, next) => {
 };
 
 exports.refreshToken = async (req, res) => {
-    const authHeader = req.headers['authorization'];
-    const token = authHeader && authHeader.split(' ')[1];
-    
-    if(token == null){
-        return res.sendStatus(401);
-    }
-    if(!refreshTokens.includes(token)){
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1];
+  
+  if(token == null){
+      return res.sendStatus(401);
+  }
+  if(!refreshTokens.includes(token)){
+      return res.sendStatus(403);
+  }
+  jwt.verify(token, REFRESH_TOKEN_SECRET, (err, user) => {
+      if(err){
         return res.sendStatus(403);
-    }
-    jwt.verify(token, REFRESH_TOKEN_SECRET, (err, user) => {
-        if(err){
-          return res.sendStatus(403);
-        }
-        const accessToken = jwt.sign(user, ACCESS_TOKEN_SECRET, {expiresIn: '900s'});
-        return res
-            .header('authorization', accessToken).send();
-    });
+      }
+      const accessToken = jwt.sign(user, ACCESS_TOKEN_SECRET, {expiresIn: '900s'});
+      return res
+          .header('authorization', accessToken).send();
+  });
 };
 
 exports.logout = async (req, res) => {

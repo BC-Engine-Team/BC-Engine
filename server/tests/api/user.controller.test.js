@@ -47,13 +47,37 @@ const resUser2 = {
     }
 };
 
+const ListUser = [
+    {
+        dataValues: {
+            email: "a@email.com",
+            name: "a",
+            role: "employee",
+        }
+    },
+    {
+        dataValues: {
+            email: "b@email.com",
+            name: "b",
+            role: "admin"
+        }
+    },
+    {
+        dataValues: {
+            email: "c@email.com",
+            name: "c",
+            role: "admin"
+        }
+    }
+];
+
 let sandbox = sinon.createSandbox();
 let authStub = sandbox.stub(AuthService, 'authenticateToken')
-    .callsFake(function(req, res, next) {
+    .callsFake(function(req, res, next){
         console.log("in original authstub...");
         req.user = reqUser;
         return next();
-});
+    });
 
 let empStub = sandbox.stub(EmpService, 'checkEmail')
     .callsFake(function(req, res, next){
@@ -192,6 +216,25 @@ describe("Test UserController", () => {
             });
         });
         
+    });
+
+    describe("View all Users", () => {
+        describe("Given a token passed", () => {
+            it("Should respond with a 200 status code", async () => {
+                userSpy = jest.spyOn(UserService, 'getAllUsers')
+                .mockImplementation(() => new Promise(
+                    (resolve) => {
+                        resolve(ListUser);
+                    }
+                ));
+
+                const response = await supertest(app).get("/users");
+
+                expect(response.status).toBe(200);
+                expect(userSpy).toHaveBeenCalledTimes(1);
+                expect(JSON.stringify(response.body)).toEqual(JSON.stringify(ListUser));
+            });
+        });
     });
     
     describe("(C2): Authenticating a User)", () => {

@@ -35,6 +35,11 @@ const NavB = (props) => {
             navigate("/login");
         }
         else {
+            navigate("/login");
+            cookies.remove("refreshToken");
+            cookies.remove("accessToken");
+            cookies.remove("username");
+            cookies.remove("role");
             let conf = {
                 headers: {
                     authorization: "Bearer " + refreshToken
@@ -47,7 +52,7 @@ const NavB = (props) => {
                     cookies.remove("refreshToken");
                     cookies.remove("accessToken");
                     cookies.remove("username");
-                    cookies.remove("role");         
+                    cookies.remove("role");
                     navigate("/login");
                 }       
             })

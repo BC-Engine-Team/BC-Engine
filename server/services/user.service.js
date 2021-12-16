@@ -36,6 +36,7 @@ exports.getAllUsers = async () => {
         User.findAll()
             .then(async data => {
                 if(data){
+                    console.log(data);
                     let returnData = [];
                     for(let u=0; u<data.length;u++){
                         returnData.push({

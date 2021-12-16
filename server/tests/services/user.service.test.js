@@ -12,6 +12,31 @@ const reqUser = {
     role: "admin"
 };
 
+const ListUser = [
+    {
+        dataValues: {
+            email: "a@email.com",
+            name: "a",
+            role: "employee",
+        }
+    },
+    {
+        dataValues: {
+            email: "b@email.com",
+            name: "b",
+            role: "admin"
+        }
+    },
+    {
+        dataValues: {
+            email: "c@email.com",
+            name: "c",
+            role: "admin"
+        }
+    }
+];
+
+
 const resUser = {
     dataValues: {
         userId: "validUUID",
@@ -38,6 +63,23 @@ describe("createUser", () => {
                 role: resUser.dataValues.role
             });
         })
+    });
+});
+
+describe("View All Users", () => {
+    describe("given a list of users", () => {
+        it("Should return the full list of user with all their information", async() => {
+
+            jest.spyOn(UserModel, 'findAll')
+            .mockImplementation(() => new Promise(
+                (resolve) => {
+                    resolve(ListUser);
+                }
+            ));
+
+            const serviceResponse = await UserService.getAllUsers();
+            expect(serviceResponse.length).toBe(3);
+        });
     });
 });
 
