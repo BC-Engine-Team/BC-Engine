@@ -58,15 +58,7 @@ thead {
     display: block !important;
   }
 
-  .container-form-enabled-form {
-    width: 100%;
-    padding-right: var(--bs-gutter-x,.75rem);
-    padding-left: var(--bs-gutter-x,.75rem);
-    margin-right: auto;
-    margin-left: auto;
-    float: none;
-  }
-  
+  .container-form-enabled-form,
   .container-form-enabled-table {
     width: 100%;
     padding-right: var(--bs-gutter-x,.75rem);
