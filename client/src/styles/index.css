@@ -42,7 +42,7 @@ input {
 }
 
 .uForm {
-  height: 510px !important;
+  display: flex;
 }
 
 thead {

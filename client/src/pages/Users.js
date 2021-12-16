@@ -115,6 +115,7 @@ const Users = () => {
     const [email, setEmail] = useState("");
     const [password1, setPassword1] = useState("");
     const [password2, setPassword2] = useState("");
+    const [role, setRole] = useState("");
 
     const [errorMessage] = useState({
         email: "This field cannot be empty!",
@@ -221,7 +222,7 @@ const Users = () => {
                         <CloseButton onClick={disableForm}/>
                         <Form
                             noValidate 
-                            className="mt-5 mx-5" 
+                            className="mt-4 mx-5" 
                             validated={validated} 
                             onSubmit={handleSubmit}>
 
@@ -281,6 +282,24 @@ const Users = () => {
                                         {errorMessage.password}
                                     </Form.Control.Feedback>
                                 </FloatingLabel>
+                            </Form.Group>
+                            
+                            <Form.Group className="mb-4" controlId="floatingModifyRole">
+                                <Form.Label>Role</Form.Label>
+                                <Form.Select required
+                                            size="sm" 
+                                            aria-label="Default select example" 
+                                            value={role} 
+                                            onChange={(e) => setRole(e.target.value)}>
+
+                                    <option value="">Select User</option>
+                                    <option value="Admin">Admin</option>
+                                    <option value="User">User</option>
+                                </Form.Select>
+
+                                <Form.Control.Feedback type="invalid">
+                                    {errorMessage.role}
+                                </Form.Control.Feedback>
                             </Form.Group>
 
                             <div className="d-flex justify-content-center mt-5 mb-4">
