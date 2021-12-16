@@ -24,6 +24,6 @@ router.delete("/logout", authService.logout);
 router.put(`/modify/:email`, authService.authenticateToken, userController.modifyUser);
 
 // Delete user selected
-//router.delete("/users/delete/:email");
+router.delete("/users/delete/:email", authService.authenticateToken, userController.deleteUser);
 
 module.exports = router;

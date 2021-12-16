@@ -120,6 +120,21 @@ exports.modifyUser = async(req, res) => {
         .catch(err => {
             return res.send(err);
         });
-
 } 
+
+exports.deleteUser = async(req, res) => {
+    if(!req.user.role === "admin") return res.status(403).send();
+
+    const user = {
+        email: req.body.email,
+    };
+
+    await userService.deleteUser(user)
+        .then(response => {
+            return res.send(response);
+        })
+        .catch(err => {
+            return res.send(err);
+        });
+}
 

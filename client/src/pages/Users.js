@@ -34,7 +34,7 @@ const Users = () => {
     const [validated, setValidated] = useState(false);
     const [InvalidCredential, setInvalidCredential] = useState("");
 
-    const FormTitle = useState("Edit User");
+    let FormTitle = useState("");
 
 
     const [formEnabled, setFormEnabled] = useState({
@@ -111,8 +111,6 @@ const Users = () => {
     }, []);
 
 
-
-
     const [errorMessage] = useState({
         email: "This field cannot be empty!",
         newPassword: "This field cannot be empty!",
@@ -133,7 +131,7 @@ const Users = () => {
             role: role
         };
 
-        Axios.put(`http://localhost:3001/users/modify/${email}`, user, {headers: header}).then((response) =>{
+        Axios.put(`http://localhost:3001/users/modify/${email}`, {headers: header}).then((response) =>{
             if(response.data === true)
             {
                 console.log("User modified successfully!");
@@ -144,7 +142,7 @@ const Users = () => {
         .catch((error) => {
             if(error.response){
                 if(error.response.status === 401 || error.response.status === 403){
-                    setInvalidCredential("Incorrect email address");
+                    setInvalidCredential("Cannot recognize the email address");
                 }
             }
             else if(error.request){
@@ -153,7 +151,39 @@ const Users = () => {
         });    
         setValidated(true);
         return false;     
-    }  
+    }
+    
+    
+    // const onDeleteClick = (event) => {
+    //     let header = {
+    //         'authorization': "Bearer " + cookies.get("accessToken")
+    //     }
+    
+    //     Axios.defaults.withCredentials = true;
+
+    //     Axios.delete(`http://localhost:3001/users/delete/${email}`, {headers: header}).then((response) =>{
+
+    //         if(response.data === true)
+    //         {
+    //             console.log("User deleted successfully!");
+    //         }
+    //         console.log(response)
+    //     })
+    //     .catch((error) => {
+    //         if(error.response){
+    //             if(error.response.status === 401 || error.response.status === 403){
+    //                 setInvalidCredential("Cannot recognize the email address");
+    //             }
+    //         }
+    //         else if(error.request){
+    //             setInvalidCredential("Can't send the request to delete the user");
+    //         }
+    //     });    
+    //     setValidated(true);
+    //     return false;   
+    // }
+
+
     
 
 
@@ -320,7 +350,7 @@ const Users = () => {
 
                                             <option value="">Select User</option>
                                             <option value="admin">admin</option>
-                                            <option value="user">user</option>
+                                            <option value="employee">employee</option>
                                         </Form.Select>
 
                                         <Form.Control.Feedback type="invalid">

@@ -1,3 +1,4 @@
+const { reject } = require("bcrypt/promises");
 const mysqldb = require("../data_access_layer/mysqldb");
 const User = mysqldb.users;
 const Op = mysqldb.Sequelize.Op;
@@ -155,3 +156,28 @@ exports.modifyUser = async (user) => {
 
     });
 };
+
+exports.deleteUser = async (user) => {
+
+    return new Promise((resolve, reject) => {
+
+        User.destroy(user,
+                    {where: {email: user.email}})
+            .then(async data => {
+                if(data){
+                    resolve("User deleted successfully");
+                }
+                resolve("User has failed to be deleted");
+            })
+            .catch(err => {
+                const response = {
+                    status: 500,
+                    data: {},
+                    error: {
+                        message: err.message || "some error occured"
+                    }
+                }
+                reject(response);
+            });
+    });
+}
