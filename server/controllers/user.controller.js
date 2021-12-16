@@ -4,7 +4,6 @@ const authService = require('../services/auth.service');
 // Create and Save a new User
 exports.create = async (req, res) => {
     if(!req.user.role === "admin") return res.status(403).send();
-    console.log(req.user.email);
     // Validate request    
     if(!req.body.email || !req.body.password 
         || !req.body.role){
@@ -22,7 +21,7 @@ exports.create = async (req, res) => {
     const user = {
         email: req.body.email,
         password: req.body.password,
-        name: req.body.name,
+        name: req.emp.name,
         role: req.body.role
     };
 
@@ -32,7 +31,14 @@ exports.create = async (req, res) => {
             return res.send(response);
         })
         .catch(err => {
-            return res.send(err);
+            if(err.message === "Validation error"){
+                err.message = "User already exists.";
+                return res.status(400).send(err);
+            }
+            else{
+                return res.status(500).send(err);
+            }
+            
         });
 };
 

@@ -29,6 +29,10 @@ const Users = () => {
         form: "d-none",
     });
 
+    const [backEnabled, setBackEnabled] = useState({
+        backButton: "d-none"
+    })
+
     const [users, setUsers] = useState([
         {name: "", email: "", role: ""}
     ]);
@@ -38,6 +42,18 @@ const Users = () => {
             table: "container-form-enabled-table",
             form: "container-form-enabled-form",
         });
+    }
+
+    const enableBackButton = () => {
+        setBackEnabled({
+            backButton: "btn btn-light py-2 px-5 my-1 shadow-sm border"
+        })
+    }
+
+    const disableBackButton = () => {
+        setBackEnabled({
+            backButton: "d-none"
+        })
     }
 
     const disableForm = () => {
@@ -57,11 +73,29 @@ const Users = () => {
     const handleAddUser = () => {
         console.log("Add user");
         enableForm();
+        
+        setInvalidInput("");
         setEmailEnable("");
+        setPasswordEnable("");
+        setRoleEnable("");
         setFormTitle("Add User");
         setFormSubmit("Add");
+        disableBackButton();
+        setErrors({});
         setForm({});
 
+    }
+
+    const handleGoBack = () => {
+        setSubmitType("submit");
+        setOnConfirmationScreen(false);
+        //setInvalidInput("");
+        setEmailEnable("");
+        setPasswordEnable("");
+        setRoleEnable("");
+        setFormTitle("Add User");
+        setFormSubmit("Add");
+        disableBackButton();
     }
 
     const handleEditUser = (email) => {
@@ -118,16 +152,16 @@ const Users = () => {
     const [validated, setValidated] = useState(false);
     const [InvalidInput, setInvalidInput] = useState("");
 
+    const [onConfirmationScreen, setOnConfirmationScreen] = useState(false);
+
     const [FormTitle, setFormTitle] = useState("");
     const [FormSubmit, setFormSubmit] = useState("");
+    const [submitType, setSubmitType] = useState("submit");
     const [emailEnable, setEmailEnable] = useState("");
-    const [email, setEmail] = useState("");
-    const [password1, setPassword1] = useState("");
-    const [password2, setPassword2] = useState("");
-    const [role, setRole] = useState("");
+    const [passwordEnable, setPasswordEnable] = useState("");
+    const [roleEnable, setRoleEnable] = useState("");
 
-    const [emailErrorMessage, setEmailErrorMessage] = useState("This field cannot empty!");
-    const [passwordErrorMessage, setPasswordErrorMessage] = useState("This field cannot empty!");
+
 
     const [form, setForm] = useState({});
     const [errors, setErrors] = useState({});
@@ -154,21 +188,77 @@ const Users = () => {
         //     event.stopPropagation();
         // }
 
+        setInvalidInput("");
+        console.log(InvalidInput.length);
         console.log("in handleSubmit");
         event.preventDefault();
+        event.stopPropagation();
 
         const newErrors = findFormErrors();
 
         if(Object.keys(newErrors).length > 0){
             setErrors(newErrors);
         }
-        else{
-            alert("NO ERRORS!!!!");
+        else if(InvalidInput.length === 0){
+            setSubmitType("button");
+            setOnConfirmationScreen(true);
+            setFormTitle("Looks good?");
+            setFormSubmit("Confirm");
+            setEmailEnable("disable");
+            setPasswordEnable("disable");
+            setRoleEnable("disable");
+            enableBackButton();
+            setErrors({});
+            
         }
 
         
 
         //setValidated(true);
+    }
+
+    const handleConfirm = (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        console.log("in handleConfirm...-------------------------------------------------------------------");
+        let header = {
+            'authorization': "Bearer " + cookies.get("accessToken")
+        }
+
+        let data = {
+            email: form.email,
+            password: form.password1,
+            role: form.role
+        }
+
+        Axios.post("http://localhost:3001/users/", data, {headers: header})
+        .then((response) => {
+            console.log(response);
+
+            if(response.status === 200 || response.status === 201) {
+                disableForm();
+                handleRefresh();
+            }
+        })
+        .catch((error) => {
+            if (error.response) {
+                if(error.response.status === 403 || error.response.status === 401){
+                    setInvalidInput(error.response.data.message);
+                    navigate("/login");
+                }
+                else {
+                    console.log(error.response.data.message);
+                    setInvalidInput(error.response.data.message);
+                    console.log(InvalidInput);
+                    handleGoBack();
+                }
+            } else if (error.request) {
+                // The request was made but no response was received
+                // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
+                // http.ClientRequest in node.js
+                setInvalidInput("Could not reach B&C Engine...");
+              }
+        });
     }
 
     const findFormErrors = () => {
@@ -186,7 +276,8 @@ const Users = () => {
         if(!password2 || password2 === ""){
             newErrors.password2 = "This field cannot be empty!";
         }
-        if(password1 !== password2){
+        if(!RegExp("^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.{8,})").exec(password1)) newErrors.password1 = "Password must be at least 8 characters, contain 1 upper-case and 1 lower-case letter, and contain a number."
+        else if(password1 !== password2){
             newErrors.password1 = "Passwords must match!";
             newErrors.password2 = "Passwords must match!";
         }
@@ -291,7 +382,7 @@ const Users = () => {
                             onClick={disableForm}/>
                         <Form
                             noValidate 
-                            className="mt-4 mx-5" 
+                            className="mt-4 mx-5 uForm" 
                             validated={validated} 
                             onSubmit={handleSubmit}>
 
@@ -310,7 +401,7 @@ const Users = () => {
                                     <Form.Control 
                                         required
                                         type="email"
-                                        defaultValue={email}
+                                        defaultValue={form.email}
                                         onChange={(e) => setField('email', e.target.value)}
                                         autoComplete='new-email'
                                         disabled={emailEnable}
@@ -328,9 +419,10 @@ const Users = () => {
                                     <Form.Control 
                                         required 
                                         type="password" 
-                                        defaultValue={password1}
+                                        defaultValue={form.password1}
                                         onChange={(e) => setField('password1', e.target.value)}
                                         autoComplete='new-password'
+                                        disabled={passwordEnable}
                                         isInvalid={!!errors.password1}
                                     />
 
@@ -345,9 +437,10 @@ const Users = () => {
                                     <Form.Control 
                                         required 
                                         type="password" 
-                                        defaultValue={password2} 
+                                        defaultValue={form.password2} 
                                         onChange={(e) => setField('password2', e.target.value)}
                                         autoComplete='off'
+                                        disabled={passwordEnable}
                                         isInvalid={!!errors.password2}
                                     />
 
@@ -362,14 +455,15 @@ const Users = () => {
                                 <Form.Select required
                                             size="sm" 
                                             aria-label="Default select example" 
-                                            defaultValue={role} 
+                                            defaultValue={form.role} 
                                             onChange={(e) => setField('role', e.target.value)}
                                             selected=""
+                                            disabled={roleEnable}
                                             isInvalid={!!errors.role}>
 
                                     <option value="">Select User</option>
-                                    <option value="Admin">Admin</option>
-                                    <option value="User">User</option>
+                                    <option value="admin">Admin</option>
+                                    <option value="employee">Employee</option>
                                 </Form.Select>
 
                                 <Form.Control.Feedback type="invalid">
@@ -377,12 +471,24 @@ const Users = () => {
                                 </Form.Control.Feedback>
                             </Form.Group>
 
-                            <div className="d-flex justify-content-center mt-5 mb-4">
+                            <div className="d-flex justify-content-center mt-3 mb-4 position-aboslute bottom-0">
                                 <Button 
-                                    type="submit" 
-                                    className="btn btn-light py-2 px-5 my-1 shadow-sm border submitButton position-absolute bottom-0 mb-5">
+                                    type={submitType} 
+                                    className="btn btn-light py-2 px-5 my-1 mx-2 shadow-sm border submitButton"
+                                    style={{display: 'inline-block'}}
+                                    onClick={onConfirmationScreen ? handleConfirm : undefined}>
                                     {FormSubmit}
                                 </Button>
+                                
+
+                                <Button 
+                                    className={backEnabled.backButton}
+                                    style={{display: 'inline-block'}}
+                                    onClick={handleGoBack}>
+                                    
+                                    Go back
+                                </Button>
+                                
                             </div>
                         </Form>
                     </div>

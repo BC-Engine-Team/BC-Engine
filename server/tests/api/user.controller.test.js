@@ -74,7 +74,6 @@ const ListUser = [
 let sandbox = sinon.createSandbox();
 let authStub = sandbox.stub(AuthService, 'authenticateToken')
     .callsFake(function(req, res, next){
-        console.log("in original authstub...");
         req.user = reqUser;
         return next();
     });

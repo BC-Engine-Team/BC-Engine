@@ -21,9 +21,7 @@ exports.createUser = async (user) => {
                 const response = {
                     status: 500,
                     data: {},
-                    error: {
-                        message: err.message || "some error occured"
-                    }
+                    message: err.message || "some error occured" 
                 }
                 reject(response);
             });
@@ -36,7 +34,6 @@ exports.getAllUsers = async () => {
         User.findAll()
             .then(async data => {
                 if(data){
-                    console.log(data);
                     let returnData = [];
                     for(let u=0; u<data.length;u++){
                         returnData.push({
@@ -53,9 +50,7 @@ exports.getAllUsers = async () => {
                 const response = {
                     status: 500,
                     data: {},
-                    error: {
-                        message: err.message || "some error occured"
-                    }
+                    message: err.message || "some error occured"
                 }
                 reject(response);
             });

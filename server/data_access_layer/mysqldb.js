@@ -43,22 +43,6 @@ for(let i=0; i<databases.length; i++){
 
 
 db.Sequelize = Sequelize;
-//db.sequelize = sequelize;
-
-const fs = require('fs');
-const path = require('path');
-const basename = path.basename(module.filename);
-
-// Add models from mysql folder
-// fs.readdirSync(__dirname + '/mysql')
-//   .filter(file => 
-//     (file.indexOf('.') !== 0) &&
-//     (file !== basename) && 
-//     (file.slice(-3) === '.js'))
-//   .forEach(file => {
-//     const model = db.mysqldb.import(path.join(__dirname + '/mysql', file));
-//     db[model.name] = model;
-//   });
 
 
 // Add any tables to the database here
