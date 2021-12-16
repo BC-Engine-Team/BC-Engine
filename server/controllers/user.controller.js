@@ -38,16 +38,12 @@ exports.findAll = async (req, res) => {
             return res.status(200).send(response);
         })
         .catch(err => {
-
-            console.log(err)
-            console.log(res)
             return res.status(500).send(err);
         });
 };
 
 // fetch all users with admin role
 exports.getAdmins = async (req, res) => {
-    console.log(res);
     if(req.user.role !== "admin") return res.status(403).send();
     await userService.getAdmins()
         .then(response => {
