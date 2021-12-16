@@ -7,6 +7,7 @@ const { afterEach, afterAll } = require('jest-circus');
 var { expect, jest } = require('@jest/globals');
 const { mocked } = require('jest-mock');
 const supertest = require('supertest');
+var MockExpressResponse = require('mock-express-response');
 
 var app;
 var auth;
@@ -16,6 +17,24 @@ const reqUser = {
     password: "validPassword",
     name: "validName",
     role: "admin"
+};
+
+const reqUserAdmin = {
+    user: {
+        email: "valid@email.com",
+        password: "validPassword",
+        name: "validName",
+        role: "admin"
+    }
+}
+
+const reqUserEmployee = {
+    user: {
+        email: "valid@email.com",
+        password: "validPassword",
+        name: "validName",
+        role: "employee"
+    }
 };
 
 const resUser = {
@@ -40,6 +59,30 @@ const resUser2 = {
     }
 };
 
+const ListUser = [
+    {
+        dataValues: {
+            email: "a@email.com",
+            name: "a",
+            role: "employee",
+        }
+    },
+    {
+        dataValues: {
+            email: "b@email.com",
+            name: "b",
+            role: "admin"
+        }
+    },
+    {
+        dataValues: {
+            email: "c@email.com",
+            name: "c",
+            role: "admin"
+        }
+    }
+];
+
 
 var sandbox = sinon.createSandbox();
 auth = require('../../services/auth.service');
@@ -52,6 +95,7 @@ sandbox.stub(auth, 'authenticateToken')
 const makeApp = require('../../app');
 app = makeApp();
 const request = supertest(app);
+const res = new MockExpressResponse();
 
 describe("Test UserController", () => {
     let userSpy = jest.spyOn(UserService, 'authenticateUser')
@@ -94,6 +138,40 @@ describe("Test UserController", () => {
                 expect(userSpy).toHaveBeenCalledTimes(1);
                 expect(JSON.stringify(response.body)).toEqual(JSON.stringify(resUser));
                 
+            });
+        });
+    });
+
+    describe("View all Users", () => {
+        describe("Given a token passed", () => {
+            it("Should respond with a 200 status code", async () => {
+                userSpy = jest.spyOn(UserService, 'getAllUsers')
+                .mockImplementation(() => new Promise(
+                    (resolve) => {
+                        resolve(ListUser);
+                    }
+                ));
+
+                const response = await supertest(app).get("/users");
+
+                expect(response.status).toBe(200);
+                expect(userSpy).toHaveBeenCalledTimes(1);
+                expect(JSON.stringify(response.body)).toEqual(JSON.stringify(ListUser));
+            });
+
+            it("Should respond with a 403 status code", async () => {
+                let response = await UserController.findAll(reqUserEmployee, res);
+                expect(response.statusCode).toBe(403);
+            });
+
+            it("Should respond with a 500 status code", async () => {
+                userSpy = jest.spyOn(UserService, 'getAllUsers')
+                .mockImplementation(async () => {
+                    await Promise.reject({status: 500});
+                });
+
+                const response = await supertest(app).get("/users");
+                expect(response.status).toBe(500);
             });
         });
     });
@@ -199,39 +277,4 @@ describe("Test UserController", () => {
             })
         });
     });
-
-        
-    
 });
-
-    // describe("GET /users/", () => {
-    //     describe("given no token is passed", () =>{
-            
-    //         it("should return 401", async () => {
-    //             const response = await request.get("/users");
-    //             expect(response.statusCode).toBe(401);
-    //         });
-            
-    //     });
-
-    //     describe("given a token is passed", () => {
-    //         it("should return 200", async () => {
-    //             const resp = await request.post("/users/authenticate").send({
-    //                 email: "first@benoit-cote.com",
-    //                 password: "verySecurePassword"
-    //             });
-    //             const aToken = resp.body.aToken;
-    //             request.get("/users")
-    //                 .set("authorization", `Bearer ${aToken}`)
-    //                 .expect(200);
-    //         });
-
-    //         it("should return 403", async () => {
-    //             const response = await request.get("/users").set("authorization", "Bearer aToken");
-    //             expect(response.statusCode).toBe(403);
-    //         });
-    //     });
-
-        
-    // });
-
