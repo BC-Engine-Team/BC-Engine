@@ -41,6 +41,8 @@ const Users = () => {
     }
 
     const disableForm = () => {
+        setValidated(false);
+        setForm({});
         setFormEnabled({
             table: "container",
             form: "d-none",
@@ -50,16 +52,19 @@ const Users = () => {
     const handleAddUser = () => {
         console.log("Add user");
         enableForm();
+        setEmailEnable("");
         setFormTitle("Add User");
         setFormSubmit("Add");
+        setForm({});
         setEmail("");
         setPassword1("");
-        setPassword2("");
+
     }
 
     const handleEditUser = (email) => {
         console.log("Edit user with email: " + email);
         enableForm();
+        setEmailEnable("disable");
 
     }
 
@@ -112,23 +117,81 @@ const Users = () => {
 
     const [FormTitle, setFormTitle] = useState("");
     const [FormSubmit, setFormSubmit] = useState("");
+    const [emailEnable, setEmailEnable] = useState("");
     const [email, setEmail] = useState("");
     const [password1, setPassword1] = useState("");
     const [password2, setPassword2] = useState("");
     const [role, setRole] = useState("");
 
-    const [errorMessage] = useState({
-        email: "This field cannot be empty!",
-        password: "This field cannot be empty!",
-    })
+    const [emailErrorMessage, setEmailErrorMessage] = useState("This field cannot empty!");
+    const [passwordErrorMessage, setPasswordErrorMessage] = useState("This field cannot empty!");
+
+    const [form, setForm] = useState({});
+    const [errors, setErrors] = useState({});
+
+    const setField = (field, value) => {
+        setForm({
+          ...form,
+          [field]: value
+        });
+
+        if ( !!errors[field] ){
+            setErrors({
+                ...errors,
+                [field]: null
+              });
+        } 
+    }
+    
 
     const handleSubmit = (event) => {
-        const form = event.currentTarget;
-        if (form.checkValidity() === false) {
-            event.preventDefault();
-            event.stopPropagation();
-        }
+        // const form = event.currentTarget;
+        // if (form.checkValidity() === false) {
+        //     event.preventDefault();
+        //     event.stopPropagation();
+        // }
+
         console.log("in handleSubmit");
+        event.preventDefault();
+
+        const newErrors = findFormErrors();
+
+        if(Object.keys(newErrors).length > 0){
+            setErrors(newErrors);
+        }
+        else{
+            alert("NO ERRORS!!!!");
+        }
+
+        
+
+        //setValidated(true);
+    }
+
+    const findFormErrors = () => {
+        const {email, password1, password2, role} = form;
+        const newErrors = {}
+
+        // email errors
+        if(!email || email === "") newErrors.email = "This field cannot empty!";
+        else if(!email.endsWith("@benoit-cote.com")) newErrors.email = "Invalid email. Must end with 'benoit-cote.com'.";
+        
+        // password errors
+        if(!password1 || password1 === ""){
+                newErrors.password1 = "This field cannot empty!";
+        }
+        if(!password2 || password2 === ""){
+            newErrors.password2 = "This field cannot be empty!";
+        }
+        if(password1 !== password2){
+            newErrors.password1 = "Passwords must match!";
+            newErrors.password2 = "Passwords must match!";
+        }
+
+        // role errors
+        if(!role || role === "") newErrors.role = "Must select a role!";
+
+        return newErrors;
     }
 
     return (
@@ -216,17 +279,20 @@ const Users = () => {
                         </Table>
                     </div>
                 </div>
+
                 <div className={formEnabled.form}>
                     <div className="card shadow m-5 uForm">
                         
-                        <CloseButton onClick={disableForm}/>
+                        <CloseButton 
+                            className="position-absolute top-0 end-0 m-4"
+                            onClick={disableForm}/>
                         <Form
                             noValidate 
                             className="mt-4 mx-5" 
                             validated={validated} 
                             onSubmit={handleSubmit}>
 
-                            <h1 className="display-4 text-center mb-4">{FormTitle}</h1>
+                            <h1 className="display-4 text-center mb-5">{FormTitle}</h1>
 
                             {
                             InvalidInput.length > 0 ? 
@@ -241,13 +307,15 @@ const Users = () => {
                                     <Form.Control 
                                         required
                                         type="email"
-                                        value={email}
-                                        onChange={(e) => setEmail(e.target.value)}
+                                        defaultValue={email}
+                                        onChange={(e) => setField('email', e.target.value)}
                                         autoComplete='off'
+                                        disabled={emailEnable}
+                                        isInvalid={!!errors.email}
                                     />
 
                                     <Form.Control.Feedback type="invalid">
-                                        {errorMessage.email}
+                                        {errors.email}
                                     </Form.Control.Feedback>
                                 </FloatingLabel>
                             </Form.Group>
@@ -257,13 +325,14 @@ const Users = () => {
                                     <Form.Control 
                                         required 
                                         type="password" 
-                                        value={password1} 
-                                        onChange={(e) => setPassword1(e.target.value)}
+                                        defaultValue={password1}
+                                        onChange={(e) => setField('password1', e.target.value)}
                                         autoComplete='off'
+                                        isInvalid={!!errors.password1}
                                     />
 
                                     <Form.Control.Feedback type="invalid">
-                                        {errorMessage.password}
+                                        {errors.password1}
                                     </Form.Control.Feedback>
                                 </FloatingLabel>
                             </Form.Group>
@@ -273,13 +342,14 @@ const Users = () => {
                                     <Form.Control 
                                         required 
                                         type="password" 
-                                        value={password2} 
-                                        onChange={(e) => setPassword2(e.target.value)}
+                                        defaultValue={password2} 
+                                        onChange={(e) => setField('password2', e.target.value)}
                                         autoComplete='off'
+                                        isInvalid={!!errors.password2}
                                     />
 
                                     <Form.Control.Feedback type="invalid">
-                                        {errorMessage.password}
+                                        {errors.password2}
                                     </Form.Control.Feedback>
                                 </FloatingLabel>
                             </Form.Group>
@@ -289,8 +359,10 @@ const Users = () => {
                                 <Form.Select required
                                             size="sm" 
                                             aria-label="Default select example" 
-                                            value={role} 
-                                            onChange={(e) => setRole(e.target.value)}>
+                                            defaultValue={role} 
+                                            onChange={(e) => setField('role', e.target.value)}
+                                            selected=""
+                                            isInvalid={!!errors.role}>
 
                                     <option value="">Select User</option>
                                     <option value="Admin">Admin</option>
@@ -298,14 +370,14 @@ const Users = () => {
                                 </Form.Select>
 
                                 <Form.Control.Feedback type="invalid">
-                                    {errorMessage.role}
+                                    
                                 </Form.Control.Feedback>
                             </Form.Group>
 
                             <div className="d-flex justify-content-center mt-5 mb-4">
                                 <Button 
                                     type="submit" 
-                                    className="btn btn-light py-2 px-5 my-1 shadow-sm border submitButton">
+                                    className="btn btn-light py-2 px-5 my-1 shadow-sm border submitButton position-absolute bottom-0 mb-5">
                                     {FormSubmit}
                                 </Button>
                             </div>
