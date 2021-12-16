@@ -16,7 +16,7 @@
   background-color: lightgrey;
 }
 
-input {
+input, select {
   border-radius: 0.7rem !important;
 }
 
@@ -24,25 +24,20 @@ input {
   border-radius: 0.25rem !important;
 }
 
-.uTable {
-  height: 510px !important;
-  overflow-y: auto;
-}
-
-.container-form-enabled-form {
-  max-width: 800px !important;
-  width: 50%;
-  float: left;
-}
-
+.container-form-enabled-form,
 .container-form-enabled-table {
-  width: 50%;
   max-width: 800px !important;
+  width: 50%;
   float: left;
 }
 
 .uForm {
-  height: 510px !important;
+  height: 650px !important;
+}
+
+.uTable {
+  height: 650px !important;
+  overflow-y: auto;
 }
 
 thead {

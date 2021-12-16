@@ -7,6 +7,7 @@ const { afterEach, afterAll } = require('jest-circus');
 var { expect, jest } = require('@jest/globals');
 const { mocked } = require('jest-mock');
 const supertest = require('supertest');
+var MockExpressResponse = require('mock-express-response');
 
 var app;
 var auth;
@@ -16,6 +17,24 @@ const reqUser = {
     password: "validPassword",
     name: "validName",
     role: "admin"
+};
+
+const reqUserAdmin = {
+    user: {
+        email: "valid@email.com",
+        password: "validPassword",
+        name: "validName",
+        role: "admin"
+    }
+}
+
+const reqUserEmployee = {
+    user: {
+        email: "valid@email.com",
+        password: "validPassword",
+        name: "validName",
+        role: "employee"
+    }
 };
 
 const resUser = {
@@ -76,6 +95,7 @@ sandbox.stub(auth, 'authenticateToken')
 const makeApp = require('../../app');
 app = makeApp();
 const request = supertest(app);
+const res = new MockExpressResponse();
 
 describe("Test UserController", () => {
     let userSpy = jest.spyOn(UserService, 'authenticateUser')
@@ -138,6 +158,25 @@ describe("Test UserController", () => {
                 expect(userSpy).toHaveBeenCalledTimes(1);
                 expect(JSON.stringify(response.body)).toEqual(JSON.stringify(ListUser));
             });
+
+            it("Should respond with a 403 status code", async () => {
+                let response = await UserController.findAll(reqUserEmployee, res);
+                expect(response.statusCode).toBe(403);
+            });
+
+            // it("Should respond with a 500 status code", async () => {
+            //     userSpy = jest.spyOn(UserService, 'getAllUsers')
+            //     .mockRejectedValue({
+            //         status: 500,
+            //         data: {},
+            //         error: {
+            //             message: "some error occured"
+            //         }
+            //     });
+
+            //     let response = await UserController.findAll(reqUserAdmin, res);
+            //     expect(response.statusCode).toBe(500);
+            // });
         });
     });
     
