@@ -15,10 +15,8 @@ import { mdiPencilOutline } from '@mdi/js';
 import Axios from 'axios';
 import Form from 'react-bootstrap/Form'
 import Alert from 'react-bootstrap/Alert'
-import { placeholder } from 'sequelize/dist/lib/operators'
 
 import DeleteUserPopup from '../components/DeleteUserPopup'
-import e from 'cors'
 import FloatingLabel from 'react-bootstrap/esm/FloatingLabel'
 
 
@@ -35,14 +33,10 @@ const Users = () => {
 
     //this is to validate if the entries are valid or not
     const [validated, setValidated] = useState(false);
-    const [InvalidCredential, setInvalidCredential] = useState("");
-
+    
 
     //this is to declare the value of my entries I can modify
     const [email, setEmail] = useState("");
-    const [newPassword, setNewPassword] = useState("");
-    const [confirmNewPassword, setConfirmNewPassword] = useState("");
-    const [role, setRole] = useState("");
 
 
     //this is to declare the value of the form title and fill the current role for the add and modify menu
@@ -64,14 +58,6 @@ const Users = () => {
     const [onConfirmationScreen, setOnConfirmationScreen] = useState(false);
     const [submitType, setSubmitType] = useState("submit");
 
-
-    //this is the error message
-    const [errorMessage] = useState({
-        email: "This field cannot be empty!",
-        newPassword: "This field cannot be empty!",
-        confirmNewPassword: "This field cannot be empty!",
-        role: "You need to select a role!"
-    });
 
 
     //this is to declare the form layout
@@ -390,11 +376,11 @@ const Users = () => {
         .catch((error) => {
             if(error.response){
                 if(error.response.status === 401 || error.response.status === 403){
-                    setInvalidCredential("Cannot recognize the email address");
+                    setInvalidInput("Cannot recognize the email address");
                 }
             }
             else if(error.request){
-                setInvalidCredential("Can't send the request to modify the user");
+                setInvalidInput("Can't send the request to modify the user");
             }
         });    
         setValidated(true);
@@ -428,11 +414,11 @@ const Users = () => {
         .catch((error) => {
             if(error.response){
                 if(error.response.status === 401 || error.response.status === 403){
-                    setInvalidCredential("Cannot recognize the email address");
+                    setInvalidInput("Cannot recognize the email address");
                 }
             }
             else if(error.request){
-            setInvalidCredential("Can't send the request to delete the user");
+            setInvalidInput("Can't send the request to delete the user");
             }
         });    
         setValidated(true);
