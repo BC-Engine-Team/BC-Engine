@@ -1,5 +1,6 @@
+const { reject } = require("bcrypt/promises");
 const mysqldb = require("../data_access_layer/mysqldb");
-const User = mysqldb.users;
+const User = mysqldb['mysqldb'].users;
 const Op = mysqldb.Sequelize.Op;
 
 exports.createUser = async (user) => {
@@ -21,9 +22,7 @@ exports.createUser = async (user) => {
                 const response = {
                     status: 500,
                     data: {},
-                    error: {
-                        message: err.message || "some error occured"
-                    }
+                    message: err.message || "some error occured" 
                 }
                 reject(response);
             });
@@ -53,9 +52,7 @@ exports.getAllUsers = async () => {
                 const response = {
                     status: 500,
                     data: {},
-                    error: {
-                        message: err.message || "some error occured"
-                    }
+                    message: err.message || "some error occured"
                 }
                 reject(response);
             });
@@ -155,3 +152,27 @@ exports.modifyUser = async (user) => {
 
     });
 };
+
+exports.deleteUser = async (email) => {
+
+    return new Promise((resolve, reject) => {
+
+        User.destroy({where: {email: email}})
+            .then(async data => {
+                if(data){
+                    resolve("User deleted successfully");
+                }
+                resolve("User has failed to be deleted");
+            })
+            .catch(err => {
+                const response = {
+                    status: 500,
+                    data: {},
+                    error: {
+                        message: err.message || "some error occured"
+                    }
+                }
+                reject(response);
+            });
+    });
+}

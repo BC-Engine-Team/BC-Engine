@@ -1,10 +1,11 @@
 const userController = require("../controllers/user.controller");
 let router = require("express").Router();
 const authService = require('../services/auth.service');
+const empService = require('../services/emp.service');
 
 
 // Create new User
-router.post("/", authService.authenticateToken, userController.create);
+router.post("/", authService.authenticateToken, empService.checkEmail, userController.create);
 
 // Fetch all users with authentication
 router.get("/", authService.authenticateToken, userController.findAll);
@@ -24,6 +25,6 @@ router.delete("/logout", authService.logout);
 router.put(`/modify/:email`, authService.authenticateToken, userController.modifyUser);
 
 // Delete user selected
-//router.delete("/users/delete/:email");
+router.delete("/delete/:email", authService.authenticateToken, userController.deleteUser);
 
 module.exports = router;
