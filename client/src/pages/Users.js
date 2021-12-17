@@ -69,10 +69,6 @@ const Users = () => {
         backButton: "d-none"
     })
 
-    const [users, setUsers] = useState([
-        {name: "", email: "", role: ""}
-    ]);
-
     const enableForm = () => {
         setFormEnabled({
             table: "container-form-enabled-table",
@@ -154,17 +150,6 @@ const Users = () => {
 
     }
 
-    const handleGoBack = () => {
-        setSubmitType("submit");
-        setOnConfirmationScreen(false);
-        setEmailEnable("");
-        setPasswordEnable("");
-        setRoleEnable("");
-        setFormTitle("Add User");
-        setFormSubmit("Add");
-        disableBackButton();
-    }
-
     //this is what happens when the user click on the modify menu
     const handleEditUser = (email, role) => {
         console.log("Edit user with email: " + role);
@@ -186,6 +171,7 @@ const Users = () => {
     //this is what happens when the user click on the delete menu
     const handleDeleteUser = (email) => {
         console.log("Delete user with email: " + email);
+        disableForm();
         setEmail(email);
         setDeleteButtonActivated(true);
     }
@@ -230,18 +216,6 @@ const Users = () => {
         handleRefresh();       
         // eslint-disable-next-line react-hooks/exhaustive-deps 
     }, []);
-
-    const [validated, setValidated] = useState(false);
-    const [InvalidInput, setInvalidInput] = useState("");
-
-    const [onConfirmationScreen, setOnConfirmationScreen] = useState(false);
-
-    const [FormTitle, setFormTitle] = useState("");
-    const [FormSubmit, setFormSubmit] = useState("");
-    const [submitType, setSubmitType] = useState("submit");
-    const [emailEnable, setEmailEnable] = useState("");
-    const [passwordEnable, setPasswordEnable] = useState("");
-    const [roleEnable, setRoleEnable] = useState("");
 
     const [form, setForm] = useState({});
     const [errors, setErrors] = useState({});
@@ -439,8 +413,7 @@ const Users = () => {
             else if(error.request){
             setInvalidInput("Can't send the request to delete the user");
             }
-        });    
-        setValidated(true);
+        });
         return false;   
     };
 

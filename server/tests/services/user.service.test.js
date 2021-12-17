@@ -1,7 +1,9 @@
 const UserService = require('../../services/user.service');
 const AuthService = require('../../services/auth.service');
-const databases = require("../../data_access_layer/mysqldb");
+const databases = require("../../data_access_layer/databases");
 const UserModel = databases['mysqldb'].users;
+
+const sinon = require("sinon");
 
 var { expect, jest } = require('@jest/globals');
 
@@ -36,7 +38,6 @@ const ListUser = [
     }
 ];
 
-
 const resUser = {
     dataValues: {
         userId: "validUUID",
@@ -49,19 +50,46 @@ const resUser = {
     }
 }
 
+const userModelError = {
+    message: "Error with the user model."
+}
+
 describe("createUser", () => {
+
+    beforeEach(() => {
+        jest.resetAllMocks();
+        jest.clearAllMocks();
+
+        sandbox = sinon.createSandbox();
+        userCreateStub = sandbox.stub(UserModel, 'create');
+    })
+
+    afterEach(() => {
+        jest.resetAllMocks();
+        jest.clearAllMocks();
+    })
+
+    var userCreateStub;
+    var sandbox;
+
     describe("given a valid user", () => {
-        it("should return resolved promise with user information", async () => {
-            const userSpy = jest.spyOn(UserModel, 'create')
+        it("should return resolved promise with user information when user model works properly", async () => {
+            // arrange
+            let userModelSpy = jest.spyOn(UserModel, 'create')
                 .mockImplementation(() => new Promise((resolve) => {
                     resolve(resUser);
                 }));
+
+            // act
             const serviceResponse = await UserService.createUser(reqUser);
+
+            // assert
             expect(serviceResponse).toEqual({
                 email: resUser.dataValues.email,
                 name: resUser.dataValues.name,
                 role: resUser.dataValues.role
             });
+            expect(userModelSpy).toBeCalledTimes(1);
         })
     });
 });
