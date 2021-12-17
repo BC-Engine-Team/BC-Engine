@@ -49,6 +49,14 @@ const resUser = {
     }
 }
 
+
+const modifiedUser = {
+    email: "first@benoit-cote.com",
+}
+
+
+
+
 describe("createUser", () => {
     describe("given a valid user", () => {
         it("should return resolved promise with user information", async () => {
@@ -81,4 +89,29 @@ describe("View All Users", () => {
         });
     });
 });
+
+
+
+
+// describe("Modify specific user", () => {
+//     describe("Given I want to modify a user", () => {
+//         it("Should return the modified user with his informations", async() => {
+
+//             jest.spyOn(UserModel, 'deleteUser')
+//             .mockImplementation(() => new Promise(
+//                 (resolve) => {
+//                     resolve(modifiedUser);
+//                 }
+//             ));
+
+//             const serviceResponse = await UserService.modifyUser(modifiedUser);
+
+
+//             expect(serviceResponse).toEqual({
+//                 password: modifiedUser.dataValues.name,
+//                 role: modifiedUser.dataValues.role
+//             });
+//         });
+//     });
+// });
 
