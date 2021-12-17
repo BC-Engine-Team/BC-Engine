@@ -295,7 +295,7 @@ const Users = () => {
             .catch((error) => {
                 if (error.response) {
                     if(error.response.status === 403 || error.response.status === 401){
-                        setInvalidInput(error.response.data.message);
+                        setInvalidInput(error.response.data.message || "");
                         navigate("/login");
                     }
                     else {
@@ -319,12 +319,12 @@ const Users = () => {
         const newErrors = {}
 
         // email errors
-        if(!email || email === "") newErrors.email = "This field cannot empty!";
+        if(!email || email === "") newErrors.email = "This field cannot be empty!";
         else if(!email.endsWith("@benoit-cote.com")) newErrors.email = "Invalid email. Must end with 'benoit-cote.com'.";
         
         // password errors
         if(!password1 || password1 === ""){
-                newErrors.password1 = "This field cannot empty!";
+                newErrors.password1 = "This field cannot be empty!";
         }else if(!RegExp("^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.{8,})").exec(password1)){
             newErrors.password1 = "Password must be at least 8 characters, contain 1 upper-case and 1 lower-case letter, and contain a number."
         }

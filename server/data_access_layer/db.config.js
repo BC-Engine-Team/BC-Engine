@@ -34,7 +34,7 @@ module.exports = {
                 DB: "Patricia reduction",
                 dialect: "mssql",
                 dialectModule: tedious,
-                port: 52896
+                port: 1433
             }
         }
     }
