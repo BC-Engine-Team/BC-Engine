@@ -1,9 +1,9 @@
 const { DataTypes } = require("sequelize/dist");
-const { sequelize, Sequelize } = require("../mysqldb");
+const { mysqldb, Sequelize } = require("../../mysqldb");
 const bcrypt = require('bcrypt');
 
-module.exports = (sequelize, DataTypes) => {
-    const User = sequelize.define("users", {
+module.exports = (mysqldb, DataTypes) => {
+    const User = mysqldb.define("users", {
         userId: {
             field: 'user_id',
             type: DataTypes.UUID,
@@ -50,8 +50,7 @@ module.exports = (sequelize, DataTypes) => {
                 return bcrypt.compareSync(password, this.password);
             }
         }
-    }
-    );
+    });
     User.prototype.validPassword = async (password, hash) => {
         return bcrypt.compareSync(password, hash);    
     }

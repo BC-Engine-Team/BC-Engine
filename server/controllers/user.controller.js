@@ -4,19 +4,24 @@ const authService = require('../services/auth.service');
 // Create and Save a new User
 exports.create = async (req, res) => {
     if(req.user.role !== "admin") return res.status(403).send();
-    
     // Validate request    
-    if(!req.body.email){
+    if(!req.body.email || !req.body.password 
+        || !req.body.role){
         return res.status(400).send({
             message: "Content cannot be empty."
         });
+    }
+    if(!req.body.email.endsWith("@benoit-cote.com")){
+        return res.status(400).send({
+            message: "Invalid email format."
+        })
     }
 
     // Create a User
     const user = {
         email: req.body.email,
         password: req.body.password,
-        name: req.body.name,
+        name: req.emp.name,
         role: req.body.role
     };
 
@@ -26,7 +31,14 @@ exports.create = async (req, res) => {
             return res.send(response);
         })
         .catch(err => {
-            return res.send(err);
+            if(err.message === "Validation error"){
+                err.message = "User already exists.";
+                return res.status(400).send(err);
+            }
+            else{
+                return res.status(500).send(err);
+            }
+            
         });
 };
 
@@ -96,4 +108,42 @@ exports.authenticateUserWithEmail = async (req, res) => {
         });
 };
 
+
+exports.modifyUser = async(req, res) => {
+    if(!req.user.role === "admin") return res.status(403).send();
+
+    // Validate request    
+    if(!req.body.email){
+        return res.status(400).send({
+            message: "Content cannot be empty."
+        });
+    }
+
+    const user = {
+        email: req.body.email,
+        password: req.body.password,
+        role: req.body.role
+    };
+
+    await userService.modifyUser(user)
+        .then(response => {
+            return res.send(response);
+        })
+        .catch(err => {
+            return res.send(err);
+        });
+} 
+
+exports.deleteUser = async(req, res) => {
+    console.log(req.user.role);
+    if(req.user.role !== "admin") return res.status(403).send();
+
+    await userService.deleteUser(req.body.email)
+        .then(response => {
+            return res.send(response);
+        })
+        .catch(err => {
+            return res.send(err);
+        });
+}
 
