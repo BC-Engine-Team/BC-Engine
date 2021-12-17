@@ -529,37 +529,3 @@ describe("Test UserController", () => {
     });
 
 });
-
-
-
-
-
-
-
-
-
-
-// describe("(C4.3) given I try to call the deleteUser service but the deleteUser service sends an error", () => {
-        //     it("Should respond with a 500 response message", async () => {
-        //         let expectedUserToDelete = {
-        //             email: deletedUser.email,
-        //             role: "admin"
-        //         }
-
-        //         userSpy = jest.spyOn(UserService, "deleteUser")
-        //         .mockImplementation(() => new Promise((resolve) => {
-        //             resolve(deletedUserInvalid);
-        //         }));
-
-
-        //         const response = await supertest(app).delete(`/users/delete/${deletedUserInvalid.email}`)
-        //         .set("authorization", "Bearer validToken")
-        //         .send(deletedUserInvalid);
-
-
-        //         expect(response.status).toBe(500);
-        //         expect(userSpy).toHaveBeenCalledTimes(1);
-        //         expect(authStub.called).toBeTruthy();
-        //         expect(empStub.called).toBeTruthy();
-        //     })
-        // });
