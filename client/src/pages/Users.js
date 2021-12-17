@@ -14,11 +14,9 @@ import { mdiPencil } from '@mdi/js';
 import { mdiPencilOutline } from '@mdi/js';
 import Axios from 'axios';
 import Form from 'react-bootstrap/Form'
-import Alert from 'react-bootstrap/Alert'
-
-import DeleteUserPopup from '../components/DeleteUserPopup'
 import FloatingLabel from 'react-bootstrap/esm/FloatingLabel'
-
+import Alert from 'react-bootstrap/Alert'
+import DeleteUserPopup from '../components/DeleteUserPopup'
 
 const Users = () => {
 
@@ -71,8 +69,6 @@ const Users = () => {
         backButton: "d-none"
     })
 
-
-
     const enableForm = () => {
         setFormEnabled({
             table: "container-form-enabled-table",
@@ -92,7 +88,6 @@ const Users = () => {
             backButton: "d-none"
         })
     }
-
 
     //when you click on the x in the add and modify menu
     const disableForm = () => {
@@ -137,6 +132,7 @@ const Users = () => {
     const handleAddUser = () => {
         console.log("Add user");
         enableForm();
+        
         setInvalidInput("");
         setEmailEnable("");
         setPasswordEnable("");
@@ -151,8 +147,8 @@ const Users = () => {
             password2: "",
             role: ""
         });
-    }
 
+    }
 
     //this is what happens when the user click on the modify menu
     const handleEditUser = (email, role) => {
@@ -175,6 +171,7 @@ const Users = () => {
     //this is what happens when the user click on the delete menu
     const handleDeleteUser = (email) => {
         console.log("Delete user with email: " + email);
+        disableForm();
         setEmail(email);
         setDeleteButtonActivated(true);
     }
@@ -219,7 +216,6 @@ const Users = () => {
         handleRefresh();       
         // eslint-disable-next-line react-hooks/exhaustive-deps 
     }, []);
-
 
     const [form, setForm] = useState({});
     const [errors, setErrors] = useState({});
@@ -317,8 +313,6 @@ const Users = () => {
                   }
             });
         }
-
-       
     }
 
     const findFormErrors = () => {
@@ -343,13 +337,11 @@ const Users = () => {
             newErrors.password2 = "This field cannot be empty!";
         }
         
-
         // role errors
         if(!role || role === "") newErrors.role = "Must select a role!";
 
         return newErrors;
     }
-
 
     //this is the when the user click on the save changes
     const onUpdateClick = (event) => {
@@ -421,11 +413,9 @@ const Users = () => {
             else if(error.request){
             setInvalidInput("Can't send the request to delete the user");
             }
-        });    
-        setValidated(true);
+        });
         return false;   
     };
-
 
     
     return (
@@ -516,9 +506,11 @@ const Users = () => {
 
                 <div className={formEnabled.form}>
                     <div className="card shadow m-5 uForm">
+                        
                         <CloseButton 
                             className="position-absolute top-0 end-0 m-4"
                             onClick={disableForm}/>
+                            
                         <Form
                             noValidate 
                             className="mt-4 mx-5 uForm" 
@@ -639,5 +631,6 @@ const Users = () => {
         </div>
     )
 }
+
 
 export default Users

@@ -145,20 +145,23 @@ describe("Test UserController", () => {
 
         describe("(C1.1): given user is authenticated and valid user body", () => {
             it("(C1.1.1): should respond with a 200 status code with filtered user body", async () => {
+                // arrange
                 userSpy = jest.spyOn(UserService, 'createUser')
                     .mockImplementation(() => new Promise((resolve) => {
                         resolve(expectedUser);
                     }));
 
+                // act
                 const response = await supertest(app).post("/users")
                     .set("authorization", "Bearer validToken")
                     .send(reqUser);
-
+                
+                // assert
                 expect(response.status).toBe(200);
+                expect(JSON.stringify(response.body)).toEqual(JSON.stringify(expectedUser));
                 expect(userSpy).toHaveBeenCalledTimes(1);
                 expect(authStub.called).toBeTruthy();
                 expect(empStub.called).toBeTruthy();
-                expect(JSON.stringify(response.body)).toEqual(JSON.stringify(expectedUser));
             });
         });
 
@@ -235,25 +238,6 @@ describe("Test UserController", () => {
             });
         });
         
-    });
-
-    describe("View all Users", () => {
-        describe("Given a token passed", () => {
-            it("Should respond with a 200 status code", async () => {
-                userSpy = jest.spyOn(UserService, 'getAllUsers')
-                .mockImplementation(() => new Promise(
-                    (resolve) => {
-                        resolve(ListUser);
-                    }
-                ));
-
-                const response = await supertest(app).get("/users");
-
-                expect(response.status).toBe(200);
-                expect(userSpy).toHaveBeenCalledTimes(1);
-                expect(JSON.stringify(response.body)).toEqual(JSON.stringify(ListUser));
-            });
-        });
     });
 
     describe("View all Users", () => {

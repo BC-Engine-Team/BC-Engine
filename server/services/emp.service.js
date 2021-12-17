@@ -1,4 +1,4 @@
-const databases = require("../data_access_layer/mysqldb");
+const databases = require("../data_access_layer/databases");
 const Employee = databases['mssql_pat'].employees;
 
 exports.checkEmail = async (req, res, next) => {

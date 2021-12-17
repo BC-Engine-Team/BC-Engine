@@ -1,7 +1,7 @@
 const EmpService = require("../../services/emp.service");
 const AuthService = require("../../services/auth.service");
 const UserService = require('../../services/user.service');
-const databases = require("../../data_access_layer/mysqldb");
+const databases = require("../../data_access_layer/databases");
 const EmpModel = databases['mssql_pat'].employees;
 const UserController = require("../../controllers/user.controller");
 
