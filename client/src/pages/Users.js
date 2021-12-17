@@ -57,6 +57,8 @@ const Users = () => {
 
     const disableForm = () => {
         setValidated(false);
+        setSubmitType("submit");
+        setOnConfirmationScreen(false);
         Array.from(document.querySelectorAll("input")).forEach(
             input => (input.value = "")
         );
@@ -88,7 +90,6 @@ const Users = () => {
     const handleGoBack = () => {
         setSubmitType("submit");
         setOnConfirmationScreen(false);
-        //setInvalidInput("");
         setEmailEnable("");
         setPasswordEnable("");
         setRoleEnable("");
@@ -271,15 +272,17 @@ const Users = () => {
         // password errors
         if(!password1 || password1 === ""){
                 newErrors.password1 = "This field cannot empty!";
+        }else if(!RegExp("^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.{8,})").exec(password1)){
+            newErrors.password1 = "Password must be at least 8 characters, contain 1 upper-case and 1 lower-case letter, and contain a number."
+        }
+        if(password1 !== password2){
+            newErrors.password1 = "Passwords must match!";
+            newErrors.password2 = "Passwords must match!";
         }
         if(!password2 || password2 === ""){
             newErrors.password2 = "This field cannot be empty!";
         }
-        if(!RegExp("^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.{8,})").exec(password1)) newErrors.password1 = "Password must be at least 8 characters, contain 1 upper-case and 1 lower-case letter, and contain a number."
-        else if(password1 !== password2){
-            newErrors.password1 = "Passwords must match!";
-            newErrors.password2 = "Passwords must match!";
-        }
+        
 
         // role errors
         if(!role || role === "") newErrors.role = "Must select a role!";
