@@ -1,5 +1,5 @@
 const { reject } = require("bcrypt/promises");
-const mysqldb = require("../data_access_layer/mysqldb");
+const mysqldb = require("../data_access_layer/databases");
 const User = mysqldb['mysqldb'].users;
 const Op = mysqldb.Sequelize.Op;
 
@@ -19,6 +19,7 @@ exports.createUser = async (user) => {
                 resolve(false);
             })
             .catch(err => {
+                console.log(err);
                 const response = {
                     status: 500,
                     data: {},
@@ -27,7 +28,6 @@ exports.createUser = async (user) => {
                 reject(response);
             });
     });
-    
 };
 
 exports.getAllUsers = async () => {
