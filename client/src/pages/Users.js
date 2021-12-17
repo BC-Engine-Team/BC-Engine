@@ -45,13 +45,24 @@ const Users = () => {
     const [role, setRole] = useState("");
 
 
-    //this is to declare the value of the form title and fill the current role
+    //this is to declare the value of the form title and fill the current role for the add and modify menu
     const [FormTitle, setFormTitle] = useState("");
     const [emailEnable, setEmailEnable] = useState("");
     const [FormSubmit, setFormSubmit] = useState("");
+    const [passwordEnable, setPasswordEnable] = useState("");
+    const [roleEnable, setRoleEnable] = useState("");
 
     //This is to activate the delete alert when the delete button is clicked
     const [deleteButtonActivated, setDeleteButtonActivated] = useState(false);
+
+
+    //This is for showing an error message when the request is not good
+    const [InvalidInput, setInvalidInput] = useState("");
+
+
+    //This is for the confirmation screen
+    const [onConfirmationScreen, setOnConfirmationScreen] = useState(false);
+    const [submitType, setSubmitType] = useState("submit");
 
 
     //this is the error message
@@ -74,9 +85,7 @@ const Users = () => {
         backButton: "d-none"
     })
 
-    const [users, setUsers] = useState([
-        {name: "", email: "", role: ""}
-    ]);
+
 
     const enableForm = () => {
         setFormEnabled({
@@ -86,7 +95,6 @@ const Users = () => {
     }
 
     //this is when the form layout is deactivated
-
     const enableBackButton = () => {
         setBackEnabled({
             backButton: "btn btn-light py-2 px-5 my-1 shadow-sm border"
@@ -99,6 +107,8 @@ const Users = () => {
         })
     }
 
+
+    //when you click on the x in the add and modify menu
     const disableForm = () => {
         setValidated(false);
         setSubmitType("submit");
@@ -115,11 +125,32 @@ const Users = () => {
         });
     }
 
+
+    //This is to handle the go back button when you click on add
+    const handleGoBack = () => {
+        if(FormTitle === "Confirm creation?"){
+            setEmailEnable("");
+            setFormTitle("Add User");
+            setFormSubmit("Add");
+        }
+        else if(FormTitle === "Confirm modification?"){
+            setEmailEnable("disable");
+            setFormTitle("Edit User");
+            setFormSubmit("Save Changes");
+        }
+
+        setSubmitType("submit");
+        setOnConfirmationScreen(false);
+        setPasswordEnable("");
+        setRoleEnable("");
+        disableBackButton();
+    }
+
+
     //this is what happens when the user click on the add user menu
     const handleAddUser = () => {
         console.log("Add user");
         enableForm();
-        
         setInvalidInput("");
         setEmailEnable("");
         setPasswordEnable("");
@@ -128,30 +159,31 @@ const Users = () => {
         setFormSubmit("Add");
         disableBackButton();
         setErrors({});
-        setForm({});
-
+        setForm({
+            email: "",
+            password1: "",
+            password2: "",
+            role: ""
+        });
     }
 
-    const handleGoBack = () => {
-        setSubmitType("submit");
-        setOnConfirmationScreen(false);
-        setEmailEnable("");
-        setPasswordEnable("");
-        setRoleEnable("");
-        setFormTitle("Add User");
-        setFormSubmit("Add");
-        disableBackButton();
-    }
 
     //this is what happens when the user click on the modify menu
     const handleEditUser = (email, role) => {
-        console.log("Edit user with email: " + email);
+        console.log("Edit user with email: " + role);
         enableForm();
-        setEmail(email);
-        setRole(role);
-        setEmailEnable("disable")
+        setForm({
+            email: email,
+            password1: "",
+            password2: "",
+            role: role
+        })
+        setEmailEnable("disable");
+        setPasswordEnable("");
+        setRoleEnable("");
         setFormTitle("Edit User");
         setFormSubmit("Save Changes");
+        disableBackButton();
     }
 
     //this is what happens when the user click on the delete menu
@@ -201,19 +233,6 @@ const Users = () => {
         handleRefresh();        
     }, []);
 
-    const [validated, setValidated] = useState(false);
-    const [InvalidInput, setInvalidInput] = useState("");
-
-    const [onConfirmationScreen, setOnConfirmationScreen] = useState(false);
-
-    const [FormTitle, setFormTitle] = useState("");
-    const [FormSubmit, setFormSubmit] = useState("");
-    const [submitType, setSubmitType] = useState("submit");
-    const [emailEnable, setEmailEnable] = useState("");
-    const [passwordEnable, setPasswordEnable] = useState("");
-    const [roleEnable, setRoleEnable] = useState("");
-
-
 
     const [form, setForm] = useState({});
     const [errors, setErrors] = useState({});
@@ -234,12 +253,6 @@ const Users = () => {
     
 
     const handleSubmit = (event) => {
-        // const form = event.currentTarget;
-        // if (form.checkValidity() === false) {
-        //     event.preventDefault();
-        //     event.stopPropagation();
-        // }
-
         setInvalidInput("");
         console.log(InvalidInput.length);
         console.log("in handleSubmit");
@@ -254,7 +267,12 @@ const Users = () => {
         else if(InvalidInput.length === 0){
             setSubmitType("button");
             setOnConfirmationScreen(true);
-            setFormTitle("Looks good?");
+            if(FormTitle === "Add User"){
+                setFormTitle("Confirm creation?");
+            }
+            else if(FormTitle === "Edit User"){
+                setFormTitle("Confirm modification?");
+            }
             setFormSubmit("Confirm");
             setEmailEnable("disable");
             setPasswordEnable("disable");
@@ -263,10 +281,6 @@ const Users = () => {
             setErrors({});
             
         }
-
-        
-
-        //setValidated(true);
     }
 
     const handleConfirm = (event) => {
@@ -283,34 +297,41 @@ const Users = () => {
             role: form.role
         }
 
-        Axios.post("http://localhost:3001/users/", data, {headers: header})
-        .then((response) => {
-            console.log(response);
+        if(FormTitle === "Confirm modification?"){
+            onUpdateClick();
+        }
+        else if(FormTitle === "Confirm creation?"){
+            Axios.post("http://localhost:3001/users/", data, {headers: header})
+            .then((response) => {
+                console.log(response);
+    
+                if(response.status === 200 || response.status === 201) {
+                    disableForm();
+                    handleRefresh();
+                }
+            })
+            .catch((error) => {
+                if (error.response) {
+                    if(error.response.status === 403 || error.response.status === 401){
+                        setInvalidInput(error.response.data.message);
+                        navigate("/login");
+                    }
+                    else {
+                        console.log(error.response.data.message);
+                        setInvalidInput(error.response.data.message);
+                        console.log(InvalidInput);
+                        handleGoBack();
+                    }
+                } else if (error.request) {
+                    // The request was made but no response was received
+                    // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
+                    // http.ClientRequest in node.js
+                    setInvalidInput("Could not reach B&C Engine...");
+                  }
+            });
+        }
 
-            if(response.status === 200 || response.status === 201) {
-                disableForm();
-                handleRefresh();
-            }
-        })
-        .catch((error) => {
-            if (error.response) {
-                if(error.response.status === 403 || error.response.status === 401){
-                    setInvalidInput(error.response.data.message);
-                    navigate("/login");
-                }
-                else {
-                    console.log(error.response.data.message);
-                    setInvalidInput(error.response.data.message);
-                    console.log(InvalidInput);
-                    handleGoBack();
-                }
-            } else if (error.request) {
-                // The request was made but no response was received
-                // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
-                // http.ClientRequest in node.js
-                setInvalidInput("Could not reach B&C Engine...");
-              }
-        });
+       
     }
 
     const findFormErrors = () => {
@@ -352,18 +373,19 @@ const Users = () => {
         Axios.defaults.withCredentials = true;
     
         let user = {
-            email: email,
-            password: confirmNewPassword,
-            role: role
+            email: form.email,
+            password: form.password2,
+            role: form.role
         };
 
-        Axios.put(`http://localhost:3001/users/modify/${email}`, user, {headers: header}).then((response) =>{
+        Axios.put(`http://localhost:3001/users/modify/${form.email}`, user, {headers: header}).then((response) =>{
             if(response.data === true)
             {
                 console.log("User modified successfully!");
             }
-
             console.log(response)
+            disableForm()
+            handleRefresh()
         })
         .catch((error) => {
             if(error.response){
@@ -533,6 +555,7 @@ const Users = () => {
                                         type="email"
                                         defaultValue={form.email}
                                         onChange={(e) => setField('email', e.target.value)}
+                                        value={form.email}
                                         autoComplete='new-email'
                                         disabled={emailEnable}
                                         isInvalid={!!errors.email}
@@ -553,6 +576,7 @@ const Users = () => {
                                         onChange={(e) => setField('password1', e.target.value)}
                                         autoComplete='new-password'
                                         disabled={passwordEnable}
+                                        value={form.password1}
                                         isInvalid={!!errors.password1}
                                     />
 
@@ -570,6 +594,7 @@ const Users = () => {
                                         defaultValue={form.password2} 
                                         onChange={(e) => setField('password2', e.target.value)}
                                         autoComplete='off'
+                                        value={form.password2}
                                         disabled={passwordEnable}
                                         isInvalid={!!errors.password2}
                                     />
@@ -587,7 +612,7 @@ const Users = () => {
                                             aria-label="Default select example" 
                                             defaultValue={form.role} 
                                             onChange={(e) => setField('role', e.target.value)}
-                                            selected=""
+                                            value={form.role}
                                             disabled={roleEnable}
                                             isInvalid={!!errors.role}>
 
