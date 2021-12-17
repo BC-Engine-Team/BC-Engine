@@ -109,3 +109,41 @@ exports.authenticateUserWithEmail = async (req, res) => {
 };
 
 
+exports.modifyUser = async(req, res) => {
+    if(!req.user.role === "admin") return res.status(403).send();
+
+    // Validate request    
+    if(!req.body.email){
+        return res.status(400).send({
+            message: "Content cannot be empty."
+        });
+    }
+
+    const user = {
+        email: req.body.email,
+        password: req.body.password,
+        role: req.body.role
+    };
+
+    await userService.modifyUser(user)
+        .then(response => {
+            return res.send(response);
+        })
+        .catch(err => {
+            return res.send(err);
+        });
+} 
+
+exports.deleteUser = async(req, res) => {
+    console.log(req.user.role);
+    if(req.user.role !== "admin") return res.status(403).send();
+
+    await userService.deleteUser(req.body.email)
+        .then(response => {
+            return res.send(response);
+        })
+        .catch(err => {
+            return res.send(err);
+        });
+}
+

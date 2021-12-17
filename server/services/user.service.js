@@ -1,3 +1,4 @@
+const { reject } = require("bcrypt/promises");
 const mysqldb = require("../data_access_layer/mysqldb");
 const User = mysqldb['mysqldb'].users;
 const Op = mysqldb.Sequelize.Op;
@@ -122,3 +123,55 @@ exports.authenticateUser = async (user) => {
         });
     });
 };
+
+
+exports.modifyUser = async (user) => {
+
+    return new Promise((resolve, reject) => {
+
+        User.update(user, 
+                   {where: {email: user.email},
+                   individualHooks: true})
+            .then(async data => {
+                if(data) {
+                    resolve("User modified successfully");
+                }
+                resolve("User has failed to modified");
+            })
+            .catch(err => {
+                const response = {
+                    status: 500,
+                    data: {},
+                    error: {
+                        message: err.message || "some error occured"
+                    }
+                }
+                reject(response);
+            });
+
+    });
+};
+
+exports.deleteUser = async (email) => {
+
+    return new Promise((resolve, reject) => {
+
+        User.destroy({where: {email: email}})
+            .then(async data => {
+                if(data){
+                    resolve("User deleted successfully");
+                }
+                resolve("User has failed to be deleted");
+            })
+            .catch(err => {
+                const response = {
+                    status: 500,
+                    data: {},
+                    error: {
+                        message: err.message || "some error occured"
+                    }
+                }
+                reject(response);
+            });
+    });
+}
