@@ -50,6 +50,10 @@ const resUser = {
     }
 }
 
+const userModelError = {
+    message: "Error with the user model."
+}
+
 
 describe("createUser", () => {
 
