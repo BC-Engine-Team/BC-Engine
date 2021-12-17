@@ -14,8 +14,11 @@ module.exports = (database) => {
   
   // Initializing Sequelize (ORM) to create users table and fill it
   if(database){
-    database.sync();
+    database.sync('mysqldb');
   }
+
+  
+
   app.use(function(req, res, next) {
     res.header('Access-Control-Allow-Origin', 'http://localhost:3000');
     res.header('Access-Control-Allow-Credentials', true);

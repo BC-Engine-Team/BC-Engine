@@ -1,31 +1,58 @@
-const myDbConfig = require("./mysqldb.config");
-
 const Sequelize = require("sequelize");
-const sequelize = new Sequelize(myDbConfig.DB, myDbConfig.USER, myDbConfig.PASSWORD, {
-  host: myDbConfig.HOST || 'localhost',
-  port: myDbConfig.port,
-  dialect: myDbConfig.dialect,
-  timezone: myDbConfig.timezone,
-  pool: {
-    max: myDbConfig.pool.max,
-    min: myDbConfig.pool.min,
-    acquire: myDbConfig.pool.acquire,
-    idle: myDbConfig.pool.idle
-  }
-});
+const env = 'development' || 'production';
+
+// Load the configuration for the dbs
+const config = require('./db.config')[env];
 
 const db = {};
 
+const databases = Object.keys(config.databases);
+
+for(let i=0; i<databases.length; i++){
+  let database = databases[i];
+  let dbPath = config.databases[database];
+
+  db[database] = new Sequelize(dbPath.DB, dbPath.USER, dbPath.PASSWORD, {
+    host: dbPath.HOST || 'localhost',
+    port: dbPath.port,
+    dialect: dbPath.dialect,
+    dialectModule: dbPath.dialectModule || "",
+    timezone: dbPath.timezone || '+00:00',
+    pool: {
+      max: dbPath.pool ? dbPath.pool.max : 5,
+      min: dbPath.pool ? dbPath.pool.min : 0,
+      acquire: dbPath.pool ? dbPath.pool.acquire : 30000,
+      idle: dbPath.pool ? dbPath.pool.idle : 10000
+    }
+  })
+}
+
+
+// const sequelize = new Sequelize(myDbConfig.DB, myDbConfig.USER, myDbConfig.PASSWORD, {
+//   host: myDbConfig.HOST || 'localhost',
+//   port: myDbConfig.port,
+//   dialect: myDbConfig.dialect,
+//   timezone: myDbConfig.timezone,
+//   pool: {
+//     max: myDbConfig.pool.max,
+//     min: myDbConfig.pool.min,
+//     acquire: myDbConfig.pool.acquire,
+//     idle: myDbConfig.pool.idle
+//   }
+// });
+
+
 db.Sequelize = Sequelize;
-db.sequelize = sequelize;
+
 
 // Add any tables to the database here
-db.users = require("./models/user.model")(sequelize, Sequelize);
+db['mysqldb'].users = require("./models/mysql/user.model")(db['mysqldb'], Sequelize);
+db['mssql_pat'].employees = require("./models/mssql_pat/employee.model")(db['mssql_pat'], Sequelize);
 
-db.sync = async (options) => {
-  await db.sequelize.sync(options)
+db.sync = async (database, options) => {
+  await db[database].sync(options)
     .then((data) => {
-      return db.users.bulkCreate([
+      return db[database].users.bulkCreate([
         {
           email: 'first@benoit-cote.com', 
           password: 'verySecurePassword', 

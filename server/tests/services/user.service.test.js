@@ -1,7 +1,7 @@
 const UserService = require('../../services/user.service');
 const AuthService = require('../../services/auth.service');
-const mysqldb = require("../../data_access_layer/mysqldb");
-const UserModel = mysqldb.users;
+const databases = require("../../data_access_layer/mysqldb");
+const UserModel = databases['mysqldb'].users;
 
 var { expect, jest } = require('@jest/globals');
 
@@ -68,8 +68,7 @@ describe("createUser", () => {
 
 describe("View All Users", () => {
     describe("given a list of users", () => {
-        it("Should return the full list of user with all their information", async() => {
-
+        it("Should return the full list of users with all their information", async() => {
             jest.spyOn(UserModel, 'findAll')
             .mockImplementation(() => new Promise(
                 (resolve) => {

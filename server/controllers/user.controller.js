@@ -3,20 +3,25 @@ const authService = require('../services/auth.service');
 
 // Create and Save a new User
 exports.create = async (req, res) => {
-    if(!req.user.role === "admin") return res.status(403).send();
-    
+    if(req.user.role !== "admin") return res.status(403).send();
     // Validate request    
-    if(!req.body.email){
+    if(!req.body.email || !req.body.password 
+        || !req.body.role){
         return res.status(400).send({
             message: "Content cannot be empty."
         });
+    }
+    if(!req.body.email.endsWith("@benoit-cote.com")){
+        return res.status(400).send({
+            message: "Invalid email format."
+        })
     }
 
     // Create a User
     const user = {
         email: req.body.email,
         password: req.body.password,
-        name: req.body.name,
+        name: req.emp.name,
         role: req.body.role
     };
 
@@ -26,31 +31,38 @@ exports.create = async (req, res) => {
             return res.send(response);
         })
         .catch(err => {
-            return res.send(err);
+            if(err.message === "Validation error"){
+                err.message = "User already exists.";
+                return res.status(400).send(err);
+            }
+            else{
+                return res.status(500).send(err);
+            }
+            
         });
 };
 
 // Fetch all Users from db
 exports.findAll = async (req, res) => {
-    if(!req.user.role === "admin") res.status(403).send();
+    if(req.user.role !== "admin") return res.status(403).send();
     await userService.getAllUsers()
         .then(response => {
-            res.send(response);
+            return res.status(200).send(response);
         })
         .catch(err => {
-            res.status(500).send(err);
+            return res.status(500).send(err);
         });
 };
 
 // fetch all users with admin role
 exports.getAdmins = async (req, res) => {
-    if(!req.user.role === "admin") res.status(403).send();
+    if(req.user.role !== "admin") return res.status(403).send();
     await userService.getAdmins()
         .then(response => {
-            res.send(response);
+            return res.send(response);
         })
         .catch(err => {
-            res.status(500).send(err);
+            return res.status(500).send(err);
         });
 };
 

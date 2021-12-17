@@ -1,5 +1,6 @@
 const UserService = require('../../services/user.service');
 const AuthService = require('../../services/auth.service');
+const EmpService = require('../../services/emp.service');
 const UserController = require('../../controllers/user.controller');
 const sinon = require('sinon');
 
@@ -7,15 +8,39 @@ const { afterEach, afterAll } = require('jest-circus');
 var { expect, jest } = require('@jest/globals');
 const { mocked } = require('jest-mock');
 const supertest = require('supertest');
+var MockExpressResponse = require('mock-express-response');
 
 var app;
 var auth;
 
 const reqUser = {
-    email: "valid@email.com",
+    email: "valid@benoit-cote.com",
     password: "validPassword",
     name: "validName",
     role: "admin"
+};
+
+const reqEmp = {
+    email: "emp@benoit-cote.com",
+    firstName: "FName",
+    lastName: "LName"
+}
+const reqUserAdmin = {
+    user: {
+        email: "valid@email.com",
+        password: "validPassword",
+        name: "validName",
+        role: "admin"
+    }
+}
+
+const reqUserEmployee = {
+    user: {
+        email: "valid@email.com",
+        password: "validPassword",
+        name: "validName",
+        role: "employee"
+    }
 };
 
 const resUser = {
@@ -65,17 +90,23 @@ const ListUser = [
 ];
 
 
-var sandbox = sinon.createSandbox();
-auth = require('../../services/auth.service');
-sandbox.stub(auth, 'authenticateToken')
-    .callsFake(function(req, res, next) {
+let sandbox = sinon.createSandbox();
+let authStub = sandbox.stub(AuthService, 'authenticateToken')
+    .callsFake(function(req, res, next){
         req.user = reqUser;
-        
         return next();
     });
+
+let empStub = sandbox.stub(EmpService, 'checkEmail')
+    .callsFake(function(req, res, next){
+        req.emp = reqEmp;
+        return next();
+});
+
 const makeApp = require('../../app');
 app = makeApp();
 const request = supertest(app);
+const res = new MockExpressResponse();
 
 describe("Test UserController", () => {
     let userSpy = jest.spyOn(UserService, 'authenticateUser')
@@ -91,10 +122,11 @@ describe("Test UserController", () => {
     });
 
     afterEach(() => {
-        sandbox.restore();
+        // sandbox.restore();
         jest.resetAllMocks();
         jest.clearAllMocks();
         userSpy.mockClear();
+        sandbox.resetHistory();
     });
 
     afterAll(() => {
@@ -102,12 +134,20 @@ describe("Test UserController", () => {
     });
     
     describe("(C1): Create a User", () => {
-        describe("(C1.1): given a valid user and JWT", () => {
 
-            it("(C1.1.1): should respond with a 200 status code", async () => {
+        let authenticateTokenStub;
+
+        let expectedUser = {
+            email: resUser.email,
+            name: resUser.name,
+            role: resUser.role
+        };
+
+        describe("(C1.1): given user is authenticated and valid user body", () => {
+            it("(C1.1.1): should respond with a 200 status code with filtered user body", async () => {
                 userSpy = jest.spyOn(UserService, 'createUser')
                     .mockImplementation(() => new Promise((resolve) => {
-                        resolve(resUser);
+                        resolve(expectedUser);
                     }));
 
                 const response = await supertest(app).post("/users")
@@ -116,8 +156,102 @@ describe("Test UserController", () => {
 
                 expect(response.status).toBe(200);
                 expect(userSpy).toHaveBeenCalledTimes(1);
-                expect(JSON.stringify(response.body)).toEqual(JSON.stringify(resUser));
-                
+                expect(authStub.called).toBeTruthy();
+                expect(empStub.called).toBeTruthy();
+                expect(JSON.stringify(response.body)).toEqual(JSON.stringify(expectedUser));
+            });
+        });
+
+        describe("(C1.2) given authenticated and invalid user body", () => {
+            it("should return 400 with message when no email", async () => {
+
+                let requestUser = {
+                    password: reqUser.password,
+                    name: reqUser.name,
+                    role: reqUser.role
+                };
+
+                const response = await request.post("/users")
+                    .set("authorization", "Bearer validToken")
+                    .send(requestUser);
+
+                expect(response.status).toBe(400);
+                expect(response.body.message).toBe("Content cannot be empty.")
+                expect(userSpy).toHaveBeenCalledTimes(0);
+                expect(authStub.called).toBeTruthy();
+                expect(empStub.called).toBeTruthy();
+            });
+            it("should return 400 with message when no password", async () => {
+                let requestUser = {
+                    email: reqUser.email,
+                    name: reqUser.name,
+                    role: reqUser.role
+                };
+
+                const response = await request.post("/users")
+                    .set("authorization", "Bearer validToken")
+                    .send(requestUser);
+
+                expect(response.status).toBe(400);
+                expect(response.body.message).toBe("Content cannot be empty.")
+                expect(userSpy).toHaveBeenCalledTimes(0);
+                expect(authStub.called).toBeTruthy();
+                expect(empStub.called).toBeTruthy();
+            });
+            it("should return 400 with message when no role", async () => {
+                let requestUser = {
+                    email: reqUser.email,
+                    password: reqUser.password,
+                    name: reqUser.name
+                };
+
+                const response = await request.post("/users")
+                    .set("authorization", "Bearer validToken")
+                    .send(requestUser);
+
+                expect(response.status).toBe(400);
+                expect(response.body.message).toBe("Content cannot be empty.")
+                expect(userSpy).toHaveBeenCalledTimes(0);
+                expect(authStub.called).toBeTruthy();
+                expect(empStub.called).toBeTruthy();
+            });
+            it("should return 400 with message when email doesn't finish by benoit-cote.com", async () => {
+                let requestUser = {
+                    email: "wrong@format.email",
+                    password: reqUser.password,
+                    name: reqUser.name,
+                    role: reqUser.role
+                };
+
+                const response = await request.post("/users")
+                    .set("authorization", "Bearer validToken")
+                    .send(requestUser);
+
+                expect(response.status).toBe(400);
+                expect(response.body.message).toBe("Invalid email format.")
+                expect(userSpy).toHaveBeenCalledTimes(0);
+                expect(authStub.called).toBeTruthy();
+                expect(empStub.called).toBeTruthy();
+            });
+        });
+        
+    });
+
+    describe("View all Users", () => {
+        describe("Given a token passed", () => {
+            it("Should respond with a 200 status code", async () => {
+                userSpy = jest.spyOn(UserService, 'getAllUsers')
+                .mockImplementation(() => new Promise(
+                    (resolve) => {
+                        resolve(ListUser);
+                    }
+                ));
+
+                const response = await supertest(app).get("/users");
+
+                expect(response.status).toBe(200);
+                expect(userSpy).toHaveBeenCalledTimes(1);
+                expect(JSON.stringify(response.body)).toEqual(JSON.stringify(ListUser));
             });
         });
     });
@@ -137,6 +271,21 @@ describe("Test UserController", () => {
                 expect(response.status).toBe(200);
                 expect(userSpy).toHaveBeenCalledTimes(1);
                 expect(JSON.stringify(response.body)).toEqual(JSON.stringify(ListUser));
+            });
+
+            it("Should respond with a 403 status code", async () => {
+                let response = await UserController.findAll(reqUserEmployee, res);
+                expect(response.statusCode).toBe(403);
+            });
+
+            it("Should respond with a 500 status code", async () => {
+                userSpy = jest.spyOn(UserService, 'getAllUsers')
+                .mockImplementation(async () => {
+                    await Promise.reject({status: 500});
+                });
+
+                const response = await supertest(app).get("/users");
+                expect(response.status).toBe(500);
             });
         });
     });
@@ -242,39 +391,5 @@ describe("Test UserController", () => {
             })
         });
     });
-
-        
-    
 });
-
-    // describe("GET /users/", () => {
-    //     describe("given no token is passed", () =>{
-            
-    //         it("should return 401", async () => {
-    //             const response = await request.get("/users");
-    //             expect(response.statusCode).toBe(401);
-    //         });
-            
-    //     });
-
-    //     describe("given a token is passed", () => {
-    //         it("should return 200", async () => {
-    //             const resp = await request.post("/users/authenticate").send({
-    //                 email: "first@benoit-cote.com",
-    //                 password: "verySecurePassword"
-    //             });
-    //             const aToken = resp.body.aToken;
-    //             request.get("/users")
-    //                 .set("authorization", `Bearer ${aToken}`)
-    //                 .expect(200);
-    //         });
-
-    //         it("should return 403", async () => {
-    //             const response = await request.get("/users").set("authorization", "Bearer aToken");
-    //             expect(response.statusCode).toBe(403);
-    //         });
-    //     });
-
-        
-    // });
 
