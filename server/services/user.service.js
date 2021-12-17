@@ -157,12 +157,11 @@ exports.modifyUser = async (user) => {
     });
 };
 
-exports.deleteUser = async (user) => {
+exports.deleteUser = async (email) => {
 
     return new Promise((resolve, reject) => {
 
-        User.destroy(user,
-                    {where: {email: user.email}})
+        User.destroy({where: {email: email}})
             .then(async data => {
                 if(data){
                     resolve("User deleted successfully");

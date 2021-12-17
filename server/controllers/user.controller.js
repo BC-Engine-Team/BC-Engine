@@ -123,13 +123,10 @@ exports.modifyUser = async(req, res) => {
 } 
 
 exports.deleteUser = async(req, res) => {
-    if(!req.user.role === "admin") return res.status(403).send();
+    console.log(req.user.role);
+    if(req.user.role !== "admin") return res.status(403).send();
 
-    const user = {
-        email: req.body.email,
-    };
-
-    await userService.deleteUser(user)
+    await userService.deleteUser(req.body.email)
         .then(response => {
             return res.send(response);
         })
