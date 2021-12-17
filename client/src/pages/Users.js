@@ -204,7 +204,6 @@ const Users = () => {
         });
     }
 
-
     useEffect(() => {
         if (cookies.get("accessToken") === undefined) {
             navigate("/login");
@@ -631,6 +630,5 @@ const Users = () => {
         </div>
     )
 }
-
 
 export default Users

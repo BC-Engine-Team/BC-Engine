@@ -90,6 +90,31 @@ const ListUser = [
 ];
 
 
+//this is all the modified user test data
+const modifiedUser = {
+    email: "first@benoit-cote.com",
+    password: "validPassword",
+    role: "employee"
+};
+
+const modifiedUserInvalid = {
+    email: "",
+    password: "validPassword",
+    role: "admin"
+}
+
+
+//this is all the delete user test data
+const deletedUser = {
+    email: "first@benoit-cote.com"
+}
+
+const deletedUserInvalid = {
+    email: "sss"
+}
+
+
+
 let sandbox = sinon.createSandbox();
 let authStub = sandbox.stub(AuthService, 'authenticateToken')
     .callsFake(function(req, res, next){
@@ -274,6 +299,8 @@ describe("Test UserController", () => {
         });
     });
     
+
+
     describe("(C2): Authenticating a User)", () => {
 
         const validUserLogin = {
@@ -375,5 +402,132 @@ describe("Test UserController", () => {
             })
         });
     });
-});
 
+
+
+    describe("(C3): Modify a User)", () => {
+
+        const expectedUserToModifyValid = {
+            email: modifiedUser.email,
+            password: modifiedUser.password,
+            role: modifiedUser.role
+        };
+        
+
+        describe("(C3.1): given user is authenticated and that entries are valid", ()  =>{
+            it("(C3.1.1): should respond with a 200 status code with a modified user", async () => {
+
+                userSpy = jest.spyOn(UserService, "modifyUser")
+                .mockImplementation(() => new Promise((resolve) => {
+                    resolve(expectedUserToModifyValid);
+                }));
+
+                const response = await supertest(app).put(`/users/modify/${modifiedUser.email}`)
+                .set("authorization", "Bearer validToken")
+                .send(expectedUserToModifyValid);
+
+                expect(response.status).toBe(200);
+                expect(userSpy).toHaveBeenCalledTimes(1);
+                expect(authStub.called).toBeTruthy();
+                expect(empStub.called).toBeTruthy();
+                expect(JSON.stringify(response.body)).toEqual(JSON.stringify(expectedUserToModifyValid));
+            });
+        });
+
+
+        describe("(C3.2) given user is authenticated but email is invalid", () => {
+             it("(C3.2.1): should respond with a 400 response message", async () => {
+
+                let expectedUserToModifyInvalid = {
+                    email: "ssssss",
+                    password: modifiedUserInvalid.password,
+                    role: modifiedUserInvalid.role
+                }
+
+                userSpy = jest.spyOn(UserService, "modifyUser")
+                .mockImplementation(() => new Promise((resolve) => {
+                    resolve(expectedUserToModifyInvalid);
+                }));
+
+                const response = await supertest(app).put(`/users/modify/${expectedUserToModifyInvalid.email}`)
+                .set("authorization", "Bearer validToken")
+                .send(modifiedUserInvalid);
+
+                expect(response.status).toBe(400);
+                expect(userSpy).toHaveBeenCalledTimes(0);
+                expect(authStub.called).toBeTruthy();
+                expect(empStub.called).toBeTruthy();
+             });
+        });
+
+        describe("(C3.3) given I try to modify the user but I am not authorized", () => {
+            it("Should respond with a 403 status code", async () => {
+                let response = await UserController.modifyUser(reqUserEmployee, res);
+                expect(response.statusCode).toBe(403);
+            });
+        });
+
+
+        describe("(C3.4) given I try to call the modifyUser service but the modifyUser service sends an error", () => {
+            it("Should respond with a 500 response message", async () => {
+                let expectedUserToModify = {
+                    email: "first@benoit-cote.com",
+                    password: modifiedUserInvalid.password,
+                    role: modifiedUserInvalid.role
+                }
+
+                userSpy = jest.spyOn(UserService, "modifyUser")
+                .mockImplementation(() => new Promise((resolve) => {
+                    resolve(expectedUserToModifyInvalid);
+                }));
+
+
+                const response = await supertest(app).put(`/users/modify/${expectedUserToModify.email}`)
+                .set("authorization", "Bearer validToken")
+                .send(expectedUserToModify);
+
+
+                expect(response.status).toBe(500);
+                expect(userSpy).toHaveBeenCalledTimes(1);
+                expect(authStub.called).toBeTruthy();
+                expect(empStub.called).toBeTruthy();
+            })
+        });
+    });
+
+
+
+
+
+    describe("(C4): Delete a User)", () => {
+
+        describe("(C4.1): given user is authenticated and that the email is valid", ()  =>{
+            it("(C4.1.1): should respond with a 200 status code with a deleted user", async () => {
+
+                userSpy = jest.spyOn(UserService, "deleteUser")
+                .mockImplementation(() => new Promise((resolve) => {
+                    resolve(deletedUser);
+                }));
+
+                const response = await supertest(app).delete(`/users/delete/${deletedUser.email}`)
+                .set("authorization", "Bearer validToken")
+                .send(deletedUser);
+
+                expect(response.status).toBe(200);
+                expect(userSpy).toHaveBeenCalledTimes(1);
+                expect(authStub.called).toBeTruthy();
+                expect(empStub.called).toBeTruthy();
+                expect(JSON.stringify(response.body)).toEqual(JSON.stringify(deletedUser));
+            });
+        });
+
+        describe("(C4.2) given I try to delete the user but I am not authorized", () => {
+            it("Should respond with a 403 status code", async () => {
+                let response = await UserController.deleteUser(reqUserEmployee, res);
+                expect(response.statusCode).toBe(403);
+            });
+        });
+        
+    });
+
+});
