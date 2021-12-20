@@ -1,6 +1,5 @@
-$delete-red: red;
-
-.btnDelete {
+.btnDelete,
+.btn-edit {
   display: flex;
   align-items: center;
   background: none;
@@ -39,9 +38,32 @@ $delete-red: red;
     }
   }
   
-
-  
   &:focus {
     box-shadow: 0 0 0 4px lighten(red, 40%);
+  }
+}
+
+.btn-edit {
+  font-size: 16px;
+  color: rgb(13, 109, 253);
+  
+  >.mdi-edit-empty {
+    display: none;
+  }
+  
+  &:hover {
+    background-color: lighten(rgb(13, 109, 253), 45%);
+    
+    >.mdi-edit-empty {
+      display: block;
+    }
+    
+    >.mdi-edit {
+      display: none;
+    }
+  }
+  
+  &:focus {
+    box-shadow: 0 0 0 4px lighten(rgb(13, 109, 253), 40%);
   }
 }
