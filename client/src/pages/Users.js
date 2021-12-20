@@ -5,8 +5,9 @@ import NavB from '../components/NavB'
 import Table from 'react-bootstrap/Table'
 import Button from 'react-bootstrap/Button'
 import CloseButton from 'react-bootstrap/CloseButton'
-import '../styles/DeleteButton.scss'
-import '../styles/EditButton.scss'
+import '../styles/Edit&DeleteButton.scss'
+import '../styles/usersPage.css'
+import '../styles/popup.css'
 import Icon from '@mdi/react'
 import { mdiDeleteEmpty } from '@mdi/js';
 import { mdiDelete } from '@mdi/js';
