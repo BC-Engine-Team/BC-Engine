@@ -20,51 +20,32 @@ import DeleteUserPopup from '../components/DeleteUserPopup'
 
 const Users = () => {
 
-    //this is to declare the cookies
     let navigate = useNavigate();
-    const cookies = new Cookies();
-
-    //this is to declare the users and the counter that returns the list of all users in the user menu
-    const [users, setUsers] = useState([{name: "", email: "", role: ""}]);
     let counter = 0;
 
+    const cookies = new Cookies();
 
-    //this is to validate if the entries are valid or not
+    const [users, setUsers] = useState([{name: "", email: "", role: ""}]);
     const [validated, setValidated] = useState(false);
-    
-
-    //this is to declare the value of my entries I can modify
     const [email, setEmail] = useState("");
-
-
-    //this is to declare the value of the form title and fill the current role for the add and modify menu
     const [FormTitle, setFormTitle] = useState("");
     const [emailEnable, setEmailEnable] = useState("");
     const [FormSubmit, setFormSubmit] = useState("");
     const [passwordEnable, setPasswordEnable] = useState("");
     const [roleEnable, setRoleEnable] = useState("");
-
-    //This is to activate the delete alert when the delete button is clicked
     const [deleteButtonActivated, setDeleteButtonActivated] = useState(false);
-
-
-    //This is for showing an error message when the request is not good
     const [InvalidInput, setInvalidInput] = useState("");
-
-
-    //This is for the confirmation screen
     const [onConfirmationScreen, setOnConfirmationScreen] = useState(false);
     const [submitType, setSubmitType] = useState("submit");
 
+    const [form, setForm] = useState({});
+    const [errors, setErrors] = useState({});
 
-
-    //this is to declare the form layout
     const [formEnabled, setFormEnabled] = useState({
         table: "container", 
         form: "d-none",
     });
 
-    //this is when the form layout is activated
     const [backEnabled, setBackEnabled] = useState({
         backButton: "d-none"
     })
@@ -76,7 +57,6 @@ const Users = () => {
         });
     }
 
-    //this is when the form layout is deactivated
     const enableBackButton = () => {
         setBackEnabled({
             backButton: "btn btn-light py-2 px-5 my-1 shadow-sm border"
@@ -89,7 +69,6 @@ const Users = () => {
         })
     }
 
-    //when you click on the x in the add and modify menu
     const disableForm = () => {
         setValidated(false);
         setSubmitType("submit");
@@ -106,8 +85,6 @@ const Users = () => {
         });
     }
 
-
-    //This is to handle the go back button when you click on add
     const handleGoBack = () => {
         if(FormTitle === "Confirm creation?"){
             setEmailEnable("");
@@ -127,12 +104,10 @@ const Users = () => {
         disableBackButton();
     }
 
-
-    //this is what happens when the user click on the add user menu
     const handleAddUser = () => {
         console.log("Add user");
+
         enableForm();
-        
         setInvalidInput("");
         setEmailEnable("");
         setPasswordEnable("");
@@ -147,28 +122,26 @@ const Users = () => {
             password2: "",
             role: ""
         });
-
     }
 
-    //this is what happens when the user click on the modify menu
     const handleEditUser = (email, role) => {
-        console.log("Edit user with email: " + role);
+        console.log("Edit user with email: " +  email);
+
         enableForm();
-        setForm({
-            email: email,
-            password1: "",
-            password2: "",
-            role: role
-        })
         setEmailEnable("disable");
         setPasswordEnable("");
         setRoleEnable("");
         setFormTitle("Edit User");
         setFormSubmit("Save Changes");
         disableBackButton();
+        setForm({
+            email: email,
+            password1: "",
+            password2: "",
+            role: role
+        });
     }
 
-    //this is what happens when the user click on the delete menu
     const handleDeleteUser = (email) => {
         console.log("Delete user with email: " + email);
         disableForm();
@@ -176,10 +149,9 @@ const Users = () => {
         setDeleteButtonActivated(true);
     }
 
-    //this is what happens when the user refresh the page
     const handleRefresh = () => {
         let header = {
-            'authorization': "Bearer " + cookies.get("accessToken")
+            'authorization': "Bearer " + cookies.get("accessToken"),
         }
     
         Axios.defaults.withCredentials = true;
@@ -213,76 +185,72 @@ const Users = () => {
         } 
 
         handleRefresh();       
+
         // eslint-disable-next-line react-hooks/exhaustive-deps 
     }, []);
-
-    const [form, setForm] = useState({});
-    const [errors, setErrors] = useState({});
 
     const setField = (field, value) => {
         setForm({
           ...form,
-          [field]: value
+          [field]: value,
         });
 
         if ( !!errors[field] ){
             setErrors({
                 ...errors,
-                [field]: null
+                [field]: null,
               });
         } 
     }
     
-
     const handleSubmit = (event) => {
-        setInvalidInput("");
-        console.log(InvalidInput.length);
-        console.log("in handleSubmit");
         event.preventDefault();
         event.stopPropagation();
+        
+        setInvalidInput("");
 
         const newErrors = findFormErrors();
 
-        if(Object.keys(newErrors).length > 0){
+        if(Object.keys(newErrors).length > 0) {
             setErrors(newErrors);
         }
-        else if(InvalidInput.length === 0){
-            setSubmitType("button");
-            setOnConfirmationScreen(true);
-            if(FormTitle === "Add User"){
+        else if(InvalidInput.length === 0) {
+            if(FormTitle === "Add User") {
                 setFormTitle("Confirm creation?");
             }
-            else if(FormTitle === "Edit User"){
+            else if(FormTitle === "Edit User") {
                 setFormTitle("Confirm modification?");
             }
+
+            setSubmitType("button");
+            setOnConfirmationScreen(true);
             setFormSubmit("Confirm");
             setEmailEnable("disable");
             setPasswordEnable("disable");
             setRoleEnable("disable");
             enableBackButton();
             setErrors({});
-            
         }
     }
 
     const handleConfirm = (event) => {
         event.preventDefault();
         event.stopPropagation();
-        console.log("in handleConfirm...-------------------------------------------------------------------");
+
         let header = {
-            'authorization': "Bearer " + cookies.get("accessToken")
+            'authorization': "Bearer " + cookies.get("accessToken"),
         }
 
         let data = {
             email: form.email,
             password: form.password1,
-            role: form.role
+            role: form.role,
         }
 
-        if(FormTitle === "Confirm modification?"){
+        if(FormTitle === "Confirm modification?") {
             onUpdateClick();
         }
-        else if(FormTitle === "Confirm creation?"){
+        else if(FormTitle === "Confirm creation?") {
             Axios.post("http://localhost:3001/users/", data, {headers: header})
             .then((response) => {
                 console.log(response);
@@ -294,7 +262,7 @@ const Users = () => {
             })
             .catch((error) => {
                 if (error.response) {
-                    if(error.response.status === 403 || error.response.status === 401){
+                    if(error.response.status === 403 || error.response.status === 401) {
                         setInvalidInput(error.response.data.message || "");
                         navigate("/login");
                     }
@@ -302,6 +270,7 @@ const Users = () => {
                         console.log(error.response.data.message);
                         setInvalidInput(error.response.data.message);
                         console.log(InvalidInput);
+
                         handleGoBack();
                     }
                 } else if (error.request) {
@@ -323,16 +292,19 @@ const Users = () => {
         else if(!email.endsWith("@benoit-cote.com")) newErrors.email = "Invalid email. Must end with 'benoit-cote.com'.";
         
         // password errors
-        if(!password1 || password1 === ""){
+        if(!password1 || password1 === "") {
                 newErrors.password1 = "This field cannot be empty!";
-        }else if(!RegExp("^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.{8,})").exec(password1)){
-            newErrors.password1 = "Password must be at least 8 characters, contain 1 upper-case and 1 lower-case letter, and contain a number."
+
+        }else if(!RegExp("^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.{8,})").exec(password1)) {
+            newErrors.password1 = "Password must be at least 8 characters, contain 1 upper-case and 1 lower-case letter, and contain a number.";
+
         }
-        if(password1 !== password2){
+        if(password1 !== password2) {
             newErrors.password1 = "Passwords must match!";
             newErrors.password2 = "Passwords must match!";
+
         }
-        if(!password2 || password2 === ""){
+        if(!password2 || password2 === "") {
             newErrors.password2 = "This field cannot be empty!";
         }
         
@@ -342,10 +314,9 @@ const Users = () => {
         return newErrors;
     }
 
-    //this is the when the user click on the save changes
-    const onUpdateClick = (event) => {
+    const onUpdateClick = () => {
         let header = {
-            'authorization': "Bearer " + cookies.get("accessToken")
+            'authorization': "Bearer " + cookies.get("accessToken"),
         }
     
         Axios.defaults.withCredentials = true;
@@ -353,70 +324,69 @@ const Users = () => {
         let user = {
             email: form.email,
             password: form.password2,
-            role: form.role
+            role: form.role,
         };
 
-        Axios.put(`http://localhost:3001/users/modify/${form.email}`, user, {headers: header}).then((response) =>{
+        Axios.put(`http://localhost:3001/users/modify/${form.email}`, user, {headers: header})
+        .then((response) => {
             if(response.data === true)
             {
                 console.log("User modified successfully!");
             }
-            console.log(response)
-            disableForm()
-            handleRefresh()
+            disableForm();
+            handleRefresh();
         })
         .catch((error) => {
-            if(error.response){
-                if(error.response.status === 401 || error.response.status === 403){
+            if(error.response) {
+                if(error.response.status === 401 || error.response.status === 403) {
                     setInvalidInput("Cannot recognize the email address");
                 }
             }
-            else if(error.request){
+            else if(error.request) {
                 setInvalidInput("Can't send the request to modify the user");
             }
         });    
+
         setValidated(true);
         return false;     
     }
     
-
-    //this is when you delete 
-    const onDeleteClick = (event) => {
+    const onDeleteClick = () => {
         let header = {
-            'authorization': "Bearer " + cookies.get("accessToken")
+            'authorization': "Bearer " + cookies.get("accessToken"),
         }
     
         Axios.defaults.withCredentials = true;
 
         let user = {
-            email: email
+            email: email,
         }
 
         console.log(header);
-        Axios.delete(`http://localhost:3001/users/delete/${email}`, {headers: header, data:user}).then((response) =>{
-
+        Axios.delete(`http://localhost:3001/users/delete/${email}`, {headers: header, data: user})
+        .then((response) => {
             if(response.data === true)
             {
                 console.log("User deleted successfully!");
             }
-            console.log(response)
+
             setDeleteButtonActivated(false);
             handleRefresh();
         })
         .catch((error) => {
-            if(error.response){
-                if(error.response.status === 401 || error.response.status === 403){
+            if(error.response) {
+                if(error.response.status === 401 || error.response.status === 403) {
                     setInvalidInput("Cannot recognize the email address");
                 }
             }
-            else if(error.request){
+            else if(error.request) {
             setInvalidInput("Can't send the request to delete the user");
             }
         });
+        
         return false;   
     };
 
-    
     return (
         <div>
             <NavB />
