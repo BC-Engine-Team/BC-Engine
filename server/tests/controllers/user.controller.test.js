@@ -158,7 +158,7 @@ describe("Test UserController", () => {
         process.exit;
     });
     
-    describe("(C1): Create a User", () => {
+    describe("UC1 - Create a User", () => {
 
         let authenticateTokenStub;
 
@@ -168,8 +168,8 @@ describe("Test UserController", () => {
             role: resUser.role
         };
 
-        describe("(C1.1): given user is authenticated and valid user body", () => {
-            it("(C1.1.1): should respond with a 200 status code with filtered user body", async () => {
+        describe("UC1.1 - given a valid user body", () => {
+            it("UC1.1.1 - should respond with a 200 status code with filtered user body", async () => {
                 // arrange
                 userSpy = jest.spyOn(UserService, 'createUser')
                     .mockImplementation(() => new Promise((resolve) => {
@@ -190,8 +190,8 @@ describe("Test UserController", () => {
             });
         });
 
-        describe("(C1.2) given authenticated and invalid user body", () => {
-            it("should return 400 with message when no email", async () => {
+        describe("UC1.2 - given an invalid user body", () => {
+            it("UC1.2.1 - should return 400 with message when no email", async () => {
 
                 let requestUser = {
                     password: reqUser.password,
@@ -209,7 +209,7 @@ describe("Test UserController", () => {
                 expect(authStub.called).toBeTruthy();
                 expect(empStub.called).toBeTruthy();
             });
-            it("should return 400 with message when no password", async () => {
+            it("UC1.2.2 - should return 400 with message when no password", async () => {
                 let requestUser = {
                     email: reqUser.email,
                     name: reqUser.name,
@@ -226,7 +226,7 @@ describe("Test UserController", () => {
                 expect(authStub.called).toBeTruthy();
                 expect(empStub.called).toBeTruthy();
             });
-            it("should return 400 with message when no role", async () => {
+            it("UC1.2.3 - should return 400 with message when no role", async () => {
                 let requestUser = {
                     email: reqUser.email,
                     password: reqUser.password,
@@ -243,7 +243,7 @@ describe("Test UserController", () => {
                 expect(authStub.called).toBeTruthy();
                 expect(empStub.called).toBeTruthy();
             });
-            it("should return 400 with message when email doesn't finish by benoit-cote.com", async () => {
+            it("UC1.2.4 - should return 400 with message when email doesn't finish by benoit-cote.com", async () => {
                 let requestUser = {
                     email: "wrong@format.email",
                     password: reqUser.password,
@@ -265,9 +265,9 @@ describe("Test UserController", () => {
         
     });
 
-    describe("View all Users", () => {
-        describe("Given a token passed", () => {
-            it("Should respond with a 200 status code", async () => {
+    describe("UC2 - View all Users", () => {
+        describe("UC2.1 - Given a token passed", () => {
+            it("UC2.1.1 - Should respond with a 200 status code when admin", async () => {
                 userSpy = jest.spyOn(UserService, 'getAllUsers')
                 .mockImplementation(() => new Promise(
                     (resolve) => {
@@ -282,12 +282,12 @@ describe("Test UserController", () => {
                 expect(JSON.stringify(response.body)).toEqual(JSON.stringify(ListUser));
             });
 
-            it("Should respond with a 403 status code", async () => {
+            it("UC2.1.2 - Should respond with a 403 status code when employee", async () => {
                 let response = await UserController.findAll(reqUserEmployee, res);
                 expect(response.statusCode).toBe(403);
             });
 
-            it("Should respond with a 500 status code", async () => {
+            it("UC2.1.3 - Should respond with a 500 status code when user service throws error", async () => {
                 userSpy = jest.spyOn(UserService, 'getAllUsers')
                 .mockImplementation(async () => {
                     await Promise.reject({status: 500});
@@ -301,16 +301,16 @@ describe("Test UserController", () => {
     
 
 
-    describe("(C2): Authenticating a User)", () => {
+    describe("UC3 - Authenticating a User)", () => {
 
         const validUserLogin = {
             email: "valid@email.com",
             password: "validPassword"
         };
 
-        describe("(C2.1): given existing email and password", () => {
+        describe("UC3.1 - given existing email and password", () => {
 
-            it("(C2.1.1): should respond with 200 status code", async () => {
+            it("UC3.1.1 - should respond with 200 status code", async () => {
                 userSpy = jest.spyOn(UserService, 'authenticateUser')
                     .mockImplementation(() => new Promise((resolve) => {
                         resolve(resUser2);
@@ -322,7 +322,7 @@ describe("Test UserController", () => {
                 expect(authSpy).toBeCalledTimes(1);
             });
 
-            it("should return jwt access token in body and refresh token in the header", async () => {
+            it("UC3.1.2 - should return jwt access token in body and refresh token in the header", async () => {
                 const response = await request.post("/users/authenticate") 
                     .send(reqUser);
                 expect(response.body.aToken).toBe("aToken");
@@ -332,9 +332,9 @@ describe("Test UserController", () => {
             });
         });
 
-        describe("given non existent email and/or wrong password", () => {
+        describe("UC3.2 - given non existent email and/or wrong password", () => {
 
-            it("should respond with 401 status code", async () => {
+            it("UC3.2.1 - should respond with 401 status code", async () => {
                 userSpy = jest.spyOn(UserService, 'authenticateUser')
                     .mockImplementation(() => new Promise((resolve) => {
                         resolve(false);
@@ -348,21 +348,7 @@ describe("Test UserController", () => {
                 expect(response.statusCode).toBe(401);
             });
 
-            it("should respond with 401 status code", async () => {
-                userSpy = jest.spyOn(UserService, 'authenticateUser')
-                    .mockImplementation(() => new Promise((resolve) => {
-                        resolve(false);
-                    }));
-                const response = await request.post("/users/authenticate").send({
-                    email: "first@benoit-cote.com",
-                    password: "verySecurePasswor"
-                });
-                expect(userSpy).toBeCalledTimes(1);
-                expect(authSpy).toBeCalledTimes(0);
-                expect(response.statusCode).toBe(401);
-            });
-
-            it("should respond with 401 status code", async () => {
+            it("UC3.2.2 - should respond with 401 status code", async () => {
                 userSpy = jest.spyOn(UserService, 'authenticateUser')
                     .mockImplementation(() => new Promise((resolve) => {
                         resolve(false);
@@ -377,8 +363,8 @@ describe("Test UserController", () => {
             });
         });
 
-        describe("given no email", () => {
-            it("should return 400 and message", async () => {
+        describe("UC3.3 - given invalid user from auth service", () => {
+            it("UC3.3.1 - should return 400 and message when no email", async () => {
                 const response = await request.post("/users/authenticate").send({
                     
                     password: "verySecurePassword"
@@ -390,22 +376,22 @@ describe("Test UserController", () => {
             });
         });
 
-        describe("given an error occurs with the user service", () => {
+        describe("UC3.4 - given an error occurs with the user service", () => {
             
-            it("should return 500 and a message", async () => {
+            it("UC3.4.1 - should return 500 and a message", async () => {
                 userSpy = jest.spyOn(UserService, 'authenticateUser')
                 .mockRejectedValue(new Error("Error with the user service"));
                 const response = await request.post("/users/authenticate").send(reqUser);
                 expect(response.statusCode).toBe(500);
                 expect(response.error.text).toBe("Error with the user service");
                 
-            })
+            });
         });
     });
 
 
 
-    describe("(C3): Modify a User)", () => {
+    describe("UC4 - Modify a User)", () => {
 
         const expectedUserToModifyValid = {
             email: modifiedUser.email,
@@ -414,8 +400,8 @@ describe("Test UserController", () => {
         };
         
 
-        describe("(C3.1): given user is authenticated and that entries are valid", ()  =>{
-            it("(C3.1.1): should respond with a 200 status code with a modified user", async () => {
+        describe("UC4.1 - given user is authenticated and that entries are valid", ()  =>{
+            it("UC4.1.1 - should respond with a 200 status code with a modified user", async () => {
 
                 userSpy = jest.spyOn(UserService, "modifyUser")
                 .mockImplementation(() => new Promise((resolve) => {
@@ -435,8 +421,8 @@ describe("Test UserController", () => {
         });
 
 
-        describe("(C3.2) given user is authenticated but email is invalid", () => {
-             it("(C3.2.1): should respond with a 400 response message", async () => {
+        describe("UC4.2 - given user is authenticated but email is invalid", () => {
+             it("UC4.2.1 - should respond with a 400 response message", async () => {
 
                 let expectedUserToModifyInvalid = {
                     email: "ssssss",
@@ -460,16 +446,16 @@ describe("Test UserController", () => {
              });
         });
 
-        describe("(C3.3) given I try to modify the user but I am not authorized", () => {
-            it("Should respond with a 403 status code", async () => {
+        describe("UC4.3 - given I try to modify the user but I am not authorized", () => {
+            it("UC4.3.1 - Should respond with a 403 status code", async () => {
                 let response = await UserController.modifyUser(reqUserEmployee, res);
                 expect(response.statusCode).toBe(403);
             });
         });
 
 
-        describe("(C3.4) given I try to call the modifyUser service but the modifyUser service sends an error", () => {
-            it("Should respond with a 500 response message", async () => {
+        describe("UC4.4 - given I try to call the modifyUser service but the modifyUser service sends an error", () => {
+            it("UC4.4.1 - Should respond with a 500 response message", async () => {
                 let expectedUserToModify = {
                     email: "first@benoit-cote.com",
                     password: modifiedUserInvalid.password,
@@ -495,14 +481,10 @@ describe("Test UserController", () => {
         });
     });
 
+    describe("UC5 - Delete a User)", () => {
 
-
-
-
-    describe("(C4): Delete a User)", () => {
-
-        describe("(C4.1): given user is authenticated and that the email is valid", ()  =>{
-            it("(C4.1.1): should respond with a 200 status code with a deleted user", async () => {
+        describe("UC5.1 - given user is authenticated and that the email is valid", ()  =>{
+            it("UC5.1.1 - should respond with a 200 status code with a deleted user", async () => {
 
                 userSpy = jest.spyOn(UserService, "deleteUser")
                 .mockImplementation(() => new Promise((resolve) => {
@@ -521,8 +503,8 @@ describe("Test UserController", () => {
             });
         });
 
-        describe("(C4.2) given I try to delete the user but I am not authorized", () => {
-            it("Should respond with a 403 status code", async () => {
+        describe("UC5.2 - given I try to delete the user but I am not authorized", () => {
+            it("UC5.2.1 - Should respond with a 403 status code", async () => {
                 let response = await UserController.deleteUser(reqUserEmployee, res);
                 expect(response.statusCode).toBe(403);
             });

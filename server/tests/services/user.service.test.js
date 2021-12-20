@@ -54,60 +54,61 @@ const userModelError = {
     message: "Error with the user model."
 }
 
+describe("Test User Service", () => {
+    describe("US1 - createUser", () => {
 
-describe("createUser", () => {
+        var userCreateStub;
+        var sandbox;
 
-    beforeEach(() => {
-        jest.resetAllMocks();
-        jest.clearAllMocks();
-
-        sandbox = sinon.createSandbox();
-        userCreateStub = sandbox.stub(UserModel, 'create');
-    })
-
-    afterEach(() => {
-        jest.resetAllMocks();
-        jest.clearAllMocks();
-    })
-
-    var userCreateStub;
-    var sandbox;
-
-    describe("given a valid user", () => {
-        it("should return resolved promise with user information when user model works properly", async () => {
-            // arrange
-            let userModelSpy = jest.spyOn(UserModel, 'create')
-                .mockImplementation(() => new Promise((resolve) => {
-                    resolve(resUser);
-                }));
-
-            // act
-            const serviceResponse = await UserService.createUser(reqUser);
-
-            // assert
-            expect(serviceResponse).toEqual({
-                email: resUser.dataValues.email,
-                name: resUser.dataValues.name,
-                role: resUser.dataValues.role
-            });
-            expect(userModelSpy).toBeCalledTimes(1);
+        beforeEach(() => {
+            jest.resetAllMocks();
+            jest.clearAllMocks();
+    
+            sandbox = sinon.createSandbox();
+            userCreateStub = sandbox.stub(UserModel, 'create');
         })
-    });
-});
-
-describe("View All Users", () => {
-    describe("given a list of users", () => {
-        it("Should return the full list of users with all their information", async() => {
-            jest.spyOn(UserModel, 'findAll')
-            .mockImplementation(() => new Promise(
-                (resolve) => {
-                    resolve(ListUser);
-                }
-            ));
-
-            const serviceResponse = await UserService.getAllUsers();
-            expect(serviceResponse.length).toBe(3);
+    
+        afterEach(() => {
+            jest.resetAllMocks();
+            jest.clearAllMocks();
+        })
+    
+        describe("US1.1 - given a valid user", () => {
+            it("US1.1.1 - should return resolved promise with user information when user model works properly", async () => {
+                // arrange
+                let userModelSpy = jest.spyOn(UserModel, 'create')
+                    .mockImplementation(() => new Promise((resolve) => {
+                        resolve(resUser);
+                    }));
+    
+                // act
+                const serviceResponse = await UserService.createUser(reqUser);
+    
+                // assert
+                expect(serviceResponse).toEqual({
+                    email: resUser.dataValues.email,
+                    name: resUser.dataValues.name,
+                    role: resUser.dataValues.role
+                });
+                expect(userModelSpy).toBeCalledTimes(1);
+            })
         });
     });
+    
+    describe("US2 - View All Users", () => {
+        describe("US2.1 - given a list of users", () => {
+            it("US2.1.1 - Should return the full list of users with all their information", async() => {
+                jest.spyOn(UserModel, 'findAll')
+                .mockImplementation(() => new Promise(
+                    (resolve) => {
+                        resolve(ListUser);
+                    }
+                ));
+    
+                const serviceResponse = await UserService.getAllUsers();
+                expect(serviceResponse.length).toBe(3);
+            });
+        });
+    });    
 });
 

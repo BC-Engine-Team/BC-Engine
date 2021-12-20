@@ -63,7 +63,7 @@ const makeApp = require('../../app');
 app = makeApp();
 const request = supertest(app);
 
-describe("checkEmail", () => {
+describe("Test Employee Service", () => {
 
     beforeEach(() => {
         jest.clearAllMocks();
@@ -77,25 +77,29 @@ describe("checkEmail", () => {
         sandbox.resetHistory();
     });
 
-    describe("given employee email", () => {
-        it("when existing, should return 200 with employee name and email", async () => {
-            const response = await request.post("/users").send(reqUser);
+    describe("ES1 - checkEmail", () => {
 
-            expect(response.status).toBe(200);
-            expect(response.body.email).toBe("emp@benoit-cote.com");
-            expect(response.body.name).toBe("FName LName")
-        })
-
-        it("when non existent, should return 400 with message", async () => {
-            empModelSpy = jest.spyOn(EmpModel, 'findOne')
-                .mockImplementation(() => new Promise((resolve) => {
-                    resolve(undefined);
-                }));
-            const response = await request.post("/users").send(reqUser);
-
-            expect(response.status).toBe(400);
-            expect(response.body.message).toBe("Employee email doesn't exist.");
+        describe("ES1.1 - given employee email", () => {
+            it("ES1.1.1 - when existing, should return 200 with employee name and email", async () => {
+                const response = await request.post("/users").send(reqUser);
+    
+                expect(response.status).toBe(200);
+                expect(response.body.email).toBe("emp@benoit-cote.com");
+                expect(response.body.name).toBe("FName LName")
+            })
+    
+            it("ES1.1.2 - when non existent, should return 400 with message", async () => {
+                empModelSpy = jest.spyOn(EmpModel, 'findOne')
+                    .mockImplementation(() => new Promise((resolve) => {
+                        resolve(undefined);
+                    }));
+                const response = await request.post("/users").send(reqUser);
+    
+                expect(response.status).toBe(400);
+                expect(response.body.message).toBe("Employee email doesn't exist.");
+            });
+            
         });
-        
     });
 });
+
