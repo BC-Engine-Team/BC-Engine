@@ -24,6 +24,7 @@ const Users = () => {
     let counter = 0;
 
     const cookies = new Cookies();
+    const displayNone = "d-none";
 
     const [users, setUsers] = useState([{name: "", email: "", role: ""}]);
     const [validated, setValidated] = useState(false);
@@ -43,11 +44,11 @@ const Users = () => {
 
     const [formEnabled, setFormEnabled] = useState({
         table: "container", 
-        form: "d-none",
+        form: displayNone,
     });
 
     const [backEnabled, setBackEnabled] = useState({
-        backButton: "d-none"
+        backButton: displayNone,
     })
 
     const enableForm = () => {
@@ -59,13 +60,13 @@ const Users = () => {
 
     const enableBackButton = () => {
         setBackEnabled({
-            backButton: "btn btn-light py-2 px-5 my-1 shadow-sm border"
+            backButton: "btn btn-light py-2 px-5 my-1 shadow-sm border",
         })
     }
 
     const disableBackButton = () => {
         setBackEnabled({
-            backButton: "d-none"
+            backButton: displayNone,
         })
     }
 
@@ -120,7 +121,7 @@ const Users = () => {
             email: "",
             password1: "",
             password2: "",
-            role: ""
+            role: "",
         });
     }
 
@@ -138,7 +139,7 @@ const Users = () => {
             email: email,
             password1: "",
             password2: "",
-            role: role
+            role: role,
         });
     }
 
@@ -214,6 +215,7 @@ const Users = () => {
         if(Object.keys(newErrors).length > 0) {
             setErrors(newErrors);
         }
+
         else if(InvalidInput.length === 0) {
             if(FormTitle === "Add User") {
                 setFormTitle("Confirm creation?");
@@ -383,7 +385,7 @@ const Users = () => {
             setInvalidInput("Can't send the request to delete the user");
             }
         });
-        
+
         return false;   
     };
 
