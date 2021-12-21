@@ -1,0 +1,14 @@
+.container-chart {
+  width: 75%;
+  float: left;
+}
+
+.container-criteria {
+    width: 25%;
+    float: left;
+}
+
+.chart {
+    height: 600px;
+    position: relative;
+}

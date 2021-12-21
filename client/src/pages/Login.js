@@ -2,15 +2,11 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Axios from 'axios'
 import Cookies from 'universal-cookie'
-
 import NavB from '../components/NavB'
-
 import Form from 'react-bootstrap/Form'
 import FloatingLabel from 'react-bootstrap/esm/FloatingLabel'
 import Button from 'react-bootstrap/Button'
 import Alert from 'react-bootstrap/Alert'
-
-
 
 const Login = () => {
     const [validated, setValidated] = useState(false);
