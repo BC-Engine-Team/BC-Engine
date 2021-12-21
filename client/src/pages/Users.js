@@ -13,13 +13,10 @@ import { mdiDelete } from '@mdi/js';
 import { mdiPencil } from '@mdi/js';
 import { mdiPencilOutline } from '@mdi/js';
 import Axios from 'axios';
-import Form from 'react-bootstrap/Form'
-import FloatingLabel from 'react-bootstrap/esm/FloatingLabel'
-import Alert from 'react-bootstrap/Alert'
 import DeleteUserPopup from '../components/DeleteUserPopup'
+import UsersForm from '../components/UsersForm'
 
 const Users = () => {
-
     let navigate = useNavigate();
     let counter = 0;
 
@@ -27,120 +24,39 @@ const Users = () => {
     const displayNone = "d-none";
 
     const [users, setUsers] = useState([{name: "", email: "", role: ""}]);
-    const [validated, setValidated] = useState(false);
     const [email, setEmail] = useState("");
-    const [FormTitle, setFormTitle] = useState("");
-    const [emailEnable, setEmailEnable] = useState("");
-    const [FormSubmit, setFormSubmit] = useState("");
-    const [passwordEnable, setPasswordEnable] = useState("");
-    const [roleEnable, setRoleEnable] = useState("");
     const [deleteButtonActivated, setDeleteButtonActivated] = useState(false);
-    const [InvalidInput, setInvalidInput] = useState("");
-    const [onConfirmationScreen, setOnConfirmationScreen] = useState(false);
-    const [submitType, setSubmitType] = useState("submit");
-
-    const [form, setForm] = useState({});
-    const [errors, setErrors] = useState({});
 
     const [formEnabled, setFormEnabled] = useState({
         table: "container", 
-        form: displayNone,
+        form: displayNone
     });
-
-    const [backEnabled, setBackEnabled] = useState({
-        backButton: displayNone,
-    })
 
     const enableForm = () => {
         setFormEnabled({
             table: "container-form-enabled-table",
-            form: "container-form-enabled-form",
+            form: "container-form-enabled-form"
         });
-    }
-
-    const enableBackButton = () => {
-        setBackEnabled({
-            backButton: "btn btn-light py-2 px-5 my-1 shadow-sm border",
-        })
-    }
-
-    const disableBackButton = () => {
-        setBackEnabled({
-            backButton: displayNone,
-        })
     }
 
     const disableForm = () => {
-        setValidated(false);
-        setSubmitType("submit");
-        setOnConfirmationScreen(false);
-        Array.from(document.querySelectorAll("input")).forEach(
-            input => (input.value = "")
-        );
-        Array.from(document.querySelectorAll("select")).forEach(
-            select => (select.value = "")
-        );
+        handleRefresh();
         setFormEnabled({
             table: "container",
-            form: "d-none",
+            form: "d-none"
         });
     }
-
-    const handleGoBack = () => {
-        if(FormTitle === "Confirm creation?"){
-            setEmailEnable("");
-            setFormTitle("Add User");
-            setFormSubmit("Add");
-        }
-        else if(FormTitle === "Confirm modification?"){
-            setEmailEnable("disable");
-            setFormTitle("Edit User");
-            setFormSubmit("Save Changes");
-        }
-
-        setSubmitType("submit");
-        setOnConfirmationScreen(false);
-        setPasswordEnable("");
-        setRoleEnable("");
-        disableBackButton();
-    }
+    module.exports = {disableForm}
 
     const handleAddUser = () => {
-        console.log("Add user");
-
         enableForm();
-        setInvalidInput("");
-        setEmailEnable("");
-        setPasswordEnable("");
-        setRoleEnable("");
-        setFormTitle("Add User");
-        setFormSubmit("Add");
-        disableBackButton();
-        setErrors({});
-        setForm({
-            email: "",
-            password1: "",
-            password2: "",
-            role: "",
-        });
+        UsersForm.handleAddUser();
     }
+    module.exports = {handleAddUser}
 
     const handleEditUser = (email, role) => {
-        console.log("Edit user with email: " +  email);
-
         enableForm();
-        setEmailEnable("disable");
-        setPasswordEnable("");
-        setRoleEnable("");
-        setFormTitle("Edit User");
-        setFormSubmit("Save Changes");
-        disableBackButton();
-        setForm({
-            email: email,
-            password1: "",
-            password2: "",
-            role: role,
-        });
+        UsersForm.handleEditUser(email, role);
     }
 
     const handleDeleteUser = (email) => {
@@ -149,6 +65,41 @@ const Users = () => {
         setEmail(email);
         setDeleteButtonActivated(true);
     }
+
+    const onDeleteClick = () => {
+        let header = {
+            'authorization': "Bearer " + cookies.get("accessToken")
+        }
+
+        let data = {
+            email: email
+        }
+    
+        Axios.defaults.withCredentials = true;
+
+        Axios.delete(`http://localhost:3001/users/delete/${email}`, {headers: header, data: data})
+        .then((response) => {
+            if(response.data === true)
+            {
+                console.log("User deleted successfully!");
+            }
+
+            setDeleteButtonActivated(false);
+            handleRefresh();
+        })
+        .catch((error) => {
+            if(error.response) {
+                if(error.response.status === 401 || error.response.status === 403) {
+                    UsersForm.setInvalidInput("Cannot recognize the email address");
+                }
+            }
+            else if(error.request) {
+                UsersForm.setInvalidInput("Can't send the request to delete the user");
+            }
+        });
+
+        return false;   
+    };
 
     const handleRefresh = () => {
         let header = {
@@ -190,205 +141,6 @@ const Users = () => {
         // eslint-disable-next-line react-hooks/exhaustive-deps 
     }, []);
 
-    const setField = (field, value) => {
-        setForm({
-          ...form,
-          [field]: value,
-        });
-
-        if ( !!errors[field] ){
-            setErrors({
-                ...errors,
-                [field]: null,
-              });
-        } 
-    }
-    
-    const handleSubmit = (event) => {
-        event.preventDefault();
-        event.stopPropagation();
-        
-        setInvalidInput("");
-
-        const newErrors = findFormErrors();
-
-        if(Object.keys(newErrors).length > 0) {
-            setErrors(newErrors);
-        }
-
-        else if(InvalidInput.length === 0) {
-            if(FormTitle === "Add User") {
-                setFormTitle("Confirm creation?");
-            }
-            else if(FormTitle === "Edit User") {
-                setFormTitle("Confirm modification?");
-            }
-
-            setSubmitType("button");
-            setOnConfirmationScreen(true);
-            setFormSubmit("Confirm");
-            setEmailEnable("disable");
-            setPasswordEnable("disable");
-            setRoleEnable("disable");
-            enableBackButton();
-            setErrors({});
-        }
-    }
-
-    const handleConfirm = (event) => {
-        event.preventDefault();
-        event.stopPropagation();
-
-        let header = {
-            'authorization': "Bearer " + cookies.get("accessToken"),
-        }
-
-        let data = {
-            email: form.email,
-            password: form.password1,
-            role: form.role,
-        }
-
-        if(FormTitle === "Confirm modification?") {
-            onUpdateClick();
-        }
-        else if(FormTitle === "Confirm creation?") {
-            Axios.post("http://localhost:3001/users/", data, {headers: header})
-            .then((response) => {
-                console.log(response);
-    
-                if(response.status === 200 || response.status === 201) {
-                    disableForm();
-                    handleRefresh();
-                }
-            })
-            .catch((error) => {
-                if (error.response) {
-                    if(error.response.status === 403 || error.response.status === 401) {
-                        setInvalidInput(error.response.data.message || "");
-                        navigate("/login");
-                    }
-                    else {
-                        console.log(error.response.data.message);
-                        setInvalidInput(error.response.data.message);
-                        console.log(InvalidInput);
-
-                        handleGoBack();
-                    }
-                } else if (error.request) {
-                    // The request was made but no response was received
-                    // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
-                    // http.ClientRequest in node.js
-                    setInvalidInput("Could not reach B&C Engine...");
-                  }
-            });
-        }
-    }
-
-    const findFormErrors = () => {
-        const {email, password1, password2, role} = form;
-        const newErrors = {}
-
-        // email errors
-        if(!email || email === "") newErrors.email = "This field cannot be empty!";
-        else if(!email.endsWith("@benoit-cote.com")) newErrors.email = "Invalid email. Must end with 'benoit-cote.com'.";
-        
-        // password errors
-        if(!password1 || password1 === "") {
-                newErrors.password1 = "This field cannot be empty!";
-
-        }else if(!RegExp("^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.{8,})").exec(password1)) {
-            newErrors.password1 = "Password must be at least 8 characters, contain 1 upper-case and 1 lower-case letter, and contain a number.";
-
-        }
-        if(password1 !== password2) {
-            newErrors.password1 = "Passwords must match!";
-            newErrors.password2 = "Passwords must match!";
-
-        }
-        if(!password2 || password2 === "") {
-            newErrors.password2 = "This field cannot be empty!";
-        }
-        
-        // role errors
-        if(!role || role === "") newErrors.role = "Must select a role!";
-
-        return newErrors;
-    }
-
-    const onUpdateClick = () => {
-        let header = {
-            'authorization': "Bearer " + cookies.get("accessToken"),
-        }
-    
-        Axios.defaults.withCredentials = true;
-    
-        let user = {
-            email: form.email,
-            password: form.password2,
-            role: form.role,
-        };
-
-        Axios.put(`http://localhost:3001/users/modify/${form.email}`, user, {headers: header})
-        .then((response) => {
-            if(response.data === true)
-            {
-                console.log("User modified successfully!");
-            }
-            disableForm();
-            handleRefresh();
-        })
-        .catch((error) => {
-            if(error.response) {
-                if(error.response.status === 401 || error.response.status === 403) {
-                    setInvalidInput("Cannot recognize the email address");
-                }
-            }
-            else if(error.request) {
-                setInvalidInput("Can't send the request to modify the user");
-            }
-        });    
-
-        setValidated(true);
-        return false;     
-    }
-    
-    const onDeleteClick = () => {
-        let header = {
-            'authorization': "Bearer " + cookies.get("accessToken"),
-        }
-    
-        Axios.defaults.withCredentials = true;
-
-        let user = {
-            email: email,
-        }
-
-        console.log(header);
-        Axios.delete(`http://localhost:3001/users/delete/${email}`, {headers: header, data: user})
-        .then((response) => {
-            if(response.data === true)
-            {
-                console.log("User deleted successfully!");
-            }
-
-            setDeleteButtonActivated(false);
-            handleRefresh();
-        })
-        .catch((error) => {
-            if(error.response) {
-                if(error.response.status === 401 || error.response.status === 403) {
-                    setInvalidInput("Cannot recognize the email address");
-                }
-            }
-            else if(error.request) {
-            setInvalidInput("Can't send the request to delete the user");
-            }
-        });
-
-        return false;   
-    };
-
     return (
         <div>
             <NavB />
@@ -410,7 +162,7 @@ const Users = () => {
                                     <th>
                                         <div className="d-flex justify-content-center">
                                             <Button 
-                                                className="btn py-0 shadow-sm border " 
+                                                className="btn py-0 shadow-sm border" 
                                                 onClick={handleAddUser}>
                                                 Add User
                                             </Button>
@@ -482,119 +234,7 @@ const Users = () => {
                             className="position-absolute top-0 end-0 m-4"
                             onClick={disableForm}/>
                             
-                        <Form
-                            noValidate 
-                            className="mt-4 mx-5 uForm" 
-                            validated={validated} 
-                            onSubmit={handleSubmit}>
-
-                            <h1 className="display-4 text-center mb-5">{FormTitle}</h1>
-
-                            {
-                            InvalidInput.length > 0 ? 
-                            <Alert variant="danger">
-                                {InvalidInput}
-                            </Alert> :
-                            <></>
-                            }
-
-                            <Form.Group className="mb-4" controlId="floatingEmail">
-                                <FloatingLabel controlId="floatingEmail" label="Email address" className="mb-3" >
-                                    <Form.Control 
-                                        required
-                                        type="email"
-                                        defaultValue={form.email}
-                                        onChange={(e) => setField('email', e.target.value)}
-                                        value={form.email}
-                                        autoComplete='new-email'
-                                        disabled={emailEnable}
-                                        isInvalid={!!errors.email}
-                                    />
-
-                                    <Form.Control.Feedback type="invalid">
-                                        {errors.email}
-                                    </Form.Control.Feedback>
-                                </FloatingLabel>
-                            </Form.Group>
-
-                            <Form.Group className="mb-4" controlId="floatingPassword1">
-                                <FloatingLabel controlId="floatingPassword1" label="Password" className="mb-3" >
-                                    <Form.Control 
-                                        required 
-                                        type="password" 
-                                        defaultValue={form.password1}
-                                        onChange={(e) => setField('password1', e.target.value)}
-                                        autoComplete='new-password'
-                                        disabled={passwordEnable}
-                                        value={form.password1}
-                                        isInvalid={!!errors.password1}
-                                    />
-
-                                    <Form.Control.Feedback type="invalid">
-                                        {errors.password1}
-                                    </Form.Control.Feedback>
-                                </FloatingLabel>
-                            </Form.Group>
-
-                            <Form.Group className="mb-4" controlId="floatingPassword2">
-                                <FloatingLabel controlId="floatingPassword2" label="Confirm Password" className="mb-3" >
-                                    <Form.Control 
-                                        required 
-                                        type="password" 
-                                        defaultValue={form.password2} 
-                                        onChange={(e) => setField('password2', e.target.value)}
-                                        autoComplete='off'
-                                        value={form.password2}
-                                        disabled={passwordEnable}
-                                        isInvalid={!!errors.password2}
-                                    />
-
-                                    <Form.Control.Feedback type="invalid">
-                                        {errors.password2}
-                                    </Form.Control.Feedback>
-                                </FloatingLabel>
-                            </Form.Group>
-                            
-                            <Form.Group className="mb-4" controlId="floatingModifyRole">
-                                <Form.Label>Role</Form.Label>
-                                <Form.Select required
-                                            size="sm" 
-                                            aria-label="Default select example" 
-                                            defaultValue={form.role} 
-                                            onChange={(e) => setField('role', e.target.value)}
-                                            value={form.role}
-                                            disabled={roleEnable}
-                                            isInvalid={!!errors.role}>
-
-                                    <option value="">Select User</option>
-                                    <option value="admin">Admin</option>
-                                    <option value="employee">Employee</option>
-                                </Form.Select>
-
-                                <Form.Control.Feedback type="invalid">
-                                    
-                                </Form.Control.Feedback>
-                            </Form.Group>
-
-                            <div className="d-flex justify-content-center mt-3 mb-4 position-aboslute bottom-0">
-                                <Button 
-                                    type={submitType} 
-                                    className="btn btn-light py-2 px-5 my-1 mx-2 shadow-sm border submitButton"
-                                    style={{display: 'inline-block'}}
-                                    onClick={onConfirmationScreen ? handleConfirm : undefined}>
-                                    {FormSubmit}
-                                </Button>
-                                
-
-                                <Button 
-                                    className={backEnabled.backButton}
-                                    style={{display: 'inline-block'}}
-                                    onClick={handleGoBack}>
-                                    Go back
-                                </Button>
-                                
-                            </div>
-                        </Form>
+                        <UsersForm />
                     </div>
                 </div>
             </div>
