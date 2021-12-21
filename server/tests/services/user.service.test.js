@@ -35,7 +35,7 @@ describe("Test User Service", () => {
     });
 
     afterEach(() => {
-        sandbox.resetHistory();
+        sandbox.restore();
     });
 
     afterAll(() => {

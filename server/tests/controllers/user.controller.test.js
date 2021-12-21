@@ -72,7 +72,7 @@ describe("Test UserController", () => {
     });
 
     afterEach(() => {
-        sandbox.resetHistory();
+        sandbox.restore();
     });
 
     afterAll(() => {
@@ -104,6 +104,11 @@ describe("Test UserController", () => {
                 expect(userSpy).toHaveBeenCalledTimes(1);
                 expect(authStub.called).toBeTruthy();
                 expect(empStub.called).toBeTruthy();
+
+                // this needs to be done manually in each test because it 
+                //doesn't work in the afterEach for some reason
+                authStub.resetHistory();
+                empStub.resetHistory();
             });
         });
 
@@ -126,6 +131,8 @@ describe("Test UserController", () => {
                 expect(userSpy).toHaveBeenCalledTimes(0);
                 expect(authStub.called).toBeTruthy();
                 expect(empStub.called).toBeTruthy();
+                authStub.resetHistory();
+                empStub.resetHistory();
             });
 
             it("UC1.2.2 - should return 400 with message when no password", async () => {
@@ -146,6 +153,8 @@ describe("Test UserController", () => {
                 expect(userSpy).toHaveBeenCalledTimes(0);
                 expect(authStub.called).toBeTruthy();
                 expect(empStub.called).toBeTruthy();
+                authStub.resetHistory();
+                empStub.resetHistory();
             });
 
             it("UC1.2.3 - should return 400 with message when no role", async () => {
@@ -166,6 +175,8 @@ describe("Test UserController", () => {
                 expect(userSpy).toHaveBeenCalledTimes(0);
                 expect(authStub.called).toBeTruthy();
                 expect(empStub.called).toBeTruthy();
+                authStub.resetHistory();
+                empStub.resetHistory();
             });
 
             it("UC1.2.4 - should return 400 with message when email doesn't finish by benoit-cote.com", async () => {
@@ -187,6 +198,8 @@ describe("Test UserController", () => {
                 expect(userSpy).toHaveBeenCalledTimes(0);
                 expect(authStub.called).toBeTruthy();
                 expect(empStub.called).toBeTruthy();
+                authStub.resetHistory();
+                empStub.resetHistory();
             });
         });
     });
