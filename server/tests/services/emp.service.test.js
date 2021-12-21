@@ -8,7 +8,6 @@ const supertest = require('supertest');
 const { afterEach, afterAll } = require('jest-circus');
 var { expect, jest } = require('@jest/globals');
 const sinon = require('sinon');
-var MockExpressResponse = require('mock-express-response');
 
 
 const reqUser = {
@@ -92,6 +91,7 @@ describe("Test Employee Service", () => {
                 expect(response.body.message).toBe("Employee email doesn't exist.");
                 expect(empModelSpy).toBeCalledTimes(1);
                 expect(userControllerStub.called).toBeFalsy();
+                userControllerStub.resetHistory();
             });
             
         });
