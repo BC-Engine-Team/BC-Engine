@@ -21,30 +21,12 @@ const reqEmp = {
     firstName: "FName",
     lastName: "LName"
 }
-const reqUserAdmin = {
-    user: {
-        email: "valid@email.com",
-        password: "validPassword",
-        name: "validName",
-        role: "admin"
-    }
-}
 
 const reqUserEmployee = {
     user: {
         email: "valid@email.com",
         role: "employee"
     }
-};
-
-const resUser = {
-    userId: "validUUID",
-    email: "valid@email.com",
-    password: "validPassword",
-    name: "validName",
-    role: "validRole",
-    updatedAt: new Date("2020-12-20"),
-    createdAt: new Date("2020-12-20")
 };
 
 const resUserFromService = {
@@ -55,25 +37,6 @@ const resUserFromService = {
         role: "validRole"
     }
 };
-
-
-
-
-//this is all the modified user test data
-const modifiedUser = {
-    email: "first@benoit-cote.com",
-    password: "validPassword",
-    role: "employee"
-};
-
-//this is all the delete user test data
-
-
-const deletedUserInvalid = {
-    email: "sss"
-}
-
-
 
 let sandbox = sinon.createSandbox();
 let authStub = sandbox.stub(AuthService, 'authenticateToken')
@@ -95,7 +58,6 @@ let userSpy = jest.spyOn(UserService, 'authenticateUser')
 
 let authSpy = jest.spyOn(AuthService, 'getTokens')
     .mockImplementation(() =>  ["aToken","rToken"]);
-
 
 const makeApp = require('../../app');
 let app = makeApp();
