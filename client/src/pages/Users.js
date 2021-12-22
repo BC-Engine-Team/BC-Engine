@@ -19,26 +19,42 @@ const Users = () => {
     const cookies = new Cookies();
     const displayNone = "d-none";
 
-    const [isUpdate, setIsUpdate] = useState(true);
-    const [isAdd, setIsAdd] = useState(true);
-    const [isEdit, setIsEdit] = useState(true);
     const [users, setUsers] = useState([{name: "", email: "", role: ""}]);
     const [email, setEmail] = useState("");
     const [deleteButtonActivated, setDeleteButtonActivated] = useState(false);
-
-    const [editValues, setEditValues] = useState({
-        email: "",
-        role: ""
-    });
+    const [setInvalidInput] = useState("");
 
     const [formEnabled, setFormEnabled] = useState({
         table: "container", 
         form: displayNone
     });
 
+    // Default values sent to the UsersForm.js on the edit form
+    const [editValues, setEditValues] = useState({
+        email: "",
+        role: ""
+    });
+
+    // Calls functions in the UsersForm.js
+    const [isUpdate, setIsUpdate] = useState(true);
+    const [isAdd, setIsAdd] = useState(true);
+    const [isEdit, setIsEdit] = useState(true);
+
     const handleDisableForm = useCallback(() => {},[isUpdate]);
     const handleAddUser = useCallback(() => {},[isAdd]);
     const handleEditUser = useCallback(() => {},[isEdit]);
+
+    const addUser = () => { setIsAdd(!isAdd) }
+
+    const editUser = (email, role) => { 
+        setEditValues({
+            email: email,
+            role: role
+        });
+        
+        // Triggers function call in the UsersForm.js
+        setIsEdit(!isEdit);
+    }
 
     const enableForm = () => {
         setFormEnabled({
@@ -54,18 +70,8 @@ const Users = () => {
             form: "d-none"
         });
 
+        // Triggers function call in the UsersForm.js
         setIsUpdate(!isUpdate);
-    }
-
-    const addUser = () => { setIsAdd(!isAdd) }
-
-    const editUser = (email, role) => { 
-        setEditValues({
-            email: email,
-            role: role
-        });
-        
-        setIsEdit(!isEdit);
     }
 
     const handleDeleteUser = (email) => {
@@ -98,11 +104,11 @@ const Users = () => {
         .catch((error) => {
             if(error.response) {
                 if(error.response.status === 401 || error.response.status === 403) {
-                    UsersForm.setInvalidInput("Cannot recognize the email address");
+                    setInvalidInput("Cannot recognize the email address");
                 }
             }
             else if(error.request) {
-                UsersForm.setInvalidInput("Can't send the request to delete the user");
+                setInvalidInput("Cannot send the request to delete the user");
             }
         });
 

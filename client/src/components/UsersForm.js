@@ -14,6 +14,7 @@ const UsersForm = (props) => {
     const displayNone = "d-none";
     const cookies = new Cookies();
 
+    // To fix issue where useEffects would trigger when component was loaded
     const [isLoadEdit, setIsLoadEdit] = useState(false);
     const [isLoadAdd, setIsLoadAdd] = useState(false);
     const [isLoadDisable, setIsLoadDisable] = useState(false);
@@ -23,17 +24,19 @@ const UsersForm = (props) => {
     const [FormSubmit, setFormSubmit] = useState("");
     const [passwordEnable, setPasswordEnable] = useState("");
     const [roleEnable, setRoleEnable] = useState("");
-    const [validated, setValidated] = useState(false);
+    const [InvalidInput, setInvalidInput] = useState("");
+    const [errors, setErrors] = useState({});
+    
     const [onConfirmationScreen, setOnConfirmationScreen] = useState(false);
     const [submitType, setSubmitType] = useState("submit");
+    const [validated, setValidated] = useState(false);
+
     const [form, setForm] = useState({
         email: "",
         password1: "",
         password2: "",
         role: ""
     });
-    const [InvalidInput, setInvalidInput] = useState("");
-    const [errors, setErrors] = useState({});
 
     const [backEnabled, setBackEnabled] = useState({
         backButton: displayNone
@@ -50,11 +53,13 @@ const UsersForm = (props) => {
         });
     }
 
+    // calls disableForm function located in Users.js
     const disableForm = () => {
         props.disableForm();
     }
 
     const handleAddUser = () => {
+        // calls enableForm function located in Users.js
         props.enableForm();
 
         setInvalidInput("");
@@ -78,9 +83,10 @@ const UsersForm = (props) => {
         else setIsLoadAdd(true);
 
         // eslint-disable-next-line react-hooks/exhaustive-deps 
-    }, [props.handleAddUser])
+    }, [props.handleAddUser]);
 
     const handleEditUser = (email, role) => {
+        // calls enableForm function located in Users.js
         props.enableForm();
 
         setEmailEnable("disable");
@@ -97,12 +103,13 @@ const UsersForm = (props) => {
         });
     }
 
+    // values email and role are passed from Users.js
     useEffect(() => {
         if (isLoadEdit) handleEditUser(props.editValues.email, props.editValues.role);
         else setIsLoadEdit(true);
 
         // eslint-disable-next-line react-hooks/exhaustive-deps 
-    }, [props.handleEditUser])
+    }, [props.handleEditUser]);
 
     const handleSubmit = (event) => {
         event.preventDefault();
@@ -140,13 +147,13 @@ const UsersForm = (props) => {
         event.stopPropagation();
 
         let header = {
-            'authorization': "Bearer " + cookies.get("accessToken"),
+            'authorization': "Bearer " + cookies.get("accessToken")
         }
 
         let data = {
             email: form.email,
             password: form.password1,
-            role: form.role,
+            role: form.role
         }
 
         if(FormTitle === "Confirm modification?") {
@@ -186,7 +193,7 @@ const UsersForm = (props) => {
 
     const findFormErrors = () => {
         const {email, password1, password2, role} = form;
-        const newErrors = {}
+        const newErrors = {};
 
         // email errors
         if(!email || email === "") newErrors.email = "This field cannot be empty!";
@@ -218,20 +225,20 @@ const UsersForm = (props) => {
     const setField = (field, value) => {
         setForm({
           ...form,
-          [field]: value,
+          [field]: value
         });
 
         if ( !!errors[field] ){
             setErrors({
                 ...errors,
-                [field]: null,
+                [field]: null
               });
         } 
     }
     
     const onUpdateClick = () => {
         let header = {
-            'authorization': "Bearer " + cookies.get("accessToken"),
+            'authorization': "Bearer " + cookies.get("accessToken")
         }
     
         Axios.defaults.withCredentials = true;
@@ -239,7 +246,7 @@ const UsersForm = (props) => {
         let user = {
             email: form.email,
             password: form.password2,
-            role: form.role,
+            role: form.role
         };
 
         Axios.put(`http://localhost:3001/users/modify/${form.email}`, user, {headers: header})
@@ -266,12 +273,12 @@ const UsersForm = (props) => {
     }
 
     const handleGoBack = () => {
-        if(FormTitle === "Confirm creation?"){
+        if(FormTitle === "Confirm creation?") {
             setEmailEnable("");
             setFormTitle("Add User");
             setFormSubmit("Add");
         }
-        else if(FormTitle === "Confirm modification?"){
+        else if(FormTitle === "Confirm modification?") {
             setEmailEnable("disable");
             setFormTitle("Edit User");
             setFormSubmit("Save Changes");
@@ -302,7 +309,7 @@ const UsersForm = (props) => {
         }
 
         // eslint-disable-next-line react-hooks/exhaustive-deps 
-    }, [props.handleDisableForm])
+    }, [props.handleDisableForm]);
 
     return (
         <div>
@@ -311,19 +318,19 @@ const UsersForm = (props) => {
                 onClick={disableForm}/>
 
             <Form
-            noValidate 
-            className="mt-4 mx-5 uForm" 
-            validated={validated} 
-            onSubmit={handleSubmit}>
+                noValidate 
+                className="mt-4 mx-5 uForm" 
+                validated={validated} 
+                onSubmit={handleSubmit}>
 
             <h1 className="display-4 text-center mb-5">{FormTitle}</h1>
 
             {
-            InvalidInput.length > 0 ? 
-            <Alert id="alertUserForm" variant="danger">
-                {InvalidInput}
-            </Alert> :
-            <></>
+                InvalidInput.length > 0 ? 
+                <Alert id="alertUserForm" variant="danger">
+                    {InvalidInput}
+                </Alert> :
+                <></>
             }
 
             <Form.Group className="mb-4" controlId="floatingEmail">
