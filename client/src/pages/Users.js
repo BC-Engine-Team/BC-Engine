@@ -5,6 +5,8 @@ import NavB from '../components/NavB'
 import Table from 'react-bootstrap/Table'
 import Button from 'react-bootstrap/Button'
 import '../styles/Edit&DeleteButton.scss'
+import '../styles/usersPage.css'
+import '../styles/popup.css'
 import Axios from 'axios';
 import DeleteUserPopup from '../components/DeleteUserPopup'
 import UsersForm from '../components/UsersForm'
@@ -39,9 +41,21 @@ const Users = () => {
     const [isAdd, setIsAdd] = useState(true);
     const [isEdit, setIsEdit] = useState(true);
 
-    const handleDisableForm = useCallback(() => {},[isUpdate]);
-    const handleAddUser = useCallback(() => {},[isAdd]);
-    const handleEditUser = useCallback(() => {},[isEdit]);
+    // Fixes issue where callback needed its call variable to be defined inside of the function
+    const [setTemp] = useState(true);
+
+    const handleDisableForm = useCallback(() => {
+        setTemp(isUpdate);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    },[isUpdate]);
+    const handleAddUser = useCallback(() => {
+        setTemp(isAdd);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    },[isAdd]);
+    const handleEditUser = useCallback(() => {
+        setTemp(isEdit);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    },[isEdit]);
 
     const addUser = () => { setIsAdd(!isAdd) }
 
@@ -123,7 +137,6 @@ const Users = () => {
     
         Axios.get("http://localhost:3001/users/", {headers: header})
         .then((response) => {
-            console.log(response.data);
             setUsers(response.data);
         })
         .catch((error) => {
