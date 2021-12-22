@@ -1,20 +1,16 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Cookies from 'universal-cookie'
 import NavB from '../components/NavB'
 import Table from 'react-bootstrap/Table'
 import Button from 'react-bootstrap/Button'
-import CloseButton from 'react-bootstrap/CloseButton'
 import '../styles/DeleteButton.scss'
 import '../styles/EditButton.scss'
-import Icon from '@mdi/react'
-import { mdiDeleteEmpty } from '@mdi/js';
-import { mdiDelete } from '@mdi/js';
-import { mdiPencil } from '@mdi/js';
-import { mdiPencilOutline } from '@mdi/js';
 import Axios from 'axios';
 import DeleteUserPopup from '../components/DeleteUserPopup'
 import UsersForm from '../components/UsersForm'
+import DeleteButton from '../components/DeleteButton'
+import EditButton from '../components/EditButton'
 
 const Users = () => {
     let navigate = useNavigate();
@@ -23,14 +19,26 @@ const Users = () => {
     const cookies = new Cookies();
     const displayNone = "d-none";
 
+    const [isUpdate, setIsUpdate] = useState(true);
+    const [isAdd, setIsAdd] = useState(true);
+    const [isEdit, setIsEdit] = useState(true);
     const [users, setUsers] = useState([{name: "", email: "", role: ""}]);
     const [email, setEmail] = useState("");
     const [deleteButtonActivated, setDeleteButtonActivated] = useState(false);
+
+    const [editValues, setEditValues] = useState({
+        email: "",
+        role: ""
+    });
 
     const [formEnabled, setFormEnabled] = useState({
         table: "container", 
         form: displayNone
     });
+
+    const handleDisableForm = useCallback(() => {},[isUpdate]);
+    const handleAddUser = useCallback(() => {},[isAdd]);
+    const handleEditUser = useCallback(() => {},[isEdit]);
 
     const enableForm = () => {
         setFormEnabled({
@@ -45,22 +53,22 @@ const Users = () => {
             table: "container",
             form: "d-none"
         });
-    }
-    module.exports = {disableForm}
 
-    const handleAddUser = () => {
-        enableForm();
-        UsersForm.handleAddUser();
+        setIsUpdate(!isUpdate);
     }
-    module.exports = {handleAddUser}
 
-    const handleEditUser = (email, role) => {
-        enableForm();
-        UsersForm.handleEditUser(email, role);
+    const addUser = () => { setIsAdd(!isAdd) }
+
+    const editUser = (email, role) => { 
+        setEditValues({
+            email: email,
+            role: role
+        });
+        
+        setIsEdit(!isEdit);
     }
 
     const handleDeleteUser = (email) => {
-        console.log("Delete user with email: " + email);
         disableForm();
         setEmail(email);
         setDeleteButtonActivated(true);
@@ -163,7 +171,7 @@ const Users = () => {
                                         <div className="d-flex justify-content-center">
                                             <Button 
                                                 className="btn py-0 shadow-sm border" 
-                                                onClick={handleAddUser}>
+                                                onClick={() => addUser()}>
                                                 Add User
                                             </Button>
                                         </div>
@@ -189,33 +197,9 @@ const Users = () => {
 
                                             <td className="py-1">
                                                 <div className="d-flex justify-content-center">
-                                                    <button className="btnEdit btn-edit" onClick={() => handleEditUser(u.email, u.role)}>
-                                                        <Icon path={mdiPencil} 
-                                                            className="mdi mdi-edit" 
-                                                            title="edit Button"
-                                                            size={1}
-                                                            horizontal/>
-                                
-                                                        <Icon path={mdiPencilOutline}
-                                                            className="mdi mdi-edit-empty" 
-                                                            title="edit Button empty"
-                                                            size={1}
-                                                            horizontal/>
-                                                    </button>
+                                                    <EditButton onEdit={() => editUser(u.email, u.role)}/>
 
-                                                    <button className="btnDelete btn-delete" onClick={() => handleDeleteUser(u.email)}>
-                                                        <Icon path={mdiDelete} 
-                                                            className="mdi mdi-delete" 
-                                                            title="delete Button"
-                                                            size={1}
-                                                            horizontal/>
-                                
-                                                        <Icon path={mdiDeleteEmpty}
-                                                            className="mdi mdi-delete-empty" 
-                                                            title="delete Button empty"
-                                                            size={1}
-                                                            horizontal/>
-                                                    </button>
+                                                    <DeleteButton onDelete={() => handleDeleteUser(u.email)} />
                                                 </div>
                                             </td>
 
@@ -229,12 +213,14 @@ const Users = () => {
 
                 <div className={formEnabled.form}>
                     <div className="card shadow m-5 uForm">
-                        
-                        <CloseButton 
-                            className="position-absolute top-0 end-0 m-4"
-                            onClick={disableForm}/>
-                            
-                        <UsersForm />
+                        <UsersForm 
+                            disableForm = {disableForm}
+                            enableForm = {enableForm}
+                            handleDisableForm = {handleDisableForm}
+                            handleAddUser = {handleAddUser}
+                            handleEditUser = {handleEditUser}
+                            editValues = {editValues}
+                            />
                     </div>
                 </div>
             </div>
