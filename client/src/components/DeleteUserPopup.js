@@ -1,7 +1,7 @@
 import React from 'react'
 import '../styles/index.css'
 
-export default function DeleteUserPopup({ open, onDelete, onClose }) {
+const DeleteUserPopup = ({ open, onDelete, onClose }) => {
     if(!open) return null;
 
     return(
@@ -17,3 +17,5 @@ export default function DeleteUserPopup({ open, onDelete, onClose }) {
         </>
     )
 }
+
+export default DeleteUserPopup
