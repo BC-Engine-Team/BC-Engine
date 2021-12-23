@@ -3,6 +3,7 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const logger = require('morgan');
 const userRoutes = require('./routes/user.routes');
+const invoiceRoutes = require('./routes/invoice.routes');
 
 module.exports = (database) => {
   const app = express();
@@ -16,8 +17,6 @@ module.exports = (database) => {
   if(database){
     database.sync('mysqldb');
   }
-
-  
 
   app.use(function(req, res, next) {
     res.header('Access-Control-Allow-Origin', 'http://localhost:3000');
@@ -43,6 +42,7 @@ module.exports = (database) => {
 
   // User routes CRUD
   app.use('/users', userRoutes);
+  app.use('/invoice', invoiceRoutes);
 
   return app;
 };

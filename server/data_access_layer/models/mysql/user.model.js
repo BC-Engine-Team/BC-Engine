@@ -1,5 +1,3 @@
-const { DataTypes } = require("sequelize/dist");
-const { mysqldb, Sequelize } = require("../../databases");
 const bcrypt = require('bcrypt');
 
 module.exports = (mysqldb, DataTypes) => {
