@@ -28,7 +28,7 @@ const Dashboard = () => {
                 </div>
                 <div className="d-inline-block container-chart">
                     <div className="card shadow ms-4 me-5 my-5">
-                        <DashboardChart />
+                        <DashboardChart data="" year=""/>
                     </div>
                 </div>
             </div>
