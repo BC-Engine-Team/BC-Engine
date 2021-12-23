@@ -27,26 +27,16 @@ for(let i=0; i<databases.length; i++){
   })
 }
 
-
-// const sequelize = new Sequelize(myDbConfig.DB, myDbConfig.USER, myDbConfig.PASSWORD, {
-//   host: myDbConfig.HOST || 'localhost',
-//   port: myDbConfig.port,
-//   dialect: myDbConfig.dialect,
-//   timezone: myDbConfig.timezone,
-//   pool: {
-//     max: myDbConfig.pool.max,
-//     min: myDbConfig.pool.min,
-//     acquire: myDbConfig.pool.acquire,
-//     idle: myDbConfig.pool.idle
-//   }
-// });
-
-
 db.Sequelize = Sequelize;
 
 
 // Add any tables to the database here
-db['mysqldb'].users = require("./models/mysql/user.model")(db['mysqldb'], Sequelize);
+//const UserModel = require("./models/mysql/user.model");
+db.addUserModel = (connection) => {
+  db['mysqldb'].users = require("./models/mysql/user.model")(connection, Sequelize);
+  console.log(db['mysqldb'].users);
+}
+//db['mysqldb'].users = require("./models/mysql/user.model")(db['mysqldb'], Sequelize);
 db['mssql_pat'].employees = require("./models/mssql_pat/employee.model")(db['mssql_pat'], Sequelize);
 
 db.sync = async (database, options) => {

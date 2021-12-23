@@ -1,7 +1,7 @@
-const { reject } = require("bcrypt/promises");
-const mysqldb = require("../data_access_layer/databases");
-const User = mysqldb['mysqldb'].users;
-const Op = mysqldb.Sequelize.Op;
+const databases = require("../data_access_layer/databases");
+const User = databases['mysqldb'].users;
+const UserDAO = require('../data_access_layer/daos/user.dao');
+const Op = databases.Sequelize.Op;
 
 exports.createUser = async (user) => {
     return new Promise((resolve, reject) => {
@@ -19,7 +19,6 @@ exports.createUser = async (user) => {
                 resolve(false);
             })
             .catch(err => {
-                console.log(err);
                 const response = {
                     status: 500,
                     data: {},
@@ -83,9 +82,7 @@ exports.getAdmins = async () => {
             const response = {
                 status: 500,
                 data: {},
-                error: {
-                    message: err.message || "some error occured"
-                }
+                message: err.message || "some error occured"
             }
             reject(response);
         });
@@ -94,33 +91,48 @@ exports.getAdmins = async () => {
 
 exports.authenticateUser = async (user) => {
     return new Promise((resolve, reject) => {
-        User.findOne({
-            where: {
-                user_email: user.email
-            }
-        })
+        UserDAO.getUserByEmail(user.email)
         .then(async data => {
-            if(!data){
-                resolve(false);
-            } else{
-                if(!data.password ||
-                    !await data.validPassword(user.password, data.password)){
-                        resolve(false);
-                } else {
-                    resolve(data);
-                }
+            if(!data) resolve(false);
+            if(!data.password ||
+                !await data.validPassword(user.password, data.password)){
+                    resolve(false);
+            } else {
+                resolve(data);
             }
-        })
-        .catch(err =>{
+        }).catch(err => {
             const response = {
                 status: 500,
                 data: {},
-                error: {
-                    message: err.message || "some error occured"
-                }
+                message: err.message || "some error occured"
             }
             reject(response);
         });
+        // User.findOne({
+        //     where: {
+        //         user_email: user.email
+        //     }
+        // })
+        // .then(async data => {
+        //     if(!data){
+        //         resolve(false);
+        //     } else{
+        //         if(!data.password ||
+        //             !await data.validPassword(user.password, data.password)){
+        //                 resolve(false);
+        //         } else {
+        //             resolve(data);
+        //         }
+        //     }
+        // })
+        // .catch(err =>{
+        //     const response = {
+        //         status: 500,
+        //         data: {},
+        //         message: err.message || "some error occured"
+        //     }
+        //     reject(response);
+        // });
     });
 };
 
@@ -142,9 +154,7 @@ exports.modifyUser = async (user) => {
                 const response = {
                     status: 500,
                     data: {},
-                    error: {
-                        message: err.message || "some error occured"
-                    }
+                    message: err.message || "some error occured"
                 }
                 reject(response);
             });
@@ -167,9 +177,7 @@ exports.deleteUser = async (email) => {
                 const response = {
                     status: 500,
                     data: {},
-                    error: {
-                        message: err.message || "some error occured"
-                    }
+                    message: err.message || "some error occured"
                 }
                 reject(response);
             });
