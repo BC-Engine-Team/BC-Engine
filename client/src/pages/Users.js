@@ -244,6 +244,7 @@ const Users = () => {
             </div>
             <DeleteUserPopup
                 open={deleteButtonActivated}
+                title={email} 
                 onDelete={() => {onDeleteClick()}}
                 onClose={() => {setDeleteButtonActivated(false)}}/>
         </div>

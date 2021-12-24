@@ -19,7 +19,7 @@
   
   .popup-inner .deleteUserButton {
     appearance: none;
-    background-color: rgb(233, 7, 7);
+    background-color: #05a105;
     color:#FFFFFF;
     border-radius: 15px;
     box-sizing: border-box;
@@ -53,7 +53,7 @@
   
   .popup-inner .cancelDeleteUserButton {
     appearance: none;
-    background-color: rgb(12, 180, 12);
+    background-color: #df0404;
     margin-right: 20px;
     color:#FFFFFF;
     border-radius: 15px;

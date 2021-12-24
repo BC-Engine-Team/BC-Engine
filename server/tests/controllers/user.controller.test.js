@@ -110,7 +110,7 @@ const deletedUser = {
 }
 
 const deletedUserInvalid = {
-    email: "sss"
+    email: ""
 }
 
 
@@ -262,8 +262,18 @@ describe("Test UserController", () => {
                 expect(empStub.called).toBeTruthy();
             });
         });
-        
+
+        describe("(C1.3) given I try to add a user but I am not authorized", () => {
+            it("Should respond with a 403 status code", async () => {
+                let response = await UserController.create(reqUserEmployee, res);
+                expect(response.statusCode).toBe(403);
+            });
+        });    
     });
+
+
+
+
 
     describe("View all Users", () => {
         describe("Given a token passed", () => {
@@ -300,6 +310,8 @@ describe("Test UserController", () => {
     });
     
 
+
+    
 
     describe("(C2): Authenticating a User)", () => {
 
@@ -405,6 +417,8 @@ describe("Test UserController", () => {
 
 
 
+
+
     describe("(C3): Modify a User)", () => {
 
         const expectedUserToModifyValid = {
@@ -491,7 +505,7 @@ describe("Test UserController", () => {
                 expect(userSpy).toHaveBeenCalledTimes(1);
                 expect(authStub.called).toBeTruthy();
                 expect(empStub.called).toBeTruthy();
-            })
+            });
         });
     });
 
@@ -528,6 +542,30 @@ describe("Test UserController", () => {
             });
         });
         
+        describe("(C4.3) given I try to call the deleteUser in userService but the deleteUser methods sends an error", () => {
+            it("Should respond with a 500 response message", async () => {
+
+                let expectedUserToDelete = {
+                    email: "first@benoit-cote.com"
+                }
+
+                userSpy = jest.spyOn(UserService, "deleteUser")
+                .mockImplementation(() => new Promise((resolve) => {
+                    resolve(expectedUserToDeleteInvalid);
+                }));
+
+
+                const response = await supertest(app).delete(`/users/delete/${expectedUserToDelete.email}`)
+                .set("authorization", "Bearer validToken")
+                .send(expectedUserToDelete);
+
+
+                expect(response.status).toBe(500);
+                expect(userSpy).toHaveBeenCalledTimes(1);
+                expect(authStub.called).toBeTruthy();
+                expect(empStub.called).toBeTruthy();
+            });
+        });
     });
 
 });

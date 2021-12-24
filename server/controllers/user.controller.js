@@ -144,7 +144,7 @@ exports.deleteUser = async(req, res) => {
             return res.send(response);
         })
         .catch(err => {
-            return res.send(err);
+            return res.status(500).send(err);
         });
 }
 
