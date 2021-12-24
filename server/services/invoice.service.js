@@ -69,9 +69,9 @@ exports.getTransactionsBetweenDates = async () => {
 
     return new Promise(async (resolve, reject) => {
         let invoiceListAsString = [];
-        let invoiceList = [];
         let totalBilled;
-        let totalDues;
+        let totalActualDues = 0;
+        let totalByMonth = dateRange("2019-11-01", "2020-10-31");
 
         await Invoice.findAll({
             where: {
@@ -81,40 +81,34 @@ exports.getTransactionsBetweenDates = async () => {
                 }
             },
             attributes: [
-                'INVOICE_ID', 
-                // [mysqldb['mssql_pat'].fn('sum', mysqldb['mssql_pat'].col('FOREIGN_CURR_VALUE')), 'totalBilled']
-            ]
+                'INVOICE_ID',
+                'FOREIGN_CURR_VALUE',
+                [mysqldb['mssql_pat'].fn('YEAR', mysqldb['mssql_pat'].col('INVOCIE_DATE')), 'year'],
+                [mysqldb['mssql_pat'].fn('MONTH', mysqldb['mssql_pat'].col('INVOCIE_DATE')), 'month']
+            ],
+            group: ['INVOICE_ID', 'FOREIGN_CURR_VALUE', 'INVOCIE_DATE']
         })
         .then(async data => {
-            if(data){
-                for(let u=0; u<data.length; u++){
-                    invoiceList.push(data[u].dataValues.INVOICE_ID);
+            if(data ){
+                for(let u=0; u<data.length; u++) {
                     invoiceListAsString.push(data[u].dataValues.INVOICE_ID.toString());
+
+                    billed = data[u].dataValues.FOREIGN_CURR_VALUE;
+                    month = data[u].dataValues.month;
+                    year = data[u].dataValues.year;
+
+                    for(let j = 0; j < totalByMonth.length; j++) {
+                        if(year === totalByMonth[j].year) {
+
+                            for(let k = 0; k < totalByMonth[j].months.length; k++) {
+                                if(month === totalByMonth[j].months[k].month) {
+                                    totalByMonth[j].months[k].billed += billed
+                                }
+                            }
+                        }
+                    }
                 }
             } 
-        })
-        .catch(err =>{
-            const response = {
-                status: 500,
-                data: {},
-                message: err.message || "some error occured"
-            }
-            reject(response);
-        });
-
-        await Invoice.findAll({
-            where: {
-                'INVOICE_ID': invoiceList
-            },
-            attributes: [
-                [mysqldb['mssql_pat'].fn('sum', mysqldb['mssql_pat'].col('FOREIGN_CURR_VALUE')), 'totalBilled']
-            ]
-        })
-        .then(async data => {
-            if(data){
-                totalBilled = data[0].dataValues.totalBilled
-            } 
-            
         })
         .catch(err =>{
             const response = {
@@ -133,26 +127,95 @@ exports.getTransactionsBetweenDates = async () => {
                 }
             },
             attributes: [
-                [mysqldb['mssql_bosco'].fn('sum', mysqldb['mssql_bosco'].col('TRANSACTION_AMOUNT')), 'totalDues']
-            ]
+                [mysqldb['mssql_bosco'].fn('sum', mysqldb['mssql_bosco'].col('TRANSACTION_AMOUNT')), 'dues'],
+                [mysqldb['mssql_bosco'].fn('YEAR', mysqldb['mssql_bosco'].col('CLEARING_DUE_DATE')), 'year'],
+                [mysqldb['mssql_bosco'].fn('MONTH', mysqldb['mssql_bosco'].col('CLEARING_DUE_DATE')), 'month']
+            ],
+            group: ['CLEARING_DUE_DATE']
         })
         .then(async data => {
-            if(data){
-                totalDues = data[0].dataValues.totalDues
+            if(data) {
+                    for(let i = 0; i < data.length; i++) {
+                    let dues = data[i].dataValues.dues;
+                    let month = data[i].dataValues.month;
+                    let year = data[i].dataValues.year;
 
-                total = ((((totalBilled - totalDues) / 12) / totalBilled) * 365)
-                resolve(total);
-            } 
+                    // Separate the values gotten by months to make calculations afterwards
+                    for(let j = 0; j < totalByMonth.length; j++) {
+                        if(year === totalByMonth[j].year) {
+
+                            for(let k = 0; k < totalByMonth[j].months.length; k++) {
+                                if(month === totalByMonth[j].months[k].month) {
+                                    totalByMonth[j].months[k].dues += dues
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // Find total billing for the year
+                for(let j = 0; j < totalByMonth.length; j++) {
+                    for(let k = 0; k < totalByMonth[j].months.length; k++) {
+                        totalBilled = totalByMonth[j].months[k].billed
+                    }
+                }
+
+                // Find the actual dues for the year
+                for(let j = 0; j < totalByMonth.length; j++) {
+                    for(let k = 0; k < totalByMonth[j].months.length; k++) {
+                        totalActualDues += totalByMonth[j].months[k].billed - totalByMonth[j].months[k].dues
+                    }
+                }
+
+                // Formula to find the average number of days of collection
+                total = Math.round((((totalActualDues / 12) / totalBilled) * 365))
+
+                let returnData = {
+                    average: total
+                }
+                resolve(returnData);
+            }
             resolve(false);
         })
-        .catch(err =>{
+        .catch(err => {
             const response = {
                 status: 500,
                 data: {},
                 message: err.message || "some error occured"
             }
-            console.log(err)
             reject(response);
         });
     });
 };
+
+function dateRange(startDate, endDate) {
+    var start      = startDate.split('-');
+    var end        = endDate.split('-');
+    var startYear  = parseInt(start[0]);
+    var endYear    = parseInt(end[0]);
+    var dates      = [];
+    var months     = [];
+  
+    for(var i = startYear; i <= endYear; i++) {
+        var endMonth = i != endYear ? 11 : parseInt(end[1]) - 1;
+        var startMon = i === startYear ? parseInt(start[1]) - 1 : 0;
+
+        for(var j = startMon; j <= endMonth; j = j > 12 ? j % 12 || 11 : j + 1) {
+            var month = j + 1;
+            var displayMonth = month < 10 ? '0' + month : month;
+
+            months.push({
+                month: parseInt(displayMonth), 
+                dues: 0, 
+                billed: 0
+            });
+        }
+
+        dates.push({
+            year: i,
+            months: months,
+        })
+        months = [];
+    }
+    return dates;
+}
