@@ -104,7 +104,7 @@ exports.authenticateUserWithEmail = async (req, res) => {
             });
         })
         .catch(err => {
-            return res.status(500).send(err);
+            return res.status(500).send(err.message);
         });
 };
 

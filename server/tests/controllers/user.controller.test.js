@@ -246,7 +246,7 @@ describe("Test UserController", () => {
                 });
 
                 // act 
-                const response = await supertest(app).get("/users");
+                const response = await request.get("/users");
 
                 // assert
                 expect(response.status).toBe(500);
@@ -320,7 +320,7 @@ describe("Test UserController", () => {
             it("UC3.4.1 - should return 500 and a message", async () => {
                 // arrange
                 userSpy = jest.spyOn(UserService, 'authenticateUser')
-                .mockRejectedValue(new Error("Error with the user service"));
+                .mockRejectedValue(new Error("Error with the user service."));
                 authSpy = jest.spyOn(AuthService, 'getTokens');
 
                 // act
@@ -328,7 +328,7 @@ describe("Test UserController", () => {
 
                 // assert
                 expect(response.statusCode).toBe(500);
-                expect(response.error.text).toBe("Error with the user service");
+                expect(response.error.text).toBe("Error with the user service.");
                 
             });
         });

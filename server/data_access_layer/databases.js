@@ -31,12 +31,7 @@ db.Sequelize = Sequelize;
 
 
 // Add any tables to the database here
-//const UserModel = require("./models/mysql/user.model");
-db.addUserModel = (connection) => {
-  db['mysqldb'].users = require("./models/mysql/user.model")(connection, Sequelize);
-  console.log(db['mysqldb'].users);
-}
-//db['mysqldb'].users = require("./models/mysql/user.model")(db['mysqldb'], Sequelize);
+db['mysqldb'].users = require("./models/mysql/user.model")(db['mysqldb'], Sequelize);
 db['mssql_pat'].employees = require("./models/mssql_pat/employee.model")(db['mssql_pat'], Sequelize);
 
 db.sync = async (database, options) => {

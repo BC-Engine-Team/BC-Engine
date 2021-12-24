@@ -14,7 +14,6 @@ module.exports = (database) => {
   
   // Initializing Sequelize (ORM) to create users table and fill it
   if(database){
-    database.addUserModel(database['mysqldb']);
     database.sync('mysqldb');
   }
 
