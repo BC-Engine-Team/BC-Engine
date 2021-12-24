@@ -110,31 +110,3 @@ describe("View All Users", () => {
         });
     });
 });
-
-
-describe("Modify a user", () => {
-
-    describe("given I modified one user", () => {
-        it("should return resolved promise with user information when user model works properly", async() =>{
-
-            // arrange
-            let userModelSpy = jest.spyOn(UserModel, 'modify')
-                .mockImplementation(() => new Promise((resolve) => {
-                    resolve(resUser);
-                }));
-                
-            // act
-            const serviceResponse = await UserService.modifyUser(reqUser);
-
-            // assert
-            expect(serviceResponse).toEqual({
-                email: resUser.dataValues.email,
-                password: resUser.dataValues.password,
-                name: resUser.dataValues.name,
-                role: resUser.dataValues.role
-            });
-            expect(userModelSpy).toBeCalledTimes(1);
-        });
-    });
-});
-
