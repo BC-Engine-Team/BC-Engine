@@ -89,7 +89,6 @@ const ListUser = [
     }
 ];
 
-
 //this is all the modified user test data
 const modifiedUser = {
     email: "first@benoit-cote.com",
@@ -103,17 +102,14 @@ const modifiedUserInvalid = {
     role: "admin"
 }
 
-
 //this is all the delete user test data
 const deletedUser = {
     email: "first@benoit-cote.com"
 }
 
 const deletedUserInvalid = {
-    email: "sss"
+    email: ""
 }
-
-
 
 let sandbox = sinon.createSandbox();
 let authStub = sandbox.stub(AuthService, 'authenticateToken')
@@ -262,7 +258,13 @@ describe("Test UserController", () => {
                 expect(empStub.called).toBeTruthy();
             });
         });
-        
+
+        describe("(C1.3) given I try to add a user but I am not authorized", () => {
+            it("Should respond with a 403 status code", async () => {
+                let response = await UserController.create(reqUserEmployee, res);
+                expect(response.statusCode).toBe(403);
+            });
+        });    
     });
 
     describe("View all Users", () => {
@@ -299,8 +301,6 @@ describe("Test UserController", () => {
         });
     });
     
-
-
     describe("(C2): Authenticating a User)", () => {
 
         const validUserLogin = {
@@ -403,8 +403,6 @@ describe("Test UserController", () => {
         });
     });
 
-
-
     describe("(C3): Modify a User)", () => {
 
         const expectedUserToModifyValid = {
@@ -491,13 +489,9 @@ describe("Test UserController", () => {
                 expect(userSpy).toHaveBeenCalledTimes(1);
                 expect(authStub.called).toBeTruthy();
                 expect(empStub.called).toBeTruthy();
-            })
+            });
         });
     });
-
-
-
-
 
     describe("(C4): Delete a User)", () => {
 
@@ -528,6 +522,30 @@ describe("Test UserController", () => {
             });
         });
         
+        describe("(C4.3) given I try to call the deleteUser in userService but the deleteUser methods sends an error", () => {
+            it("Should respond with a 500 response message", async () => {
+
+                let expectedUserToDelete = {
+                    email: "first@benoit-cote.com"
+                }
+
+                userSpy = jest.spyOn(UserService, "deleteUser")
+                .mockImplementation(() => new Promise((resolve) => {
+                    resolve(expectedUserToDeleteInvalid);
+                }));
+
+
+                const response = await supertest(app).delete(`/users/delete/${expectedUserToDelete.email}`)
+                .set("authorization", "Bearer validToken")
+                .send(expectedUserToDelete);
+
+
+                expect(response.status).toBe(500);
+                expect(userSpy).toHaveBeenCalledTimes(1);
+                expect(authStub.called).toBeTruthy();
+                expect(empStub.called).toBeTruthy();
+            });
+        });
     });
 
 });
