@@ -89,7 +89,6 @@ const ListUser = [
     }
 ];
 
-
 //this is all the modified user test data
 const modifiedUser = {
     email: "first@benoit-cote.com",
@@ -103,7 +102,6 @@ const modifiedUserInvalid = {
     role: "admin"
 }
 
-
 //this is all the delete user test data
 const deletedUser = {
     email: "first@benoit-cote.com"
@@ -112,8 +110,6 @@ const deletedUser = {
 const deletedUserInvalid = {
     email: ""
 }
-
-
 
 let sandbox = sinon.createSandbox();
 let authStub = sandbox.stub(AuthService, 'authenticateToken')
@@ -271,10 +267,6 @@ describe("Test UserController", () => {
         });    
     });
 
-
-
-
-
     describe("View all Users", () => {
         describe("Given a token passed", () => {
             it("Should respond with a 200 status code", async () => {
@@ -309,10 +301,6 @@ describe("Test UserController", () => {
         });
     });
     
-
-
-    
-
     describe("(C2): Authenticating a User)", () => {
 
         const validUserLogin = {
@@ -415,10 +403,6 @@ describe("Test UserController", () => {
         });
     });
 
-
-
-
-
     describe("(C3): Modify a User)", () => {
 
         const expectedUserToModifyValid = {
@@ -508,10 +492,6 @@ describe("Test UserController", () => {
             });
         });
     });
-
-
-
-
 
     describe("(C4): Delete a User)", () => {
 
