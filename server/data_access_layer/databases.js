@@ -38,7 +38,7 @@ db['mssql_pat'].employees = require("./models/mssql_pat/employee.model")(db['mss
 db['mssql_pat'].invoice_header = require("./models/mssql_pat/invoice_header.model")(db['mssql_pat'], Sequelize);
 
 //bosco database tables
-db['mssql_bosco'].transactions = require("./models/mssql_pat/accounting_client.model")(db['mssql_bosco'], Sequelize);
+db['mssql_bosco'].transactions = require("./models/mssql_bosco/accounting_client.model")(db['mssql_bosco'], Sequelize);
 
 
 db.sync = async (database, options) => {

@@ -1,6 +1,6 @@
 module.exports = (mssql_bosco, DataTypes) => {
     const Transaction = mssql_bosco.define("ACCOUNTING_CLIENT", {
-        conectionId: {
+        connectionId: {
             field: 'CONNECTION_ID',
             type: DataTypes.INTEGER
         },
@@ -10,7 +10,11 @@ module.exports = (mssql_bosco, DataTypes) => {
         },
         clearingDueDate: {
             field: 'CLEARING_DUE_DATE',
-            type: DataTypes.DATE
+            type: DataTypes.DATEONLY
+        },
+        transactionAmmount: {
+            field: 'TRANSACTION_AMOUNT',
+            type: DataTypes.DECIMAL(19, 2)
         }
     },
     {

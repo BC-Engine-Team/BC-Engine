@@ -10,21 +10,25 @@ module.exports = (mssql_pat, DataTypes) => {
             type: DataTypes.STRING
         },
         invoiceDate: {
-            field: 'INVOICE_DATE',
-            type: DataTypes.DATE
+            field: 'INVOCIE_DATE',
+            type: DataTypes.DATEONLY
         },
         invoiceType: {
             field: 'INVOICE_TYPE',
             type: DataTypes.INTEGER
+        },
+        foreignCurrencyValue: {
+            field: 'FOREIGN_CURR_VALUE',
+            type: DataTypes.DECIMAL(14,2)
         }
     },
     {
-        modelName: 'Employee',
-        tableName: 'PERSON',
+        modelName: 'InvoiceHeader',
+        tableName: 'INVOICE_HEADER',
         underscore: true,
         timestamps: false
     });
 
     InvoiceHeader.removeAttribute('id');
-    return Employee;
+    return InvoiceHeader;
 };

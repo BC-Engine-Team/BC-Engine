@@ -3,6 +3,12 @@ let router = require("express").Router();
 const authService = require('../services/auth.service');
 
 // Fetch all invoices
-router.get("/", authService.authenticateToken, invoiceController.findAll);
+router.get("/allInvoices", authService.authenticateToken, invoiceController.findAllInvoices);
+
+// fetch all transactions
+router.get("/allTransactions", authService.authenticateToken, invoiceController.findAllTransactions);
+
+
+router.get("/defaultChart", authService.authenticateToken, invoiceController.findTransactionsBetweenDates);
 
 module.exports = router;
