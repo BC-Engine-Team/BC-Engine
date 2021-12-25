@@ -64,14 +64,16 @@ exports.getAllTransactions = async () => {
 };
 
 exports.getTransactionsBetweenDates = async () => {
-    const startDate = new Date("2019-11-01 00:00:00");
-    const endDate = new Date("2020-10-31 11:59:59");
+    const startDateString = "2018-12-01";
+    const endDateString = "2020-10-31";
+    const startDate = new Date(`${startDateString} 00:00:00`);
+    const endDate = new Date(`${endDateString} 11:59:59`);
 
     return new Promise(async (resolve, reject) => {
         let invoiceListAsString = [];
         let totalBilled;
         let totalActualDues = 0;
-        let totalByMonth = dateRange("2019-11-01", "2020-10-31");
+        let totalByMonth = dateRange(startDateString, endDateString);
 
         await Invoice.findAll({
             where: {
@@ -89,28 +91,23 @@ exports.getTransactionsBetweenDates = async () => {
             group: ['INVOICE_ID', 'FOREIGN_CURR_VALUE', 'INVOCIE_DATE']
         })
         .then(async data => {
-            if(data ){
-                for(let u=0; u<data.length; u++) {
+            if(data) {
+                for(let u = 0; u < data.length; u++) {
                     invoiceListAsString.push(data[u].dataValues.INVOICE_ID.toString());
 
-                    billed = data[u].dataValues.FOREIGN_CURR_VALUE;
+                    billed = data[u].dataValues.FOREIGN_CURR_VALUE; 
                     month = data[u].dataValues.month;
                     year = data[u].dataValues.year;
 
                     for(let j = 0; j < totalByMonth.length; j++) {
-                        if(year === totalByMonth[j].year) {
-
-                            for(let k = 0; k < totalByMonth[j].months.length; k++) {
-                                if(month === totalByMonth[j].months[k].month) {
-                                    totalByMonth[j].months[k].billed += billed
-                                }
-                            }
+                        if(year === totalByMonth[j].year && month === totalByMonth[j].month) {
+                            totalByMonth[j].billed += billed;
                         }
                     }
                 }
             } 
         })
-        .catch(err =>{
+        .catch(err => {
             const response = {
                 status: 500,
                 data: {},
@@ -142,38 +139,13 @@ exports.getTransactionsBetweenDates = async () => {
 
                     // Separate the values gotten by months to make calculations afterwards
                     for(let j = 0; j < totalByMonth.length; j++) {
-                        if(year === totalByMonth[j].year) {
-
-                            for(let k = 0; k < totalByMonth[j].months.length; k++) {
-                                if(month === totalByMonth[j].months[k].month) {
-                                    totalByMonth[j].months[k].dues += dues
-                                }
-                            }
+                        if(year === totalByMonth[j].year && month === totalByMonth[j].month) {
+                            totalByMonth[j].dues += dues;
                         }
                     }
                 }
-
-                // Find total billing for the year
-                for(let j = 0; j < totalByMonth.length; j++) {
-                    for(let k = 0; k < totalByMonth[j].months.length; k++) {
-                        totalBilled = totalByMonth[j].months[k].billed
-                    }
-                }
-
-                // Find the actual dues for the year
-                for(let j = 0; j < totalByMonth.length; j++) {
-                    for(let k = 0; k < totalByMonth[j].months.length; k++) {
-                        totalActualDues += totalByMonth[j].months[k].billed - totalByMonth[j].months[k].dues
-                    }
-                }
-
-                // Formula to find the average number of days of collection
-                total = Math.round((((totalActualDues / 12) / totalBilled) * 365))
-
-                let returnData = {
-                    average: total
-                }
-                resolve(returnData);
+                
+                resolve(getTotalsByMonth(totalByMonth));
             }
             resolve(false);
         })
@@ -188,34 +160,90 @@ exports.getTransactionsBetweenDates = async () => {
     });
 };
 
-function dateRange(startDate, endDate) {
-    var start      = startDate.split('-');
-    var end        = endDate.split('-');
-    var startYear  = parseInt(start[0]);
-    var endYear    = parseInt(end[0]);
-    var dates      = [];
-    var months     = [];
-  
+dateRange = (startDate, endDate) => {
+    let start      = startDate.split('-');
+    let end        = endDate.split('-');
+    let startYear  = parseInt(start[0]);
+    let endYear    = parseInt(end[0]);
+    let dates      = [];
+    
     for(var i = startYear; i <= endYear; i++) {
-        var endMonth = i != endYear ? 11 : parseInt(end[1]) - 1;
-        var startMon = i === startYear ? parseInt(start[1]) - 1 : 0;
+        let endMonth = i != endYear ? 11 : parseInt(end[1]) - 1;
+        let startMon = i === startYear ? parseInt(start[1]) - 1 : 0;
 
-        for(var j = startMon; j <= endMonth; j = j > 12 ? j % 12 || 11 : j + 1) {
-            var month = j + 1;
-            var displayMonth = month < 10 ? '0' + month : month;
+        for(let j = startMon; j <= endMonth; j = j > 12 ? j % 12 || 11 : j + 1) {
+            let month = j + 1;
+            let displayMonth = month < 10 ? '0' + month : month;
 
-            months.push({
-                month: parseInt(displayMonth), 
+            dates.push({
+                year: i,
+                month:  parseInt(displayMonth),
                 dues: 0, 
                 billed: 0
             });
         }
-
-        dates.push({
-            year: i,
-            months: months,
-        })
-        months = [];
     }
     return dates;
+}
+
+getTotalsByMonth = (totalByMonth) => {
+    let total;
+    let returnData = [];
+    console.log(totalByMonth)
+
+// 23 length -> 12months (11)
+// 18 months -> 29 length (11)
+
+    for(let i = 1; i <= totalByMonth.length - 11; i++) {
+        let totalBilled = 0;
+        let totalActualDues = 0;
+        let year;
+        let month;
+
+        let start = totalByMonth.length - i;
+        let end = (totalByMonth.length - 11) - i;
+
+        console.log(i)
+        console.log(start)
+        console.log(end)
+        console.log("**************")
+        for(let j = start; j >= end; j--) {
+            if(year === undefined && month === undefined) {
+                year = totalByMonth[j].year;
+
+                // Get the month and year for the average
+                if(totalByMonth[j].month === 12) {
+                    month = 1;
+                    year += 1;
+                } else {
+                    month = totalByMonth[j].month + 1;
+                }
+            }
+            
+            console.log(totalByMonth[j].year + " " + totalByMonth[j].month)
+
+            // Find total billing for the year
+            totalBilled += totalByMonth[j].billed;
+
+            // Find the actual dues for the year
+            totalActualDues += totalByMonth[j].billed - totalByMonth[j].dues;
+        }
+        console.log("11111111111")
+        console.log(month)
+        console.log(year)
+        console.log(totalActualDues)
+        console.log(totalBilled)
+        console.log("11111111111")
+
+        // Formula to find the average number of days of collection
+        total = Math.round((((totalActualDues / 12) / totalBilled) * 365));
+
+        returnData.push({
+            year: year,
+            month: month,
+            average: total
+        });
+    }
+
+    return returnData;
 }

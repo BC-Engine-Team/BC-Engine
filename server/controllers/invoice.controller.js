@@ -12,6 +12,7 @@ exports.findAllInvoices = async (req, res) => {
         });
 };
 
+// Fetch all transactions from bosco db
 exports.findAllTransactions = async (req, res) => {
     if(req.user.role !== "admin") return res.status(403).send();
     await invoiceService.getAllTransactions()
