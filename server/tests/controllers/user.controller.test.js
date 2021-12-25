@@ -202,6 +202,13 @@ describe("Test UserController", () => {
                 empStub.resetHistory();
             });
         });
+
+        describe("UC1.3 - given I try to add a user but I am not authorized", () => {
+            it("UC1.3.1 - Should respond with a 403 status code", async () => {
+                let response = await UserController.create(reqUserEmployee, res);
+                expect(response.statusCode).toBe(403);
+            });
+        });    
     });
 
     describe("UC2 - View all Users", () => {
@@ -446,5 +453,27 @@ describe("Test UserController", () => {
                 expect(response.statusCode).toBe(403);
             });
         }); 
+        
+        describe("UC5.3 - given I try to call the deleteUser in userService but the deleteUser methods sends an error", () => {
+            it("UC5.3.1 - Should respond with a 500 response message", async () => {
+
+                let expectedUserToDelete = {
+                    email: "first@benoit-cote.com"
+                }
+
+                userSpy = jest.spyOn(UserService, "deleteUser")
+                .mockImplementation(() => new Promise((resolve) => {
+                    resolve(expectedUserToDeleteInvalid);
+                }));
+
+                const response = await supertest(app).delete(`/users/delete/${expectedUserToDelete.email}`)
+                .set("authorization", "Bearer validToken")
+                .send(expectedUserToDelete);
+
+                expect(response.status).toBe(500);
+                expect(userSpy).toHaveBeenCalledTimes(1);
+                expect(authStub.called).toBeTruthy();
+            });
+        });
     });
 });
