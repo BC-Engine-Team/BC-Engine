@@ -2,7 +2,7 @@ const databases = require("../databases");
 const UserModel = databases['mysqldb'].users;
 
 
-exports.getUserByEmail = async (userModel = UserModel, email) => {
+exports.getUserByEmail = async (email, userModel = UserModel) => {
     return new Promise((resolve, reject) => {
         userModel.findOne({
             where: {
@@ -55,7 +55,7 @@ exports.getAllUsers = async (userModel = UserModel) => {
     
 }
 
-exports.createUser = async (userModel = UserModel, user) => {
+exports.createUser = async (user, userModel = UserModel) => {
     return new Promise((resolve, reject) => {
         userModel.create(user)
             .then(async data => {
@@ -79,3 +79,45 @@ exports.createUser = async (userModel = UserModel, user) => {
             })
     });
 };
+
+exports.updateUser = async (user, userModel = UserModel) => {
+    return new Promise((resolve, reject) => {
+        userModel.update(user, 
+                   {where: {email: user.email},
+                   individualHooks: true})
+            .then(async data => {
+                if(data) {
+                    resolve("User modified successfully.");
+                }
+                resolve("User was not updated.");
+            })
+            .catch(err => {
+                const response = {
+                    status: 500,
+                    data: {},
+                    message: err.message || "some error occured"
+                }
+                reject(response);
+            });
+    });
+}
+
+exports.deleteUser = async (email, userModel = UserModel) => {
+    return new Promise((resolve, reject) => {
+        userModel.destroy({where: {email: email}})
+            .then(async data => {
+                if(data){
+                    resolve("User deleted successfully.");
+                }
+                resolve("User has failed to be deleted.");
+            })
+            .catch(err => {
+                const response = {
+                    status: 500,
+                    data: {},
+                    message: err.message || "some error occured"
+                }
+                reject(response);
+            });
+    });
+}

@@ -5,87 +5,26 @@ const Op = databases.Sequelize.Op;
 
 exports.createUser = async (user) => {
     return new Promise((resolve, reject) => {
-        User.create(user)
+        UserDAO.createUser(user)
             .then(async data => {
-                if(data) {
-                    let returnData = {
-                        email: data.dataValues.email,
-                        name: data.dataValues.name,
-                        role: data.dataValues.role
-                    };
-                    
-                    resolve(returnData);
-                }
-                resolve(false);
+                resolve(data);
             })
             .catch(err => {
-                const response = {
-                    status: 500,
-                    data: {},
-                    message: err.message || "some error occured" 
-                }
-                reject(response);
+                reject(err);
             });
     });
 };
 
 exports.getAllUsers = async () => {
     return new Promise((resolve, reject) => {
-        User.findAll()
+        UserDAO.getAllUsers()
             .then(async data => {
-                if(data){
-                    let returnData = [];
-                    for(let u=0; u<data.length;u++){
-                        returnData.push({
-                            email: data[u].dataValues.email,
-                            name: data[u].dataValues.name,
-                            role: data[u].dataValues.role
-                        });
-                    }
-                    resolve(returnData);
-                } 
-                resolve(false);
+                if(data) resolve(data);
+                resolve("Could not get all users.");
             })
-            .catch(err =>{
-                const response = {
-                    status: 500,
-                    data: {},
-                    message: err.message || "some error occured"
-                }
-                reject(response);
+            .catch(err => {
+                reject(err);
             });
-    });
-};
-
-exports.getAdmins = async () => {
-    return new Promise((resolve, reject) => {
-        User.findAll({
-            where: {
-                role: 'admin'
-            }
-        })
-        .then(async data => {
-            if(data){
-                let returnData = [];
-                for(let u=0; u<data.length;u++){
-                    returnData.push({
-                        email: data[u].dataValues.email,
-                        name: data[u].dataValues.name,
-                        role: data[u].dataValues.role
-                    });
-                }
-                resolve(returnData);
-            } 
-            resolve(false);
-        })
-        .catch(err =>{
-            const response = {
-                status: 500,
-                data: {},
-                message: err.message || "some error occured"
-            }
-            reject(response);
-        });
     });
 };
 
@@ -108,78 +47,29 @@ exports.authenticateUser = async (user) => {
             }
             reject(response);
         });
-        // User.findOne({
-        //     where: {
-        //         user_email: user.email
-        //     }
-        // })
-        // .then(async data => {
-        //     if(!data){
-        //         resolve(false);
-        //     } else{
-        //         if(!data.password ||
-        //             !await data.validPassword(user.password, data.password)){
-        //                 resolve(false);
-        //         } else {
-        //             resolve(data);
-        //         }
-        //     }
-        // })
-        // .catch(err =>{
-        //     const response = {
-        //         status: 500,
-        //         data: {},
-        //         message: err.message || "some error occured"
-        //     }
-        //     reject(response);
-        // });
     });
 };
 
-
 exports.modifyUser = async (user) => {
-
     return new Promise((resolve, reject) => {
-
-        User.update(user, 
-                   {where: {email: user.email},
-                   individualHooks: true})
+        UserDAO.updateUser(user)
             .then(async data => {
-                if(data) {
-                    resolve("User modified successfully");
-                }
-                resolve("User has failed to modified");
+                resolve(data);
             })
             .catch(err => {
-                const response = {
-                    status: 500,
-                    data: {},
-                    message: err.message || "some error occured"
-                }
-                reject(response);
+                reject(err);
             });
-
     });
 };
 
 exports.deleteUser = async (email) => {
-
     return new Promise((resolve, reject) => {
-
-        User.destroy({where: {email: email}})
+        UserDAO.deleteUser(email)
             .then(async data => {
-                if(data){
-                    resolve("User deleted successfully");
-                }
-                resolve("User has failed to be deleted");
+                resolve(data);
             })
             .catch(err => {
-                const response = {
-                    status: 500,
-                    data: {},
-                    message: err.message || "some error occured"
-                }
-                reject(response);
+                reject(err);
             });
     });
 }

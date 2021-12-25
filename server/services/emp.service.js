@@ -1,17 +1,9 @@
-const databases = require("../data_access_layer/databases");
-const Employee = databases['mssql_pat'].employees;
+const EmpDAO = require("../data_access_layer/daos/emp.dao");
 
 exports.checkEmail = async (req, res, next) => {
-    Employee.findOne({
-        where: {
-            email: req.body.email
-        }
-    }).then(async data => {
+    EmpDAO.getEmployeeByEmail(req.body.email).then(async data => {
         if(data){
-            req.emp = {};
-            let empName = data.dataValues.firstName + " " + data.dataValues.lastName;
-            req.emp.email = data.dataValues.email;
-            req.emp.name = empName;
+            req.emp = data;
             return next()
         }
         const response = {
