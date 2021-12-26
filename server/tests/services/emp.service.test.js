@@ -4,12 +4,10 @@ const UserService = require('../../services/user.service');
 const databases = require("../../data_access_layer/databases");
 const EmpModel = databases['mssql_pat'].employees;
 const UserController = require("../../controllers/user.controller");
-
 const supertest = require('supertest');
 const { afterEach, afterAll } = require('jest-circus');
 var { expect, jest } = require('@jest/globals');
 const sinon = require('sinon');
-var MockExpressResponse = require('mock-express-response');
 
 
 const reqUser = {
@@ -19,23 +17,12 @@ const reqUser = {
     role: "admin"
 };
 
-const reqUser2 = {
-    body:{
-        email: "emp@benoit-cote.com",
-        password: "validPassword",
-        name: "FName LName",
-        role: "admin"
-    }
-    
-};
-
 const reqEmp = {
     dataValues: {
         email: "emp@benoit-cote.com",
         firstName: "FName",
         lastName: "LNameeeeeee"
     }
-    
 };
 
 
@@ -45,14 +32,10 @@ let authStub = sandbox.stub(AuthService, 'authenticateToken')
         req.user = reqUser;
         return next();
     });
-
-
-const userServiceSpy = jest.spyOn(UserService, 'createUser')
-.mockImplementation(() => new Promise((resolve) => {
-    resolve(reqUser);
-}));
-
-const userControllerSpy = jest.spyOn(UserController, 'create');
+let userControllerStub = sandbox.stub(UserController, 'create')
+    .callsFake(function(req, res){
+        res.send(reqUser);
+    });
 
 let empModelSpy = jest.spyOn(EmpModel, 'findOne')
 .mockImplementation(() => new Promise((resolve) => {
@@ -63,39 +46,55 @@ const makeApp = require('../../app');
 app = makeApp();
 const request = supertest(app);
 
-describe("checkEmail", () => {
+describe("Test Employee Service", () => {
 
     beforeEach(() => {
         jest.clearAllMocks();
     });
 
     afterEach(() => {
-        // sandbox.restore();
-        jest.resetAllMocks();
-        jest.clearAllMocks();
-        userSpy.mockClear();
-        sandbox.resetHistory();
     });
 
-    describe("given employee email", () => {
-        it("when existing, should return 200 with employee name and email", async () => {
-            const response = await request.post("/users").send(reqUser);
+    afterAll(() => {
+        process.exit;
+    });
 
-            expect(response.status).toBe(200);
-            expect(response.body.email).toBe("emp@benoit-cote.com");
-            expect(response.body.name).toBe("FName LName")
-        })
+    describe("ES1 - checkEmail", () => {
 
-        it("when non existent, should return 400 with message", async () => {
-            empModelSpy = jest.spyOn(EmpModel, 'findOne')
-                .mockImplementation(() => new Promise((resolve) => {
-                    resolve(undefined);
-                }));
-            const response = await request.post("/users").send(reqUser);
+        describe("ES1.1 - given employee email", () => {
+            it("ES1.1.1 - when existing, should return 200 with employee name and email", async () => {
+                // act
+                const response = await request.post("/users").send(reqUser);
+    
+                // assert
+                expect(response.status).toBe(200);
+                expect(response.body.email).toBe("emp@benoit-cote.com");
+                expect(response.body.name).toBe("FName LName")
+                expect(empModelSpy).toBeCalledTimes(1);
+                expect(userControllerStub.called).toBeTruthy();
+                userControllerStub.resetHistory();
 
-            expect(response.status).toBe(400);
-            expect(response.body.message).toBe("Employee email doesn't exist.");
+            })
+    
+            it("ES1.1.2 - when non existent, should return 400 with message", async () => {
+                // arrange
+                empModelSpy = jest.spyOn(EmpModel, 'findOne')
+                    .mockImplementation(() => new Promise((resolve) => {
+                        resolve(undefined);
+                    }));
+
+                // act
+                const response = await request.post("/users").send(reqUser);
+    
+                // assert
+                expect(response.status).toBe(400);
+                expect(response.body.message).toBe("Employee email doesn't exist.");
+                expect(empModelSpy).toBeCalledTimes(1);
+                expect(userControllerStub.called).toBeFalsy();
+                userControllerStub.resetHistory();
+            });
+            
         });
-        
     });
 });
+

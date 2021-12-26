@@ -1,6 +1,3 @@
-const { DataTypes } = require("sequelize/dist");
-const { mssql_pat, Sequelize } = require("../../databases");
-
 module.exports = (mssql_pat, DataTypes) => {
     const Employee = mssql_pat.define("PERSON", {
         firstName: {

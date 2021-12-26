@@ -54,18 +54,6 @@ exports.findAll = async (req, res) => {
         });
 };
 
-// fetch all users with admin role
-exports.getAdmins = async (req, res) => {
-    if(req.user.role !== "admin") return res.status(403).send();
-    await userService.getAdmins()
-        .then(response => {
-            return res.send(response);
-        })
-        .catch(err => {
-            return res.status(500).send(err);
-        });
-};
-
 // Begining of Authenticate a user
 exports.authenticateUserWithEmail = async (req, res) => {
     const user = req.body;
@@ -135,7 +123,6 @@ exports.modifyUser = async(req, res) => {
 } 
 
 exports.deleteUser = async(req, res) => {
-    console.log(req.user.role);
     if(req.user.role !== "admin") return res.status(403).send();
 
 
