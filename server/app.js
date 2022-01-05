@@ -7,7 +7,7 @@ const userRoutes = require('./routes/user.routes');
 module.exports = (database) => {
   const app = express();
 
-  app.use(express.static(path.resolve(__dirname, '../client/build', 'index.html')));
+  app.use(express.static(path.join(__dirname, '../client/build')));
   app.use(bodyParser.json());
   app.use(bodyParser.urlencoded({extended: true}));
   app.use(logger('dev'));
@@ -36,7 +36,7 @@ module.exports = (database) => {
 
   // Static endpoint (Delivery of the React SPA)
   app.get('*', (req, res) => {
-    res.sendFile(path.resolve(__dirname, '../client/build', 'index.html'));
+    res.sendFile(path.join(__dirname, '../client/build/index.html'));
   });
 
   // User routes CRUD
