@@ -36,7 +36,7 @@ module.exports = (database) => {
 
   // Static endpoint (Delivery of the React SPA)
   app.get('*', (req, res) => {
-    res.sendFile(path.resolve(__dirname, '../../client/public', 'index.html'));
+    res.sendFile(path.resolve(__dirname, '../client/build', 'index.html'));
   });
 
   // User routes CRUD
