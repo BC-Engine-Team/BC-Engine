@@ -4,6 +4,10 @@ module.exports = (mssql_bosco, DataTypes) => {
             field: 'CONNECTION_ID',
             type: DataTypes.INTEGER
         },
+        patInvoiceId: {
+            field: 'PAT_INVOICE_ID',
+            type: DataTypes.INTEGER
+        },
         transactionRef: {
             field: 'TRANSACTION_REF',
             type: DataTypes.STRING
@@ -12,9 +16,21 @@ module.exports = (mssql_bosco, DataTypes) => {
             field: 'CLEARING_DUE_DATE',
             type: DataTypes.DATEONLY
         },
-        transactionAmmount: {
+        clearingDueAmount: {
+            field: 'CLEARING_DUE_AMOUNT',
+            type: DataTypes.DECIMAL
+        },
+        transactionAmount: {
             field: 'TRANSACTION_AMOUNT',
             type: DataTypes.DECIMAL(19, 2)
+        },
+        transactionDate: {
+            field: 'TRANSACTION_DATE',
+            type: DataTypes.DATEONLY
+        },
+        clearingLastTransaction: {
+            field: 'CLEARING_LAST_TRANSACTION',
+            type: DataTypes.DATEONLY
         }
     },
     {

@@ -11,4 +11,6 @@ router.get("/allTransactions", authService.authenticateToken, invoiceController.
 
 router.get("/defaultChart", authService.authenticateToken, invoiceController.findTransactionsBetweenDates);
 
+router.get("/testInvoices", invoiceController.testInvoices);
+
 module.exports = router;

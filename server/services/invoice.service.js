@@ -1,7 +1,8 @@
-const mysqldb = require("../data_access_layer/databases");
-const Invoice = mysqldb['mssql_pat'].invoice_header;
-const Transaction = mysqldb['mssql_bosco'].transactions;
+const databases = require("../data_access_layer/databases");
+const Invoice = databases['mssql_pat'].invoice_header;
+const Transaction = databases['mssql_bosco'].transactions;
 const { Op } = require('sequelize');
+const { gt, lte } = require("sequelize/dist/lib/operators");
 
 
 exports.getAllInvoices = async () => {
@@ -63,6 +64,111 @@ exports.getAllTransactions = async () => {
     });
 };
 
+exports.testInvoices = async () => {
+    const MULTIPLIER = 365;
+    const startDateString = "2019-11-01";
+    const endDateString = "2020-11-01";
+    const startDate = new Date(`${startDateString} 00:00:00`);
+    let endDate = new Date(`${endDateString} 00:00:00`);
+    let listOfAverageDues = [];
+    let listOfBilled = [];
+    let listOfAverages = [];
+
+    return new Promise(async (resolve, reject) => {
+
+        let listOfTransactions = [];
+        await Transaction.findAll({
+            where: {
+                connectionId: 3,
+                transactionAmount: {
+                    [Op.gt]: 0
+                },
+                transactionDate: {
+                    [Op.lt]: endDate
+                }
+            }
+        }).then(async data => {
+            data.forEach(element => {
+                listOfTransactions.push(element.dataValues);
+            });
+            console.log(data.length);
+
+            for(let i = 0; i < 12; i++){
+                if(i != 0){
+                    startDate.setMonth(startDate.getMonth() - 1);
+                    endDate.setMonth(endDate.getMonth() - 1);
+                }
+                
+                let total = 0;
+    
+                listOfTransactions.forEach(t => {
+                    if(t.transactionDate < endDate && t.transactionDate >= startDate){
+                        total += t.transactionAmount;
+                    }
+                });
+    
+                listOfBilled.push(total);
+            }
+    
+            console.log(listOfBilled);
+    
+            endDate = new Date(`${endDateString} 00:00:00`);
+    
+            for(let i = 0; i < 12; i++){
+                if(i != 0){
+                    endDate.setMonth(endDate.getMonth() - 1);
+                }
+                
+                let totalDues = 0;
+    
+                let innerEndDate = new Date(`${endDateString} 00:00:00`);
+                for(let i = 0; i < 12; i++){
+                    if(i != 0){
+                        innerEndDate.setMonth(innerEndDate.getMonth() - i);
+                    }
+                    let billed = 0;
+                    let paid = 0;
+                    
+                    listOfTransactions.forEach(t => {
+                        if(t.transactionDate < innerEndDate){
+                            billed += t.transactionAmount;
+                        }
+                        if(t.clearingLastTransaction < innerEndDate 
+                            && t.clearingDueAmount === 0
+                            && t.transactionDate < innerEndDate){
+                            paid += t.transactionAmount;
+                        }
+                    });
+                    console.log(billed);
+                    totalDues += (billed - paid);
+                }
+    
+                listOfAverageDues.push((totalDues / 12));
+            }
+    
+            endDate = new Date(`${endDateString} 00:00:00`);
+            for(let i = 0; i < 12; i++){
+                if(i != 0){
+                    endDate.setMonth(endDate.getMonth() - 1);
+                }
+                let average = listOfAverageDues[i] / listOfBilled[i] * MULTIPLIER;
+                let avgObject = {
+                    month: endDate,
+                    avg: average
+                }
+                listOfAverages.push(avgObject);
+            }
+    
+            //console.log(listOfAverages);
+            resolve(listOfAverages);
+
+        }).catch(err => {
+            reject(err.message);
+        });
+    });
+    
+}
+
 exports.getTransactionsBetweenDates = async () => {
     const startDateString = "2018-12-01";
     const endDateString = "2020-10-31";
@@ -85,8 +191,8 @@ exports.getTransactionsBetweenDates = async () => {
             attributes: [
                 'INVOICE_ID',
                 'FOREIGN_CURR_VALUE',
-                [mysqldb['mssql_pat'].fn('YEAR', mysqldb['mssql_pat'].col('INVOCIE_DATE')), 'year'],
-                [mysqldb['mssql_pat'].fn('MONTH', mysqldb['mssql_pat'].col('INVOCIE_DATE')), 'month']
+                [databases['mssql_pat'].fn('YEAR', databases['mssql_pat'].col('INVOCIE_DATE')), 'year'],
+                [databases['mssql_pat'].fn('MONTH', databases['mssql_pat'].col('INVOCIE_DATE')), 'month']
             ],
             group: ['INVOICE_ID', 'FOREIGN_CURR_VALUE', 'INVOCIE_DATE']
         })
@@ -124,9 +230,9 @@ exports.getTransactionsBetweenDates = async () => {
                 }
             },
             attributes: [
-                [mysqldb['mssql_bosco'].fn('sum', mysqldb['mssql_bosco'].col('TRANSACTION_AMOUNT')), 'dues'],
-                [mysqldb['mssql_bosco'].fn('YEAR', mysqldb['mssql_bosco'].col('CLEARING_DUE_DATE')), 'year'],
-                [mysqldb['mssql_bosco'].fn('MONTH', mysqldb['mssql_bosco'].col('CLEARING_DUE_DATE')), 'month']
+                [databases['mssql_bosco'].fn('sum', databases['mssql_bosco'].col('TRANSACTION_AMOUNT')), 'dues'],
+                [databases['mssql_bosco'].fn('YEAR', databases['mssql_bosco'].col('CLEARING_DUE_DATE')), 'year'],
+                [databases['mssql_bosco'].fn('MONTH', databases['mssql_bosco'].col('CLEARING_DUE_DATE')), 'month']
             ],
             group: ['CLEARING_DUE_DATE']
         })

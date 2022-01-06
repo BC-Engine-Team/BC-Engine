@@ -35,3 +35,10 @@ exports.findTransactionsBetweenDates = async (req, res) => {
             return res.status(500).send(err);
         });
 };
+
+exports.testInvoices = async (req, res) => {
+    await invoiceService.testInvoices()
+        .then(response => {
+            return res.send(response);
+        })
+}
