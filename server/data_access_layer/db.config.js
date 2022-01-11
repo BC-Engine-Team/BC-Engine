@@ -3,14 +3,14 @@ const tedious = require('tedious');
 module.exports = {
     development: {
         databases: {
-            mysqldb: {
-                HOST: "localhost",
-                USER: "root",
-                PASSWORD: process.env.MYSQL_ROOT_PASSWORD,
-                DB: process.env.MYSQL_DATABASE,
-                dialect: "mysql",
+            localdb: {
+                HOST: process.env.LOCAL_HOST,
+                USER: process.env.LOCAL_USER,
+                PASSWORD: process.env.LOCAL_ROOT_PASSWORD,
+                DB: process.env.LOCAL_DATABASE,
+                dialect: process.env.LOCAL_DIALECT,
                 timezone: "-05:00",
-                port: process.env.MYSQL_LOCAL_PORT,
+                port: process.env.LOCAL_PORT,
                 pool: {
                     max: 5,
                     min: 0,

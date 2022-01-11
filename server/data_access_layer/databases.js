@@ -46,7 +46,7 @@ db.Sequelize = Sequelize;
 
 
 // Add any tables to the database here
-db['mysqldb'].users = require("./models/mysql/user.model")(db['mysqldb'], Sequelize);
+db['localdb'].users = require("./models/localdb/user.model")(db['localdb'], Sequelize);
 db['mssql_pat'].employees = require("./models/mssql_pat/employee.model")(db['mssql_pat'], Sequelize);
 
 db.sync = async (database, options) => {

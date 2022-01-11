@@ -1,9 +1,9 @@
 const { DataTypes } = require("sequelize/dist");
-const { mysqldb, Sequelize } = require("../../databases");
+const { localdb, Sequelize } = require("../../databases");
 const bcrypt = require('bcrypt');
 
-module.exports = (mysqldb, DataTypes) => {
-    const User = mysqldb.define("users", {
+module.exports = (localdb, DataTypes) => {
+    const User = localdb.define("users", {
         userId: {
             field: 'user_id',
             type: DataTypes.UUID,
