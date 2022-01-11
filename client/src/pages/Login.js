@@ -43,6 +43,8 @@ const Login = () => {
                 password: password,
             }
     
+            console.log(process.env.IP_ADDRESS + "/users/authenticate")
+
             Axios.post(process.env.IP_ADDRESS + "/users/authenticate", data)
             .then((response) => {
                 console.log(response);
