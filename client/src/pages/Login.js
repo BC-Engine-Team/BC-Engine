@@ -10,8 +10,6 @@ import FloatingLabel from 'react-bootstrap/esm/FloatingLabel'
 import Button from 'react-bootstrap/Button'
 import Alert from 'react-bootstrap/Alert'
 
-
-
 const Login = () => {
     const [validated, setValidated] = useState(false);
 
@@ -45,7 +43,7 @@ const Login = () => {
                 password: password,
             }
     
-            Axios.post("http://localhost:3001/users/authenticate", data)
+            Axios.post(process.env.IP_ADDRESS + "/users/authenticate", data)
             .then((response) => {
                 console.log(response);
 

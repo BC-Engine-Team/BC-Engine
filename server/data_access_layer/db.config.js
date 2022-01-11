@@ -6,11 +6,11 @@ module.exports = {
             mysqldb: {
                 HOST: "localhost",
                 USER: "root",
-                PASSWORD: "root",
-                DB: "bcenginedb",
+                PASSWORD: process.env.MYSQL_ROOT_PASSWORD,
+                DB: process.env.MYSQL_DATABASE,
                 dialect: "mysql",
                 timezone: "-05:00",
-                port: 3308,
+                port: process.env.MYSQL_LOCAL_PORT,
                 pool: {
                     max: 5,
                     min: 0,
