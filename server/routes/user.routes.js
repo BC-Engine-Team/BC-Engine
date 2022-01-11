@@ -13,9 +13,6 @@ router.get("/", authService.authenticateToken, userController.findAll);
 // Authenticate user
 router.post("/authenticate", userController.authenticateUserWithEmail);
 
-// Fetch admins
-router.get("/admins",  authService.authenticateToken, userController.getAdmins);
-
 // Refresh JWT
 router.post("/refresh", authService.refreshToken);
 
