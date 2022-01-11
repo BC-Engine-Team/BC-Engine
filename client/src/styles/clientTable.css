@@ -1,0 +1,13 @@
+.row-style {
+    text-align: center;
+}
+
+.amount-owed{
+    text-align: center;
+    color: #df0404;
+}
+
+.amount-due{
+    text-align: center;
+    color: #05a105;
+}

@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router';
 import Cookies from 'universal-cookie';
 import NavB from '../components/NavB'
 import UnderConstruction from '../components/UnderConstruction'
+import ClientTable from '../components/ClientTable'
+
 
 const Dashboard = () => {
     let navigate = useNavigate();
@@ -19,6 +21,7 @@ const Dashboard = () => {
         <div>
             <NavB />
             <UnderConstruction pageName="Dashboard"/>
+            <ClientTable/>
         </div>
     )
 }
