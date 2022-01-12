@@ -35,6 +35,10 @@ module.exports = (database) => {
     res.json({ message: "Hello from B&C Engine!" });
   });
 
+  app.get('/*', function (req, res) {
+    res.sendFile(path.join(__dirname, '../client/build', 'index.html'));
+  });
+
   // User routes CRUD
   app.use('/users', userRoutes);
 
