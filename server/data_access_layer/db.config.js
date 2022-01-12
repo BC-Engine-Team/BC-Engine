@@ -17,7 +17,8 @@ module.exports = {
                     min: 0,
                     acquire: 30000,
                     idle: 10000
-                }
+                },
+                use_env_variable: "DATABASE_URL"
             },
             mssql_bosco: {
                 HOST: "localhost",
