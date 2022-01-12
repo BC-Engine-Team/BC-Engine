@@ -1,4 +1,5 @@
 const tedious = require('tedious');
+require("../../config.js")
 
 module.exports = {
     development: {

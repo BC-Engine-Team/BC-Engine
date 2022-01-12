@@ -1,7 +1,7 @@
 const { reject } = require("bcrypt/promises");
-const mysqldb = require("../data_access_layer/databases");
-const User = mysqldb['mysqldb'].users;
-const Op = mysqldb.Sequelize.Op;
+const localdb = require("../data_access_layer/databases");
+const User = localdb['localdb'].users;
+const Op = localdb.Sequelize.Op;
 
 exports.createUser = async (user) => {
     return new Promise((resolve, reject) => {

@@ -3,20 +3,22 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const logger = require('morgan');
 const userRoutes = require('./routes/user.routes');
+require("../config.js")
 
 module.exports = (database) => {
   const app = express();
 
-  app.use(express.static(path.join(__dirname, '../client/build')));
+  app.use(express.static(path.resolve(__dirname, '../client/build')));
   app.use(bodyParser.json());
   app.use(bodyParser.urlencoded({extended: true}));
   app.use(logger('dev'));
   
   // Initializing Sequelize (ORM) to create users table and fill it
   if(database){
-    database.sync('mysqldb');
+    database.sync('localdb');
   }
 
+  
   app.use(function(req, res, next) {
     res.header('Access-Control-Allow-Origin', process.env.IP_ADDRESS);
     res.header('Access-Control-Allow-Credentials', true);
@@ -36,7 +38,7 @@ module.exports = (database) => {
 
   // Static endpoint (Delivery of the React SPA)
   app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, '../client/build/index.html'));
+    res.sendFile(path.resolve(__dirname, '../client/public', 'index.html'));
   });
 
   // User routes CRUD

@@ -1,4 +1,5 @@
 const jwt = require('jsonwebtoken');
+require("../../config.js")
 
 const ACCESS_TOKEN_SECRET=process.env.ACCESS_TOKEN_SECRET
 const REFRESH_TOKEN_SECRET=process.env.REFRESH_TOKEN_SECRET
