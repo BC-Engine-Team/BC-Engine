@@ -18,7 +18,6 @@ module.exports = (database) => {
     database.sync('localdb');
   }
 
-  
   app.use(function(req, res, next) {
     res.header('Access-Control-Allow-Origin', process.env.IP_ADDRESS);
     res.header('Access-Control-Allow-Credentials', true);
@@ -35,11 +34,6 @@ module.exports = (database) => {
   app.get("/api", async (req, res) => {
     res.json({ message: "Hello from B&C Engine!" });
   });
-
-  // Static endpoint (Delivery of the React SPA)
-  // app.get('*', (req, res) => {
-  //   res.sendFile(path.resolve(__dirname, '../client/public', 'index.html'));
-  // });
 
   // User routes CRUD
   app.use('/users', userRoutes);
