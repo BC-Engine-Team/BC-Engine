@@ -39,6 +39,7 @@ db['mssql_pat'].invoice_header = require("./models/mssql_pat/invoice_header.mode
 
 //bosco database tables
 db['mssql_bosco'].transactions = require("./models/mssql_bosco/accounting_client.model")(db['mssql_bosco'], Sequelize);
+db['mssql_bosco'].transactions_stat = require("./models/mssql_bosco/accounting_client_stat.model")(db['mssql_bosco'], Sequelize);
 
 
 db.sync = async (database, options) => {

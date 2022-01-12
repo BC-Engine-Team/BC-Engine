@@ -9,7 +9,7 @@ router.get("/allInvoices", authService.authenticateToken, invoiceController.find
 router.get("/allTransactions", authService.authenticateToken, invoiceController.findAllTransactions);
 
 
-router.get("/defaultChart", authService.authenticateToken, invoiceController.findTransactionsBetweenDates);
+router.get("/defaultChart", invoiceController.getAverages);
 
 router.get("/testInvoices", invoiceController.testInvoices);
 

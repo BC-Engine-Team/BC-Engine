@@ -1,6 +1,7 @@
 const databases = require("../data_access_layer/databases");
 const Invoice = databases['mssql_pat'].invoice_header;
 const Transaction = databases['mssql_bosco'].transactions;
+const TransacStatDao = require("../data_access_layer/daos/transac.dao");
 const { Op } = require('sequelize');
 const { gt, lte } = require("sequelize/dist/lib/operators");
 
@@ -64,10 +65,124 @@ exports.getAllTransactions = async () => {
     });
 };
 
+
+exports.getDues = async (yearMonthList) => {
+    let totalDuesList = [];
+
+    return new Promise((resolve, reject) => {
+        TransacStatDao.getTransactionsStatByYearMonth(yearMonthList).then(async data => {
+            if(data){
+                yearMonthList.forEach(ym => {
+                    let totalDues = 0;
+                    data.forEach(e => {
+                        if(e.yearMonth === ym){
+                            totalDues += (e.dueCurrent + e.due1Month + e.due2Month + e.due3Month);
+                        }
+                    });
+                    totalDuesList.push({
+                        month: ym.toString(),
+                        totalDues: totalDues.toFixed(2)
+                    });
+                });
+                resolve(totalDuesList);
+            }
+            reject(false);
+    
+        }).catch(err => {
+            reject(err.message);
+        });
+    });
+}
+
+exports.getBilled = async (beginDate, finishDate, yearMonthList) => {
+    let billedList = [];
+    console.log("billedList");
+
+    return new Promise((resolve, reject) => {
+        TransacStatDao.getTransactionsByTransactionDate(beginDate, finishDate).then(async data => {
+            if(data){
+                finishDate.setMonth(finishDate.getMonth() - 11);
+                yearMonthList.forEach(ym => {
+                    let billed = 0;
+                    data.forEach(e => {
+                        if(e.transactionDate < finishDate && e.transactionDate >= beginDate){
+                            billed += e.amount;
+                        }
+                    });
+                    billedList.push({
+                        month: ym.toString(),
+                        billed: billed
+                    });
+                    finishDate.setMonth(finishDate.getMonth() + 1);
+                    beginDate.setMonth(beginDate.getMonth() + 1);
+                });
+                resolve(billedList);
+            }
+            reject(false);
+        })
+        .catch(err => {
+            reject(err.message);
+        });
+    });
+}
+
+exports.getAverages = async (startDate, endDate) => {
+    const startYear = parseInt(startDate.split('-')[0]);
+    let startMonth = parseInt(startDate.split('-')[1]);
+    const endYear = parseInt(endDate.split('-')[0]);
+    const endMonth = parseInt(endDate.split('-')[1]);
+
+    let yearMonthList = [];
+    for(let y = startYear; y <= endYear; y++){
+        if(y != startYear) startMonth = 1;
+        for(let m = startMonth; m <=12; m++){
+            if(y == endYear && m > endMonth) break;
+            let yearMonthStr = y.toString();
+            if(m < 10) yearMonthStr += '0';
+            yearMonthStr += m.toString();
+            yearMonthList.push(parseInt(yearMonthStr));
+        }
+    }
+
+    return new Promise(async (resolve, reject) => {
+        let averagesList = [];
+        let totalDuesList = [];
+        let billedList = [];
+
+        await this.getDues(yearMonthList).then(async data => {
+            totalDuesList = data;
+        }).catch(err => {
+            reject(err.message);
+        });
+
+        let beginDate = new Date(`${startDate} 00:00:00`);
+        let finishDate = new Date(`${endDate} 00:00:00`);
+        beginDate.setMonth(beginDate.getMonth() - 12);
+
+        await this.getBilled(beginDate, finishDate, yearMonthList).then(async data => {
+            billedList = data;
+        }).catch(err => {
+            reject(err.message);
+        });
+
+
+        let counter = 0;
+        yearMonthList.forEach(ym => {
+            let average = totalDuesList[counter].totalDues / billedList[counter].billed * 365;
+            averagesList.push({
+                month: ym,
+                average: average.toFixed(2)
+            });
+            counter++;
+        });
+        resolve(averagesList);
+    });
+}
+
 exports.testInvoices = async () => {
     const MULTIPLIER = 365;
-    const startDateString = "2019-11-01";
-    const endDateString = "2020-11-01";
+    const startDateString = "2019-12-01";
+    const endDateString = "2020-12-01";
     const startDate = new Date(`${startDateString} 00:00:00`);
     let endDate = new Date(`${endDateString} 00:00:00`);
     let listOfAverageDues = [];
@@ -75,6 +190,14 @@ exports.testInvoices = async () => {
     let listOfAverages = [];
 
     return new Promise(async (resolve, reject) => {
+
+
+        await Invoice.findAll({
+            where: {
+                
+            }
+        })
+
 
         let listOfTransactions = [];
         await Transaction.findAll({
@@ -91,7 +214,6 @@ exports.testInvoices = async () => {
             data.forEach(element => {
                 listOfTransactions.push(element.dataValues);
             });
-            console.log(data.length);
 
             for(let i = 0; i < 12; i++){
                 if(i != 0){
@@ -120,16 +242,16 @@ exports.testInvoices = async () => {
                 }
                 
                 let totalDues = 0;
-    
-                let innerEndDate = new Date(`${endDateString} 00:00:00`);
+                let innerEndDate = new Date(endDate.toDateString());
                 for(let i = 0; i < 12; i++){
                     if(i != 0){
-                        innerEndDate.setMonth(innerEndDate.getMonth() - i);
+                        innerEndDate.setMonth(innerEndDate.getMonth() - 1);
                     }
                     let billed = 0;
                     let paid = 0;
                     
                     listOfTransactions.forEach(t => {
+
                         if(t.transactionDate < innerEndDate){
                             billed += t.transactionAmount;
                         }
@@ -139,12 +261,12 @@ exports.testInvoices = async () => {
                             paid += t.transactionAmount;
                         }
                     });
-                    console.log(billed);
                     totalDues += (billed - paid);
                 }
-    
                 listOfAverageDues.push((totalDues / 12));
             }
+
+            console.log(listOfAverageDues);
     
             endDate = new Date(`${endDateString} 00:00:00`);
             for(let i = 0; i < 12; i++){

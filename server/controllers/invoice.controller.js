@@ -42,3 +42,13 @@ exports.testInvoices = async (req, res) => {
             return res.send(response);
         })
 }
+
+exports.getAverages = async (req, res) => {
+    await invoiceService.getAverages(req.body.startDate, req.body.endDate)
+        .then(response => {
+            return res.status(200).send(response);
+        })
+        .catch(err => {
+            return res.status(500).send(err.message);
+        });
+}
