@@ -58,7 +58,22 @@ const NavB = (props) => {
                 }       
             })
             .catch((error) => {
-                console.log(error);
+                if(error.response) {
+                    if(error.response.status === 403 || error.response.status === 401) {
+                        console.log(error.response.body);
+                    }
+                    else {
+                        console.log("Malfunction in the B&C Engine...");
+                    }
+                }
+                else if(error.request) {
+                    console.log("Could not reach b&C Engine...");
+                }
+                cookies.remove("refreshToken");
+                cookies.remove("accessToken");
+                cookies.remove("username");
+                cookies.remove("role");
+                navigate("/login");
             });
         }
     }

@@ -117,11 +117,14 @@ const Users = () => {
         .catch((error) => {
             if(error.response) {
                 if(error.response.status === 401 || error.response.status === 403) {
-                    setInvalidInput("Cannot recognize the email address");
+                    setInvalidInput("You are not authorized to perform this action.");
+                }
+                else {
+                    setInvalidInput("Malfunction in the B&C Engine...");
                 }
             }
             else if(error.request) {
-                setInvalidInput("Cannot send the request to delete the user");
+                setInvalidInput("Could not reach b&C Engine...");
             }
         });
 
@@ -142,7 +145,7 @@ const Users = () => {
         .catch((error) => {
             if(error.response) {
                 if(error.response.status === 403 || error.response.status === 401) {
-                    console.log(error.response.satus + " - Error trying to reach B&C Engine");
+                    console.log("You are not authorized to perform this action.");
                 }
                 else {
                     console.log("Could not reach b&C Engine...");
