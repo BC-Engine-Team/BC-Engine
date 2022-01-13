@@ -137,8 +137,6 @@ const Users = () => {
     
         Axios.get(`${process.env.REACT_APP_API}/users/`, {headers: header})
         .then((response) => {
-            console.log("LOLOLOL")
-            console.log(`${process.env.REACT_APP_API}/users/`)
             setUsers(response.data);
         })
         .catch((error) => {
