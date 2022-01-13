@@ -7,15 +7,20 @@ exports.getInvoicesByDate = async (startDate, endDate, invoiceAffectModel = Invo
     return new Promise(async (resolve, reject) => {
         try {
             const data = await database.query(
-                "select sum(affect_amount) from BOSCO_INVOICE_AFFECT\
-                where AFFECT_ACCOUNT = '1200'\
-                and AFFECT_AMOUNT > 0\
-                and INVOICE_ID in (select INVOICE_ID from INVOICE_HEADER\
-                where INVOCIE_DATE < '2020-11-01'\
-                and INVOCIE_DATE >= '2019-11-01')",
-                { type: QueryTypes.SELECT }
+                "Select IH.INVOCIE_DATE, IH.ACTOR_ID, BIA.AFFECT_AMOUNT \
+                from INVOICE_HEADER IH, BOSCO_INVOICE_AFFECT BIA \
+                Where IH.INVOICE_PREVIEW=0 \
+                AND IH.INVOICE_TYPE in (1,4) \
+                AND IH.INVOCIE_DATE between ? AND ? \
+                AND BIA.INVOICE_ID=IH.INVOICE_ID \
+                AND BIA.AFFECT_ACCOUNT like '%1200%'",
+                {
+                    replacements: [startDate, endDate],
+                    type: QueryTypes.SELECT
+                }
             );
-            resolve(data[0]['']);
+            if (data) resolve(data);
+            reject(false);
         }
         catch (err) {
             reject(err);
