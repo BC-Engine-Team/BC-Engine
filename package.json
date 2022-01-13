@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "engines": {
-    "node": "16.13.0"
+    "node": "16.13.1"
   },
   "scripts": {
     "test": "jest --coverage",
@@ -31,6 +31,7 @@
     "mock-express-response": "^0.3.0",
     "morgan": "^1.10.0",
     "mysql2": "^2.3.3",
+    "pg": "^8.7.1",
     "react-router-bootstrap": "^0.26.0",
     "sequelize": "^6.12.0-alpha.1",
     "sequelize-cli": "^6.3.0",
