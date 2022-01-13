@@ -7,10 +7,10 @@ services:
     restart: always
     env_file: ./.env
     environment:
-      MYSQL_ROOT_PASSWORD: $MYSQL_ROOT_PASSWORD
-      MYSQL_DATABASE: $MYSQL_DATABASE
+      MYSQL_ROOT_PASSWORD: $LOCAL_ROOT_PASSWORD
+      MYSQL_DATABASE: $LOCAL_DATABASE
     ports:
-      - $MYSQL_LOCAL_PORT:$MYSQL_DOCKER_PORT
+      - $LOCAL_PORT:$LOCAL_DOCKER_PORT
     volumes:
       - db-config:/etc/mysql
       - ./dump.sql:/docker-entrypoint-initdb.d/

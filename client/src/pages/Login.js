@@ -40,8 +40,8 @@ const Login = () => {
                 email: email,
                 password: password,
             }
-    
-            Axios.post("http://localhost:3001/users/authenticate", data)
+
+            Axios.post(`${process.env.REACT_APP_API}/users/authenticate`, data)
             .then((response) => {
                 console.log(response);
 

@@ -30,10 +30,7 @@ for (let i = 0; i < databases.length; i++) {
 db.Sequelize = Sequelize;
 
 // Add any tables to the database here
-// Own database tables
-db['mysqldb'].users = require("./models/mysql/user.model")(db['mysqldb'], Sequelize);
-
-// Patricia database tables
+db['localdb'].users = require("./models/localdb/user.model")(db['localdb'], Sequelize);
 db['mssql_pat'].employees = require("./models/mssql_pat/employee.model")(db['mssql_pat'], Sequelize);
 db['mssql_pat'].invoice_header = require("./models/mssql_pat/invoice_header.model")(db['mssql_pat'], Sequelize);
 db['mssql_pat'].invoice_affect = require("./models/mssql_pat/invoice_affect.model")(db['mssql_pat'], Sequelize);

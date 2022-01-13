@@ -46,7 +46,7 @@ const NavB = (props) => {
                 }
             };
     
-            Axios.delete("http://localhost:3001/users/logout", conf)
+            Axios.delete(`${process.env.REACT_APP_API}/users/logout`, conf)
             .then((response) => {
 
                 if(response.status === 204) {     

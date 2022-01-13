@@ -160,7 +160,7 @@ const UsersForm = (props) => {
             onUpdateClick();
         }
         else if(FormTitle === "Confirm creation?") {
-            Axios.post("http://localhost:3001/users/", data, {headers: header})
+            Axios.post(`${process.env.REACT_APP_API}/users/`, data, {headers: header})
             .then((response) => {
     
                 if(response.status === 200 || response.status === 201) {
@@ -246,7 +246,7 @@ const UsersForm = (props) => {
             role: form.role
         };
 
-        Axios.put(`http://localhost:3001/users/modify/${form.email}`, user, {headers: header})
+        Axios.put(`${process.env.REACT_APP_API}/users/modify/${form.email}`, user, {headers: header})
         .then((response) => {
             if(response.data === true)
             {
