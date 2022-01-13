@@ -8,7 +8,7 @@ const db = {};
 
 const databases = Object.keys(config.databases);
 
-for(let i=0; i<databases.length; i++){
+for (let i = 0; i < databases.length; i++) {
   let database = databases[i];
   let dbPath = config.databases[database];
 
@@ -36,6 +36,7 @@ db['mysqldb'].users = require("./models/mysql/user.model")(db['mysqldb'], Sequel
 // Patricia database tables
 db['mssql_pat'].employees = require("./models/mssql_pat/employee.model")(db['mssql_pat'], Sequelize);
 db['mssql_pat'].invoice_header = require("./models/mssql_pat/invoice_header.model")(db['mssql_pat'], Sequelize);
+db['mssql_pat'].invoice_affect = require("./models/mssql_pat/invoice_affect.model")(db['mssql_pat'], Sequelize);
 
 //bosco database tables
 db['mssql_bosco'].transactions = require("./models/mssql_bosco/accounting_client.model")(db['mssql_bosco'], Sequelize);
@@ -47,15 +48,15 @@ db.sync = async (database, options) => {
     .then(() => {
       return db[database].users.bulkCreate([
         {
-          email: 'first@benoit-cote.com', 
-          password: 'verySecurePassword', 
-          name: 'Marc Benoit', 
+          email: 'first@benoit-cote.com',
+          password: 'verySecurePassword',
+          name: 'Marc Benoit',
           role: 'admin'
         },
         {
-          email: 'second@benoit-cote.com', 
-          password: 'verySecurePassword', 
-          name: 'JC Benoit', 
+          email: 'second@benoit-cote.com',
+          password: 'verySecurePassword',
+          name: 'JC Benoit',
           role: 'employee'
         }],
         {
@@ -68,8 +69,8 @@ db.sync = async (database, options) => {
         console.log(e.toJSON());
       });
     })
-    .catch((err) =>{
-      if(err){
+    .catch((err) => {
+      if (err) {
         console.log('Could not sync with the Database.');
       }
     });

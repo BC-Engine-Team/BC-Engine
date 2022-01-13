@@ -1,11 +1,34 @@
 import { Bar } from 'react-chartjs-2';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom'
+import Cookies from 'universal-cookie'
 import 'chart.js/auto';
 
 const DashboardChart = (props) => {
-    const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+    let navigate = useNavigate();
 
-    const [chartData] = useState({
+    const cookies = new Cookies();
+
+    useEffect(() => {
+        if (cookies.get("accessToken") === undefined) {
+            navigate("/login");
+        }
+        else if(cookies.get("role") !== "admin") {
+            navigate("/dashboard");
+        } 
+     
+        console.log(props.data)
+
+        // eslint-disable-next-line react-hooks/exhaustive-deps 
+    }, []);
+
+    //const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+
+
+    const [months, setMonths] = useState();
+    
+
+    const [chartData, setChartData] = useState({
         labels: months,
         datasets: [
             {
@@ -22,6 +45,7 @@ const DashboardChart = (props) => {
                 data={chartData} 
                 
                 options={{
+                    responsive: true,
                     maintainAspectRatio: false,
                     aspectRatio: 4,
                     scales: {

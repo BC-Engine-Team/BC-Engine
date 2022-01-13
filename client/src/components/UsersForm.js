@@ -162,7 +162,6 @@ const UsersForm = (props) => {
         else if(FormTitle === "Confirm creation?") {
             Axios.post("http://localhost:3001/users/", data, {headers: header})
             .then((response) => {
-                console.log(response);
     
                 if(response.status === 200 || response.status === 201) {
                     disableForm();
@@ -175,9 +174,7 @@ const UsersForm = (props) => {
                         navigate("/login");
                     }
                     else {
-                        console.log(error.response.data.message);
                         setInvalidInput(error.response.data.message);
-                        console.log(InvalidInput);
 
                         handleGoBack();
                     }
@@ -262,11 +259,14 @@ const UsersForm = (props) => {
                 if(error.response.status === 401 || error.response.status === 403) {
                     setInvalidInput("Cannot recognize the email address");
                 }
+                else {
+                    setInvalidInput("Malfunction in the B&C Engine...");
+                }
             }
             else if(error.request) {
                 setInvalidInput("Can't send the request to modify the user");
             }
-        });    
+        }); 
 
         setValidated(true);
         return false;     

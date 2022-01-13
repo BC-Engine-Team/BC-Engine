@@ -11,6 +11,8 @@ router.get("/allTransactions", authService.authenticateToken, invoiceController.
 
 router.get("/defaultChart", invoiceController.getAverages);
 
+router.get("/defaultChartTest", invoiceController.getAveragesTest);
+
 router.get("/testInvoices", invoiceController.testInvoices);
 
 module.exports = router;

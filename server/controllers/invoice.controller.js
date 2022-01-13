@@ -52,3 +52,56 @@ exports.getAverages = async (req, res) => {
             return res.status(500).send(err.message);
         });
 }
+
+exports.getAveragesTest = async (req, res) => {
+    return res.send([
+        {
+            month: 201912,
+            average: 90
+        },
+        {
+            month: 202001,
+            average: 91
+        },
+        {
+            month: 202002,
+            average: 93
+        },
+        {
+            month: 202003,
+            average: 95
+        },
+        {
+            month: 202004,
+            average: 91
+        },
+        {
+            month: 202005,
+            average: 97
+        },
+        {
+            month: 202006,
+            average: 94
+        },
+        {
+            month: 202007,
+            average: 99
+        },
+        {
+            month: 202008,
+            average: 91
+        },
+        {
+            month: 202009,
+            average: 96
+        },
+        {
+            month: 202010,
+            average: 93
+        },
+        {
+            month: 202011,
+            average: 97
+        }
+    ]);
+}

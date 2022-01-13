@@ -64,7 +64,6 @@ const Login = () => {
                     setInvalidCredential("Incorrect email or password.");
                 }
             }).catch((error) => {
-
                 if(error.response){
                     if(error.response.status === 403 || error.response.status === 401){
                         setInvalidCredential("Incorrect email or password.");
