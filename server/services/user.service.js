@@ -1,5 +1,5 @@
 const databases = require("../data_access_layer/databases");
-const User = databases['mysqldb'].users;
+const User = databases['localdb'].users;
 const UserDAO = require('../data_access_layer/daos/user.dao');
 const Op = databases.Sequelize.Op;
 

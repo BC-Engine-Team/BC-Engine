@@ -1,16 +1,17 @@
 const tedious = require('tedious');
+require("../../config.js")
 
 module.exports = {
     development: {
         databases: {
-            mysqldb: {
-                HOST: "localhost",
-                USER: "root",
-                PASSWORD: "root",
-                DB: "bcenginedb",
+            localdb: {
+                HOST: process.env.LOCAL_HOST,
+                USER: process.env.LOCAL_USER,
+                PASSWORD: process.env.LOCAL_ROOT_PASSWORD,
+                DB: process.env.LOCAL_DATABASE,
                 dialect: "mysql",
                 timezone: "-05:00",
-                port: 3308,
+                port: process.env.LOCAL_PORT,
                 pool: {
                     max: 5,
                     min: 0,
