@@ -11,7 +11,6 @@
     "test:watch": "jest --watch",
     "start": "cd server && node server.js",
     "start-dev": "docker-compose up -d && timeout 15 && cd server && nodemon server.js",
-    "start-prod": "cd server && node server.js",
     "start-all": "concurrently \"cd client && npm start\" \"cd server && node server.js\"",
     "build": "npm install && cd client && npm install && npm run build"
   },

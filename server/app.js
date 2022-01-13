@@ -19,7 +19,7 @@ module.exports = (database) => {
   }
 
   app.use(function(req, res, next) {
-    res.header('Access-Control-Allow-Origin', process.env.IP_ADDRESS);
+    res.header('Access-Control-Allow-Origin', "localhost:3000");
     res.header('Access-Control-Allow-Credentials', true);
     res.header('Access-Control-Allow-Methods', 'DELETE, PUT, POST, GET, OPTIONS, HEAD');
     res.header(
@@ -38,6 +38,8 @@ module.exports = (database) => {
   // User routes CRUD
   app.use('/api/users', userRoutes);
 
+  // Handles page refresh on the client side 
+  // (view index.hmtl and 404.html located in the client/public folder)
   app.use(function(req, res) {
     res.sendFile(path.resolve(__dirname, '../client/public/404.html'));
   });

@@ -9,7 +9,7 @@ module.exports = {
                 USER: process.env.LOCAL_USER,
                 PASSWORD: process.env.LOCAL_ROOT_PASSWORD,
                 DB: process.env.LOCAL_DATABASE,
-                dialect: process.env.LOCAL_DIALECT,
+                dialect: "mysql",
                 timezone: "-05:00",
                 port: process.env.LOCAL_PORT,
                 pool: {
