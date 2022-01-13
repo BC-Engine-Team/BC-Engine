@@ -27,28 +27,22 @@ module.exports = (localdb, DataTypes) => {
             type: DataTypes.STRING
         }
         
-    },
-    {
-        hooks: {
-            beforeCreate: async (user) => {
-                if(user.password){
-                    const salt = await bcrypt.genSalt(10, 'a');
-                    user.password = await bcrypt.hash(user.password, salt);
-                }
-            },
-            beforeUpdate:async (user) => {
-                if(user.password){
-                    const salt = await bcrypt.genSalt(10, 'a');
-                    user.password = await bcrypt.hash(user.password, salt);
-                }
-            },
-        },
-        instanceMethods: {
-            validatePassword: (password) => {
-                return bcrypt.compareSync(password, this.password);
-            }
+    });
+
+    User.addHook('beforeCreate', async (user) => {
+        if(user.password){
+            const salt = await bcrypt.genSalt(10, 'a');
+            user.password = await bcrypt.hash(user.password, salt);
         }
     });
+
+    User.addHook('beforeUpdate', async (user) => {
+        if(user.password){
+            const salt = await bcrypt.genSalt(10, 'a');
+            user.password = await bcrypt.hash(user.password, salt);
+        }
+    });
+
     User.prototype.validPassword = async (password, hash) => {
         return bcrypt.compareSync(password, hash);    
     }

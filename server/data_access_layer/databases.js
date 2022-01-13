@@ -27,21 +27,6 @@ for(let i=0; i<databases.length; i++){
   })
 }
 
-
-// const sequelize = new Sequelize(myDbConfig.DB, myDbConfig.USER, myDbConfig.PASSWORD, {
-//   host: myDbConfig.HOST || 'localhost',
-//   port: myDbConfig.port,
-//   dialect: myDbConfig.dialect,
-//   timezone: myDbConfig.timezone,
-//   pool: {
-//     max: myDbConfig.pool.max,
-//     min: myDbConfig.pool.min,
-//     acquire: myDbConfig.pool.acquire,
-//     idle: myDbConfig.pool.idle
-//   }
-// });
-
-
 db.Sequelize = Sequelize;
 
 
