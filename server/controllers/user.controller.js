@@ -104,7 +104,6 @@ exports.authenticateUserWithEmail = async (req, res) => {
             });
         })
         .catch(err => {
-            console.log(err)
             return res.status(500).send(err.message);
         });
 };
@@ -136,7 +135,6 @@ exports.modifyUser = async(req, res) => {
 } 
 
 exports.deleteUser = async(req, res) => {
-    console.log(req.user.role);
     if(req.user.role !== "admin") return res.status(403).send();
 
 
