@@ -1,6 +1,7 @@
 /node_modules
 /package-lock.json
-client/package-lock.json
 /coverage
 /.env
 
+.env
+client/package-lock.json

@@ -104,7 +104,7 @@ const Users = () => {
     
         Axios.defaults.withCredentials = true;
 
-        Axios.delete(`http://localhost:3001/users/delete/${email}`, {headers: header, data: data})
+        Axios.delete(`${process.env.REACT_APP_API}/users/delete/${email}`, {headers: header, data: data})
         .then((response) => {
             if(response.data === true)
             {
@@ -135,7 +135,7 @@ const Users = () => {
     
         Axios.defaults.withCredentials = true;
     
-        Axios.get("http://localhost:3001/users/", {headers: header})
+        Axios.get(`${process.env.REACT_APP_API}/users/`, {headers: header})
         .then((response) => {
             setUsers(response.data);
         })

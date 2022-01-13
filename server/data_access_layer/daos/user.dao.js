@@ -1,5 +1,5 @@
 const databases = require("../databases");
-const UserModel = databases['mysqldb'].users;
+const UserModel = databases['localdb'].users;
 
 
 exports.getUserByEmail = async (email, userModel = UserModel) => {

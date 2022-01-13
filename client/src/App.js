@@ -11,7 +11,7 @@ function App() {
   return (
     <div>
       {/* Routes to pages */}
-      <BrowserRouter>
+      <BrowserRouter basename="/">
         <Routes>
           <Route exact path="/" element={<Navigate replace to="login" />}/>
           <Route exact path="/login" element={<Login />} />
