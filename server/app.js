@@ -38,5 +38,9 @@ module.exports = (database) => {
   // User routes CRUD
   app.use('/api/users', userRoutes);
 
+  app.use(function(req, res) {
+    res.sendFile(path.resolve(__dirname, '../client/public/404.html'));
+  });
+
   return app;
 };
