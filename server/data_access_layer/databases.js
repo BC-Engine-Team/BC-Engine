@@ -38,7 +38,7 @@ db['mssql_pat'].invoice_affect = require("./models/mssql_pat/invoice_affect.mode
 //bosco database tables
 db['mssql_bosco'].transactions = require("./models/mssql_bosco/accounting_client.model")(db['mssql_bosco'], Sequelize);
 db['mssql_bosco'].transactions_stat = require("./models/mssql_bosco/accounting_client_stat.model")(db['mssql_bosco'], Sequelize);
-
+db['mssql_bosco'].clients = require("./models/mssql_bosco/client.model")(db['mssql_bosco'], Sequelize);
 
 db.sync = async (database, options) => {
   await db[database].sync(options)

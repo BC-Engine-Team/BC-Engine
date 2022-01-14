@@ -1,15 +1,24 @@
 import React from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import Table from 'react-bootstrap/Table'
 import '../styles/clientTable.css'
 
-const ClientTable = () => {
+const ClientTable = (data) => {
+
+
+    
+    const [clients, setClients] = useState([{name: "William Roger", country: "Canada", averagecollection: "35.6", amountowed: "4500", amountdue: "2122", clientgrading: "A", status: "ACTIVE"}]);
+    
+    let counter = 0;
+
+    
     return(
 
         <div className="justify-content-center">
             <div>
                 <div className="card shadow m-5 uTable">
 
-                    <Table responsive="xl">
+                    <Table responsive="xl" hover>
 
                         <thead className='bg-light'>
                             <tr key="0">
@@ -24,25 +33,21 @@ const ClientTable = () => {
                         </thead>
 
                         <tbody>
-                            <tr>
-                                <td className='row-style'>Nicolas Espitalier</td>
-                                <td className='row-style'>Canada</td>
-                                <td className='row-style'>29</td>
-                                <td className='amount-owed'>450.43 CAD</td>
-                                <td className='amount-due'>6000.67 CAD</td>
-                                <td className='row-style'>A</td>
-                                <td className='row-style'>ACTIVE</td>
-                            </tr>
 
-                            <tr>
-                                <td className='row-style'>Phillipe Heinsenberg</td>
-                                <td className='row-style'>Germany</td>
-                                <td className='row-style'>30</td>
-                                <td className='amount-owed'>120.43 CAD</td>
-                                <td className='amount-due'>3542.67 CAD</td>
-                                <td className='row-style'>A</td>
-                                <td className='row-style'>ACTIVE</td>
-                            </tr>
+                            {clients.map (c => {
+                                counter++;
+                                return(
+                                    <tr key={counter}>
+                                        <td className='row-style'>{c.name}</td>
+                                        <td className='row-style'>{c.country}</td>
+                                        <td className='row-style'>{c.averagecollection}</td>
+                                        <td className='amount-owed'>{c.amountowed}</td>
+                                        <td className='amount-due'>{c.amountdue}</td>
+                                        <td className='row-style'>{c.clientgrading}</td>
+                                        <td className='row-style'>{c.status}</td>
+                                    </tr>
+                                );
+                            })}
                         </tbody>
                     </Table>
                 </div>

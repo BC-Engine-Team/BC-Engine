@@ -1,6 +1,10 @@
 const TransacStatDao = require("../data_access_layer/daos/transac.dao");
 const InvoiceAffectDao = require("../data_access_layer/daos/invoice_affect.dao");
+const ClientDao = require("../data_access_layer/daos/client.dao");
+const { addListener } = require("nodemon");
 
+
+let clientIDList = [];
 
 exports.getDues = async (yearMonthList) => {
     let totalDuesList = [];
@@ -37,6 +41,7 @@ exports.getBilled = async (startDateStr, endDateStr, yearMonthList) => {
     let endDate = new Date(parseInt(endDateStr.substring(5, 7)) + " " + parseInt(endDateStr.substring(8)) + " " + parseInt(endDateStr.substring(0, 4)));
     endDate.setMonth(endDate.getMonth() - 11);
 
+
     return new Promise(async (resolve, reject) => {
         await InvoiceAffectDao.getInvoicesByDate(startDateStr, endDateStr).then(async data => {
             if (data) {
@@ -44,6 +49,9 @@ exports.getBilled = async (startDateStr, endDateStr, yearMonthList) => {
                     let billed = 0;
 
                     data.forEach(i => {
+
+                        clientIDList.push(i['ACTOR_ID']);
+
                         if (i['INVOCIE_DATE'] >= startDate && i['INVOCIE_DATE'] < endDate) {
                             billed += i['AFFECT_AMOUNT'];
                         }
@@ -64,11 +72,35 @@ exports.getBilled = async (startDateStr, endDateStr, yearMonthList) => {
     });
 }
 
+
+exports.getClientInformations = async(clientsID) => {
+    return new Promise(async (resolve, reject) => {
+        
+        await ClientDao.getClientByID(clientsID).then(async data => {
+            if(data){
+                resolve(data);
+            }
+            resolve(false);
+        });
+    });
+}
+
+
 exports.getAverages = async (startDateStr, endDateStr) => {
     const startYear = parseInt(startDateStr.split('-')[0]);
     let startMonth = parseInt(startDateStr.split('-')[1]);
     const endYear = parseInt(endDateStr.split('-')[0]);
     const endMonth = parseInt(endDateStr.split('-')[1]);
+
+    let clientList = [];
+
+    let returnData = {
+        chart: [],
+        clients: []
+    };
+
+
+    clientIDList = [];
 
     // make list of yearMonth [201911,202001,202002,...] to select dues
     let yearMonthList = [];
@@ -82,6 +114,7 @@ exports.getAverages = async (startDateStr, endDateStr) => {
             yearMonthList.push(parseInt(yearMonthStr));
         }
     }
+
 
     return new Promise(async (resolve, reject) => {
         let averagesList = [];
@@ -108,6 +141,13 @@ exports.getAverages = async (startDateStr, endDateStr) => {
             reject(err.message);
         });
 
+
+        // Get list of client name by actor id
+        await this.getClientInformations(clientIDList).then(async data => {
+            clientList = data;
+        }); 
+
+
         // Populate average list with average for each month
         let counter = 0;
         yearMonthList.forEach(ym => {
@@ -118,7 +158,10 @@ exports.getAverages = async (startDateStr, endDateStr) => {
             });
             counter++;
         });
-        resolve(averagesList);
 
+        returnData.chart = averagesList;
+        returnData.clients = clientList;
+        resolve(returnData);
+        
     });
 }

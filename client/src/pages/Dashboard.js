@@ -11,23 +11,21 @@ const Dashboard = () => {
     let navigate = useNavigate();
     const cookies = new Cookies();
 
-    const [rawChartData, setRawChartData] = useState();
+    const [chartData, setChartData] = useState();
+    const [clients, setClients] = useState();
 
 
-    useEffect(() => {
-        if (cookies.get("accessToken") === undefined) {
-            navigate("/login");
-        }
-
+    const handleRefresh = () => {
         let header = {
             'authorization': "Bearer " + cookies.get("accessToken"),
         }
 
         Axios.defaults.withCredentials = true;
 
-        Axios.get("http://localhost:3001/invoice/defaultChartTest", { headers: header })
+        Axios.get(`${process.env.REACT_APP_API}/invoice/defaultChartAndTable`, { headers: header })
             .then((response) => {
-                setRawChartData(response.data);
+                setChartData(response.data.chart);
+                setClients(response.data.client);
             })
             .catch((error) => {
                 if (error.response) {
@@ -42,15 +40,22 @@ const Dashboard = () => {
                     console.log("Could not reach b&C Engine...");
                 }
             });
+    }
 
+
+
+    useEffect(() => {
+        if (cookies.get("accessToken") === undefined) {
+            navigate("/login");
+        }
+        handleRefresh();
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
+
 
     return (
         <div>
             <NavB />
-            <UnderConstruction pageName="Dashboard"/>
-            <ClientTable/>
             <div className='d-flex realMain'>
                 <div className="justify-content-center main">
                     <div className="container-criteria">
@@ -60,9 +65,10 @@ const Dashboard = () => {
                     </div>
                     <div className="container-chart">
                         <div className="card shadow my-3 mx-3">
-                            <DashboardChart data={rawChartData} />
+                            <DashboardChart data={chartData} />
                         </div>
                     </div>
+                    <ClientTable data={clients}/>
                 </div>
             </div>
         </div>
