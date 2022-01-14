@@ -1,4 +1,4 @@
-const TransacStatDao = require("../data_access_layer/daos/transac.dao");
+const TransacStatDao = require("../data_access_layer/daos/transac_stat.dao");
 const InvoiceAffectDao = require("../data_access_layer/daos/invoice_affect.dao");
 
 

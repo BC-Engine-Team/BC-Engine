@@ -22,9 +22,9 @@ exports.testInvoices = async (req, res) => {
 
 exports.getAverages = async (req, res) => {
     if (req.user.role !== "admin") return res.status(403).send();
-    if (!req.body.startDate || !req.body.endDate)
+    if (!req.params.startDate || !req.params.endDate)
         return res.status(400).send("Content cannot be empty.");
-    await invoiceService.getAverages(req.body.startDate, req.body.endDate)
+    await invoiceService.getAverages(req.params.startDate, req.params.endDate)
         .then(response => {
             if (response) {
                 return res.status(200).send(response);
