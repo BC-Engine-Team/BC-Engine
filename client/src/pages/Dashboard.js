@@ -29,8 +29,8 @@ const Dashboard = () => {
     let navigate = useNavigate();
     const cookies = new Cookies();
 
-    const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-    const label = ""
+    let months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+    let label = ""
     const fallbackChartData = {
         labels: months,
         datasets: [
@@ -41,7 +41,6 @@ const Dashboard = () => {
             }
         ]
     }
-
 
     const [chartData, setChartData] = useState(fallbackChartData);
     const [preparedChartData, setPreparedChartData] = useState();
@@ -67,8 +66,11 @@ const Dashboard = () => {
                 }
 
                 setAuthorized(true);
-
+                months = [];
                 for (let i = 0; i < res.data.length; i++) {
+                    let year = res.data[i].month.toString().substring(0, 4);
+                    let month = res.data[i].month.toString().substring(4);
+                    months.push(year + "-" + month);
                     averages.push(parseFloat(res.data[i].average));
                 }
 
@@ -185,9 +187,8 @@ const Dashboard = () => {
                                                 }
                                             },
                                             legend: {
-                                                display: true,
-                                                position: 'right',
-                                                rtl: true
+                                                display: false,
+                                                position: 'right'
                                             }
                                         }
                                     }}
