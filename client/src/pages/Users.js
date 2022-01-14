@@ -20,13 +20,13 @@ const Users = () => {
     const cookies = new Cookies();
     const displayNone = "d-none";
 
-    const [users, setUsers] = useState([{name: "", email: "", role: ""}]);
+    const [users, setUsers] = useState([{ name: "", email: "", role: "" }]);
     const [email, setEmail] = useState("");
     const [deleteButtonActivated, setDeleteButtonActivated] = useState(false);
     const [setInvalidInput] = useState("");
 
     const [formEnabled, setFormEnabled] = useState({
-        table: "container", 
+        table: "container",
         form: displayNone
     });
 
@@ -47,24 +47,24 @@ const Users = () => {
     const handleDisableForm = useCallback(() => {
         setTemp(isUpdate);
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    },[isUpdate]);
+    }, [isUpdate]);
     const handleAddUser = useCallback(() => {
         setTemp(isAdd);
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    },[isAdd]);
+    }, [isAdd]);
     const handleEditUser = useCallback(() => {
         setTemp(isEdit);
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    },[isEdit]);
+    }, [isEdit]);
 
     const addUser = () => { setIsAdd(!isAdd) }
 
-    const editUser = (email, role) => { 
+    const editUser = (email, role) => {
         setEditValues({
             email: email,
             role: role
         });
-        
+
         // Triggers function call in the UsersForm.js
         setIsEdit(!isEdit);
     }
@@ -101,71 +101,70 @@ const Users = () => {
         let data = {
             email: email
         }
-    
+
         Axios.defaults.withCredentials = true;
 
-        Axios.delete(`${process.env.REACT_APP_API}/users/delete/${email}`, {headers: header, data: data})
-        .then((response) => {
-            if(response.data === true)
-            {
-                console.log("User deleted successfully!");
-            }
-
-            setDeleteButtonActivated(false);
-            handleRefresh();
-        })
-        .catch((error) => {
-            if(error.response) {
-                if(error.response.status === 401 || error.response.status === 403) {
-                    setInvalidInput("You are not authorized to perform this action.");
+        Axios.delete(`${process.env.REACT_APP_API}/users/delete/${email}`, { headers: header, data: data })
+            .then((response) => {
+                if (response.data === true) {
+                    console.log("User deleted successfully!");
                 }
-                else {
-                    setInvalidInput("Malfunction in the B&C Engine...");
-                }
-            }
-            else if(error.request) {
-                setInvalidInput("Could not reach b&C Engine...");
-            }
-        });
 
-        return false;   
+                setDeleteButtonActivated(false);
+                handleRefresh();
+            })
+            .catch((error) => {
+                if (error.response) {
+                    if (error.response.status === 401 || error.response.status === 403) {
+                        setInvalidInput("You are not authorized to perform this action.");
+                    }
+                    else {
+                        setInvalidInput("Malfunction in the B&C Engine...");
+                    }
+                }
+                else if (error.request) {
+                    setInvalidInput("Could not reach b&C Engine...");
+                }
+            });
+
+        return false;
     };
 
     const handleRefresh = () => {
         let header = {
             'authorization': "Bearer " + cookies.get("accessToken"),
         }
-    
+
         Axios.defaults.withCredentials = true;
-    
-        Axios.get(`${process.env.REACT_APP_API}/users/`, {headers: header})
-        .then((response) => {
-            setUsers(response.data);
-        })
-        .catch((error) => {
-            if(error.response) {
-                if(error.response.status === 403 || error.response.status === 401) {
-                    console.log("You are not authorized to perform this action.");
+
+        Axios.get(`${process.env.REACT_APP_API}/users/`, { headers: header })
+            .then((response) => {
+                setUsers(response.data);
+            })
+            .catch((error) => {
+                if (error.response) {
+                    if (error.response.status === 403 || error.response.status === 401) {
+                        console.log("You are not authorized to perform this action.");
+                    }
+                    else {
+                        console.log("Could not reach b&C Engine...");
+                    }
                 }
-                else {
+                else if (error.request) {
                     console.log("Could not reach b&C Engine...");
                 }
-            }
-            else if(error.request) {
-                console.log("Could not reach b&C Engine...");
-            }
-        });
+            });
     }
 
     useEffect(() => {
         if (cookies.get("accessToken") === undefined) {
             navigate("/login");
         }
-        else if(cookies.get("role") !== "admin") {
+        else if (cookies.get("role") !== "admin") {
             navigate("/dashboard");
-        } 
+        }
 
-        handleRefresh();       
+        handleRefresh();
 
         // eslint-disable-next-line react-hooks/exhaustive-deps 
     }, []);
@@ -190,8 +189,8 @@ const Users = () => {
                                     <th>ROLE</th>
                                     <th>
                                         <div className="d-flex justify-content-center">
-                                            <Button 
-                                                className="btn py-0 shadow-sm border" 
+                                            <Button
+                                                className="btn py-0 shadow-sm border"
                                                 onClick={() => addUser()}>
                                                 Add User
                                             </Button>
@@ -202,7 +201,7 @@ const Users = () => {
                             </thead>
 
                             <tbody>
-                                {users.map (u => {
+                                {users.map(u => {
                                     counter++;
                                     return (
                                         <tr key={counter}>
@@ -218,7 +217,7 @@ const Users = () => {
 
                                             <td className="py-1">
                                                 <div className="d-flex justify-content-center">
-                                                    <EditButton onEdit={() => editUser(u.email, u.role)}/>
+                                                    <EditButton onEdit={() => editUser(u.email, u.role)} />
 
                                                     <DeleteButton onDelete={() => handleDeleteUser(u.email)} />
                                                 </div>
@@ -234,22 +233,22 @@ const Users = () => {
 
                 <div className={formEnabled.form}>
                     <div className="card shadow m-5 uForm">
-                        <UsersForm 
-                            disableForm = {disableForm}
-                            enableForm = {enableForm}
-                            handleDisableForm = {handleDisableForm}
-                            handleAddUser = {handleAddUser}
-                            handleEditUser = {handleEditUser}
-                            editValues = {editValues}
-                            />
+                        <UsersForm
+                            disableForm={disableForm}
+                            enableForm={enableForm}
+                            handleDisableForm={handleDisableForm}
+                            handleAddUser={handleAddUser}
+                            handleEditUser={handleEditUser}
+                            editValues={editValues}
+                        />
                     </div>
                 </div>
             </div>
             <DeleteUserPopup
                 open={deleteButtonActivated}
-                title={email} 
-                onDelete={() => {onDeleteClick()}}
-                onClose={() => {setDeleteButtonActivated(false)}}/>
+                title={email}
+                onDelete={() => { onDeleteClick() }}
+                onClose={() => { setDeleteButtonActivated(false) }} />
         </div>
     )
 }

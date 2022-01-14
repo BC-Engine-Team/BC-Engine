@@ -1,7 +1,6 @@
 const database = require('../databases')['mssql_pat']
 const InvoiceAffectModel = database.invoice_affect;
-const { Op, QueryTypes } = require('sequelize');
-
+const { QueryTypes } = require('sequelize');
 
 exports.getInvoicesByDate = async (startDate, endDate, invoiceAffectModel = InvoiceAffectModel) => {
     return new Promise(async (resolve, reject) => {
