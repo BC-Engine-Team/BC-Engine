@@ -12,31 +12,25 @@ const Dashboard = () => {
     const cookies = new Cookies();
 
     const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-
     const label = "2019-12 to 2020-11"
 
-    const [chartData, setChartData] = useState();
+    const [chartData, setChartData] = useState({
+        labels: months,
+        datasets: [
+            {
+                label: label,
+                data: null,
+                backgroundColor: 'rgb(127, 128, 203)'
+            }
+        ]
+    });
     const [rawChartData, setRawChartData] = useState([]);
     const [prepChartData, setPrepChartData] = useState();
     const [clients, setClients] = useState();
 
+    const chart = async () => {
+        let averages = [];
 
-
-
-    useEffect(() => {
-        if (cookies.get("accessToken") === undefined) {
-            navigate("/login");
-        }
-        else if (cookies.get("role") !== "admin") {
-            navigate("/dashboard");
-        }
-
-        handleRefresh();
-
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
-
-    const handleRefresh = () => {
         let header = {
             'authorization': "Bearer " + cookies.get("accessToken"),
         }
@@ -46,18 +40,14 @@ const Dashboard = () => {
             endDate: "2020-11-01"
         };
 
-        Axios.defaults.withCredentials = true;
+        await Axios.get(`${process.env.REACT_APP_API}/invoice/defaultChartAndTable/${dates.startDate}/${dates.endDate}`, { headers: header })
+            .then((res) => {
 
-        Axios.get(`${process.env.REACT_APP_API}/invoice/defaultChartAndTable/${dates.startDate}/${dates.endDate}`, { headers: header })
-            .then((response) => {
-                console.log(response);
-                setRawChartData([...response.data]);
-                let preparedData = [];
-                rawChartData.forEach(e => {
-                    preparedData.push(e.average);
+                console.log(res.data);
+
+                res.data.forEach(e => {
+                   averages.push(e[0].average);
                 });
-                setPrepChartData(preparedData);
-                //setClients(response.data.clients);
             })
             .catch((error) => {
                 if (error.response) {
@@ -72,7 +62,69 @@ const Dashboard = () => {
                     console.log("Could not reach b&C Engine...");
                 }
             });
+
+            setChartData({
+                labels: months,
+                datasets: [
+                    {
+                        label: label,
+                        data: averages,
+                        backgroundColor: 'rgb(127, 128, 203)'
+                    }
+                ]
+            });
     }
+
+    useEffect(() => {
+        if (cookies.get("accessToken") === undefined) {
+            navigate("/login");
+        }
+        else if (cookies.get("role") !== "admin") {
+            navigate("/dashboard");
+        }
+
+        chart();
+
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
+    // const handleRefresh = () => {
+    //     let header = {
+    //         'authorization': "Bearer " + cookies.get("accessToken"),
+    //     }
+
+    //     const dates = {
+    //         startDate: "2019-12-01",
+    //         endDate: "2020-11-01"
+    //     };
+
+    //     Axios.defaults.withCredentials = true;
+
+    //     Axios.get(`${process.env.REACT_APP_API}/invoice/defaultChartAndTable/${dates.startDate}/${dates.endDate}`, { headers: header })
+    //         .then((response) => {
+    //             console.log(response);
+    //             setRawChartData([...response.data]);
+    //             let preparedData = [];
+    //             rawChartData.forEach(e => {
+    //                 preparedData.push(e.average);
+    //             });
+    //             setPrepChartData(preparedData);
+    //             //setClients(response.data.clients);
+    //         })
+    //         .catch((error) => {
+    //             if (error.response) {
+    //                 if (error.response.status === 403 || error.response.status === 401) {
+    //                     console.log(error.response.body);
+    //                 }
+    //                 else {
+    //                     console.log("Malfunction in the B&C Engine...");
+    //                 }
+    //             }
+    //             else if (error.request) {
+    //                 console.log("Could not reach b&C Engine...");
+    //             }
+    //         });
+    //}
 
     // const prepareDataForChart = () => {
     //     let preparedData = [];
@@ -94,61 +146,49 @@ const Dashboard = () => {
                     </div>
                     <div className="container-chart">
                         <div className="card shadow my-3 mx-3">
-                            {prepChartData &&
-                                <Bar
-                                    data={{
-                                        labels: months,
-                                        datasets: [
-                                            {
-                                                label: label,
-                                                data: prepChartData,
-                                                backgroundColor: 'rgb(127, 128, 203)'
-                                            }
-                                        ]
-                                    }}
+                            <Bar
+                                data={chartData}
 
-                                    options={{
-                                        responsive: true,
-                                        maintainAspectRatio: false,
-                                        aspectRatio: 4,
-                                        scales: {
-                                            yAxes: {
-                                                title: {
-                                                    display: true,
-                                                    text: 'Days',
-                                                    font: {
-                                                        size: 15
-                                                    }
-                                                }
-                                            },
-                                            xAxes: {
-                                                title: {
-                                                    display: true,
-                                                    text: 'Months',
-                                                    font: {
-                                                        size: 15
-                                                    }
+                                options={{
+                                    responsive: true,
+                                    maintainAspectRatio: false,
+                                    aspectRatio: 4,
+                                    scales: {
+                                        yAxes: {
+                                            title: {
+                                                display: true,
+                                                text: 'Days',
+                                                font: {
+                                                    size: 15
                                                 }
                                             }
                                         },
-                                        plugins: {
+                                        xAxes: {
                                             title: {
                                                 display: true,
-                                                text: 'Average Collection Days over Time',
+                                                text: 'Months',
                                                 font: {
-                                                    size: 20
+                                                    size: 15
                                                 }
-                                            },
-                                            legend: {
-                                                display: true,
-                                                position: 'right',
-                                                rtl: true
                                             }
                                         }
-                                    }}
-                                />
-                            }
-
+                                    },
+                                    plugins: {
+                                        title: {
+                                            display: true,
+                                            text: 'Average Collection Days over Time',
+                                            font: {
+                                                size: 20
+                                            }
+                                        },
+                                        legend: {
+                                            display: true,
+                                            position: 'right',
+                                            rtl: true
+                                        }
+                                    }
+                                }}
+                            />
                         </div>
                     </div>
                 </div>
