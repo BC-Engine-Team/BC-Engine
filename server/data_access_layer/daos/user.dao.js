@@ -14,13 +14,11 @@ exports.getUserByEmail = async (email, userModel = UserModel) => {
             resolve(false);
         })
         .catch(err => {
-            console.log(err);
             const response = {
                 status: 500,
                 data: {},
                 message: err.message || "some error occured"
             }
-            console.log(response);
             reject(response);
         });
     });
