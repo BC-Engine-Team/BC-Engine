@@ -143,6 +143,8 @@ const UsersForm = (props) => {
             setFormSubmit("Confirm");
             setEmailEnable("disable");
             setPasswordEnable("disable");
+            setShowPass(false);
+            setShowPass2(false);
             setRoleEnable("disable");
             enableBackButton();
             setErrors({});
@@ -377,12 +379,16 @@ const UsersForm = (props) => {
                         value={form.password1}
                         isInvalid={!!errors.password1}
                     />
-
-                    <Icon 
-                        className='showHideBTN'
-                        path={showPass ? mdiEye : mdiEyeOff}
-                        onClick={() => showHide(true)} 
-                        size={1} />
+                    {
+                        passwordEnable ? 
+                        <></> :
+                        <Icon 
+                            className='showHideBTN'
+                            path={showPass ? mdiEye : mdiEyeOff}
+                            onClick={() => showHide(true)} 
+                            size={1} />
+                    }
+                    
 
                     <Form.Control.Feedback type="invalid">
                         {errors.password1}
@@ -402,11 +408,16 @@ const UsersForm = (props) => {
                         isInvalid={!!errors.password2}
                     />
 
-                    <Icon 
-                        className='showHideBTN'
-                        path={showPass2 ? mdiEye : mdiEyeOff}
-                        onClick={() => showHide(false)} 
-                        size={1} />
+                    {
+                        passwordEnable ? 
+                        <></> :
+                        <Icon 
+                            className='showHideBTN'
+                            path={showPass2 ? mdiEye : mdiEyeOff}
+                            onClick={() => showHide(false)} 
+                            size={1}  />
+                    }
+                    
 
                     <Form.Control.Feedback type="invalid">
                         {errors.password2}

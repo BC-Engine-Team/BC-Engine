@@ -5,7 +5,7 @@
         checkHookDefined
     } = require('sequelize-test-helpers');
 
-const UserModel = require('../../data_access_layer/models/mysql/user.model');
+const UserModel = require('../../data_access_layer/models/localdb/user.model');
 const UserDAO = require('../../data_access_layer/daos/user.dao');
 
 let returnedUser = {
