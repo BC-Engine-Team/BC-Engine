@@ -1,12 +1,17 @@
-import Form from 'react-bootstrap/Form'
-import FloatingLabel from 'react-bootstrap/esm/FloatingLabel'
-import Alert from 'react-bootstrap/Alert'
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import Button from 'react-bootstrap/Button'
 import Axios from 'axios';
 import Cookies from 'universal-cookie'
+
+import Icon from '@mdi/react'
+import { mdiEye } from '@mdi/js';
+import { mdiEyeOff } from '@mdi/js';
+
 import CloseButton from 'react-bootstrap/CloseButton'
+import Button from 'react-bootstrap/Button'
+import Alert from 'react-bootstrap/Alert'
+import Form from 'react-bootstrap/Form'
+import FloatingLabel from 'react-bootstrap/esm/FloatingLabel'
 
 const UsersForm = (props) => {
     let navigate = useNavigate();
@@ -26,6 +31,8 @@ const UsersForm = (props) => {
     const [roleEnable, setRoleEnable] = useState("");
     const [InvalidInput, setInvalidInput] = useState("");
     const [errors, setErrors] = useState({});
+    const [showPass, setShowPass] = useState(false);
+    const [showPass2, setShowPass2] = useState(false);
     
     const [onConfirmationScreen, setOnConfirmationScreen] = useState(false);
     const [submitType, setSubmitType] = useState("submit");
@@ -291,6 +298,17 @@ const UsersForm = (props) => {
         disableBackButton();
     }
 
+    const showHide = (firstPassword) => {
+        if(firstPassword) {
+            if(showPass) setShowPass(false);
+            else setShowPass(true);
+        }
+        else {
+            if(showPass2) setShowPass2(false);
+            else setShowPass2(true);
+        }
+    }
+
     useEffect(() => {
         if(isLoadDisable) {
             setValidated(false);
@@ -355,13 +373,19 @@ const UsersForm = (props) => {
                 <FloatingLabel controlId="floatingPassword1" label="Password" className="mb-3" >
                     <Form.Control 
                         required 
-                        type="password"
+                        type={showPass ? "text" : "password"}
                         onChange={(e) => setField('password1', e.target.value)}
                         autoComplete='new-password'
                         disabled={passwordEnable}
                         value={form.password1}
                         isInvalid={!!errors.password1}
                     />
+
+                    <Icon 
+                        className='showHideBTN'
+                        path={showPass ? mdiEye : mdiEyeOff}
+                        onClick={() => showHide(true)} 
+                        size={1} />
 
                     <Form.Control.Feedback type="invalid">
                         {errors.password1}
@@ -373,13 +397,19 @@ const UsersForm = (props) => {
                 <FloatingLabel controlId="floatingPassword2" label="Confirm Password" className="mb-3" >
                     <Form.Control 
                         required 
-                        type="password"
+                        type={showPass2 ? "text" : "password"}
                         onChange={(e) => setField('password2', e.target.value)}
                         autoComplete='off'
                         value={form.password2}
                         disabled={passwordEnable}
                         isInvalid={!!errors.password2}
                     />
+
+                    <Icon 
+                        className='showHideBTN'
+                        path={showPass2 ? mdiEye : mdiEyeOff}
+                        onClick={() => showHide(false)} 
+                        size={1} />
 
                     <Form.Control.Feedback type="invalid">
                         {errors.password2}

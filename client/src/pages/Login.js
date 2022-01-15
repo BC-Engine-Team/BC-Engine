@@ -1,27 +1,34 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Axios from 'axios'
 import Cookies from 'universal-cookie'
 
+import Icon from '@mdi/react'
+import { mdiEye } from '@mdi/js';
+import { mdiEyeOff } from '@mdi/js';
+
 import NavB from '../components/NavB'
 
 import Form from 'react-bootstrap/Form'
+import InputGroup from 'react-bootstrap/InputGroup'
 import FloatingLabel from 'react-bootstrap/esm/FloatingLabel'
 import Button from 'react-bootstrap/Button'
 import Alert from 'react-bootstrap/Alert'
 
 const Login = () => {
+    const [showPass, setShowPass] = useState(false);
     const [validated, setValidated] = useState(false);
+    const [validationError, setValidationError] = useState(false);
 
     const [InvalidCredential, setInvalidCredential] = useState("");
 
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
 
-    const [errorMessage] = useState({
+    const [errorMessage, setErrorMessage] = useState({
         email: "This field cannot be empty!",
         password: "This field cannot be empty!",
-    })
+    });
 
     const cookies = new Cookies();
 
@@ -29,13 +36,15 @@ const Login = () => {
 
     Axios.defaults.withCredentials = true;
 
-    const handleSubmit = (event) => {
+    const handleSubmit = async (event) => {
         const form = event.currentTarget;
         if (form.checkValidity() === false) {
             event.preventDefault();
             event.stopPropagation();
+            setValidated(true);
         }
         else {
+            setInvalidCredential("");
             event.preventDefault();
             
             let data = {
@@ -43,10 +52,8 @@ const Login = () => {
                 password: password,
             }
 
-            Axios.post(`${process.env.REACT_APP_API}/users/authenticate`, data)
+            await Axios.post(`${process.env.REACT_APP_API}/users/authenticate`, data)
             .then((response) => {
-                console.log(response);
-
                 if(response.data.auth === true) {
 
                     let aToken = response.data.aToken.toString();
@@ -64,12 +71,20 @@ const Login = () => {
                 else
                 {
                     setInvalidCredential("Incorrect email or password.");
+                    setErrorMessage({
+                        email: "This field cannot be empty!",
+                    password: "This field cannot be empty!"
+                    });
                 }
             }).catch((error) => {
 
                 if(error.response){
                     if(error.response.status === 403 || error.response.status === 401){
                         setInvalidCredential("Incorrect email or password.");
+                        setErrorMessage({
+                            email: "This field cannot be empty!",
+                        password: "This field cannot be empty!"
+                        });
                     }
                     else {
                         setInvalidCredential("Could not reach B&C Engine...");
@@ -82,10 +97,35 @@ const Login = () => {
                   }
             });
         }
-
-      setValidated(true);
+        
       return false;
     };
+
+    const showHide = () => {
+        if(showPass) {
+            setShowPass(false);
+        }
+        else {
+            setShowPass(true);
+        }
+    }
+
+    useEffect(() => {
+        if(InvalidCredential !== "" && !validationError) {
+            setValidationError(true)
+            setValidated(false)
+            setErrorMessage({
+                email: "",
+                password: "",
+            })
+        }
+        else if (validationError) {
+            setValidated(true);
+            setValidationError(false);
+        }
+
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+      }, [InvalidCredential]);
 
     return (
         <div>
@@ -114,6 +154,7 @@ const Login = () => {
                                     required
                                     type="email"
                                     value={email}
+                                    isInvalid={validationError}
                                     onChange={(e) => setEmail(e.target.value)}
                                 />
 
@@ -124,13 +165,20 @@ const Login = () => {
                         </Form.Group>
 
                         <Form.Group className="mb-5" controlId="floatingPassword">
-                            <FloatingLabel controlId="floatingPassword" label="Password" className="mb-3" >
+                            <FloatingLabel controlId="floatingPassword" label="Password" className="mb-3 inputWithShowHide" >
                                 <Form.Control 
                                     required 
-                                    type="password" 
+                                    type={showPass ? "text" : "password"} 
                                     value={password} 
+                                    isInvalid={validationError}
                                     onChange={(e) => setPassword(e.target.value)}
                                 />
+
+                                <Icon 
+                                    className='showHideBTN'
+                                    path={showPass ? mdiEye : mdiEyeOff}
+                                    onClick={showHide} 
+                                    size={1} />
 
                                 <Form.Control.Feedback type="invalid">
                                     {errorMessage.password}
