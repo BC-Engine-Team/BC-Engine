@@ -10,7 +10,6 @@ import { mdiEyeOff } from '@mdi/js';
 import NavB from '../components/NavB'
 
 import Form from 'react-bootstrap/Form'
-import InputGroup from 'react-bootstrap/InputGroup'
 import FloatingLabel from 'react-bootstrap/esm/FloatingLabel'
 import Button from 'react-bootstrap/Button'
 import Alert from 'react-bootstrap/Alert'
@@ -31,7 +30,6 @@ const Login = () => {
     });
 
     const cookies = new Cookies();
-
     let navigate = useNavigate();
 
     Axios.defaults.withCredentials = true;
@@ -73,7 +71,7 @@ const Login = () => {
                     setInvalidCredential("Incorrect email or password.");
                     setErrorMessage({
                         email: "This field cannot be empty!",
-                    password: "This field cannot be empty!"
+                        password: "This field cannot be empty!"
                     });
                 }
             }).catch((error) => {
@@ -83,7 +81,7 @@ const Login = () => {
                         setInvalidCredential("Incorrect email or password.");
                         setErrorMessage({
                             email: "This field cannot be empty!",
-                        password: "This field cannot be empty!"
+                            password: "This field cannot be empty!"
                         });
                     }
                     else {
@@ -97,17 +95,13 @@ const Login = () => {
                   }
             });
         }
-        
+
       return false;
     };
 
     const showHide = () => {
-        if(showPass) {
-            setShowPass(false);
-        }
-        else {
-            setShowPass(true);
-        }
+        if(showPass) setShowPass(false);
+        else setShowPass(true);
     }
 
     useEffect(() => {

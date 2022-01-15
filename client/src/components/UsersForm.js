@@ -169,8 +169,6 @@ const UsersForm = (props) => {
         else if(FormTitle === "Confirm creation?") {
             Axios.post(`${process.env.REACT_APP_API}/users/`, data, {headers: header})
             .then((response) => {
-                console.log(response);
-    
                 if(response.status === 200 || response.status === 201) {
                     disableForm();
                 }
@@ -184,7 +182,6 @@ const UsersForm = (props) => {
                     else {
                         console.log(error.response.data.message);
                         setInvalidInput(error.response.data.message);
-                        console.log(InvalidInput);
 
                         handleGoBack();
                     }
