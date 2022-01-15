@@ -34,7 +34,7 @@ const Login = () => {
 
     Axios.defaults.withCredentials = true;
 
-    const handleSubmit = async (event) => {
+    const handleSubmit = (event) => {
         const form = event.currentTarget;
         if (form.checkValidity() === false) {
             event.preventDefault();
@@ -50,7 +50,7 @@ const Login = () => {
                 password: password,
             }
 
-            await Axios.post(`${process.env.REACT_APP_API}/users/authenticate`, data)
+            Axios.post(`${process.env.REACT_APP_API}/users/authenticate`, data)
             .then((response) => {
                 if(response.data.auth === true) {
 
