@@ -95,7 +95,7 @@ describe("Test UserController", () => {
                     }));
 
                 // act
-                const response = await supertest(app).post("/users")
+                const response = await supertest(app).post("/api/users")
                     .send(reqUser);
                 
                 // assert
@@ -122,7 +122,7 @@ describe("Test UserController", () => {
                 };
 
                 // act
-                const response = await request.post("/users")
+                const response = await request.post("/api/users")
                     .send(noEmailReqUser);
 
                 // assert
@@ -144,7 +144,7 @@ describe("Test UserController", () => {
                 };
 
                 // act
-                const response = await request.post("/users")
+                const response = await request.post("/api/users")
                     .send(noPassReqUser);
 
                 // assert
@@ -166,7 +166,7 @@ describe("Test UserController", () => {
                 };
 
                 // act
-                const response = await request.post("/users")
+                const response = await request.post("/api/users")
                     .send(noRoleReqUser);
 
                 // assert
@@ -189,7 +189,7 @@ describe("Test UserController", () => {
                 };
 
                 // act
-                const response = await request.post("/users")
+                const response = await request.post("/api/users")
                     .send(wrongEmailReqUser);
 
                 // assert
@@ -229,7 +229,7 @@ describe("Test UserController", () => {
                 ));
 
                 // act
-                const response = await request.get("/users");
+                const response = await request.get("/api/users");
 
                 // assert
                 expect(response.status).toBe(200);
@@ -253,7 +253,7 @@ describe("Test UserController", () => {
                 });
 
                 // act 
-                const response = await request.get("/users");
+                const response = await request.get("/api/users");
 
                 // assert
                 expect(response.status).toBe(500);
@@ -272,7 +272,7 @@ describe("Test UserController", () => {
                     }));
 
                 // act
-                const response = await request.post("/users/authenticate")
+                const response = await request.post("/api/users/authenticate")
                     .send(reqUser);
 
                 // assert
@@ -294,7 +294,7 @@ describe("Test UserController", () => {
                 authSpy = jest.spyOn(AuthService, 'getTokens');
                 
                 // act
-                const response = await request.post("/users/authenticate").send(reqUser);
+                const response = await request.post("/api/users/authenticate").send(reqUser);
 
                 // assert
                 expect(userSpy).toBeCalledTimes(1);
@@ -313,7 +313,7 @@ describe("Test UserController", () => {
                 authSpy = jest.spyOn(AuthService, 'getTokens');
 
                 // act
-                const response = await request.post("/users/authenticate").send(noEmailReqUser);
+                const response = await request.post("/api/users/authenticate").send(noEmailReqUser);
 
                 // assert
                 expect(response.statusCode).toBe(400);
@@ -331,7 +331,7 @@ describe("Test UserController", () => {
                 authSpy = jest.spyOn(AuthService, 'getTokens');
 
                 // act
-                const response = await request.post("/users/authenticate").send(reqUser);
+                const response = await request.post("/api/users/authenticate").send(reqUser);
 
                 // assert
                 expect(response.statusCode).toBe(500);
@@ -363,7 +363,7 @@ describe("Test UserController", () => {
                 }));
 
                 // act
-                const response = await request.put(`/users/modify/${reqUser.email}`)
+                const response = await request.put(`/api/users/modify/${reqUser.email}`)
                     .send(expectedUserToModifyValid);
 
                 expect(response.status).toBe(200);
@@ -378,7 +378,7 @@ describe("Test UserController", () => {
                 userSpy = jest.spyOn(UserService, "modifyUser");
 
                 // act
-                const response = await supertest(app).put(`/users/modify/someEmail`)
+                const response = await supertest(app).put(`/api/users/modify/someEmail`)
                     .send(modifiedUserInvalid);
 
                 // assert
@@ -410,7 +410,7 @@ describe("Test UserController", () => {
                 });
 
                 // act
-                const response = await request.put(`/users/modify/${expectedUserToModifyValid.email}`)
+                const response = await request.put(`/api/users/modify/${expectedUserToModifyValid.email}`)
                     .send(expectedUserToModifyValid);
 
                 // assert
@@ -434,7 +434,7 @@ describe("Test UserController", () => {
                 }));
 
                 // act
-                const response = await request.delete(`/users/delete/${deletedUser.email}`)
+                const response = await request.delete(`/api/users/delete/${deletedUser.email}`)
                     .send(deletedUser);
 
                 // assert
@@ -466,7 +466,7 @@ describe("Test UserController", () => {
                     resolve(expectedUserToDeleteInvalid);
                 }));
 
-                const response = await supertest(app).delete(`/users/delete/${expectedUserToDelete.email}`)
+                const response = await supertest(app).delete(`/api/users/delete/${expectedUserToDelete.email}`)
                 .set("authorization", "Bearer validToken")
                 .send(expectedUserToDelete);
 
