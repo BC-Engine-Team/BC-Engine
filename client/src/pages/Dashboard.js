@@ -135,7 +135,7 @@ const Dashboard = () => {
                 <div className="justify-content-center main">
                     <div className="container-criteria">
                         <div className="card shadow my-3 mx-3">
-                            <InputGroup className="my-2  px-2">
+                            <InputGroup className="my-2  px-2" id='chartName'>
                                 <FormControl
                                     placeholder="Enter Chart Report Name"
                                     aria-label="Username"

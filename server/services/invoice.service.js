@@ -90,7 +90,10 @@ exports.getBilled = async (startDateStr, endDateStr, yearMonthList) => {
     let billedList = [];
     let startDate = new Date(parseInt(startDateStr.substring(5, 7)) + " " + parseInt(startDateStr.substring(8)) + " " + parseInt(startDateStr.substring(0, 4)));
     let endDate = new Date(parseInt(endDateStr.substring(5, 7)) + " " + parseInt(endDateStr.substring(8)) + " " + parseInt(endDateStr.substring(0, 4)));
-    endDate.setMonth(endDate.getMonth() - 11);
+    endDate.setMonth(endDate.getMonth() - (yearMonthList.length - 1));
+
+    startDate.setUTCHours(0, 0, 0, 0);
+    endDate.setUTCHours(0, 0, 0, 0);
 
     return new Promise(async (resolve, reject) => {
         await InvoiceAffectDao.getInvoicesByDate(startDateStr, endDateStr).then(async data => {
@@ -98,19 +101,30 @@ exports.getBilled = async (startDateStr, endDateStr, yearMonthList) => {
                 yearMonthList.forEach(ym => {
                     let billed = 0;
 
+
+
+                    console.log(startDate)
+                    console.log(endDate)
+                    console.log()
+
+                    let counter = 0;
+
                     data.forEach(i => {
                         if (i['INVOCIE_DATE'] >= startDate && i['INVOCIE_DATE'] < endDate) {
                             billed += i['AFFECT_AMOUNT'];
+                            counter++;
                         }
                     });
+
+                    console.log(counter);
 
                     billedList.push({
                         month: ym,
                         billed: billed
                     });
 
-                    startDate.setMonth(startDate.getMonth() + 1);
-                    endDate.setMonth(endDate.getMonth() + 1);
+                    startDate.setUTCMonth(startDate.getUTCMonth() + 1);
+                    endDate.setUTCMonth(endDate.getUTCMonth() + 1);
                 });
                 resolve(billedList);
             }
