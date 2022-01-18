@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
-import { InputGroup, FormControl, Button } from 'react-bootstrap'
+import { InputGroup, FormControl, Button, Form } from 'react-bootstrap'
 import Axios from 'axios';
 import Cookies from 'universal-cookie';
 import NavB from '../components/NavB';
@@ -31,6 +31,7 @@ const Dashboard = () => {
 
     let months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
     let label = ""
+
     const fallbackChartData = {
         labels: months,
         datasets: [
@@ -45,6 +46,13 @@ const Dashboard = () => {
     const [chartData, setChartData] = useState(fallbackChartData);
     const [preparedChartData, setPreparedChartData] = useState();
     const [authorized, setAuthorized] = useState(false);
+
+    const [employeeSelect, SetEmployeeSelect] = useState([
+        { value: "hello", label: "hello" },
+        { value: "hello", label: "hello" },
+        { value: "hello", label: "hello" },
+        { value: "hello", label: "hello" },
+    ]);
 
     const chart = async () => {
         let averages = [];
@@ -165,18 +173,41 @@ const Dashboard = () => {
             <div className='mainContainer mainDiv'>
                 <div className="justify-content-center main">
                     <div className="container-criteria">
-                        <div className="card shadow my-3 mx-3">
-                            <InputGroup className="my-2  px-2" id='chartName'>
+                        <div className="card shadow m-3 p-3">
+
+                            <InputGroup className="my-2" id='chartName'>
                                 <FormControl
+                                    className="w-100 my-1"
                                     placeholder="Enter Chart Report Name"
                                     aria-label="Username"
                                     aria-describedby="basic-addon1"
                                 />
                             </InputGroup>
+
+                            <InputGroup className="my-2">
+                                <FormControl as="select">
+                                    <option value="All">All</option>
+                                    {employeeSelect.map(e => {
+                                        return (
+                                            <option value={e.value}>{e.label}</option>
+                                        )
+                                    })}
+                                </FormControl>
+
+                                <Button 
+                                    id="compareToAllBTN" 
+                                    variant="light" 
+                                    className="btn btn-light shadow-sm border inputSelect ms-1">
+                                    Compare
+                                </Button>
+                            </InputGroup>
+                            
                             <Button
                                 onClick={loadChartData}
-                                className='my-2 mx-2'
-                                variant='primary'>Load Chart</Button>
+                                className='my-2'
+                                variant='primary'>
+                                Load Chart
+                            </Button>
                         </div>
                     </div>
                     <div className="container-chart">

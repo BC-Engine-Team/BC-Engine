@@ -20,10 +20,20 @@ html {
   background-color: lightgrey;
 }
 
-input, select {
+input, select, button {
   border-radius: 0.7rem !important;
 }
 
 .form-check-input {
   border-radius: 0.25rem !important;
+}
+
+.inputSelect {
+  border-radius: 0.7rem !important;
+  border-color: rgb(206, 212, 218);
+  max-width: min-content
+}
+
+.inputSelect:hover {
+  background-color: rgb(211, 211, 211);
 }
