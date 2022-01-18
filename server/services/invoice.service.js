@@ -101,12 +101,6 @@ exports.getBilled = async (startDateStr, endDateStr, yearMonthList) => {
                 yearMonthList.forEach(ym => {
                     let billed = 0;
 
-
-
-                    console.log(startDate)
-                    console.log(endDate)
-                    console.log()
-
                     let counter = 0;
 
                     data.forEach(i => {
@@ -115,8 +109,6 @@ exports.getBilled = async (startDateStr, endDateStr, yearMonthList) => {
                             counter++;
                         }
                     });
-
-                    console.log(counter);
 
                     billedList.push({
                         month: ym,

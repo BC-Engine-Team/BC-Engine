@@ -48,6 +48,7 @@ const Dashboard = () => {
 
     const chart = async () => {
         let averages = [];
+        let datasets = [];
 
         let header = {
             'authorization': "Bearer " + cookies.get("accessToken"),
@@ -64,27 +65,57 @@ const Dashboard = () => {
                     setAuthorized(false);
                     return;
                 }
-
                 setAuthorized(true);
-                months = [];
+
+                let data = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+                let red = 127;
+                let green = 128;
+                let blue = 203;
+                let color = 'rgb(' + red + ',' + green + ',' + blue + ')';
+
+                let previousYear = parseInt(res.data[0].month.toString().substring(0, 4));
+
+                console.log(datasets);
+                //months = [];
                 for (let i = 0; i < res.data.length; i++) {
-                    let year = res.data[i].month.toString().substring(0, 4);
-                    let month = res.data[i].month.toString().substring(4);
-                    months.push(year + "-" + month);
-                    averages.push(parseFloat(res.data[i].average));
+                    let year = parseInt(res.data[i].month.toString().substring(0, 4));
+                    let month = parseInt(res.data[i].month.toString().substring(4));
+                    let average = parseFloat(res.data[i].average);
+
+                    if (year !== previousYear || res.data[i].month === res.data[res.data.length - 1].month) {
+                        if (res.data[i].month === res.data[res.data.length - 1].month) {
+                            for (let x = 0; x < data.length; x++) {
+                                if ((month - 1) === x) {
+                                    data[x] = average;
+                                }
+                            }
+                        }
+                        red = Math.floor((Math.random() * 255) + 1);
+                        green = Math.floor((Math.random() * 255) + 1);
+                        blue = Math.floor((Math.random() * 255) + 1);
+                        color = 'rgb(' + red + ',' + green + ',' + blue + ')';
+                        label = previousYear;
+                        datasets.push({
+                            label: label,
+                            data: data,
+                            backgroundColor: color
+                        });
+                        previousYear = year;
+                        data = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+                    }
+
+                    for (let x = 0; x < data.length; x++) {
+                        if ((month - 1) === x) {
+                            data[x] = average;
+                        }
+                    }
                 }
 
                 setPreparedChartData(averages);
 
                 setChartData({
                     labels: months,
-                    datasets: [
-                        {
-                            label: label,
-                            data: averages,
-                            backgroundColor: 'rgb(127, 128, 203)'
-                        }
-                    ]
+                    datasets: datasets
                 });
             })
             .catch((error) => {
@@ -131,7 +162,7 @@ const Dashboard = () => {
     return (
         <div>
             <NavB />
-            <div className='d-flex realMain'>
+            <div className='mainContainer mainDiv'>
                 <div className="justify-content-center main">
                     <div className="container-criteria">
                         <div className="card shadow my-3 mx-3">
@@ -187,7 +218,7 @@ const Dashboard = () => {
                                                 }
                                             },
                                             legend: {
-                                                display: false,
+                                                display: true,
                                                 position: 'right'
                                             }
                                         }
