@@ -1,4 +1,5 @@
 const EmpDAO = require("../data_access_layer/daos/emp.dao");
+const NameDAO = require("../data_access_layer/daos/name.dao");
 
 exports.checkEmail = async (req, res, next) => {
     EmpDAO.getEmployeeByEmail(req.body.email).then(async data => {
@@ -23,3 +24,41 @@ exports.checkEmail = async (req, res, next) => {
     })
     
 };
+
+exports.getAllEmployees = async () => {
+    listEmployees = [];
+    listEmployeesWithNameID = []
+
+    return new Promise(async (resolve, reject) => {
+        await EmpDAO.getAllEmployees()
+            .then(async data => {
+                if(data) {
+                    listEmployees = data;
+                }
+                else {
+                    resolve("Could not get all employees.");
+                }
+            })
+            .catch(err => {
+                reject(err);
+            });
+
+        await listEmployees.forEach(e => {
+           NameDAO.getEmployeeByName(e.firstName, e.lastName)
+                .then(async data => {
+                    if(data) {
+                        listEmployeesWithNameID.push(data.dataValues);
+                        if(listEmployees.length === listEmployeesWithNameID.length) {
+                            resolve(listEmployeesWithNameID);
+                        }
+                    }
+                    else {
+                        resolve("Could not get all employees.");
+                    }
+                })
+                .catch(err => {
+                    reject(err);
+                });
+        });
+    });
+}

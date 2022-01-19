@@ -123,7 +123,6 @@ exports.getBilled = async (startDateStr, endDateStr, yearMonthList) => {
             resolve(false);
         }).catch(err => {
             reject(err.message);
-        })
+        });
     });
 }
-

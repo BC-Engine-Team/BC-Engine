@@ -73,4 +73,3 @@ exports.logout = async (req, res) => {
 exports.setRefreshTokens = (rToken) => {
   refreshTokens = [rToken];
 };
-

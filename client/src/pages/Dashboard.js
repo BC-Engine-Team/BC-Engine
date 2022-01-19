@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
-import { InputGroup, FormControl, Button, Form } from 'react-bootstrap'
+import { InputGroup, FormControl, Button } from 'react-bootstrap'
 import Axios from 'axios';
 import Cookies from 'universal-cookie';
 import NavB from '../components/NavB';
@@ -47,12 +47,34 @@ const Dashboard = () => {
     const [preparedChartData, setPreparedChartData] = useState();
     const [authorized, setAuthorized] = useState(false);
 
-    const [employeeSelect, SetEmployeeSelect] = useState([
-        { value: "hello", label: "hello" },
-        { value: "hello", label: "hello" },
-        { value: "hello", label: "hello" },
-        { value: "hello", label: "hello" },
-    ]);
+    const [employeeSelect, SetEmployeeSelect] = useState([]);
+
+    const createEmployeeCriteria = async () => {
+        let listEmployee = [];
+
+        let header = {
+            'authorization': "Bearer " + cookies.get("accessToken"),
+        }
+
+        await Axios.get(`${process.env.REACT_APP_API}/invoice/employees`, { headers: header })
+            .then((res) => {
+                if (res.status === 403 && res.status === 401) {
+                    setAuthorized(false);
+                    return;
+                }
+                setAuthorized(true);
+
+                for(let i = 0; i < res.data.length; i++) {
+
+                    listEmployee.push({
+                        label: res.data[i].firstName + " " + res.data[i].lastName,
+                        value: res.data[i].nameID
+                    });
+                }
+
+                SetEmployeeSelect(listEmployee);
+            })
+    }
 
     const chart = async () => {
         let averages = [];
@@ -82,8 +104,7 @@ const Dashboard = () => {
                 let color = 'rgb(' + red + ',' + green + ',' + blue + ')';
 
                 let previousYear = parseInt(res.data[0].month.toString().substring(0, 4));
-
-                console.log(datasets);
+                
                 //months = [];
                 for (let i = 0; i < res.data.length; i++) {
                     let year = parseInt(res.data[i].month.toString().substring(0, 4));
@@ -150,6 +171,7 @@ const Dashboard = () => {
         }
 
         chart();
+        createEmployeeCriteria()
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);

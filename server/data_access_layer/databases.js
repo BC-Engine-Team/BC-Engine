@@ -30,14 +30,18 @@ for (let i = 0; i < databases.length; i++) {
 db.Sequelize = Sequelize;
 
 // Add any tables to the database here
+// Local database tables
 db['localdb'].users = require("./models/localdb/user.model")(db['localdb'], Sequelize);
+
+// Patricia database tables
 db['mssql_pat'].employees = require("./models/mssql_pat/employee.model")(db['mssql_pat'], Sequelize);
 db['mssql_pat'].invoice_header = require("./models/mssql_pat/invoice_header.model")(db['mssql_pat'], Sequelize);
 db['mssql_pat'].invoice_affect = require("./models/mssql_pat/invoice_affect.model")(db['mssql_pat'], Sequelize);
 
-//bosco database tables
+// Bosco database tables
 db['mssql_bosco'].transactions = require("./models/mssql_bosco/accounting_client.model")(db['mssql_bosco'], Sequelize);
 db['mssql_bosco'].transactions_stat = require("./models/mssql_bosco/accounting_client_stat.model")(db['mssql_bosco'], Sequelize);
+db['mssql_bosco'].nameEmployee = require("./models/mssql_bosco/name.model")(db['mssql_bosco'], Sequelize);
 
 
 db.sync = async (database, options) => {

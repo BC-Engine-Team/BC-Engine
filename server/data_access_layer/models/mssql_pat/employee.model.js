@@ -9,9 +9,12 @@ module.exports = (mssql_pat, DataTypes) => {
             type: DataTypes.STRING
         },
         email: {
-            primaryKey: true,
             field: 'EMAIL',
             type: DataTypes.STRING
+        },
+        isActive: {
+            field: 'IS_ACTIV',
+            type: DataTypes.BOOLEAN
         }
     },
     {
