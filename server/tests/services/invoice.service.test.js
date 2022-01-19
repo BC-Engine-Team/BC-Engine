@@ -62,16 +62,16 @@ let fakeTransacStatList = [
 
 let fakeInvoiceAffectList = [
     {
-        INVOCIE_DATE: new Date(2020, 9, 15),
-        AFFECT_AMOUNT: 50
+        invoiceDate: new Date(2020, 9, 15),
+        amount: 50
     },
     {
-        INVOCIE_DATE: new Date(2020, 10, 15),
-        AFFECT_AMOUNT: 50
+        invoiceDate: new Date(2020, 10, 15),
+        amount: 50
     },
     {
-        INVOCIE_DATE: new Date(2020, 11, 15),
-        AFFECT_AMOUNT: 50
+        invoiceDate: new Date(2020, 11, 15),
+        amount: 50
     }
 ];
 

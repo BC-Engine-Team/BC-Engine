@@ -105,8 +105,8 @@ exports.getBilled = async (startDateStr, endDateStr, yearMonthList) => {
                     let billed = 0;
 
                     data.forEach(i => {
-                        if (i['INVOCIE_DATE'] >= startDate && i['INVOCIE_DATE'] < endDate) {
-                            billed += i['AFFECT_AMOUNT'];
+                        if (i.invoiceDate >= startDate && i.invoiceDate < endDate) {
+                            billed += i.amount;
                         }
                     });
 
