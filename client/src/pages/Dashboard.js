@@ -47,7 +47,6 @@ const Dashboard = () => {
     const [authorized, setAuthorized] = useState(false);
 
     const chart = async () => {
-        let averages = [];
         let datasets = [];
 
         let header = {
@@ -75,8 +74,6 @@ const Dashboard = () => {
 
                 let previousYear = parseInt(res.data[0].month.toString().substring(0, 4));
 
-                console.log(datasets);
-                //months = [];
                 for (let i = 0; i < res.data.length; i++) {
                     let year = parseInt(res.data[i].month.toString().substring(0, 4));
                     let month = parseInt(res.data[i].month.toString().substring(4));
@@ -111,7 +108,7 @@ const Dashboard = () => {
                     }
                 }
 
-                setPreparedChartData(averages);
+                setPreparedChartData(datasets);
 
                 setChartData({
                     labels: months,
@@ -147,16 +144,13 @@ const Dashboard = () => {
     }, []);
 
     const loadChartData = () => {
-        setChartData({
-            labels: months,
-            datasets: [
-                {
-                    label: label,
-                    data: preparedChartData,
-                    backgroundColor: 'rgb(127, 128, 203)'
-                }
-            ]
-        })
+        if (preparedChartData) {
+            setChartData({
+                labels: months,
+                datasets: preparedChartData
+            });
+        }
+
     }
 
     return (
