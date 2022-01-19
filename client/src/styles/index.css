@@ -20,12 +20,16 @@ html {
   background-color: lightgrey;
 }
 
-input, select, button {
+input, select, button{
   border-radius: 0.7rem !important;
 }
 
 .form-check-input {
   border-radius: 0.25rem !important;
+}
+
+.form-switch .form-check-input {
+  border-radius: 0.7rem !important;
 }
 
 .inputSelect {
@@ -35,5 +39,11 @@ input, select, button {
 }
 
 .inputSelect:hover {
-  background-color: rgb(211, 211, 211);
+  background-color: rgb(228, 228, 228);
+}
+
+@media (max-width: 768px) {
+  .navBarGreeting {
+    display: none;
+  } 
 }

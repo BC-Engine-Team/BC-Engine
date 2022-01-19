@@ -27,19 +27,8 @@ const NavB = (props) => {
     const logout = () => {
         let refreshToken = cookies.get("refreshToken");
 
-        if (refreshToken === undefined) {
-            cookies.remove("refreshToken");
-            cookies.remove("accessToken");
-            cookies.remove("username");
-            cookies.remove("role");
-            navigate("/login");
-        }
-        else {
-            navigate("/login");
-            cookies.remove("refreshToken");
-            cookies.remove("accessToken");
-            cookies.remove("username");
-            cookies.remove("role");
+        if (refreshToken !== undefined) {
+            
             let conf = {
                 headers: {
                     authorization: "Bearer " + refreshToken
@@ -50,11 +39,7 @@ const NavB = (props) => {
                 .then((response) => {
 
                     if (response.status === 204) {
-                        cookies.remove("refreshToken");
-                        cookies.remove("accessToken");
-                        cookies.remove("username");
-                        cookies.remove("role");
-                        navigate("/login");
+                       console.log("Successfully logged out!")
                     }
                 })
                 .catch((error) => {
@@ -69,13 +54,14 @@ const NavB = (props) => {
                     else if (error.request) {
                         console.log("Could not reach b&C Engine...");
                     }
-                    cookies.remove("refreshToken");
-                    cookies.remove("accessToken");
-                    cookies.remove("username");
-                    cookies.remove("role");
-                    navigate("/login");
                 });
         }
+
+        navigate("/login");
+        cookies.remove("refreshToken");
+        cookies.remove("accessToken");
+        cookies.remove("username");
+        cookies.remove("role");
     }
 
     //For Login page navBar
@@ -142,10 +128,10 @@ const NavB = (props) => {
                         }
 
                         <Nav className="justify-content-end">
-                            <Navbar.Text className="me-3">
+                            <Navbar.Text className="px-2 me-1 navBarGreeting">
                                 Hello, {username}
                             </Navbar.Text>
-                            <Nav.Link id="sign_out" onClick={logout}>Sign out</Nav.Link>
+                            <Nav.Link className="px-2" id="sign_out" onClick={logout}>Sign out</Nav.Link>
                         </Nav>
 
                     </Navbar.Collapse>

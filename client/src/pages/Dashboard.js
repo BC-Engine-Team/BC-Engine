@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
-import { InputGroup, FormControl, Button } from 'react-bootstrap'
+import { InputGroup, FormControl, FormLabel, Button, OverlayTrigger, Tooltip as ToolTipBootstrap, FormCheck } from 'react-bootstrap'
 import Axios from 'axios';
 import Cookies from 'universal-cookie';
 import NavB from '../components/NavB';
@@ -26,6 +26,8 @@ ChartJS.register(
 );
 
 const Dashboard = () => {
+
+    let counter = 1;
     let navigate = useNavigate();
     const cookies = new Cookies();
 
@@ -48,6 +50,13 @@ const Dashboard = () => {
     const [authorized, setAuthorized] = useState(false);
 
     const [employeeSelect, SetEmployeeSelect] = useState([]);
+
+    // Criteria
+    const [compareEmployeeChecked, setCompareEmployeeChecked] = useState(false);
+    const [employeeCriteria, SetEmployeeCriteria] = useState({
+        id: "All",
+        name: "All"
+    });
 
     const createEmployeeCriteria = async () => {
         let listEmployee = [];
@@ -104,7 +113,7 @@ const Dashboard = () => {
                 let color = 'rgb(' + red + ',' + green + ',' + blue + ')';
 
                 let previousYear = parseInt(res.data[0].month.toString().substring(0, 4));
-                
+
                 //months = [];
                 for (let i = 0; i < res.data.length; i++) {
                     let year = parseInt(res.data[i].month.toString().substring(0, 4));
@@ -196,32 +205,85 @@ const Dashboard = () => {
                 <div className="justify-content-center main">
                     <div className="container-criteria">
                         <div className="card shadow m-3 p-3">
+                            <h3 className="text-center">Chart Criteria</h3>
 
                             <InputGroup className="my-2" id='chartName'>
                                 <FormControl
-                                    className="w-100 my-1"
+                                    className="my-1"
                                     placeholder="Enter Chart Report Name"
                                     aria-label="Username"
                                     aria-describedby="basic-addon1"
                                 />
                             </InputGroup>
 
-                            <InputGroup className="my-2">
-                                <FormControl as="select">
-                                    <option value="All">All</option>
-                                    {employeeSelect.map(e => {
-                                        return (
-                                            <option value={e.value}>{e.label}</option>
-                                        )
-                                    })}
-                                </FormControl>
+                            <FormLabel htmlFor="inputPassword5" className="ms-1">Employee</FormLabel>
+                            <InputGroup className="mb-2">
+                                {
+                                employeeCriteria.name === undefined || employeeCriteria.name === "All" 
+                                ? 
+                                    <FormControl id="employeeCriteriaDashboard" as="select" onChange={e => SetEmployeeCriteria({
+                                            id: e.target.value.split("/")[0], 
+                                            name: e.target.value.split("/")[1]
+                                        })}>
 
-                                <Button 
-                                    id="compareToAllBTN" 
-                                    variant="light" 
-                                    className="btn btn-light shadow-sm border inputSelect ms-1">
-                                    Compare
-                                </Button>
+                                        <option key="1" value="All/All">All</option>
+                                        {employeeSelect.map(e => {
+                                            counter++
+                                            return (
+                                                <option key={counter} value={e.value + "/" + e.label}>{e.label}</option>
+                                            )
+                                        })}
+                                    </FormControl>
+                                : 
+                                    <OverlayTrigger
+                                        placement="top"
+                                        overlay={
+                                            <ToolTipBootstrap id="compareBTN-tooltip">
+                                                {employeeCriteria.name}
+                                            </ToolTipBootstrap>
+                                        } >
+
+                                        <FormControl id="employeeCriteriaDashboard"s as="select" onChange={e => SetEmployeeCriteria({
+                                                id: e.target.value.split("/")[0], 
+                                                name: e.target.value.split("/")[1]
+                                            })}>
+
+                                            <option key="1" value="All/All">All</option>
+                                            {employeeSelect.map(e => {
+                                                counter++
+                                                return (
+                                                    <option key={counter} value={e.value + "/" + e.label}>{e.label}</option>
+                                                )
+                                            })}
+                                        </FormControl>
+                                    </OverlayTrigger>
+                                }
+
+                                <OverlayTrigger
+                                    placement="top"
+                                    overlay={
+                                        <ToolTipBootstrap id="compareBTN-tooltip">
+                                            Compare selected employee with all employees
+                                        </ToolTipBootstrap>
+                                    } >
+
+                                    <Button 
+                                        id="compareToAllBTN" 
+                                        variant="light" 
+                                        disabled={employeeCriteria.id === "All"}
+                                        onClick={() => setCompareEmployeeChecked(!compareEmployeeChecked)}
+                                        className="btn btn-light shadow-sm border inputSelect ms-1">
+
+                                            <FormCheck 
+                                            type="switch" 
+                                            label="Compare"
+                                            disabled={employeeCriteria.id === "All"}
+                                            checked={compareEmployeeChecked}
+                                            />
+                                    </Button>
+                                </OverlayTrigger>
+
+                                
                             </InputGroup>
                             
                             <Button
@@ -268,7 +330,8 @@ const Dashboard = () => {
                                                 text: 'Average Collection Days over Time',
                                                 font: {
                                                     size: 20
-                                                }
+                                                },
+                                                color: 'black'
                                             },
                                             legend: {
                                                 display: true,
