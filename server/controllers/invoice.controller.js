@@ -1,18 +1,24 @@
 const invoiceService = require('../services/invoice.service');
 
 exports.getAverages = async (req, res) => {
-    if (req.user.role !== "admin") return res.status(403).send();
+    let regexDateStr = /^\d{4}-\d{2}-\d{2}$/;
+    let regexDate = new RegExp(regexDateStr);
+
     if (!req.params.startDate || !req.params.endDate)
-        return res.status(400).send("Content cannot be empty.");
+        return res.status(400).send({ message: "Content cannot be empty." });
+
+    if (!regexDate.test(req.params.startDate) || !regexDate.test(req.params.endDate))
+        return res.status(400).send({ message: "Wrong format." });
+
 
     await invoiceService.getAverages(req.params.startDate, req.params.endDate)
         .then(response => {
             if (response) {
                 return res.status(200).send(response);
             }
-            return res.status(404).send("The data could not be fetched.");
+            return res.status(500).send({ message: "The data could not be fetched." });
         })
         .catch(err => {
-            return res.status(500).send(err.message);
+            return res.status(500).send({ message: err.message });
         });
 }
