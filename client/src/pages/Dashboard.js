@@ -62,8 +62,8 @@ const Dashboard = () => {
         }
 
         const dates = {
-            startDate: "2016-05-01",
-            endDate: "2020-11-01"
+            startDate: "2017-01-01",
+            endDate: "2020-12-01"
         };
 
         await Axios.get(`${process.env.REACT_APP_API}/invoice/defaultChartAndTable/${dates.startDate}/${dates.endDate}`, { headers: header })
@@ -93,8 +93,6 @@ const Dashboard = () => {
                                 }
                             }
                         }
-
-                        console.log(colorCounter)
 
                         color = colors[colorCounter];
 
