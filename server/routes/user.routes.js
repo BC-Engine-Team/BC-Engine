@@ -7,7 +7,7 @@ const empService = require('../services/emp.service');
 // Create new User
 router.post("/", authService.authenticateToken, empService.checkEmail, userController.create);
 
-// Fetch all users with authentication
+// Fetch all users
 router.get("/", authService.authenticateToken, userController.findAll);
 
 // Authenticate user
