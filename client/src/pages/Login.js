@@ -181,6 +181,7 @@ const Login = () => {
 
                         <div className="d-flex justify-content-center mt-5 mb-4">
                             <Button
+                                id='loginButton'
                                 type="submit"
                                 className="btn btn-light py-2 px-5 my-1 shadow-sm border submitButton">
                                 Login

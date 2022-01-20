@@ -168,8 +168,9 @@ const Dashboard = () => {
                 <div className="justify-content-center main">
                     <div className="container-criteria">
                         <div className="card shadow my-3 mx-3">
-                            <InputGroup className="my-2  px-2" id='chartName'>
+                            <InputGroup className="my-2  px-2" >
                                 <FormControl
+                                    id='chartName'
                                     placeholder="Enter Chart Report Name"
                                     aria-label="Username"
                                     aria-describedby="basic-addon1"
@@ -185,6 +186,7 @@ const Dashboard = () => {
                         <div className="card shadow my-3 mx-3">
                             {chartData &&
                                 <Bar
+                                    id='chart'
                                     data={chartData.datasets.length === 0 || authorized === false ? fallbackChartData : chartData}
 
                                     options={{
