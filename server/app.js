@@ -3,22 +3,23 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const logger = require('morgan');
 const userRoutes = require('./routes/user.routes');
-require("../config.js")
+const invoiceRoutes = require('./routes/invoice.routes');
+require("../config.js");
 
 module.exports = (database) => {
   const app = express();
 
   app.use(express.static(path.resolve(__dirname, '../client/build')));
   app.use(bodyParser.json());
-  app.use(bodyParser.urlencoded({extended: true}));
+  app.use(bodyParser.urlencoded({ extended: true }));
   app.use(logger('dev'));
-  
+
   // Initializing Sequelize (ORM) to create users table and fill it
-  if(database){
+  if (database) {
     database.sync('localdb');
   }
 
-  app.use(function(req, res, next) {
+  app.use(function (req, res, next) {
     res.header('Access-Control-Allow-Origin', "http://localhost:3000");
     res.header('Access-Control-Allow-Credentials', true);
     res.header('Access-Control-Allow-Methods', 'DELETE, PUT, POST, GET, OPTIONS, HEAD');
@@ -36,11 +37,12 @@ module.exports = (database) => {
   });
 
   // User routes CRUD
+  app.use('/api/invoice', invoiceRoutes);
   app.use('/api/users', userRoutes);
 
-  // Handles page refresh on the client side 
+  // Handles page refresh on the client side
   // (view index.hmtl and 404.html located in the client/public folder)
-  app.use(function(req, res) {
+  app.use(function (req, res) {
     res.sendFile(path.resolve(__dirname, '../client/public/404.html'));
   });
 

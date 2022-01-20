@@ -1,6 +1,5 @@
 import Icon from '@mdi/react'
-import { mdiDeleteEmpty } from '@mdi/js';
-import { mdiDelete } from '@mdi/js';
+import { mdiDeleteEmpty, mdiDelete } from '@mdi/js';
 
 const DeleteButton = ({ onDelete }) => {
     return (

@@ -19,7 +19,16 @@ exports.getAllUsers = async () => {
     return new Promise((resolve, reject) => {
         UserDAO.getAllUsers()
             .then(async data => {
-                if(data) resolve(data);
+                if(data) {
+
+                    // Puts users in alphabetical order for the users table
+                    let sortedUser = data.sort((a, b) => {
+                        let userA = a.name.toUpperCase();
+                        let userB = b.name.toUpperCase();
+                        return (userA < userB) ? -1 : (userA > userB) ? 1 : 0;
+                    });
+                    resolve(sortedUser);
+                }
                 resolve("Could not get all users.");
             })
             .catch(err => {

@@ -1,6 +1,5 @@
 import Icon from '@mdi/react'
-import { mdiPencil } from '@mdi/js';
-import { mdiPencilOutline } from '@mdi/js';
+import { mdiPencil, mdiPencilOutline } from '@mdi/js';
 
 const EditButton = ({ onEdit }) => {
     return (

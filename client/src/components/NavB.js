@@ -31,7 +31,7 @@ const NavB = (props) => {
             cookies.remove("refreshToken");
             cookies.remove("accessToken");
             cookies.remove("username");
-            cookies.remove("role"); 
+            cookies.remove("role");
             navigate("/login");
         }
         else {
@@ -45,36 +45,51 @@ const NavB = (props) => {
                     authorization: "Bearer " + refreshToken
                 }
             };
-    
-            Axios.delete(`${process.env.REACT_APP_API}/users/logout`, conf)
-            .then((response) => {
 
-                if(response.status === 204) {     
+            Axios.delete(`${process.env.REACT_APP_API}/users/logout`, conf)
+                .then((response) => {
+
+                    if (response.status === 204) {
+                        cookies.remove("refreshToken");
+                        cookies.remove("accessToken");
+                        cookies.remove("username");
+                        cookies.remove("role");
+                        navigate("/login");
+                    }
+                })
+                .catch((error) => {
+                    if (error.response) {
+                        if (error.response.status === 403 || error.response.status === 401) {
+                            console.log(error.response.status);
+                        }
+                        else {
+                            console.log("Malfunction in the B&C Engine...");
+                        }
+                    }
+                    else if (error.request) {
+                        console.log("Could not reach b&C Engine...");
+                    }
                     cookies.remove("refreshToken");
                     cookies.remove("accessToken");
                     cookies.remove("username");
                     cookies.remove("role");
                     navigate("/login");
-                }       
-            })
-            .catch((error) => {
-                console.log(error);
-            });
+                });
         }
     }
 
     //For Login page navBar
-    if(page.page === "login") {
+    if (page.page === "login") {
         return (
             <Navbar variant="dark" bg="dark" className="mb-2">
                 <Container fluid className="justify-content-center">
                     <Navbar.Brand>
                         <img
-                            alt="logo" 
-                            src={logo} 
-                            width="30" 
-                            height="30" 
-                            className="d-inline-block align-top" 
+                            alt="logo"
+                            src={logo}
+                            width="30"
+                            height="30"
+                            className="d-inline-block align-top"
                         />
                         {' '} B&C Engine
                     </Navbar.Brand>
@@ -100,30 +115,30 @@ const NavB = (props) => {
                     <Navbar.Collapse id="basic-navbar-nav">
 
                         { // if user is admin, show all tabs else, show only dsahboard and reports
-                        role === "admin" ?
-                            <Nav className="me-auto">
-                                <LinkContainer to="/dashboard" className="px-2">
-                                    <Nav.Link>Dashboard</Nav.Link>
-                                </LinkContainer>
-                                <LinkContainer to="/reports" className="px-2">
-                                    <Nav.Link>Reports</Nav.Link>
-                                </LinkContainer>
-                                <LinkContainer to="/users" className="px-2">
-                                    <Nav.Link>Users</Nav.Link>
-                                </LinkContainer>
-                                <LinkContainer to="/manage" className="px-2">
-                                    <Nav.Link>Manage</Nav.Link>
-                                </LinkContainer>
-                            </Nav> 
-                            :
-                            <Nav className="me-auto">
-                                <LinkContainer to="/dashboard" className="px-2">
-                                    <Nav.Link>Dashboard</Nav.Link>
-                                </LinkContainer>
-                                <LinkContainer to="/reports" className="px-2">
-                                    <Nav.Link>Reports</Nav.Link>
-                                </LinkContainer>
-                            </Nav>
+                            role === "admin" ?
+                                <Nav className="me-auto">
+                                    <LinkContainer to="/dashboard" className="px-2">
+                                        <Nav.Link>Dashboard</Nav.Link>
+                                    </LinkContainer>
+                                    <LinkContainer to="/reports" className="px-2">
+                                        <Nav.Link>Reports</Nav.Link>
+                                    </LinkContainer>
+                                    <LinkContainer to="/users" className="px-2">
+                                        <Nav.Link>Users</Nav.Link>
+                                    </LinkContainer>
+                                    <LinkContainer to="/manage" className="px-2">
+                                        <Nav.Link>Manage</Nav.Link>
+                                    </LinkContainer>
+                                </Nav>
+                                :
+                                <Nav className="me-auto">
+                                    <LinkContainer to="/dashboard" className="px-2">
+                                        <Nav.Link>Dashboard</Nav.Link>
+                                    </LinkContainer>
+                                    <LinkContainer to="/reports" className="px-2">
+                                        <Nav.Link>Reports</Nav.Link>
+                                    </LinkContainer>
+                                </Nav>
                         }
 
                         <Nav className="justify-content-end">

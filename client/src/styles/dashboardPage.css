@@ -1,0 +1,36 @@
+.container-chart {
+  width: 75%;
+  float: left;
+}
+
+.container-criteria {
+    width: 25%;
+    float: left;
+}
+
+.chart {
+    height: 600px;
+    position: relative;
+}
+
+.main {
+  flex-flow: row wrap;
+  display: flex;
+  width: 100%;
+  max-width: 2100px;
+  justify-self: center;
+}
+
+.mainDiv {
+  justify-content: center;
+}
+
+@media all and (max-width: 1000px) {
+  .main {
+    flex-direction: column;
+  }
+  .container-chart, 
+  .container-criteria {
+    width: 100%;
+  }
+}
