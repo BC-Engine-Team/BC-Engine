@@ -98,6 +98,19 @@ i18n
                             ViewButton: 'View Subordinates'
                         }
                     },
+                    reports: {
+                        chartReports: {
+                            Name: 'NAME OF REPORT',
+                            Employee: 'EMPLOYEE CRITERIA',
+                            ClientType: 'CLIENT TYPE',
+                            Country: 'COUNTRY',
+                            AgeOfAccount: 'AGE OF ACCOUNT',
+                            AccountType: 'ACCOUNT TYPE',
+                            StartDate: 'START DATE',
+                            EndDate: 'END DATE',
+                            LoadButton: 'Load'
+                        }
+                    },
                     form: {
                         Password: 'Password',
                         ConfirmPassword: 'Confirm Password',
@@ -193,6 +206,19 @@ i18n
                                 Type2: 'Subalterne'
                             },
                             ViewButton: 'Voir les subalternes'
+                        }
+                    },
+                    reports: {
+                        chartReports: {
+                            Name: 'NOM DU RAPPORT',
+                            Employee: 'EMPLOYÉ',
+                            ClientType: 'TYPE DE CLIENT',
+                            Country: 'PAYS',
+                            AgeOfAccount: 'AGE DU COMPTE',
+                            AccountType: 'TYPE DU COMPTE',
+                            StartDate: 'DATE DE DÉBUT',
+                            EndDate: 'DATE DE FIN',
+                            LoadButton: 'Charger'
                         }
                     },
                     form : {
