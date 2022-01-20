@@ -218,32 +218,17 @@ const Dashboard = () => {
 
                             <FormLabel htmlFor="inputPassword5" className="ms-1">Employee</FormLabel>
                             <InputGroup className="mb-2">
-                                {
-                                employeeCriteria.name === undefined || employeeCriteria.name === "All" 
-                                ? 
-                                    <FormControl id="employeeCriteriaDashboard" as="select" onChange={e => SetEmployeeCriteria({
-                                            id: e.target.value.split("/")[0], 
-                                            name: e.target.value.split("/")[1]
-                                        })}>
-
-                                        <option key="1" value="All/All">All</option>
-                                        {employeeSelect.map(e => {
-                                            counter++
-                                            return (
-                                                <option key={counter} value={e.value + "/" + e.label}>{e.label}</option>
-                                            )
-                                        })}
-                                    </FormControl>
-                                : 
+         
+                                {employeeCriteria.name !== "All"}
                                     <OverlayTrigger
                                         placement="top"
-                                        overlay={
-                                            <ToolTipBootstrap id="compareBTN-tooltip">
+                                        overlay={employeeCriteria.name !== "All" ?
+                                            <ToolTipBootstrap id="compareBTN-tooltip" className="transparent">
                                                 {employeeCriteria.name}
-                                            </ToolTipBootstrap>
+                                            </ToolTipBootstrap> : <></>
                                         } >
 
-                                        <FormControl id="employeeCriteriaDashboard"s as="select" onChange={e => SetEmployeeCriteria({
+                                        <FormControl id="employeeCriteriaDashboard" as="select" onChange={e => SetEmployeeCriteria({
                                                 id: e.target.value.split("/")[0], 
                                                 name: e.target.value.split("/")[1]
                                             })}>
@@ -257,7 +242,6 @@ const Dashboard = () => {
                                             })}
                                         </FormControl>
                                     </OverlayTrigger>
-                                }
 
                                 <OverlayTrigger
                                     placement="top"
@@ -295,7 +279,7 @@ const Dashboard = () => {
                         </div>
                     </div>
                     <div className="container-chart">
-                        <div className="card shadow my-3 mx-3">
+                        <div className="card shadow my-3 mx-3 p-2 pt-3">
                             {chartData &&
                                 <Bar
                                     data={chartData.datasets.length === 0 || authorized === false ? fallbackChartData : chartData}
@@ -329,7 +313,9 @@ const Dashboard = () => {
                                                 display: true,
                                                 text: 'Average Collection Days over Time',
                                                 font: {
-                                                    size: 20
+                                                    size: 25,
+                                                    family: 'system-ui',
+                                                    weight: "600"
                                                 },
                                                 color: 'black'
                                             },
