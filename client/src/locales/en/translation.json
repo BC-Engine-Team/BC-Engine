@@ -1,0 +1,143 @@
+{
+    "navbar":{
+        "DashboardLabel":"Dashboard",
+        "ReportsLabel":"Reports",
+        "UsersLabel":"Users",
+        "ManageLabel":"Manage",
+        "Greeting":"Hello, ",
+        "SignOutLabel":"Sign out"},
+        "login":{
+            "Title":"Login",
+            "SubmitButton":"Login"
+        },
+        "user":{
+            "table":{
+                "AddButton":"Add User",
+                "Name":"NAME",
+                "Email":"EMAIL",
+                "Role":"ROLE",
+                "select":{
+                    "Default":"Select User",
+                    "Admin":"admin",
+                    "Employee":"employee"}
+                },
+                "delete":{
+                    "NotAuthorized":"You are not authorized to perform this action.",
+                    "Yes":"Yes",
+                    "No":"No",
+                    "Title":"Are you sure you want to delete "
+                },
+                "update":{
+                    "Title":"Edit User",
+                    "Confirmation":"Confirm modifications?",
+                    "FormSubmit":"Save Changes"
+                },
+                "create":{
+                    "Title":"Add User",
+                    "Confirmation":"Confirm creation?",
+                    "FormSubmit":"Add"
+                },
+                "error":{
+                    "InvalidEmailValidation":"Invalid email. Must end with 'benoit-cote.com'.",
+                    "InvalidPasswordValidation":"Password must be at least 8 characters, contain 1 upper-case and 1 lower-case letter, and contain a number.",
+                    "MustSelectRoleValidation":"Must select a role!",
+                    "InvalidEmailUpdate":"Cannot recognize the email addres",
+                    "RequestFailedUpdate":"Cannot send the request to modify the user"
+                },
+                "GoBackButton":"Go Back"
+            },
+            "dashboard":{
+                "criteria":{
+                    "NamePlaceHolder":"Enter Chart Report Name",
+                    "LoadChartButton":"Load Chart"
+                },
+                "chart":{
+                    "Title":"Average Collection Days over Time",
+                    "YAxisLabel":"Days",
+                    "XAxisLabel":"Months",
+                    "months":{
+                        "Jan":"January",
+                        "Feb":"February",
+                        "Mar":"March",
+                        "Apr":"April",
+                        "May":"May",
+                        "Jun":"June",
+                        "Jul":"July",
+                        "Aug":"August",
+                        "Sep":"September",
+                        "Oct":"October",
+                        "Nov":"November",
+                        "Dec":"December"
+                    },
+                    "FallbackLegendLabel":"Waiting for data..."
+                }
+            },
+            "manage":{
+                "table":{
+                    "Title":"Employee List",
+                    "Name":"NAME",
+                    "Email":"EMAIL",
+                    "type":{
+                        "Title":"TYPE",
+                        "Type1":"Manager",
+                        "Type2":"Subordinate"
+                    },
+                    "ViewButton":"View Subordinates"
+                }
+            },
+            "reports":{
+                "reports":{
+                    "Title":"Reports",
+                    "NameLabel":"Report Name",
+                    "DateLabel":"Report Date",
+                    "EmployeeLabel":"Concerned Employee(s)",
+                    "EmailButtonLabel":"Email",
+                    "ExportButtonLabel":"Export"
+                },
+                "reportsManagement":{
+                    "Title":"Reports Management",
+                    "reportType":{
+                        "Title":"Report Type",
+                        "PlaceHolder":"Select Report Type",
+                        "EmpPerRep":"Employee Performance Report",
+                        "SubPerRep":"Subordinate Performance Report"
+                    },
+                    "frequency":{
+                        "Title":"Frequency",
+                        "PlaceHolder":"Select Frequency",
+                        "Week":"Weekly",
+                        "BiWeek":"Biweekly",
+                        "Month":"Monthly",
+                        "Bimonth":"Bimonthly",
+                        "Year":"Yearly"
+                    },
+                    "employees":{
+                        "Title":"Select Employee(s)"
+                    }
+                },
+                "chartReports":{
+                    "Name":"NAME OF REPORT",
+                    "Employee":"EMPLOYEE CRITERIA",
+                    "ClientType":"CLIENT TYPE",
+                    "Country":"COUNTRY",
+                    "AgeOfAccount":"AGE OF ACCOUNT",
+                    "AccountType":"ACCOUNT TYPE",
+                    "StartDate":"START DATE",
+                    "EndDate":"END DATE",
+                    "LoadButton":"Load"
+                }
+            },
+            "form":{
+                "Password":"Password",
+                "ConfirmPassword":"Confirm Password",
+                "EmailAddress":"Email Address",
+                "Role":"Role",
+                "SubmitButton":"Confirm"
+            },
+            "error":{
+                "Empty":"This field cannot be empty!",
+                "Incorrect":"Incorrect email or password.",
+                "NotFound":"Could not reach B&C Engine...",
+                "PasswordMatch":"Password must match!"
+            }
+}
