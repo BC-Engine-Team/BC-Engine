@@ -18,6 +18,14 @@ i18n
         resources: {
             en: {
                 translation: {
+                    navbar: {
+                        DashboardLabel: 'Dashboard',
+                        ReportsLabel: 'Reports',
+                        UsersLabel: 'Users',
+                        ManageLabel: 'Manage',
+                        Greeting: 'Hello, ',
+                        SignOutLabel: 'Sign out'
+                    },
                     login: {
                         Title: 'Login',
                         SubmitButton: 'Login'
@@ -99,6 +107,35 @@ i18n
                         }
                     },
                     reports: {
+                        reports: {
+                            Title: 'Reports',
+                            NameLabel: 'Report Name',
+                            DateLabel: 'Report Date',
+                            EmployeeLabel: 'Concerned Employee(s)',
+                            EmailButtonLabel: 'Email',
+                            ExportButtonLabel: 'Export'
+                        },
+                        reportsManagement: {
+                            Title: 'Reports Management',
+                            reportType: {
+                                Title: 'Report Type',
+                                PlaceHolder: 'Select Report Type',
+                                EmpPerRep: 'Employee Performance Report',
+                                SubPerRep: 'Subordinate Performance Report'
+                            },
+                            frequency: {
+                                Title: 'Frequency',
+                                PlaceHolder: 'Select Frequency',
+                                Week: 'Weekly',
+                                BiWeek: 'Biweekly',
+                                Month: 'Monthly',
+                                Bimonth: 'Bimonthly',
+                                Year: 'Yearly'
+                            },
+                            employees: {
+                                Title: 'Select Employee(s)'
+                            }
+                        },
                         chartReports: {
                             Name: 'NAME OF REPORT',
                             Employee: 'EMPLOYEE CRITERIA',
@@ -123,11 +160,19 @@ i18n
                         Incorrect: 'Incorrect email or password.',
                         NotFound: 'Could not reach B&C Engine...',
                         PasswordMatch: 'Password must match!'
-                    },
+                    }
                 }
             },
             fr: {
                 translation: {
+                    navbar: {
+                        DashboardLabel: 'Tableau de bord',
+                        ReportsLabel: 'Rapports',
+                        UsersLabel: 'Utilisateurs',
+                        ManageLabel: 'Gérer',
+                        Greeting: 'Bonjour, ',
+                        SignOutLabel: 'Se déconnecter'
+                    },
                     login: {
                         Title: 'Connexion',
                         SubmitButton: 'Se Connecter'
@@ -209,6 +254,35 @@ i18n
                         }
                     },
                     reports: {
+                        reports: {
+                            Title: 'Rapports',
+                            NameLabel: 'Nom du Rapport',
+                            DateLabel: 'Date du Rapport',
+                            EmployeeLabel: 'Employé(es) concerné(es)',
+                            EmailButtonLabel: 'Address Courriel',
+                            ExportButtonLabel: 'Exporter'
+                        },
+                        reportsManagement: {
+                            Title: 'Gestion des Rapports',
+                            reportType: {
+                                Title: 'Type de Rapport',
+                                PlaceHolder: 'Selectionnez le Type de Rapport',
+                                EmpPerRep: "Rapport de Performance d'Employé(e)",
+                                SubPerRep: 'Rapport de Performance des Subordonnés'
+                            },
+                            frequency: {
+                                Title: 'Fréquence',
+                                PlaceHolder: 'Selectionnez la Fréquence',
+                                Week: 'Hebdomadaire',
+                                BiWeek: 'Bihebdomadaire',
+                                Month: 'Mensuel',
+                                Bimonth: 'Bimensuel',
+                                Year: 'Annuel'
+                            },
+                            employees: {
+                                Title: 'Selectionnez les Employé(es)'
+                            }
+                        },
                         chartReports: {
                             Name: 'NOM DU RAPPORT',
                             Employee: 'EMPLOYÉ',
@@ -221,7 +295,7 @@ i18n
                             LoadButton: 'Charger'
                         }
                     },
-                    form : {
+                    form: {
                         Password: 'Mot de passe',
                         ConfirmPassword: 'Confirmer le mot de passe',
                         EmailAddress: 'Addresse Couriel',
@@ -233,7 +307,7 @@ i18n
                         Incorrect: 'Address couriel ou mot de passe invalide.',
                         NotFound: "Impossible d'atteindre B&C Engine...",
                         PasswordMatch: 'Les mots de passe ne correspondent pas!'
-                    },
+                    }
                 }
             }
         }

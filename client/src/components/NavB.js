@@ -13,11 +13,18 @@ const NavB = (props) => {
     const [page] = useState(props);
     const cookies = new Cookies();
     const { t, i18n } = useTranslation();
-    
+
     const lngs = {
         en: { nativeName: 'English' },
-        fr: { nativeName: 'French' }
+        fr: { nativeName: 'Français' }
     };
+
+    const DashboardLabel = t('navbar.DashboardLabel');
+    const ReportsLabel = t('navbar.ReportsLabel');
+    const UsersLabel = t('navbar.UsersLabel');
+    const ManageLabel = t('navbar.ManageLabel');
+    const GreetingLabel = t('navbar.Greeting');
+    const SignOutLabel = t('navbar.SignOutLabel');
 
     let username;
     let role;
@@ -125,25 +132,25 @@ const NavB = (props) => {
                             role === "admin" ?
                                 <Nav className="me-auto">
                                     <LinkContainer to="/dashboard" className="px-2">
-                                        <Nav.Link>Dashboard</Nav.Link>
+                                        <Nav.Link>{DashboardLabel}</Nav.Link>
                                     </LinkContainer>
                                     <LinkContainer to="/reports" className="px-2">
-                                        <Nav.Link>Reports</Nav.Link>
+                                        <Nav.Link>{ReportsLabel}</Nav.Link>
                                     </LinkContainer>
                                     <LinkContainer to="/users" className="px-2">
-                                        <Nav.Link>Users</Nav.Link>
+                                        <Nav.Link>{UsersLabel}</Nav.Link>
                                     </LinkContainer>
                                     <LinkContainer to="/manage" className="px-2">
-                                        <Nav.Link>Manage</Nav.Link>
+                                        <Nav.Link>{ManageLabel}</Nav.Link>
                                     </LinkContainer>
                                 </Nav>
                                 :
                                 <Nav className="me-auto">
                                     <LinkContainer to="/dashboard" className="px-2">
-                                        <Nav.Link>Dashboard</Nav.Link>
+                                        <Nav.Link>{DashboardLabel}</Nav.Link>
                                     </LinkContainer>
                                     <LinkContainer to="/reports" className="px-2">
-                                        <Nav.Link>Reports</Nav.Link>
+                                        <Nav.Link>{ReportsLabel}</Nav.Link>
                                     </LinkContainer>
                                 </Nav>
                         }
@@ -154,12 +161,12 @@ const NavB = (props) => {
                                     <button key={lng} style={{ fontWeight: i18n.resolvedLanguage === lng ? 'bold' : 'normal' }} type="submit" onClick={() => i18n.changeLanguage(lng)}>
                                         {lngs[lng].nativeName}
                                     </button>
-                            ))}
+                                ))}
                             </div>
                             <Navbar.Text className="me-3">
-                                Hello, {username}
+                                {GreetingLabel} {username}
                             </Navbar.Text>
-                            <Nav.Link id="sign_out" onClick={logout}>Sign out</Nav.Link>
+                            <Nav.Link id="sign_out" onClick={logout}>{SignOutLabel}</Nav.Link>
                         </Nav>
 
                     </Navbar.Collapse>
