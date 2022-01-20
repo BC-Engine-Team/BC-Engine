@@ -4,7 +4,6 @@ import { InputGroup, FormControl, Button } from 'react-bootstrap'
 import Axios from 'axios';
 import Cookies from 'universal-cookie';
 import NavB from '../components/NavB';
-//import DashboardChart from '../components/DashboardChart';
 import '../styles/dashboardPage.css'
 import { Bar } from 'react-chartjs-2';
 import {
@@ -95,7 +94,6 @@ const Dashboard = () => {
                         }
 
                         color = colors[colorCounter];
-
                         colorCounter++;
                         if (colorCounter === colors.length) colorCounter = 0;
 

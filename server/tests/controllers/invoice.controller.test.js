@@ -26,7 +26,6 @@ let authStub = sandbox.stub(AuthService, 'authenticateToken')
 
 let invoiceServiceSpy = jest.spyOn(InvoiceService, 'getAverages')
     .mockImplementation(() => new Promise((resolve) => {
-        console.log("in invoicespy")
         resolve(false);
     }));
 
