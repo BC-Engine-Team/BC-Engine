@@ -158,7 +158,7 @@ const Login = () => {
                                 />
 
                                 <Form.Control.Feedback type="invalid">
-                                    {t(errorMessage.email)}
+                                    {errorMessage.email}
                                 </Form.Control.Feedback>
                             </FloatingLabel>
                         </Form.Group>
