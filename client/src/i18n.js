@@ -85,6 +85,19 @@ i18n
                             FallbackLegendLabel: 'Waiting for data...'
                         }
                     },
+                    manage: {
+                        table: {
+                            Title: 'Employee List',
+                            Name: 'NAME',
+                            Email: 'EMAIL',
+                            type: {
+                                Title: 'TYPE',
+                                Type1: 'Manager',
+                                Type2: 'Subordinate'
+                            },
+                            ViewButton: 'View Subordinates'
+                        }
+                    },
                     form: {
                         Password: 'Password',
                         ConfirmPassword: 'Confirm Password',
@@ -143,19 +156,6 @@ i18n
                         },
                         GoBackButton: 'Précédent'
                     },
-                    form : {
-                        Password: 'Mot de passe',
-                        ConfirmPassword: 'Confirmer le mot de passe',
-                        EmailAddress: 'Addresse Couriel',
-                        Role: 'Role',
-                        SubmitButton: 'Confirmer'
-                    },
-                    error: {
-                        Empty: 'Ce champs est obligatoire!',
-                        Incorrect: 'Address couriel ou mot de passe invalide.',
-                        NotFound: "Impossible d'atteindre B&C Engine...",
-                        PasswordMatch: 'Les mots de passe ne correspondent pas!'
-                    },
                     dashboard: {
                         criteria: {
                             NamePlaceHolder: 'Entrez le nom de votre Rapport Graphique',
@@ -181,7 +181,33 @@ i18n
                             },
                             FallbackLegendLabel: 'En attente des données...'
                         }
-                    }
+                    },
+                    manage: {
+                        table: {
+                            Title: 'Liste des employés',
+                            Name: 'NOM',
+                            Email: 'COURIEL',
+                            type: {
+                                Title: 'TYPE',
+                                Type1: 'Superviseur',
+                                Type2: 'Subalterne'
+                            },
+                            ViewButton: 'Voir les subalternes'
+                        }
+                    },
+                    form : {
+                        Password: 'Mot de passe',
+                        ConfirmPassword: 'Confirmer le mot de passe',
+                        EmailAddress: 'Addresse Couriel',
+                        Role: 'Role',
+                        SubmitButton: 'Confirmer'
+                    },
+                    error: {
+                        Empty: 'Ce champs est obligatoire!',
+                        Incorrect: 'Address couriel ou mot de passe invalide.',
+                        NotFound: "Impossible d'atteindre B&C Engine...",
+                        PasswordMatch: 'Les mots de passe ne correspondent pas!'
+                    },
                 }
             }
         }
