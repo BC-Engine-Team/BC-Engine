@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Axios from 'axios'
 import Cookies from 'universal-cookie'
+import { useTranslation, Trans } from 'react-i18next';
 
 import Icon from '@mdi/react'
 import { mdiEye } from '@mdi/js';
@@ -14,6 +15,14 @@ import Button from 'react-bootstrap/Button'
 import Alert from 'react-bootstrap/Alert'
 
 const Login = () => {
+    const cookies = new Cookies();
+    const { t } = useTranslation();
+    let navigate = useNavigate();
+
+    const emptyError = t('login.error.Empty');
+    const incorrectError = t('login.error.Incorrect');
+    const notFoundError = t('login.error.NotFound');
+
     const [showPass, setShowPass] = useState(false);
     const [validated, setValidated] = useState(false);
     const [validationError, setValidationError] = useState(false);
@@ -24,12 +33,9 @@ const Login = () => {
     const [password, setPassword] = useState("");
 
     const [errorMessage, setErrorMessage] = useState({
-        email: "This field cannot be empty!",
-        password: "This field cannot be empty!",
+        email: emptyError,
+        password: emptyError,
     });
-
-    const cookies = new Cookies();
-    let navigate = useNavigate();
 
     Axios.defaults.withCredentials = true;
 
@@ -66,31 +72,31 @@ const Login = () => {
                         navigate("/dashboard");
                     }
                     else {
-                        setInvalidCredential("Incorrect email or password.");
+                        setInvalidCredential(incorrectError);
                         setErrorMessage({
-                            email: "This field cannot be empty!",
-                            password: "This field cannot be empty!"
+                            email: emptyError,
+                            password: emptyError
                         });
                     }
                 }).catch((error) => {
 
                     if (error.response) {
                         if (error.response.status === 403 || error.response.status === 401) {
-                            setInvalidCredential("Incorrect email or password.");
+                            setInvalidCredential(incorrectError);
                             setErrorMessage({
-                                email: "This field cannot be empty!",
-                                password: "This field cannot be empty!"
+                                email: emptyError,
+                                password: emptyError
                             });
                         }
                         else {
-                            setInvalidCredential("Incorrect email or password.");
+                            setInvalidCredential(incorrectError);
                         }
                     }
                     else if (error.request) {
                         // The request was made but no response was received
                         // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
                         // http.ClientRequest in node.js
-                        setInvalidCredential("Could not reach B&C Engine...");
+                        setInvalidCredential(notFoundError);
                     }
                 });
         }
@@ -136,13 +142,13 @@ const Login = () => {
                         {
                             InvalidCredential.length > 0 ?
                                 <Alert variant="danger">
-                                    {InvalidCredential}
+                                    {t(InvalidCredential)}
                                 </Alert> :
                                 <></>
                         }
 
                         <Form.Group className="mb-4" controlId="floatingEmail">
-                            <FloatingLabel controlId="floatingEmail" label="Email address" className="mb-3" >
+                            <FloatingLabel controlId="floatingEmail" label={t('login.form.EmailAddress')} className="mb-3" >
                                 <Form.Control
                                     required
                                     type="email"
@@ -152,13 +158,13 @@ const Login = () => {
                                 />
 
                                 <Form.Control.Feedback type="invalid">
-                                    {errorMessage.email}
+                                    {t(errorMessage.email)}
                                 </Form.Control.Feedback>
                             </FloatingLabel>
                         </Form.Group>
 
                         <Form.Group className="mb-5" controlId="floatingPassword">
-                            <FloatingLabel controlId="floatingPassword" label="Password" className="mb-3 inputWithShowHide" >
+                            <FloatingLabel controlId="floatingPassword" label={t('login.form.Password')} className="mb-3 inputWithShowHide" >
                                 <Form.Control
                                     required
                                     type={showPass ? "text" : "password"}
@@ -174,7 +180,7 @@ const Login = () => {
                                     size={1} />
 
                                 <Form.Control.Feedback type="invalid">
-                                    {errorMessage.password}
+                                    {t(errorMessage.password)}
                                 </Form.Control.Feedback>
                             </FloatingLabel>
                         </Form.Group >

@@ -7,10 +7,17 @@ import { useState } from 'react'
 import Axios from 'axios'
 import { useNavigate } from 'react-router-dom'
 import Cookies from 'universal-cookie'
+import { useTranslation, Trans } from 'react-i18next';
 
 const NavB = (props) => {
     const [page] = useState(props);
     const cookies = new Cookies();
+    const { t, i18n } = useTranslation();
+    
+    const lngs = {
+        en: { nativeName: 'English' },
+        fr: { nativeName: 'French' }
+    };
 
     let username;
     let role;
@@ -142,6 +149,13 @@ const NavB = (props) => {
                         }
 
                         <Nav className="justify-content-end">
+                            <div>
+                                {Object.keys(lngs).map((lng) => (
+                                    <button key={lng} style={{ fontWeight: i18n.resolvedLanguage === lng ? 'bold' : 'normal' }} type="submit" onClick={() => i18n.changeLanguage(lng)}>
+                                        {lngs[lng].nativeName}
+                                    </button>
+                            ))}
+                            </div>
                             <Navbar.Text className="me-3">
                                 Hello, {username}
                             </Navbar.Text>
