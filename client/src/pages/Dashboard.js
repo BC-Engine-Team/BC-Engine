@@ -31,6 +31,14 @@ const Dashboard = () => {
 
     let months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
     let label = ""
+    let colors = [
+        'rgb(255, 192, 159)',
+        'rgb(191, 175, 192)',
+        'rgb(255, 238, 147)',
+        'rgb(160, 206, 217)',
+        'rgb(173, 247, 182)'
+    ];
+
     const fallbackChartData = {
         labels: months,
         datasets: [
@@ -54,7 +62,7 @@ const Dashboard = () => {
         }
 
         const dates = {
-            startDate: "2019-12-01",
+            startDate: "2016-05-01",
             endDate: "2020-11-01"
         };
 
@@ -66,13 +74,11 @@ const Dashboard = () => {
                 }
                 setAuthorized(true);
 
-                let data = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-                let red = 127;
-                let green = 128;
-                let blue = 203;
-                let color = 'rgb(' + red + ',' + green + ',' + blue + ')';
 
                 let previousYear = parseInt(res.data[0].month.toString().substring(0, 4));
+                let data = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+                let color = colors[0];
+                let colorCounter = 0;
 
                 for (let i = 0; i < res.data.length; i++) {
                     let year = parseInt(res.data[i].month.toString().substring(0, 4));
@@ -87,10 +93,14 @@ const Dashboard = () => {
                                 }
                             }
                         }
-                        red = Math.floor((Math.random() * 255) + 1);
-                        green = Math.floor((Math.random() * 255) + 1);
-                        blue = Math.floor((Math.random() * 255) + 1);
-                        color = 'rgb(' + red + ',' + green + ',' + blue + ')';
+
+                        console.log(colorCounter)
+
+                        color = colors[colorCounter];
+
+                        colorCounter++;
+                        if (colorCounter === colors.length) colorCounter = 0;
+
                         label = previousYear;
                         datasets.push({
                             label: label,
@@ -208,8 +218,12 @@ const Dashboard = () => {
                                                 display: true,
                                                 text: 'Average Collection Days over Time',
                                                 font: {
-                                                    size: 20
-                                                }
+                                                    size: 25,
+                                                    family: 'system-ui',
+                                                    weight: '600'
+
+                                                },
+                                                color: 'black'
                                             },
                                             legend: {
                                                 display: true,
