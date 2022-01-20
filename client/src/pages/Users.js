@@ -1,22 +1,29 @@
 import { useCallback, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Cookies from 'universal-cookie'
-import NavB from '../components/NavB'
+import { useTranslation, Trans } from 'react-i18next';
+import Axios from 'axios';
+
 import Table from 'react-bootstrap/Table'
 import Button from 'react-bootstrap/Button'
+
 import '../styles/Edit&DeleteButton.scss'
 import '../styles/usersPage.css'
 import '../styles/popup.css'
-import Axios from 'axios';
+
+import NavB from '../components/NavB'
 import DeleteUserPopup from '../components/DeleteUserPopup'
 import UsersForm from '../components/UsersForm'
 import DeleteButton from '../components/DeleteButton'
 import EditButton from '../components/EditButton'
 
+
 const Users = () => {
+    const { t } = useTranslation();
     let navigate = useNavigate();
     let counter = 0;
 
+    const notFoundError = t('error.NotFound');
     const cookies = new Cookies();
     const displayNone = "d-none";
 
@@ -116,14 +123,14 @@ const Users = () => {
             .catch((error) => {
                 if (error.response) {
                     if (error.response.status === 401 || error.response.status === 403) {
-                        setInvalidInput("You are not authorized to perform this action.");
+                        setInvalidInput(t('user.delete'));
                     }
                     else {
-                        setInvalidInput("Malfunction in the B&C Engine...");
+                        setInvalidInput(notFoundError);
                     }
                 }
                 else if (error.request) {
-                    setInvalidInput("Could not reach b&C Engine...");
+                    setInvalidInput(notFoundError);
                 }
             });
 
@@ -184,15 +191,15 @@ const Users = () => {
                                             #
                                         </div>
                                     </th>
-                                    <th>NAME</th>
-                                    <th>EMAIL</th>
-                                    <th>ROLE</th>
+                                    <th>{t('user.table.Name')}</th>
+                                    <th>{t('user.table.Email')}</th>
+                                    <th>{t('user.table.Role')}</th>
                                     <th>
                                         <div className="d-flex justify-content-center">
                                             <Button
                                                 className="btn py-0 shadow-sm border"
                                                 onClick={() => addUser()}>
-                                                Add User
+                                                {t('user.table.AddButton')}
                                             </Button>
                                         </div>
                                     </th>

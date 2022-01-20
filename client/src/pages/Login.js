@@ -19,9 +19,9 @@ const Login = () => {
     const { t } = useTranslation();
     let navigate = useNavigate();
 
-    const emptyError = t('login.error.Empty');
-    const incorrectError = t('login.error.Incorrect');
-    const notFoundError = t('login.error.NotFound');
+    const emptyError = t('error.Empty');
+    const incorrectError = t('error.Incorrect');
+    const notFoundError = t('error.NotFound');
 
     const [showPass, setShowPass] = useState(false);
     const [validated, setValidated] = useState(false);
@@ -131,7 +131,7 @@ const Login = () => {
             <NavB page="login" />
             <div className="container">
                 <div className="card shadow p-3 m-5">
-                    <h1 className="display-1 font-weight-bold text-center mt-5 mb-4">Login</h1>
+                    <h1 className="display-1 font-weight-bold text-center mt-5 mb-4">{t('login.Title')}</h1>
 
                     <Form
                         noValidate
@@ -142,13 +142,13 @@ const Login = () => {
                         {
                             InvalidCredential.length > 0 ?
                                 <Alert variant="danger">
-                                    {t(InvalidCredential)}
+                                    (InvalidCredential)
                                 </Alert> :
                                 <></>
                         }
 
                         <Form.Group className="mb-4" controlId="floatingEmail">
-                            <FloatingLabel controlId="floatingEmail" label={t('login.form.EmailAddress')} className="mb-3" >
+                            <FloatingLabel controlId="floatingEmail" label={t('form.EmailAddress')} className="mb-3" >
                                 <Form.Control
                                     required
                                     type="email"
@@ -164,7 +164,7 @@ const Login = () => {
                         </Form.Group>
 
                         <Form.Group className="mb-5" controlId="floatingPassword">
-                            <FloatingLabel controlId="floatingPassword" label={t('login.form.Password')} className="mb-3 inputWithShowHide" >
+                            <FloatingLabel controlId="floatingPassword" label={t('form.Password')} className="mb-3 inputWithShowHide" >
                                 <Form.Control
                                     required
                                     type={showPass ? "text" : "password"}
@@ -180,7 +180,7 @@ const Login = () => {
                                     size={1} />
 
                                 <Form.Control.Feedback type="invalid">
-                                    {t(errorMessage.password)}
+                                    (errorMessage.password)
                                 </Form.Control.Feedback>
                             </FloatingLabel>
                         </Form.Group >
@@ -190,7 +190,7 @@ const Login = () => {
                                 id='loginButton'
                                 type="submit"
                                 className="btn btn-light py-2 px-5 my-1 shadow-sm border submitButton">
-                                Login
+                                {t('login.SubmitButton')}
                             </Button>
                         </div>
 
