@@ -9,11 +9,11 @@ i18n
     .use(initReactI18next)
     // init i18next
     .init({
-            debug: true,
-            fallbackLng: 'en',
-            interpolation: {
-                escapeValue: false, // not needed for react as it escapes by default
-            },
+        debug: true,
+        fallbackLng: 'en',
+        interpolation: {
+            escapeValue: false, // not needed for react as it escapes by default
+        },
         // here are all the translations
         resources: {
             en: {
@@ -27,6 +27,32 @@ i18n
                             Empty: 'This field cannot be empty!',
                             Incorrect: 'Incorrect email or password.',
                             NotFound: 'Could not reach B&C Engine...'
+                        }
+                    },
+                    dashboard: {
+                        criteria: {
+                            NamePlaceHolder: 'Enter Chart Report Name',
+                            LoadChartButton: 'Load Chart'
+                        },
+                        chart: {
+                            Title: 'Average Collection Days over Time',
+                            YAxisLabel: 'Days',
+                            XAxisLabel: 'Months',
+                            months: {
+                                Jan: 'January',
+                                Feb: 'February',
+                                Mar: 'March',
+                                Apr: 'April',
+                                May: 'May',
+                                Jun: 'June',
+                                Jul: 'July',
+                                Aug: 'August',
+                                Sep: 'September',
+                                Oct: 'October',
+                                Nov: 'November',
+                                Dec: 'December'
+                            },
+                            FallbackLegendLabel: 'Waiting for data...'
                         }
                     }
                 }
@@ -42,6 +68,32 @@ i18n
                             Empty: 'Ce champs doit être rempli!',
                             Incorrect: 'Address couriel ou mot de passe invalide.',
                             NotFound: "Impossible d'atteindre B&C Engine..."
+                        }
+                    },
+                    dashboard: {
+                        criteria: {
+                            NamePlaceHolder: 'Entrez le nom de votre Rapport Graphique',
+                            LoadChartButton: 'Mettre à jour le Graphique'
+                        },
+                        chart: {
+                            Title: 'Moyenne de Jour de Collection par Mois',
+                            YAxisLabel: 'Jours',
+                            XAxisLabel: 'Mois',
+                            months: {
+                                Jan: 'Janvier',
+                                Feb: 'Février',
+                                Mar: 'Mars',
+                                Apr: 'Avril',
+                                May: 'Mai',
+                                Jun: 'Juin',
+                                Jul: 'Juillet',
+                                Aug: 'Août',
+                                Sep: 'Septembre',
+                                Oct: 'Octobre',
+                                Nov: 'Novembre',
+                                Dec: 'Decembre'
+                            },
+                            FallbackLegendLabel: 'En attente des données...'
                         }
                     }
                 }
