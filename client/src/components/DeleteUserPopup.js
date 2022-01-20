@@ -1,15 +1,15 @@
 import React from 'react'
 import '../styles/index.css'
-import { useTranslation, Trans } from 'react-i18next';
+import { useTranslation } from 'react-i18next';
 
 const DeleteUserPopup = ({ open, title, onDelete, onClose }) => {
     const { t } = useTranslation();
 
-    if(!open) return null;
+    if (!open) return null;
 
-    return(
+    return (
         <>
-        <div className="obscureBackground"/>
+            <div className="obscureBackground" />
             <div className="card popup">
                 <h4 className="text-center">{t('user.delete.Title')} {title}?</h4>
                 <div className='popup-inner'>

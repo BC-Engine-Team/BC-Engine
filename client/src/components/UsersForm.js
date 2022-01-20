@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Axios from 'axios';
 import Cookies from 'universal-cookie'
-import { useTranslation, Trans } from 'react-i18next';
+import { useTranslation } from 'react-i18next';
 
 import Icon from '@mdi/react'
 import { mdiEye } from '@mdi/js';

@@ -7,7 +7,7 @@ import { useState } from 'react'
 import Axios from 'axios'
 import { useNavigate } from 'react-router-dom'
 import Cookies from 'universal-cookie'
-import { useTranslation, Trans } from 'react-i18next';
+import { useTranslation } from 'react-i18next';
 
 const NavB = (props) => {
     const [page] = useState(props);

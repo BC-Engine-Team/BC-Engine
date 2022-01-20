@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { InputGroup, FormControl, Button } from 'react-bootstrap'
 
-import { useTranslation, Trans } from 'react-i18next';
+import { useTranslation } from 'react-i18next';
 
 import Axios from 'axios';
 import Cookies from 'universal-cookie';
