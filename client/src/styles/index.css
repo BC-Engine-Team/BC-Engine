@@ -27,3 +27,19 @@ input, select {
 .form-check-input {
   border-radius: 0.25rem !important;
 }
+
+.navLogin {
+  text-align: center;
+}
+
+.navContainer {
+  position: relative;
+}
+
+.navBrandLogin {
+  float: none;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%)
+}

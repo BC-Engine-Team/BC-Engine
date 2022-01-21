@@ -1,6 +1,9 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { InputGroup, FormControl, Button } from 'react-bootstrap'
+
+import { useTranslation } from 'react-i18next';
+
 import Axios from 'axios';
 import Cookies from 'universal-cookie';
 import NavB from '../components/NavB';
@@ -27,8 +30,30 @@ ChartJS.register(
 const Dashboard = () => {
     let navigate = useNavigate();
     const cookies = new Cookies();
+    const { t } = useTranslation();
 
-    let months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+    // variables used for internationalization
+    const chartReportNamePlaceHolder = t('dashboard.criteria.NamePlaceHolder');
+    const loadChartButtonText = t('dashboard.criteria.LoadChartButton');
+    const chartTitle = t('dashboard.chart.Title');
+    const chartXLabel = t('dashboard.chart.XAxisLabel');
+    const chartYLabel = t('dashboard.chart.YAxisLabel');
+    const months = [
+        t('dashboard.chart.months.Jan'),
+        t('dashboard.chart.months.Feb'),
+        t('dashboard.chart.months.Mar'),
+        t('dashboard.chart.months.Apr'),
+        t('dashboard.chart.months.May'),
+        t('dashboard.chart.months.Jun'),
+        t('dashboard.chart.months.Jul'),
+        t('dashboard.chart.months.Aug'),
+        t('dashboard.chart.months.Sep'),
+        t('dashboard.chart.months.Oct'),
+        t('dashboard.chart.months.Nov'),
+        t('dashboard.chart.months.Dec')
+    ];
+    const chartFallbackLegendLabel = t('dashboard.chart.FallbackLegendLabel');
+
     let label = ""
     let colors = [
         'rgb(255, 192, 159)',
@@ -38,16 +63,14 @@ const Dashboard = () => {
         'rgb(173, 247, 182)'
     ];
 
-    const fallbackChartData = {
-        labels: months,
-        datasets: [
-            {
-                label: label,
-                data: [5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5],
-                backgroundColor: 'rgb(127, 128, 203)'
-            }
-        ]
-    }
+    const fallbackChartData = [
+        {
+            label: chartFallbackLegendLabel,
+            data: [5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5],
+            backgroundColor: 'rgb(127, 128, 203)'
+        }
+    ];
+
 
     const [chartData, setChartData] = useState(fallbackChartData);
     const [preparedChartData, setPreparedChartData] = useState();
@@ -116,10 +139,7 @@ const Dashboard = () => {
 
                 setPreparedChartData(datasets);
 
-                setChartData({
-                    labels: months,
-                    datasets: datasets
-                });
+                setChartData(datasets);
             })
             .catch((error) => {
                 if (error.response) {
@@ -151,10 +171,7 @@ const Dashboard = () => {
 
     const loadChartData = () => {
         if (preparedChartData) {
-            setChartData({
-                labels: months,
-                datasets: preparedChartData
-            });
+            setChartData(chartData);
         }
 
     }
@@ -169,7 +186,7 @@ const Dashboard = () => {
                             <InputGroup className="my-2  px-2" >
                                 <FormControl
                                     id='chartName'
-                                    placeholder="Enter Chart Report Name"
+                                    placeholder={chartReportNamePlaceHolder}
                                     aria-label="Username"
                                     aria-describedby="basic-addon1"
                                 />
@@ -177,7 +194,7 @@ const Dashboard = () => {
                             <Button
                                 onClick={loadChartData}
                                 className='my-2 mx-2'
-                                variant='primary'>Load Chart</Button>
+                                variant='primary'>{loadChartButtonText}</Button>
                         </div>
                     </div>
                     <div className="container-chart">
@@ -185,7 +202,10 @@ const Dashboard = () => {
                             {chartData &&
                                 <Bar
                                     id='chart'
-                                    data={chartData.datasets.length === 0 || authorized === false ? fallbackChartData : chartData}
+                                    data={{
+                                        labels: months,
+                                        datasets: chartData.length === 0 || authorized === false ? fallbackChartData : chartData
+                                    }}
 
                                     options={{
                                         responsive: true,
@@ -195,7 +215,7 @@ const Dashboard = () => {
                                             yAxes: {
                                                 title: {
                                                     display: true,
-                                                    text: 'Days',
+                                                    text: chartYLabel,
                                                     font: {
                                                         size: 15
                                                     }
@@ -204,7 +224,7 @@ const Dashboard = () => {
                                             xAxes: {
                                                 title: {
                                                     display: true,
-                                                    text: 'Months',
+                                                    text: chartXLabel,
                                                     font: {
                                                         size: 15
                                                     }
@@ -214,7 +234,7 @@ const Dashboard = () => {
                                         plugins: {
                                             title: {
                                                 display: true,
-                                                text: 'Average Collection Days over Time',
+                                                text: chartTitle,
                                                 font: {
                                                     size: 25,
                                                     family: 'system-ui',

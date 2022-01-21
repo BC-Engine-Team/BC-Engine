@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Axios from 'axios'
 import Cookies from 'universal-cookie'
+import { useTranslation } from 'react-i18next';
 
 import Icon from '@mdi/react'
 import { mdiEye } from '@mdi/js';
@@ -14,6 +15,14 @@ import Button from 'react-bootstrap/Button'
 import Alert from 'react-bootstrap/Alert'
 
 const Login = () => {
+    const cookies = new Cookies();
+    const { t } = useTranslation();
+    let navigate = useNavigate();
+
+    const emptyError = t('error.Empty');
+    const incorrectError = t('error.Incorrect');
+    const notFoundError = t('error.NotFound');
+
     const [showPass, setShowPass] = useState(false);
     const [validated, setValidated] = useState(false);
     const [validationError, setValidationError] = useState(false);
@@ -24,12 +33,9 @@ const Login = () => {
     const [password, setPassword] = useState("");
 
     const [errorMessage, setErrorMessage] = useState({
-        email: "This field cannot be empty!",
-        password: "This field cannot be empty!",
+        email: emptyError,
+        password: emptyError,
     });
-
-    const cookies = new Cookies();
-    let navigate = useNavigate();
 
     Axios.defaults.withCredentials = true;
 
@@ -66,31 +72,31 @@ const Login = () => {
                         navigate("/dashboard");
                     }
                     else {
-                        setInvalidCredential("Incorrect email or password.");
+                        setInvalidCredential(incorrectError);
                         setErrorMessage({
-                            email: "This field cannot be empty!",
-                            password: "This field cannot be empty!"
+                            email: emptyError,
+                            password: emptyError
                         });
                     }
                 }).catch((error) => {
 
                     if (error.response) {
                         if (error.response.status === 403 || error.response.status === 401) {
-                            setInvalidCredential("Incorrect email or password.");
+                            setInvalidCredential(incorrectError);
                             setErrorMessage({
-                                email: "This field cannot be empty!",
-                                password: "This field cannot be empty!"
+                                email: emptyError,
+                                password: emptyError
                             });
                         }
                         else {
-                            setInvalidCredential("Incorrect email or password.");
+                            setInvalidCredential(incorrectError);
                         }
                     }
                     else if (error.request) {
                         // The request was made but no response was received
                         // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
                         // http.ClientRequest in node.js
-                        setInvalidCredential("Could not reach B&C Engine...");
+                        setInvalidCredential(notFoundError);
                     }
                 });
         }
@@ -125,7 +131,7 @@ const Login = () => {
             <NavB page="login" />
             <div className="container">
                 <div className="card shadow p-3 m-5">
-                    <h1 className="display-1 font-weight-bold text-center mt-5 mb-4">Login</h1>
+                    <h1 className="display-1 font-weight-bold text-center mt-5 mb-4">{t('login.Title')}</h1>
 
                     <Form
                         noValidate
@@ -136,13 +142,13 @@ const Login = () => {
                         {
                             InvalidCredential.length > 0 ?
                                 <Alert variant="danger">
-                                    {InvalidCredential}
+                                    (InvalidCredential)
                                 </Alert> :
                                 <></>
                         }
 
                         <Form.Group className="mb-4" controlId="floatingEmail">
-                            <FloatingLabel controlId="floatingEmail" label="Email address" className="mb-3" >
+                            <FloatingLabel controlId="floatingEmail" label={t('form.EmailAddress')} className="mb-3" >
                                 <Form.Control
                                     required
                                     type="email"
@@ -158,7 +164,7 @@ const Login = () => {
                         </Form.Group>
 
                         <Form.Group className="mb-5" controlId="floatingPassword">
-                            <FloatingLabel controlId="floatingPassword" label="Password" className="mb-3 inputWithShowHide" >
+                            <FloatingLabel controlId="floatingPassword" label={t('form.Password')} className="mb-3 inputWithShowHide" >
                                 <Form.Control
                                     required
                                     type={showPass ? "text" : "password"}
@@ -174,7 +180,7 @@ const Login = () => {
                                     size={1} />
 
                                 <Form.Control.Feedback type="invalid">
-                                    {errorMessage.password}
+                                    (errorMessage.password)
                                 </Form.Control.Feedback>
                             </FloatingLabel>
                         </Form.Group >
@@ -184,7 +190,7 @@ const Login = () => {
                                 id='loginButton'
                                 type="submit"
                                 className="btn btn-light py-2 px-5 my-1 shadow-sm border submitButton">
-                                Login
+                                {t('login.SubmitButton')}
                             </Button>
                         </div>
 
