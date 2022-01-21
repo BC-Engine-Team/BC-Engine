@@ -25,10 +25,10 @@ const DashboardChart = (props) => {
     //const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 
 
-    const [months, setMonths] = useState();
+    const [months] = useState();
     
 
-    const [chartData, setChartData] = useState({
+    const [chartData] = useState({
         labels: months,
         datasets: [
             {

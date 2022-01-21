@@ -1,5 +1,5 @@
 import React from 'react'
-import { useCallback, useEffect, useState } from 'react'
+import { useState } from 'react'
 import Table from 'react-bootstrap/Table'
 import '../styles/clientTable.css'
 
