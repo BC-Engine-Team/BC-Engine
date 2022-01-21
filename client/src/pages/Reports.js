@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react'
 import UnderConstruction from '../components/UnderConstruction'
 import NavB from '../components/NavB'
-import { useNavigate } from 'react-router'
+import { useNavigate } from 'react-router-dom'
 import Cookies from 'universal-cookie'
 
 const Reports = () => {
@@ -18,7 +18,7 @@ const Reports = () => {
     return (
         <div>
             <NavB />
-            <UnderConstruction pageName="Reports"/>
+            <UnderConstruction pageName="Reports" />
         </div>
     )
 }

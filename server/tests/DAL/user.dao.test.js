@@ -1,9 +1,9 @@
- const {sequelize,
-        dataTypes,
-        checkModelName,
-        checkPropertyExists,
-        checkHookDefined
-    } = require('sequelize-test-helpers');
+const { sequelize,
+    dataTypes,
+    checkModelName,
+    checkPropertyExists,
+    checkHookDefined
+} = require('sequelize-test-helpers');
 
 const UserModel = require('../../data_access_layer/models/localdb/user.model');
 const UserDAO = require('../../data_access_layer/daos/user.dao');
@@ -34,9 +34,9 @@ let listOfUsers = [
     },
     {
         dataValues: {
-        email: 'myEmail@email.com',
-        name: 'myName',
-        role: 'myRole'
+            email: 'myEmail@email.com',
+            name: 'myName',
+            role: 'myRole'
         }
     }
 ]
@@ -78,7 +78,7 @@ describe("Test User DAL", () => {
 
         it("UD1.2 - should return false when non existent email", async () => {
             // arrange
-            UserMock.$queryInterface.$useHandler(function(query, queryOptions, done){
+            UserMock.$queryInterface.$useHandler(function (query, queryOptions, done) {
                 return Promise.resolve(false);
             })
 
@@ -91,22 +91,23 @@ describe("Test User DAL", () => {
 
         it("UD1.3 - should catch error thrown by user model", async () => {
             // arrange
-            UserMock.$queryInterface.$useHandler(function(query, queryOptions, done){
+            UserMock.$queryInterface.$useHandler(function (query, queryOptions, done) {
                 return new Error("Error with the UserModel.");
             });
 
-            // act
-            const resp = await UserDAO.getUserByEmail("", UserMock);
+            // act and assert
+            const response = await UserDAO.getUserByEmail("", UserMock);
 
             // assert
-            expect(resp.message).toBe("Error with the UserModel.");
+            expect(response.message).toEqual("Error with the UserModel.");
+
         });
     });
 
     describe("UD2 - createUser", () => {
         it("UD2.1 - should return created user when valid", async () => {
             // arrange
-            UserMock.$queryInterface.$useHandler(function(query, queryOptions, done){
+            UserMock.$queryInterface.$useHandler(function (query, queryOptions, done) {
                 return Promise.resolve(createdUser);
             });
 
@@ -121,7 +122,7 @@ describe("Test User DAL", () => {
 
         it("UD2.2 - should catch error thrown by the User Model", async () => {
             // arrange
-            UserMock.$queryInterface.$useHandler(function(query, queryOptions, done){
+            UserMock.$queryInterface.$useHandler(function (query, queryOptions, done) {
                 return Promise.reject(new Error("Error with the User Model."));
             });
 
@@ -136,7 +137,7 @@ describe("Test User DAL", () => {
     describe("UD3 - getAllUsers", () => {
         it("UD3.1 - should return list of users", async () => {
             // arrange
-            UserMock.$queryInterface.$useHandler(function(query, queryOptions, done){
+            UserMock.$queryInterface.$useHandler(function (query, queryOptions, done) {
                 return Promise.resolve(listOfUsers);
             });
 
@@ -149,7 +150,7 @@ describe("Test User DAL", () => {
 
         it("UD3.2 - should return false when User Model rejects with false", async () => {
             // arrange
-            UserMock.$queryInterface.$useHandler(function(query, queryOptions, done){
+            UserMock.$queryInterface.$useHandler(function (query, queryOptions, done) {
                 return Promise.resolve(false);
             });
 
@@ -162,7 +163,7 @@ describe("Test User DAL", () => {
 
         it("UD3.3 - should catch error thrown by the User Model", async () => {
             // arrange
-            UserMock.$queryInterface.$useHandler(function(query, queryOptions, done){
+            UserMock.$queryInterface.$useHandler(function (query, queryOptions, done) {
                 return Promise.reject(new Error("Error with the User Model."));
             });
 
@@ -177,7 +178,7 @@ describe("Test User DAL", () => {
     describe("UD4 - updateUser", () => {
         it("UD4.1 - should return successful update message", async () => {
             // arrange
-            UserMock.$queryInterface.$useHandler(function(query, queryOptions, done){
+            UserMock.$queryInterface.$useHandler(function (query, queryOptions, done) {
                 return Promise.resolve(true);
             });
 
@@ -190,7 +191,7 @@ describe("Test User DAL", () => {
 
         it("UD4.2 - should return unsuccessful update message when UserModel resolves false", async () => {
             // arrange
-            UserMock.$queryInterface.$useHandler(function(query, queryOptions, done){
+            UserMock.$queryInterface.$useHandler(function (query, queryOptions, done) {
                 return Promise.resolve(false);
             })
 
@@ -203,7 +204,7 @@ describe("Test User DAL", () => {
 
         it("UD4.3 - should catch error thrown by the User Model", async () => {
             // arrange
-            UserMock.$queryInterface.$useHandler(function(query, queryOptions, done){
+            UserMock.$queryInterface.$useHandler(function (query, queryOptions, done) {
                 return Promise.reject(new Error("Error with the User Model."));
             });
 
@@ -218,7 +219,7 @@ describe("Test User DAL", () => {
     describe("UD5 - deleteUser", () => {
         it("UD5.1 - should return successful delete message", async () => {
             // arrange
-            UserMock.$queryInterface.$useHandler(function(query, queryOptions, done){
+            UserMock.$queryInterface.$useHandler(function (query, queryOptions, done) {
                 return Promise.resolve(true);
             });
 
@@ -231,7 +232,7 @@ describe("Test User DAL", () => {
 
         it("UD5.2 - should return false when non existent email", async () => {
             // arrange
-            UserMock.$queryInterface.$useHandler(function(query, queryOptions, done){
+            UserMock.$queryInterface.$useHandler(function (query, queryOptions, done) {
                 return Promise.resolve(false);
             })
 
@@ -244,7 +245,7 @@ describe("Test User DAL", () => {
 
         it("UD5.3 - should catch error thrown by user model", async () => {
             // arrange
-            UserMock.$queryInterface.$useHandler(function(query, queryOptions, done){
+            UserMock.$queryInterface.$useHandler(function (query, queryOptions, done) {
                 return new Error("Error with the UserModel.");
             });
 

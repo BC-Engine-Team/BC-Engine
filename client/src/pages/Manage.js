@@ -5,7 +5,6 @@ import NavB from '../components/NavB'
 import UnderConstruction from '../components/UnderConstruction'
 
 const Manage = () => {
-
     let navigate = useNavigate();
     const cookies = new Cookies();
 
@@ -13,16 +12,16 @@ const Manage = () => {
         if (cookies.get("accessToken") === undefined) {
             navigate("/login");
         }
-        else if(cookies.get("role") !== "admin") {
+        else if (cookies.get("role") !== "admin") {
             navigate("/dashboard");
-        } 
+        }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     return (
         <div>
             <NavB />
-            <UnderConstruction pageName="Manage"/>
+            <UnderConstruction pageName="Manage" />
         </div>
     )
 }

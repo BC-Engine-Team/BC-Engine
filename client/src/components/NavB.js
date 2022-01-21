@@ -1,5 +1,4 @@
 import Navbar from 'react-bootstrap/Navbar'
-import Container from 'react-bootstrap/Container'
 import Nav from 'react-bootstrap/Nav'
 import { LinkContainer } from "react-router-bootstrap"
 import logo from '../Images/logo.png'
@@ -7,11 +6,28 @@ import { useState } from 'react'
 import Axios from 'axios'
 import { useNavigate } from 'react-router-dom'
 import Cookies from 'universal-cookie'
+import { useTranslation } from 'react-i18next';
+import { Container, NavDropdown} from 'react-bootstrap'
 
 const NavB = (props) => {
     const [page] = useState(props);
     const cookies = new Cookies();
+    const { t, i18n } = useTranslation();
 
+    const lngs = {
+        en: { nativeName: 'English' },
+        fr: { nativeName: 'Français' }
+    };
+
+    const DashboardLabel = t('navbar.DashboardLabel');
+    const ReportsLabel = t('navbar.ReportsLabel');
+    const UsersLabel = t('navbar.UsersLabel');
+    const ManageLabel = t('navbar.ManageLabel');
+    const GreetingLabel = t('navbar.Greeting');
+    const SignOutLabel = t('navbar.SignOutLabel');
+
+    const [languageTitle, setLanguageTitle] = useState(lngs[i18n.language].nativeName);
+    
     let username;
     let role;
 
@@ -68,8 +84,8 @@ const NavB = (props) => {
     if (page.page === "login") {
         return (
             <Navbar variant="dark" bg="dark" className="mb-2">
-                <Container fluid className="justify-content-center">
-                    <Navbar.Brand>
+                <Container fluid className="navContainer">
+                    <Navbar.Brand className="navBrandLogin">
                         <img
                             alt="logo"
                             src={logo}
@@ -79,7 +95,25 @@ const NavB = (props) => {
                         />
                         {' '} B&C Engine
                     </Navbar.Brand>
+
+                    <Nav className="ms-auto">
+                        <NavDropdown title={languageTitle} id="navbar-language-dropdown-login">
+                            {Object.keys(lngs).map((lng) => (
+                                <NavDropdown.Item 
+                                    id={lng} 
+                                    key={lng}
+                                    onClick={() => {
+                                        i18n.changeLanguage(lng);
+                                        setLanguageTitle(lngs[lng].nativeName);
+                                    }}>
+                                    {lngs[lng].nativeName}
+                                </NavDropdown.Item>
+                            ))}
+                        </NavDropdown>
+                    </Nav>
+                        
                 </Container>
+                
             </Navbar>
         )
     }
@@ -104,34 +138,49 @@ const NavB = (props) => {
                             role === "admin" ?
                                 <Nav className="me-auto">
                                     <LinkContainer to="/dashboard" className="px-2">
-                                        <Nav.Link>Dashboard</Nav.Link>
+                                        <Nav.Link>{DashboardLabel}</Nav.Link>
                                     </LinkContainer>
                                     <LinkContainer to="/reports" className="px-2">
-                                        <Nav.Link>Reports</Nav.Link>
+                                        <Nav.Link>{ReportsLabel}</Nav.Link>
                                     </LinkContainer>
                                     <LinkContainer to="/users" className="px-2">
-                                        <Nav.Link>Users</Nav.Link>
+                                        <Nav.Link>{UsersLabel}</Nav.Link>
                                     </LinkContainer>
                                     <LinkContainer to="/manage" className="px-2">
-                                        <Nav.Link>Manage</Nav.Link>
+                                        <Nav.Link>{ManageLabel}</Nav.Link>
                                     </LinkContainer>
                                 </Nav>
                                 :
                                 <Nav className="me-auto">
                                     <LinkContainer to="/dashboard" className="px-2">
-                                        <Nav.Link>Dashboard</Nav.Link>
+                                        <Nav.Link>{DashboardLabel}</Nav.Link>
                                     </LinkContainer>
                                     <LinkContainer to="/reports" className="px-2">
-                                        <Nav.Link>Reports</Nav.Link>
+                                        <Nav.Link>{ReportsLabel}</Nav.Link>
                                     </LinkContainer>
                                 </Nav>
                         }
 
                         <Nav className="justify-content-end">
-                            <Navbar.Text className="px-2 me-1 navBarGreeting">
-                                Hello, {username}
+                            <Navbar.Text className="me-2">
+                                {GreetingLabel} {username}
                             </Navbar.Text>
-                            <Nav.Link className="px-2" id="sign_out" onClick={logout}>Sign out</Nav.Link>
+
+                            <NavDropdown title={languageTitle} id="navbar-language-dropdown">
+                                {Object.keys(lngs).map((lng) => (
+                                    <NavDropdown.Item 
+                                        id={lng} 
+                                        key={lng}
+                                        onClick={() => {
+                                            i18n.changeLanguage(lng);
+                                            setLanguageTitle(lngs[lng].nativeName);
+                                        }}>
+                                        {lngs[lng].nativeName}
+                                    </NavDropdown.Item>
+                                ))}
+                            </NavDropdown>
+
+                            <Nav.Link id="sign_out" onClick={logout}>{SignOutLabel}</Nav.Link>
                         </Nav>
 
                     </Navbar.Collapse>

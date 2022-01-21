@@ -47,3 +47,18 @@ input, select, button{
     display: none;
   } 
 }
+.navLogin {
+  text-align: center;
+}
+
+.navContainer {
+  position: relative;
+}
+
+.navBrandLogin {
+  float: none;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%)
+}

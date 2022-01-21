@@ -45,7 +45,9 @@ exports.getAverages = async (startDateStr, endDateStr) => {
             reject(err);
         });
 
+
         // Populate average list with average for each month
+        if (totalDuesList.length === 0 || billedList.length === 0) return;
         let counter = 0;
         yearMonthList.forEach(ym => {
             let average = totalDuesList[counter].totalDues / billedList[counter].billed * 365;
@@ -81,7 +83,7 @@ exports.getDues = async (yearMonthList) => {
             }
             resolve(false);
         }).catch(err => {
-            reject(err.message);
+            reject(err);
         });
     });
 }
@@ -98,15 +100,13 @@ exports.getBilled = async (startDateStr, endDateStr, yearMonthList) => {
     return new Promise(async (resolve, reject) => {
         await InvoiceAffectDao.getInvoicesByDate(startDateStr, endDateStr).then(async data => {
             if (data) {
+
                 yearMonthList.forEach(ym => {
                     let billed = 0;
 
-                    let counter = 0;
-
                     data.forEach(i => {
-                        if (i['INVOCIE_DATE'] >= startDate && i['INVOCIE_DATE'] < endDate) {
-                            billed += i['AFFECT_AMOUNT'];
-                            counter++;
+                        if (i.invoiceDate >= startDate && i.invoiceDate < endDate) {
+                            billed += i.amount;
                         }
                     });
 
@@ -122,7 +122,8 @@ exports.getBilled = async (startDateStr, endDateStr, yearMonthList) => {
             }
             resolve(false);
         }).catch(err => {
-            reject(err.message);
-        });
+            reject(err);
+        })
     });
 }
+

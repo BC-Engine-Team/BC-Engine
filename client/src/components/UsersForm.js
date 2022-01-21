@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Axios from 'axios';
 import Cookies from 'universal-cookie'
+import { useTranslation } from 'react-i18next';
 
 import Icon from '@mdi/react'
 import { mdiEye } from '@mdi/js';
@@ -16,8 +17,12 @@ import FloatingLabel from 'react-bootstrap/esm/FloatingLabel'
 const UsersForm = (props) => {
     let navigate = useNavigate();
 
+    const { t } = useTranslation();
     const displayNone = "d-none";
     const cookies = new Cookies();
+
+    const emptyError = t('error.Empty');
+    const notFoundError = t('error.NotFound');
 
     // To fix issue where useEffects would trigger when component was loaded
     const [isLoadEdit, setIsLoadEdit] = useState(false);
@@ -73,8 +78,8 @@ const UsersForm = (props) => {
         setEmailEnable("");
         setPasswordEnable("");
         setRoleEnable("");
-        setFormTitle("Add User");
-        setFormSubmit("Add");
+        setFormTitle(t('user.create.Title'));
+        setFormSubmit(t('user.create.FormSubmit'));
         disableBackButton();
         setErrors({});
         setForm({
@@ -99,8 +104,8 @@ const UsersForm = (props) => {
         setEmailEnable("disable");
         setPasswordEnable("");
         setRoleEnable("");
-        setFormTitle("Edit User");
-        setFormSubmit("Save Changes");
+        setFormTitle(t('user.update.Title'));
+        setFormSubmit(t('user.update.FormSubmit'));
         disableBackButton();
         setForm({
             email: email,
@@ -131,16 +136,16 @@ const UsersForm = (props) => {
         }
 
         else if (InvalidInput.length === 0) {
-            if (FormTitle === "Add User") {
-                setFormTitle("Confirm creation?");
+            if (FormTitle === t('user.update.Title')) {
+                setFormTitle(t('user.update.Confirmation'));
             }
-            else if (FormTitle === "Edit User") {
-                setFormTitle("Confirm modification?");
+            else if (FormTitle === t('user.create.Title')) {
+                setFormTitle(t('user.create.Confirmation'));
             }
 
             setSubmitType("button");
             setOnConfirmationScreen(true);
-            setFormSubmit("Confirm");
+            setFormSubmit(t('form.SubmitButton'));
             setEmailEnable("disable");
             setPasswordEnable("disable");
             setShowPass(false);
@@ -165,10 +170,10 @@ const UsersForm = (props) => {
             role: form.role
         }
 
-        if (FormTitle === "Confirm modification?") {
+        if (FormTitle === t('user.update.Confirmation')) {
             onUpdateClick();
         }
-        else if (FormTitle === "Confirm creation?") {
+        else if (FormTitle === t('user.create.Confirmation')) {
             Axios.post(`${process.env.REACT_APP_API}/users/`, data, { headers: header })
                 .then((response) => {
                     if (response.status === 200 || response.status === 201) {
@@ -190,7 +195,7 @@ const UsersForm = (props) => {
                         // The request was made but no response was received
                         // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
                         // http.ClientRequest in node.js
-                        setInvalidInput("Could not reach B&C Engine...");
+                        setInvalidInput(notFoundError);
                     }
                 });
         }
@@ -201,28 +206,28 @@ const UsersForm = (props) => {
         const newErrors = {};
 
         // email errors
-        if (!email || email === "") newErrors.email = "This field cannot be empty!";
-        else if (!email.endsWith("@benoit-cote.com")) newErrors.email = "Invalid email. Must end with 'benoit-cote.com'.";
+        if (!email || email === "") newErrors.email = emptyError;
+        else if (!email.endsWith("@benoit-cote.com")) newErrors.email = t('user.error.InvalidEmailValidation');
 
         // password errors
         if (!password1 || password1 === "") {
-            newErrors.password1 = "This field cannot be empty!";
+            newErrors.password1 = emptyError;
 
         } else if (!RegExp("^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.{8,})").exec(password1)) {
-            newErrors.password1 = "Password must be at least 8 characters, contain 1 upper-case and 1 lower-case letter, and contain a number.";
+            newErrors.password1 = t('user.error.InvalidPasswordValidation');
 
         }
         if (password1 !== password2) {
-            newErrors.password1 = "Passwords must match!";
-            newErrors.password2 = "Passwords must match!";
+            newErrors.password1 = t('error.PasswordMatch');
+            newErrors.password2 = t('error.PasswordMatch');
 
         }
         if (!password2 || password2 === "") {
-            newErrors.password2 = "This field cannot be empty!";
+            newErrors.password2 = emptyError;
         }
 
         // role errors
-        if (!role || role === "") newErrors.role = "Must select a role!";
+        if (!role || role === "") newErrors.role = t('user.error.MustSelectRoleValidation');
 
         return newErrors;
     }
@@ -264,14 +269,14 @@ const UsersForm = (props) => {
             .catch((error) => {
                 if (error.response) {
                     if (error.response.status === 401 || error.response.status === 403) {
-                        setInvalidInput("Cannot recognize the email address");
+                        setInvalidInput(t('user.error.InvalidEmailUpdate'));
                     }
                     else {
-                        setInvalidInput("Malfunction in the B&C Engine...");
+                        setInvalidInput(notFoundError);
                     }
                 }
                 else if (error.request) {
-                    setInvalidInput("Can't send the request to modify the user");
+                    setInvalidInput(t('user.error.RequestFailedUpdate'));
                 }
             });
 
@@ -280,15 +285,15 @@ const UsersForm = (props) => {
     }
 
     const handleGoBack = () => {
-        if (FormTitle === "Confirm creation?") {
+        if (FormTitle === t('user.create.Confirmation')) {
             setEmailEnable("");
-            setFormTitle("Add User");
-            setFormSubmit("Add");
+            setFormTitle(t('user.create.Title'));
+            setFormSubmit(t('user.create.FormSubmit'));
         }
-        else if (FormTitle === "Confirm modification?") {
+        else if (FormTitle === t('user.update.Confirmation')) {
             setEmailEnable("disable");
-            setFormTitle("Edit User");
-            setFormSubmit("Save Changes");
+            setFormTitle(t('user.update.Title'));
+            setFormSubmit(t('user.update.FormSubmit'));
         }
 
         setSubmitType("submit");
@@ -352,7 +357,7 @@ const UsersForm = (props) => {
                 }
 
                 <Form.Group className="mb-4" controlId="floatingEmail">
-                    <FloatingLabel controlId="floatingEmail" label="Email address" className="mb-3" >
+                    <FloatingLabel controlId="floatingEmail" label={t('form.EmailAddress')} className="mb-3" >
                         <Form.Control
                             required
                             type="email"
@@ -370,7 +375,7 @@ const UsersForm = (props) => {
                 </Form.Group>
 
                 <Form.Group className="mb-4" controlId="floatingPassword1">
-                    <FloatingLabel controlId="floatingPassword1" label="Password" className="mb-3" >
+                    <FloatingLabel controlId="floatingPassword1" label={t('form.Password')} className="mb-3" >
                         <Form.Control
                             required
                             type={showPass ? "text" : "password"}
@@ -398,7 +403,7 @@ const UsersForm = (props) => {
                 </Form.Group>
 
                 <Form.Group className="mb-4" controlId="floatingPassword2">
-                    <FloatingLabel controlId="floatingPassword2" label="Confirm Password" className="mb-3" >
+                    <FloatingLabel controlId="floatingPassword2" label={t('form.ConfirmPassword')} className="mb-3" >
                         <Form.Control
                             required
                             type={showPass2 ? "text" : "password"}
@@ -427,7 +432,7 @@ const UsersForm = (props) => {
                 </Form.Group>
 
                 <Form.Group className="mb-4" controlId="floatingModifyRole">
-                    <Form.Label>Role</Form.Label>
+                    <Form.Label>{t('form.Role')}</Form.Label>
                     <Form.Select required
                         size="sm"
                         aria-label="Default select example"
@@ -436,9 +441,9 @@ const UsersForm = (props) => {
                         disabled={roleEnable}
                         isInvalid={!!errors.role}>
 
-                        <option value="">Select User</option>
-                        <option value="admin">Admin</option>
-                        <option value="employee">Employee</option>
+                        <option value="">{t('user.table.select.Default')}</option>
+                        <option value="admin">{t('user.table.select.Admin')}</option>
+                        <option value="employee">{t('user.table.select.Employee')}</option>
                     </Form.Select>
 
                     <Form.Control.Feedback type="invalid">
@@ -460,7 +465,7 @@ const UsersForm = (props) => {
                         className={backEnabled.backButton}
                         style={{ display: 'inline-block' }}
                         onClick={handleGoBack}>
-                        Go back
+                        {t('user.GoBackButton')}
                     </Button>
 
                 </div>

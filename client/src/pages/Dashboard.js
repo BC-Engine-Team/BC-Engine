@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
-import { InputGroup, FormControl, FormLabel, Button, OverlayTrigger, Tooltip as ToolTipBootstrap, FormCheck } from 'react-bootstrap'
+import { InputGroup, FormControl, FormLabel, Button, OverlayTrigger, Tooltip as ToolTipBootstrap, FormCheck } from 'react-bootstrap';
+import { useTranslation } from 'react-i18next';
 import Axios from 'axios';
 import Cookies from 'universal-cookie';
 import NavB from '../components/NavB';
@@ -30,6 +31,131 @@ const Dashboard = () => {
     let counter = 1;
     let navigate = useNavigate();
     const cookies = new Cookies();
+    const { t } = useTranslation();
+
+    // variables used for internationalization
+    const chartReportNamePlaceHolder = t('dashboard.criteria.NamePlaceHolder');
+    const loadChartButtonText = t('dashboard.criteria.LoadChartButton');
+    const chartTitle = t('dashboard.chart.Title');
+    const chartXLabel = t('dashboard.chart.XAxisLabel');
+    const chartYLabel = t('dashboard.chart.YAxisLabel');
+    const months = [
+        t('dashboard.chart.months.Jan'),
+        t('dashboard.chart.months.Feb'),
+        t('dashboard.chart.months.Mar'),
+        t('dashboard.chart.months.Apr'),
+        t('dashboard.chart.months.May'),
+        t('dashboard.chart.months.Jun'),
+        t('dashboard.chart.months.Jul'),
+        t('dashboard.chart.months.Aug'),
+        t('dashboard.chart.months.Sep'),
+        t('dashboard.chart.months.Oct'),
+        t('dashboard.chart.months.Nov'),
+        t('dashboard.chart.months.Dec')
+    ];
+    const chartFallbackLegendLabel = t('dashboard.chart.FallbackLegendLabel');
+
+    let label = ""
+    let colors = [
+        'rgb(255, 192, 159)',
+        'rgb(191, 175, 192)',
+        'rgb(255, 238, 147)',
+        'rgb(160, 206, 217)',
+        'rgb(173, 247, 182)'
+    ];
+
+    const fallbackChartData = [
+        {
+            label: chartFallbackLegendLabel,
+            data: [5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5],
+            backgroundColor: 'rgb(127, 128, 203)'
+        }
+    ];
+
+
+    const [chartData, setChartData] = useState(fallbackChartData);
+    const [preparedChartData, setPreparedChartData] = useState();
+    const [authorized, setAuthorized] = useState(false);
+
+    const chart = async () => {
+        let datasets = [];
+
+        let header = {
+            'authorization': "Bearer " + cookies.get("accessToken"),
+        }
+
+        const dates = {
+            startDate: "2017-01-01",
+            endDate: "2020-12-01"
+        };
+
+        await Axios.get(`${process.env.REACT_APP_API}/invoice/defaultChartAndTable/${dates.startDate}/${dates.endDate}`, { headers: header })
+            .then((res) => {
+                if (res.status === 403 && res.status === 401) {
+                    setAuthorized(false);
+                    return;
+                }
+                setAuthorized(true);
+
+
+                let previousYear = parseInt(res.data[0].month.toString().substring(0, 4));
+                let data = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+                let color = colors[0];
+                let colorCounter = 0;
+
+                for (let i = 0; i < res.data.length; i++) {
+                    let year = parseInt(res.data[i].month.toString().substring(0, 4));
+                    let month = parseInt(res.data[i].month.toString().substring(4));
+                    let average = parseFloat(res.data[i].average);
+
+                    if (year !== previousYear || res.data[i].month === res.data[res.data.length - 1].month) {
+                        if (res.data[i].month === res.data[res.data.length - 1].month) {
+                            for (let x = 0; x < data.length; x++) {
+                                if ((month - 1) === x) {
+                                    data[x] = average;
+                                }
+                            }
+                        }
+
+                        color = colors[colorCounter];
+                        colorCounter++;
+                        if (colorCounter === colors.length) colorCounter = 0;
+
+                        label = previousYear;
+                        datasets.push({
+                            label: label,
+                            data: data,
+                            backgroundColor: color
+                        });
+                        previousYear = year;
+                        data = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+                    }
+
+                    for (let x = 0; x < data.length; x++) {
+                        if ((month - 1) === x) {
+                            data[x] = average;
+                        }
+                    }
+                }
+
+                setPreparedChartData(datasets);
+
+                setChartData(datasets);
+            })
+            .catch((error) => {
+                if (error.response) {
+                    if (error.response.status === 403 || error.response.status === 401) {
+                        console.log(error.response.body);
+                    }
+                    else {
+                        console.log("Malfunction in the B&C Engine...");
+                    }
+                }
+                else if (error.request) {
+                    console.log("Could not reach b&C Engine...");
+                }
+            });
+    }
 
     let months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
     let label = ""
@@ -186,16 +312,10 @@ const Dashboard = () => {
     }, []);
 
     const loadChartData = () => {
-        setChartData({
-            labels: months,
-            datasets: [
-                {
-                    label: label,
-                    data: preparedChartData,
-                    backgroundColor: 'rgb(127, 128, 203)'
-                }
-            ]
-        })
+        if (preparedChartData) {
+            setChartData(chartData);
+        }
+
     }
 
     return (
@@ -204,19 +324,20 @@ const Dashboard = () => {
             <div className='mainContainer mainDiv'>
                 <div className="justify-content-center main">
                     <div className="container-criteria">
-                        <div className="card shadow m-3 p-3">
-                            <h3 className="text-center">Chart Criteria</h3>
+                        <div className="card shadow my-3 mx-3">
+                            <h3 className="text-center">{t('dashboard.criteria.Title')}</h3>
 
-                            <InputGroup className="my-2" id='chartName'>
+                            <InputGroup className="my-2  px-2" >
                                 <FormControl
+                                    id='chartName'
                                     className="my-1"
-                                    placeholder="Enter Chart Report Name"
+                                    placeholder={chartReportNamePlaceHolder}
                                     aria-label="Username"
                                     aria-describedby="basic-addon1"
                                 />
                             </InputGroup>
 
-                            <FormLabel htmlFor="inputPassword5" className="ms-1">Employee</FormLabel>
+                            <FormLabel htmlFor="inputPassword5" className="ms-1">{t('dashboard.criteria.labels.Employee')}</FormLabel>
                             <InputGroup className="mb-2">
          
                                 {employeeCriteria.name !== "All"}
@@ -233,7 +354,7 @@ const Dashboard = () => {
                                                 name: e.target.value.split("/")[1]
                                             })}>
 
-                                            <option key="1" value="All/All">All</option>
+                                            <option key="1" value="All/All">{t('dashboard.criteria.All')}</option>
                                             {employeeSelect.map(e => {
                                                 counter++
                                                 return (
@@ -247,7 +368,7 @@ const Dashboard = () => {
                                     placement="top"
                                     overlay={
                                         <ToolTipBootstrap id="compareBTN-tooltip">
-                                            Compare selected employee with all employees
+                                            {t('dashboard.criteria.Compare')}
                                         </ToolTipBootstrap>
                                     } >
 
@@ -267,14 +388,13 @@ const Dashboard = () => {
                                     </Button>
                                 </OverlayTrigger>
 
-                                
                             </InputGroup>
                             
                             <Button
                                 onClick={loadChartData}
-                                className='my-2'
+                                className='my-2 mx-2'
                                 variant='primary'>
-                                Load Chart
+                                {loadChartButtonText}
                             </Button>
                         </div>
                     </div>
@@ -282,7 +402,11 @@ const Dashboard = () => {
                         <div className="card shadow my-3 mx-3 p-2 pt-3">
                             {chartData &&
                                 <Bar
-                                    data={chartData.datasets.length === 0 || authorized === false ? fallbackChartData : chartData}
+                                    id='chart'
+                                    data={{
+                                        labels: months,
+                                        datasets: chartData.length === 0 || authorized === false ? fallbackChartData : chartData
+                                    }}
 
                                     options={{
                                         responsive: true,
@@ -292,7 +416,7 @@ const Dashboard = () => {
                                             yAxes: {
                                                 title: {
                                                     display: true,
-                                                    text: 'Days',
+                                                    text: chartYLabel,
                                                     font: {
                                                         size: 15
                                                     }
@@ -301,7 +425,7 @@ const Dashboard = () => {
                                             xAxes: {
                                                 title: {
                                                     display: true,
-                                                    text: 'Months',
+                                                    text: chartXLabel,
                                                     font: {
                                                         size: 15
                                                     }
@@ -311,11 +435,12 @@ const Dashboard = () => {
                                         plugins: {
                                             title: {
                                                 display: true,
-                                                text: 'Average Collection Days over Time',
+                                                text: chartTitle,
                                                 font: {
                                                     size: 25,
                                                     family: 'system-ui',
-                                                    weight: "600"
+                                                    weight: '600'
+
                                                 },
                                                 color: 'black'
                                             },

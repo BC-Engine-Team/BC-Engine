@@ -2,10 +2,10 @@ const database = require('../databases')['mssql_pat']
 const InvoiceAffectModel = database.invoice_affect;
 const { QueryTypes } = require('sequelize');
 
-exports.getInvoicesByDate = async (startDate, endDate, invoiceAffectModel = InvoiceAffectModel) => {
+exports.getInvoicesByDate = async (startDate, endDate, db = database) => {
     return new Promise(async (resolve, reject) => {
         try {
-            const data = await database.query(
+            const data = await db.query(
                 "Select IH.INVOCIE_DATE, IH.ACTOR_ID, BIA.AFFECT_AMOUNT \
                 from INVOICE_HEADER IH, BOSCO_INVOICE_AFFECT BIA \
                 Where IH.INVOICE_PREVIEW=0 \
@@ -18,8 +18,18 @@ exports.getInvoicesByDate = async (startDate, endDate, invoiceAffectModel = Invo
                     type: QueryTypes.SELECT
                 }
             );
-            if (data) resolve(data);
-            reject(false);
+            if (data) {
+                let returnData = [];
+                data.forEach(e => {
+                    returnData.push({
+                        invoiceDate: e['INVOCIE_DATE'],
+                        actorId: e['ACTOR_ID'],
+                        amount: e['AFFECT_AMOUNT']
+                    });
+                });
+                resolve(returnData);
+            }
+            resolve(false);
         }
         catch (err) {
             reject(err);
