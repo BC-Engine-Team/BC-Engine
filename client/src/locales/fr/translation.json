@@ -51,7 +51,13 @@
     "dashboard": {
        "criteria": {
           "NamePlaceHolder": "Entrez le nom de votre Rapport Graphique",
-          "LoadChartButton": "Mettre à jour le Graphique"
+          "LoadChartButton": "Mettre à jour le Graphique",
+          "Title":"Filtres du graphique",
+          "Compare":"Comparer l'employé selectionné avec tous les employés",
+          "All":"Tous",
+          "labels": {
+             "Employee":"Employé"
+          }
        },
        "chart": {
           "Title": "Moyenne de Jour de Collection par Mois",
