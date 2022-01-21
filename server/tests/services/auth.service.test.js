@@ -59,7 +59,7 @@ describe("Test Authentication Service", () => {
         describe("AS1.1 - given no token in header", () =>{
             it("AS1.1.1 - should return 403 Forbidden", async () =>{
                 // act
-                const response = await request.delete("/users/logout");
+                const response = await request.delete("/api/users/logout");
 
                 // assert
                 expect(response.status).toBe(403);
@@ -72,7 +72,7 @@ describe("Test Authentication Service", () => {
                 AuthService.setRefreshTokens("test");
 
                 // act
-                const response = await request.delete("/users/logout")
+                const response = await request.delete("/api/users/logout")
                     .set("authorization", `Bearer test`);
 
                 // assert
@@ -81,7 +81,7 @@ describe("Test Authentication Service", () => {
     
             it("AS2.2 - should return 403 when invalid token", async () => {
                 // act
-                const response = await request.delete("/users/logout")
+                const response = await request.delete("/api/users/logout")
                     .set("authorization", "Bearer invalidToken");
 
                 // assert
@@ -96,7 +96,7 @@ describe("Test Authentication Service", () => {
         describe("AS2.1 - given no token in header", () =>{
             it("AS2.1.1 - should return 403 Forbidden", async () =>{
                 // act
-                const response = await request.post("/users");
+                const response = await request.post("/api/users");
 
                 // assert
                 expect(response.status).toBe(403);
@@ -109,7 +109,7 @@ describe("Test Authentication Service", () => {
                 const [aToken, rToken] = AuthService.getTokens(reqUser);
     
                 // act
-                const resp = await request.post("/users")
+                const resp = await request.post("/api/users")
                     .set("authorization", `Bearer ${aToken}`)
                     .send(reqUser);
                 
@@ -123,7 +123,7 @@ describe("Test Authentication Service", () => {
         describe("AS2.3 - given invalid token in header", () =>{
             it("AS2.3.1 - should return 401 Unauthorized", async () =>{
                 // act
-                const response = await request.get("/users")
+                const response = await request.get("/api/users")
                     .set("authorization", `Bearer invalidToken`);
             
                 // assert
@@ -131,7 +131,7 @@ describe("Test Authentication Service", () => {
             });
             it("AS2.3.2 - should return 403 Forbidden", async () =>{
                 // act
-                const response = await request.get("/users")
+                const response = await request.get("/api/users")
                     .set("authorization", `invalidToken`);
 
                 // assert

@@ -1,0 +1,147 @@
+{
+    "navbar": {
+       "DashboardLabel": "Tableau de bord",
+       "ReportsLabel": "Rapports",
+       "UsersLabel": "Utilisateurs",
+       "ManageLabel": "Gérer",
+       "Greeting": "Bonjour, ",
+       "SignOutLabel": "Se déconnecter"
+    },
+    "login": {
+       "Title": "Connexion",
+       "SubmitButton": "Se Connecter"
+    },
+    "user": {
+       "table": {
+          "AddButton": "Ajouter un utilisateur",
+          "Name": "NOM",
+          "Email": "COURIEL",
+          "Role": "ROLE",
+          "select": {
+             "Default": "Selectionner un role",
+             "Admin": "administrateur",
+             "Employee": "employé"
+          }
+       },
+       "delete": {
+          "NotAuthorized": "Vous n'ètes pas authoriser à performer cet action.",
+          "Yes": "Oui",
+          "No": "Non",
+          "Title": "Êtes-vous sur de vouloir supprimer "
+       },
+       "update": {
+          "Title": "Modifier l'utilisateur",
+          "Confirmation": "Confirmer les modifications?",
+          "FormSubmit": "Savegarder les modifications"
+       },
+       "create": {
+          "Title": "Ajouter un utilisateur",
+          "Confirmation": "Confirmer l'ajout?",
+          "FormSubmit": "Ajouter"
+       },
+       "error": {
+          "InvalidEmailValidation": "Addresse couriel invalide. Il doit commencer par 'benoit-cote.com'",
+          "InvalidPasswordValidation": "Mot de pass doit être au moins 8 charactères,  contenir 1 lettre majuscule et une lettre minuscule, et doit contenir un chiffre.",
+          "MustSelectRoleValidation": "Selectionez un role!",
+          "InvalidEmailUpdate": "Incapable de reconnaître l'address couriel",
+          "RequestFailedUpdate": "Incapable d'envoyer la requête pour modifier l'utilisateur"
+       },
+       "GoBackButton": "Précédent"
+    },
+    "dashboard": {
+       "criteria": {
+          "NamePlaceHolder": "Entrez le nom de votre Rapport Graphique",
+          "LoadChartButton": "Mettre à jour le Graphique"
+       },
+       "chart": {
+          "Title": "Moyenne de Jour de Collection par Mois",
+          "YAxisLabel": "Jours",
+          "XAxisLabel": "Mois",
+          "months": {
+             "Jan": "Janvier",
+             "Feb": "Février",
+             "Mar": "Mars",
+             "Apr": "Avril",
+             "May": "Mai",
+             "Jun": "Juin",
+             "Jul": "Juillet",
+             "Aug": "Août",
+             "Sep": "Septembre",
+             "Oct": "Octobre",
+             "Nov": "Novembre",
+             "Dec": "Decembre"
+          },
+          "FallbackLegendLabel": "En attente des données..."
+       }
+    },
+    "manage": {
+       "table": {
+          "Title": "Liste des employés",
+          "Name": "NOM",
+          "Email": "COURIEL",
+          "type": {
+             "Title": "TYPE",
+             "Type1": "Superviseur",
+             "Type2": "Subalterne"
+          },
+          "ViewButton": "Voir les subalternes"
+       }
+    },
+    "reports": {
+       "reports": {
+          "Title": "Rapports",
+          "NameLabel": "Nom du Rapport",
+          "DateLabel": "Date du Rapport",
+          "EmployeeLabel": "Employé(es) concerné(es)",
+          "EmailButtonLabel": "Address Courriel",
+          "ExportButtonLabel": "Exporter"
+       },
+       "reportsManagement": {
+          "Title": "Gestion des Rapports",
+          "reportType": {
+             "Title": "Type de Rapport",
+             "PlaceHolder": "Selectionnez le Type de Rapport",
+             "EmpPerRep": "Rapport de Performance d'Employé(e)",
+             "SubPerRep": "Rapport de Performance des Subordonnés"
+          },
+          "frequency": {
+             "Title": "Fréquence",
+             "PlaceHolder": "Selectionnez la Fréquence",
+             "Week": "Hebdomadaire",
+             "BiWeek": "Bihebdomadaire",
+             "Month": "Mensuel",
+             "Bimonth": "Bimensuel",
+             "Year": "Annuel"
+          },
+          "employees": {
+             "Title": "Selectionnez les Employé(es)"
+          }
+       },
+       "chartReports": {
+          "Name": "NOM DU RAPPORT",
+          "Employee": "EMPLOYÉ",
+          "ClientType": "TYPE DE CLIENT",
+          "Country": "PAYS",
+          "AgeOfAccount": "AGE DU COMPTE",
+          "AccountType": "TYPE DU COMPTE",
+          "StartDate": "DATE DE DÉBUT",
+          "EndDate": "DATE DE FIN",
+          "LoadButton": "Charger"
+       }
+    },
+    "form": {
+       "Password": "Mot de passe",
+       "ConfirmPassword": "Confirmer le mot de passe",
+       "EmailAddress": "Addresse Couriel",
+       "Role": "Role",
+       "SubmitButton": "Confirmer"
+    },
+    "error": {
+       "Empty": "Ce champs est obligatoire!",
+       "Incorrect": "Address couriel ou mot de passe invalide.",
+       "NotFound": "Impossible d'atteindre B&C Engine...",
+       "PasswordMatch": "Les mots de passe ne correspondent pas!"
+    }
+ }
+ 
+ 

@@ -46,13 +46,13 @@ db.sync = async (database, options) => {
       return db[database].users.bulkCreate([
         {
           email: 'first@benoit-cote.com',
-          password: 'verySecurePassword',
+          password: 'verySecurePassword1',
           name: 'Marc Benoit',
           role: 'admin'
         },
         {
           email: 'second@benoit-cote.com',
-          password: 'verySecurePassword',
+          password: 'verySecurePassword1',
           name: 'JC Benoit',
           role: 'employee'
         }],

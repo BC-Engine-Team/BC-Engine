@@ -40,24 +40,24 @@ const resUserFromService = {
 
 let sandbox = sinon.createSandbox();
 let authStub = sandbox.stub(AuthService, 'authenticateToken')
-    .callsFake(function(req, res, next){
+    .callsFake(function (req, res, next) {
         req.user = reqUser;
         return next();
     });
 
 let empStub = sandbox.stub(EmpService, 'checkEmail')
-    .callsFake(function(req, res, next){
+    .callsFake(function (req, res, next) {
         req.emp = reqEmp;
         return next();
-});
+    });
 
 let userSpy = jest.spyOn(UserService, 'authenticateUser')
     .mockImplementation(() => new Promise((resolve) => {
         resolve(false);
-}));
+    }));
 
 let authSpy = jest.spyOn(AuthService, 'getTokens')
-    .mockImplementation(() =>  ["aToken","rToken"]);
+    .mockImplementation(() => ["aToken", "rToken"]);
 
 const makeApp = require('../../app');
 let app = makeApp();
@@ -65,7 +65,7 @@ const request = supertest(app);
 let res;
 
 describe("Test UserController", () => {
-    
+
     beforeEach(() => {
         jest.clearAllMocks();
         res = new MockExpressResponse();
@@ -78,7 +78,7 @@ describe("Test UserController", () => {
     afterAll(() => {
         process.exit;
     });
-    
+
     describe("UC1 - Create a User", () => {
 
         describe("UC1.1 - given a valid user body", () => {
@@ -95,9 +95,9 @@ describe("Test UserController", () => {
                     }));
 
                 // act
-                const response = await supertest(app).post("/users")
+                const response = await supertest(app).post("/api/users")
                     .send(reqUser);
-                
+
                 // assert
                 expect(response.status).toBe(200);
                 expect(JSON.stringify(response.body)).toEqual(JSON.stringify(expectedUser));
@@ -122,7 +122,7 @@ describe("Test UserController", () => {
                 };
 
                 // act
-                const response = await request.post("/users")
+                const response = await request.post("/api/users")
                     .send(noEmailReqUser);
 
                 // assert
@@ -144,7 +144,7 @@ describe("Test UserController", () => {
                 };
 
                 // act
-                const response = await request.post("/users")
+                const response = await request.post("/api/users")
                     .send(noPassReqUser);
 
                 // assert
@@ -166,7 +166,7 @@ describe("Test UserController", () => {
                 };
 
                 // act
-                const response = await request.post("/users")
+                const response = await request.post("/api/users")
                     .send(noRoleReqUser);
 
                 // assert
@@ -189,7 +189,7 @@ describe("Test UserController", () => {
                 };
 
                 // act
-                const response = await request.post("/users")
+                const response = await request.post("/api/users")
                     .send(wrongEmailReqUser);
 
                 // assert
@@ -208,7 +208,7 @@ describe("Test UserController", () => {
                 let response = await UserController.create(reqUserEmployee, res);
                 expect(response.statusCode).toBe(403);
             });
-        });    
+        });
     });
 
     describe("UC2 - View all Users", () => {
@@ -218,18 +218,18 @@ describe("Test UserController", () => {
                 // arrange
                 let ListUser = [];
                 const listUserLength = 3;
-                for(let i = 0; i < listUserLength; i++){
+                for (let i = 0; i < listUserLength; i++) {
                     ListUser.push(resUserFromService);
                 }
                 userSpy = jest.spyOn(UserService, 'getAllUsers')
-                .mockImplementation(() => new Promise(
-                    (resolve) => {
-                        resolve(ListUser);
-                    }
-                ));
+                    .mockImplementation(() => new Promise(
+                        (resolve) => {
+                            resolve(ListUser);
+                        }
+                    ));
 
                 // act
-                const response = await request.get("/users");
+                const response = await request.get("/api/users");
 
                 // assert
                 expect(response.status).toBe(200);
@@ -248,19 +248,19 @@ describe("Test UserController", () => {
             it("UC2.1.3 - Should respond with a 500 status code when user service throws error", async () => {
                 // arrange
                 userSpy = jest.spyOn(UserService, 'getAllUsers')
-                .mockImplementation(async () => {
-                    await Promise.reject({status: 500});
-                });
+                    .mockImplementation(async () => {
+                        await Promise.reject({ status: 500 });
+                    });
 
                 // act 
-                const response = await request.get("/users");
+                const response = await request.get("/api/users");
 
                 // assert
                 expect(response.status).toBe(500);
             });
         });
     });
-    
+
     describe("UC3 - Authenticating a User)", () => {
 
         describe("UC3.1 - given existing email and password", () => {
@@ -272,7 +272,7 @@ describe("Test UserController", () => {
                     }));
 
                 // act
-                const response = await request.post("/users/authenticate")
+                const response = await request.post("/api/users/authenticate")
                     .send(reqUser);
 
                 // assert
@@ -292,9 +292,9 @@ describe("Test UserController", () => {
                         resolve(false);
                     }));
                 authSpy = jest.spyOn(AuthService, 'getTokens');
-                
+
                 // act
-                const response = await request.post("/users/authenticate").send(reqUser);
+                const response = await request.post("/api/users/authenticate").send(reqUser);
 
                 // assert
                 expect(userSpy).toBeCalledTimes(1);
@@ -313,7 +313,7 @@ describe("Test UserController", () => {
                 authSpy = jest.spyOn(AuthService, 'getTokens');
 
                 // act
-                const response = await request.post("/users/authenticate").send(noEmailReqUser);
+                const response = await request.post("/api/users/authenticate").send(noEmailReqUser);
 
                 // assert
                 expect(response.statusCode).toBe(400);
@@ -327,16 +327,16 @@ describe("Test UserController", () => {
             it("UC3.4.1 - should return 500 and a message", async () => {
                 // arrange
                 userSpy = jest.spyOn(UserService, 'authenticateUser')
-                .mockRejectedValue(new Error("Error with the user service."));
+                    .mockRejectedValue(new Error("Error with the user service."));
                 authSpy = jest.spyOn(AuthService, 'getTokens');
 
                 // act
-                const response = await request.post("/users/authenticate").send(reqUser);
+                const response = await request.post("/api/users/authenticate").send(reqUser);
 
                 // assert
                 expect(response.statusCode).toBe(500);
                 expect(response.error.text).toBe("Error with the user service.");
-                
+
             });
         });
     });
@@ -354,16 +354,16 @@ describe("Test UserController", () => {
             role: "admin"
         }
 
-        describe("UC4.1 - given user is authenticated and that entries are valid", ()  =>{
+        describe("UC4.1 - given user is authenticated and that entries are valid", () => {
             it("UC4.1.1 - should respond with a 200 status code with a modified user", async () => {
                 // arrange
                 userSpy = jest.spyOn(UserService, "modifyUser")
-                .mockImplementation(() => new Promise((resolve) => {
-                    resolve(expectedUserToModifyValid);
-                }));
+                    .mockImplementation(() => new Promise((resolve) => {
+                        resolve(expectedUserToModifyValid);
+                    }));
 
                 // act
-                const response = await request.put(`/users/modify/${reqUser.email}`)
+                const response = await request.put(`/api/users/modify/${reqUser.email}`)
                     .send(expectedUserToModifyValid);
 
                 expect(response.status).toBe(200);
@@ -373,18 +373,18 @@ describe("Test UserController", () => {
         });
 
         describe("UC4.2 - given user is authenticated but email is invalid", () => {
-             it("UC4.2.1 - should respond with a 400 response message", async () => {
+            it("UC4.2.1 - should respond with a 400 response message", async () => {
                 // arrange
                 userSpy = jest.spyOn(UserService, "modifyUser");
 
                 // act
-                const response = await supertest(app).put(`/users/modify/someEmail`)
+                const response = await supertest(app).put(`/api/users/modify/someEmail`)
                     .send(modifiedUserInvalid);
 
                 // assert
                 expect(response.status).toBe(400);
                 expect(userSpy).toHaveBeenCalledTimes(0);
-             });
+            });
         });
 
         describe("UC4.3 - given I try to modify the user but I am not authorized", () => {
@@ -405,12 +405,12 @@ describe("Test UserController", () => {
             it("UC4.4.1 - Should respond with a 500 response message", async () => {
                 // arrange
                 userSpy = jest.spyOn(UserService, "modifyUser")
-                .mockImplementation(async () => {
-                    await Promise.reject({status: 500});
-                });
+                    .mockImplementation(async () => {
+                        await Promise.reject({ status: 500 });
+                    });
 
                 // act
-                const response = await request.put(`/users/modify/${expectedUserToModifyValid.email}`)
+                const response = await request.put(`/api/users/modify/${expectedUserToModifyValid.email}`)
                     .send(expectedUserToModifyValid);
 
                 // assert
@@ -422,19 +422,19 @@ describe("Test UserController", () => {
 
     describe("UC5 - Delete a User)", () => {
 
-        describe("UC5.1 - given user is authenticated and that the email is valid", ()  =>{
+        describe("UC5.1 - given user is authenticated and that the email is valid", () => {
             it("UC5.1.1 - should respond with a 200 status code with a deleted user", async () => {
                 // arrange
                 const deletedUser = {
                     email: reqUser.email
                 }
                 userSpy = jest.spyOn(UserService, "deleteUser")
-                .mockImplementation(() => new Promise((resolve) => {
-                    resolve(deletedUser);
-                }));
+                    .mockImplementation(() => new Promise((resolve) => {
+                        resolve(deletedUser);
+                    }));
 
                 // act
-                const response = await request.delete(`/users/delete/${deletedUser.email}`)
+                const response = await request.delete(`/api/users/delete/${deletedUser.email}`)
                     .send(deletedUser);
 
                 // assert
@@ -452,8 +452,8 @@ describe("Test UserController", () => {
                 // assert
                 expect(response.statusCode).toBe(403);
             });
-        }); 
-        
+        });
+
         describe("UC5.3 - given I try to call the deleteUser in userService but the deleteUser methods sends an error", () => {
             it("UC5.3.1 - Should respond with a 500 response message", async () => {
 
@@ -462,13 +462,13 @@ describe("Test UserController", () => {
                 }
 
                 userSpy = jest.spyOn(UserService, "deleteUser")
-                .mockImplementation(() => new Promise((resolve) => {
-                    resolve(expectedUserToDeleteInvalid);
-                }));
+                    .mockImplementation(() => new Promise((resolve) => {
+                        resolve(expectedUserToDeleteInvalid);
+                    }));
 
-                const response = await supertest(app).delete(`/users/delete/${expectedUserToDelete.email}`)
-                .set("authorization", "Bearer validToken")
-                .send(expectedUserToDelete);
+                const response = await supertest(app).delete(`/api/users/delete/${expectedUserToDelete.email}`)
+                    .set("authorization", "Bearer validToken")
+                    .send(expectedUserToDelete);
 
                 expect(response.status).toBe(500);
                 expect(userSpy).toHaveBeenCalledTimes(1);

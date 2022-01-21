@@ -64,7 +64,7 @@ describe("Test Employee Service", () => {
         describe("ES1.1 - given employee email", () => {
             it("ES1.1.1 - when existing, should return 200 with employee name and email", async () => {
                 // act
-                const response = await request.post("/users").send(reqUser);
+                const response = await request.post("/api/users").send(reqUser);
     
                 // assert
                 expect(response.status).toBe(200);
@@ -84,7 +84,7 @@ describe("Test Employee Service", () => {
                     }));
 
                 // act
-                const response = await request.post("/users").send(reqUser);
+                const response = await request.post("/api/users").send(reqUser);
     
                 // assert
                 expect(response.status).toBe(400);

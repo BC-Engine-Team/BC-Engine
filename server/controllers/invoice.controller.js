@@ -20,33 +20,40 @@ exports.testInvoices = async (req, res) => {
 }
 
 exports.getAverages = async (req, res) => {
-    if (!req.body.startDate || !req.body.endDate)
-        return res.status(400).send({message: "Content cannot be empty in invoice controller."});
-    await invoiceService.getAverages(req.body.startDate, req.body.endDate)
+    let regexDateStr = /^\d{4}-\d{2}-\d{2}$/;
+    let regexDate = new RegExp(regexDateStr);
+
+    if (!req.params.startDate || !req.params.endDate)
+        return res.status(400).send({ message: "Content cannot be empty." });
+
+    if (!regexDate.test(req.params.startDate) || !regexDate.test(req.params.endDate))
+        return res.status(400).send({ message: "Wrong format." });
+
+
+    await invoiceService.getAverages(req.params.startDate, req.params.endDate)
         .then(response => {
             if (response) {
                 return res.status(200).send(response);
             }
-            return res.status(404).send({message: "The averages could not be fetched from invoice controller because the url is unrecognizable."});
+            return res.status(500).send({ message: "The data could not be fetched." });
         })
         .catch(err => {
-            return res.status(500).send({message: "The averages could not be fetched from invoice controller because invoice service don't work properly."});
+            return res.status(500).send({ message: err.message });
         });
 }
 
-
-exports.getNamesAndCountries = async(req, res) => {
-    await invoiceService.getNamesAndCountries()
-        .then(response => {
-            if(response){
-                return res.status(200).send(response);
-            }
-            return res.status(404).send({message: "The name and countries could not be fetched from invoice controller because the url is unrecognizable."});
-        })
-        .catch(err => {
-            return res.status(500).send({message: "The name and countries could not be fetched from invoice controller because invoice service don't work properly."})
-        });
-}
+// exports.getNamesAndCountries = async(req, res) => {
+//     await invoiceService.getNamesAndCountries()
+//         .then(response => {
+//             if(response){
+//                 return res.status(200).send(response);
+//             }
+//             return res.status(404).send({message: "The name and countries could not be fetched from invoice controller because the url is unrecognizable."});
+//         })
+//         .catch(err => {
+//             return res.status(500).send({message: "The name and countries could not be fetched from invoice controller because invoice service don't work properly."})
+//         });
+// }
 
 
 exports.getAveragesTest = async (req, res) => {
