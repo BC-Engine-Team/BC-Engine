@@ -15,17 +15,16 @@ const Dashboard = () => {
     const [clients, setClients] = useState();
 
 
-    const handleRefresh = () => {
+    const handleRefreshChart = () => {
         let header = {
             'authorization': "Bearer " + cookies.get("accessToken"),
         }
 
         Axios.defaults.withCredentials = true;
 
-        Axios.get(`${process.env.REACT_APP_API}/invoice/defaultChartAndTable`, { headers: header })
+        Axios.get(`${process.env.REACT_APP_API}/invoice/defaultChart`, { headers: header })
             .then((response) => {
-                setChartData(response.data.chart);
-                setClients(response.data.client);
+                setChartData(response.data);
             })
             .catch((error) => {
                 if (error.response) {
@@ -43,12 +42,40 @@ const Dashboard = () => {
     }
 
 
+    const handleRefreshTable = () =>{
+        let header = {
+            'authorization': 'Bearer' + cookies.get("accessToken"),
+        }
 
+        Axios.defaults.withCredentials = true;
+
+        Axios.get(`${process.env.REACT_APP_API}/invoice/defaultTable`, { headers: header })
+            .then((response) => {
+                setClients(response.data);
+            })
+            .catch((error) => {
+                if(error.response){
+                    if(error.response.status === 403 || error.response.status === 401) {
+                        console.log(error.response.body);
+                    }
+                    else{
+                        console.log("Malfunction in the B&C Engine...");
+                    }
+                }
+                else if (error.request){
+                    console.log("Could not reach B&C Engine...");
+                }
+            });
+    }
+
+    
     useEffect(() => {
         if (cookies.get("accessToken") === undefined) {
             navigate("/login");
         }
-        handleRefresh();
+        handleRefreshChart();
+        handleRefreshTable();
+        
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 

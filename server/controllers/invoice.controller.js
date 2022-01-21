@@ -2,7 +2,6 @@ const invoiceService = require('../services/invoice.service');
 
 
 exports.findTransactionsBetweenDates = async (req, res) => {
-    if (req.user.role !== "admin") return res.status(403).send();
     await invoiceService.getTransactionsBetweenDates()
         .then(response => {
             return res.status(200).send(response);
@@ -21,20 +20,34 @@ exports.testInvoices = async (req, res) => {
 }
 
 exports.getAverages = async (req, res) => {
-    if (req.user.role !== "admin") return res.status(403).send();
     if (!req.body.startDate || !req.body.endDate)
-        return res.status(400).send("Content cannot be empty.");
+        return res.status(400).send({message: "Content cannot be empty in invoice controller."});
     await invoiceService.getAverages(req.body.startDate, req.body.endDate)
         .then(response => {
             if (response) {
                 return res.status(200).send(response);
             }
-            return res.status(404).send("The data could not be fetched.");
+            return res.status(404).send({message: "The averages could not be fetched from invoice controller because the url is unrecognizable."});
         })
         .catch(err => {
-            return res.status(500).send(err);
+            return res.status(500).send({message: "The averages could not be fetched from invoice controller because invoice service don't work properly."});
         });
 }
+
+
+exports.getNamesAndCountries = async(req, res) => {
+    await invoiceService.getNamesAndCountries()
+        .then(response => {
+            if(response){
+                return res.status(200).send(response);
+            }
+            return res.status(404).send({message: "The name and countries could not be fetched from invoice controller because the url is unrecognizable."});
+        })
+        .catch(err => {
+            return res.status(500).send({message: "The name and countries could not be fetched from invoice controller because invoice service don't work properly."})
+        });
+}
+
 
 exports.getAveragesTest = async (req, res) => {
     return res.send([

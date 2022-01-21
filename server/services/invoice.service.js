@@ -4,8 +4,8 @@ const ClientDao = require("../data_access_layer/daos/client.dao");
 const { addListener } = require("nodemon");
 
 
-let clientIDList = [];
 
+//method to get the dues
 exports.getDues = async (yearMonthList) => {
     let totalDuesList = [];
 
@@ -35,6 +35,10 @@ exports.getDues = async (yearMonthList) => {
     });
 }
 
+
+
+
+//method to get the billed amount
 exports.getBilled = async (startDateStr, endDateStr, yearMonthList) => {
     let billedList = [];
     let startDate = new Date(parseInt(startDateStr.substring(5, 7)) + " " + parseInt(startDateStr.substring(8)) + " " + parseInt(startDateStr.substring(0, 4)));
@@ -73,12 +77,29 @@ exports.getBilled = async (startDateStr, endDateStr, yearMonthList) => {
 }
 
 
-exports.getClientInformations = async(clientsID) => {
+
+let clientIDList = [];
+
+//method to get the names and countries based by clients id
+exports.getNamesAndCountries = async() => {
+
+    let formattedClientList = [];
+    let formattedName = "";
+
     return new Promise(async (resolve, reject) => {
         
-        await ClientDao.getClientByID(clientsID).then(async data => {
+        await ClientDao.getClientByID(clientIDList).then(async data => {
             if(data){
-                resolve(data);
+                data.forEach(i => {
+                    formattedName = i["NAME_1"] + " " + i["NAME_2"] + " " + i["NAME_3"];
+
+                    formattedClientList.push({
+                        name: formattedName,
+                        country: i["COUNTRY_LABEL"]
+                    });
+
+                });
+                resolve(formattedClientList);
             }
             resolve(false);
         });
@@ -86,21 +107,15 @@ exports.getClientInformations = async(clientsID) => {
 }
 
 
+
+
+//to get the averages for the chart
 exports.getAverages = async (startDateStr, endDateStr) => {
     const startYear = parseInt(startDateStr.split('-')[0]);
     let startMonth = parseInt(startDateStr.split('-')[1]);
     const endYear = parseInt(endDateStr.split('-')[0]);
     const endMonth = parseInt(endDateStr.split('-')[1]);
 
-    let clientList = [];
-
-    let returnData = {
-        chart: [],
-        clients: []
-    };
-
-
-    clientIDList = [];
 
     // make list of yearMonth [201911,202001,202002,...] to select dues
     let yearMonthList = [];
@@ -142,12 +157,6 @@ exports.getAverages = async (startDateStr, endDateStr) => {
         });
 
 
-        // Get list of client name by actor id
-        await this.getClientInformations(clientIDList).then(async data => {
-            clientList = data;
-        }); 
-
-
         // Populate average list with average for each month
         let counter = 0;
         yearMonthList.forEach(ym => {
@@ -158,10 +167,7 @@ exports.getAverages = async (startDateStr, endDateStr) => {
             });
             counter++;
         });
-
-        returnData.chart = averagesList;
-        returnData.clients = clientList;
-        resolve(returnData);
         
+        resolve(averagesList);
     });
 }

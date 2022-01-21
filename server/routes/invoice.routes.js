@@ -3,7 +3,9 @@ let router = require("express").Router();
 const authService = require('../services/auth.service');
 
 
-router.get("/defaultChartAndTable", authService.authenticateToken, invoiceController.getAverages);
+router.get("/defaultChart", authService.authenticateToken, invoiceController.getAverages);
+
+router.get("/defaultTable", authService.authenticateToken, invoiceController.getNamesAndCountries);
 
 router.get("/defaultChartTest", invoiceController.getAveragesTest);
 

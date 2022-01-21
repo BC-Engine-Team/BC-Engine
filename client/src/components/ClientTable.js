@@ -6,8 +6,7 @@ import '../styles/clientTable.css'
 const ClientTable = (data) => {
 
 
-    
-    const [clients, setClients] = useState([{name: "William Roger", country: "Canada", averagecollection: "35.6", amountowed: "4500", amountdue: "2122", clientgrading: "A", status: "ACTIVE"}]);
+    const [clients] = useState([{name: data["name"], country: data["country"]}]);
     
     let counter = 0;
 
@@ -40,11 +39,11 @@ const ClientTable = (data) => {
                                     <tr key={counter}>
                                         <td className='row-style'>{c.name}</td>
                                         <td className='row-style'>{c.country}</td>
-                                        <td className='row-style'>{c.averagecollection}</td>
+                                        {/* <td className='row-style'>{c.averagecollection}</td>
                                         <td className='amount-owed'>{c.amountowed}</td>
                                         <td className='amount-due'>{c.amountdue}</td>
                                         <td className='row-style'>{c.clientgrading}</td>
-                                        <td className='row-style'>{c.status}</td>
+                                        <td className='row-style'>{c.status}</td> */}
                                     </tr>
                                 );
                             })}

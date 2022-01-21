@@ -15,10 +15,6 @@ module.exports = (mssql_bosco, DataTypes) => {
         name3: {
             field: 'NAME_3',
             type: DataTypes.STRING
-        },
-        countryCode: {
-            field: 'LEGAL_COUNTRY_CODE',
-            type: DataTypes.STRING
         }
     },
     {
