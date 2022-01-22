@@ -36,7 +36,7 @@ exports.getAverages = async (req, res) => {
                 return res.status(200).send(response);
             }
             return res.status(500).send({ message: "The data could not be fetched." });
-        })
+    })
         .catch(err => {
             return res.status(500).send({ message: err.message });
         });

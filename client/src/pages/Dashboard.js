@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router';
 import Axios from 'axios';
 import Cookies from 'universal-cookie';
 import NavB from '../components/NavB'
-//import ClientTable from '../components/ClientTable'
+import ClientTable from '../components/ClientTable'
 import '../styles/dashboardPage.css'
 import { InputGroup, FormControl, Button } from 'react-bootstrap'
 
@@ -76,7 +76,7 @@ const Dashboard = () => {
     const [chartData, setChartData] = useState(fallbackChartData);
     const [preparedChartData, setPreparedChartData] = useState();
     const [authorized, setAuthorized] = useState(false);
-    //const [clients, setClients] = useState();
+    const [clients, setClients] = useState();
 
     const chart = async () => {
         let datasets = [];
@@ -99,19 +99,19 @@ const Dashboard = () => {
                 setAuthorized(true);
 
 
-                let previousYear = parseInt(res.data[0].month.toString().substring(0, 4));
+                let previousYear = parseInt(res.data[0].chart.month.toString().substring(0, 4));
                 let data = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
                 let color = colors[0];
                 let colorCounter = 0;
 
-                for (let i = 0; i < res.data.length; i++) {
-                    let year = parseInt(res.data[i].month.toString().substring(0, 4));
-                    let month = parseInt(res.data[i].month.toString().substring(4));
-                    let average = parseFloat(res.data[i].average);
+                for (let i = 0; i < res.data.chart.length; i++) {
+                    let year = parseInt(res.data[i].chart.month.toString().substring(0, 4));
+                    let month = parseInt(res.data[i].chart.month.toString().substring(4));
+                    let average = parseFloat(res.data[i].chart.average);
 
-                    if (year !== previousYear || res.data[i].month === res.data[res.data.length - 1].month) {
-                        if (res.data[i].month === res.data[res.data.length - 1].month) {
-                            for (let x = 0; x < data.length; x++) {
+                    if (year !== previousYear || res.data[i].chart.month === res.data[res.data.length - 1].chart.month) {
+                        if (res.data[i].chart.month === res.data[res.data.length - 1].chart.month) {
+                            for (let x = 0; x < data.chart.length; x++) {
                                 if ((month - 1) === x) {
                                     data[x] = average;
                                 }
@@ -141,7 +141,10 @@ const Dashboard = () => {
 
                 setPreparedChartData(datasets);
 
-                setChartData(datasets);
+                setChartData(datasets); 
+
+                setClients(res.data.table)
+
             })
             .catch((error) => {
                 if (error.response) {
@@ -159,33 +162,6 @@ const Dashboard = () => {
     }
 
     
-    // const handleRefreshTable = () =>{
-    //     let header = {
-    //         'authorization': 'Bearer' + cookies.get("accessToken"),
-    //     }
-
-    //     Axios.defaults.withCredentials = true;
-
-    //     Axios.get(`${process.env.REACT_APP_API}/invoice/defaultTable`, { headers: header })
-    //         .then((response) => {
-    //             setClients(response.data);
-    //         })
-    //         .catch((error) => {
-    //             if(error.response){
-    //                 if(error.response.status === 403 || error.response.status === 401) {
-    //                     console.log(error.response.body);
-    //                 }
-    //                 else{
-    //                     console.log("Malfunction in the B&C Engine...");
-    //                 }
-    //             }
-    //             else if (error.request){
-    //                 console.log("Could not reach B&C Engine...");
-    //             }
-    //         });
-    // }
-
-    
     useEffect(() => {
         if (cookies.get("accessToken") === undefined) {
             navigate("/login");
@@ -195,7 +171,6 @@ const Dashboard = () => {
         }
 
         chart();
-        //handleRefreshTable();
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
         
@@ -207,7 +182,6 @@ const Dashboard = () => {
     }
 
     
-
     return (
         <div>
             <NavB />
@@ -286,7 +260,7 @@ const Dashboard = () => {
                             }
                         </div>
                     </div>
-                    {/* <ClientTable data={clients}/> */}
+                    <ClientTable data={clients}/>
                 </div>
             </div>
         </div>

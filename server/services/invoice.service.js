@@ -1,7 +1,7 @@
 const TransacStatDao = require("../data_access_layer/daos/transac_stat.dao");
 const InvoiceAffectDao = require("../data_access_layer/daos/invoice_affect.dao");
 const ClientDao = require("../data_access_layer/daos/client.dao");
-const { addListener } = require("nodemon");
+
 
 exports.getAverages = async (startDateStr, endDateStr) => {
     const startYear = parseInt(startDateStr.split('-')[0]);
@@ -26,6 +26,9 @@ exports.getAverages = async (startDateStr, endDateStr) => {
         let averagesList = [];
         let totalDuesList = [];
         let billedList = [];
+        let clientList = [];
+        let returnData = [];
+
 
         // Get the list of total dues for each month
         await this.getDues(yearMonthList).then(async data => {
@@ -48,6 +51,14 @@ exports.getAverages = async (startDateStr, endDateStr) => {
         });
 
 
+        //Get list of client based by actor id
+        await this.getNamesAndCountries(clientIDList).then(async data => {
+            clientList = data;
+        }).catch(err => {
+            reject(err);
+        })
+
+
         // Populate average list with average for each month
         if (totalDuesList.length === 0 || billedList.length === 0) return;
         let counter = 0;
@@ -59,9 +70,47 @@ exports.getAverages = async (startDateStr, endDateStr) => {
             });
             counter++;
         });
-        resolve(averagesList);
+
+
+        returnData.push({
+            chart: averagesList,
+            table: clientList
+        });
+
+        resolve(returnData);
     });
 }
+
+
+let clientIDList = [];
+
+// method to get the names and countries based by clients id
+exports.getNamesAndCountries = async (clientsID) => {
+
+    let formattedClientList = [];
+    let formattedName = "";
+
+    return new Promise(async (resolve, reject) => {
+        
+        await ClientDao.getClientByID(clientsID).then(async data => {
+
+            if(data){
+                data.forEach(i => {
+                    formattedName = i.name1 + " " + i.name2 + " " + i.name3;
+
+                    formattedClientList.push({
+                        name: formattedName,
+                        country: i.country
+                    });
+
+                });
+                resolve(formattedClientList);
+            }
+            resolve(false);
+        });
+    });
+}
+
 
 exports.getDues = async (yearMonthList) => {
     let totalDuesList = [];
@@ -113,9 +162,11 @@ exports.getBilled = async (startDateStr, endDateStr, yearMonthList) => {
                     data.forEach(i => {
                         if (i.invoiceDate >= startDate && i.invoiceDate < endDate) {
                             billed += i.amount;
+                            clientIDList.push(i.actorId);
                         }
                     });
 
+                    
                     billedList.push({
                         month: ym,
                         billed: billed
@@ -124,6 +175,7 @@ exports.getBilled = async (startDateStr, endDateStr, yearMonthList) => {
                     startDate.setUTCMonth(startDate.getUTCMonth() + 1);
                     endDate.setUTCMonth(endDate.getUTCMonth() + 1);
                 });
+
                 resolve(billedList);
             }
             resolve(false);
@@ -135,33 +187,7 @@ exports.getBilled = async (startDateStr, endDateStr, yearMonthList) => {
 
 
 
-// let clientIDList = [];
 
-//// method to get the names and countries based by clients id
-// exports.getNamesAndCountries = async() => {
-
-//     let formattedClientList = [];
-//     let formattedName = "";
-
-//     return new Promise(async (resolve, reject) => {
-        
-//         await ClientDao.getClientByID(clientIDList).then(async data => {
-//             if(data){
-//                 data.forEach(i => {
-//                     formattedName = i["NAME_1"] + " " + i["NAME_2"] + " " + i["NAME_3"];
-
-//                     formattedClientList.push({
-//                         name: formattedName,
-//                         country: i["COUNTRY_LABEL"]
-//                     });
-
-//                 });
-//                 resolve(formattedClientList);
-//             }
-//             resolve(false);
-//         });
-//     });
-// }
 
 
 
