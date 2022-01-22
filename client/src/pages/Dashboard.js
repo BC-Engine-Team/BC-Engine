@@ -72,10 +72,18 @@ const Dashboard = () => {
         }
     ];
 
-
     const [chartData, setChartData] = useState(fallbackChartData);
     const [preparedChartData, setPreparedChartData] = useState();
     const [authorized, setAuthorized] = useState(false);
+
+    const [employeeSelect, SetEmployeeSelect] = useState([]);
+
+    // Criteria
+    const [compareEmployeeChecked, setCompareEmployeeChecked] = useState(false);
+    const [employeeCriteria, SetEmployeeCriteria] = useState({
+        id: "All",
+        name: "All"
+    });
 
     const chart = async () => {
         let datasets = [];
@@ -157,33 +165,6 @@ const Dashboard = () => {
             });
     }
 
-    let months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-    let label = ""
-
-    const fallbackChartData = {
-        labels: months,
-        datasets: [
-            {
-                label: label,
-                data: [5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5],
-                backgroundColor: 'rgb(127, 128, 203)'
-            }
-        ]
-    }
-
-    const [chartData, setChartData] = useState(fallbackChartData);
-    const [preparedChartData, setPreparedChartData] = useState();
-    const [authorized, setAuthorized] = useState(false);
-
-    const [employeeSelect, SetEmployeeSelect] = useState([]);
-
-    // Criteria
-    const [compareEmployeeChecked, setCompareEmployeeChecked] = useState(false);
-    const [employeeCriteria, SetEmployeeCriteria] = useState({
-        id: "All",
-        name: "All"
-    });
-
     const createEmployeeCriteria = async () => {
         let listEmployee = [];
 
@@ -209,92 +190,6 @@ const Dashboard = () => {
 
                 SetEmployeeSelect(listEmployee);
             })
-    }
-
-    const chart = async () => {
-        let averages = [];
-        let datasets = [];
-
-        let header = {
-            'authorization': "Bearer " + cookies.get("accessToken"),
-        }
-
-        const dates = {
-            startDate: "2019-12-01",
-            endDate: "2020-11-01"
-        };
-
-        await Axios.get(`${process.env.REACT_APP_API}/invoice/defaultChartAndTable/${dates.startDate}/${dates.endDate}`, { headers: header })
-            .then((res) => {
-                if (res.status === 403 && res.status === 401) {
-                    setAuthorized(false);
-                    return;
-                }
-                setAuthorized(true);
-
-                let data = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-                let red = 127;
-                let green = 128;
-                let blue = 203;
-                let color = 'rgb(' + red + ',' + green + ',' + blue + ')';
-
-                let previousYear = parseInt(res.data[0].month.toString().substring(0, 4));
-
-                //months = [];
-                for (let i = 0; i < res.data.length; i++) {
-                    let year = parseInt(res.data[i].month.toString().substring(0, 4));
-                    let month = parseInt(res.data[i].month.toString().substring(4));
-                    let average = parseFloat(res.data[i].average);
-
-                    if (year !== previousYear || res.data[i].month === res.data[res.data.length - 1].month) {
-                        if (res.data[i].month === res.data[res.data.length - 1].month) {
-                            for (let x = 0; x < data.length; x++) {
-                                if ((month - 1) === x) {
-                                    data[x] = average;
-                                }
-                            }
-                        }
-                        red = Math.floor((Math.random() * 255) + 1);
-                        green = Math.floor((Math.random() * 255) + 1);
-                        blue = Math.floor((Math.random() * 255) + 1);
-                        color = 'rgb(' + red + ',' + green + ',' + blue + ')';
-                        label = previousYear;
-                        datasets.push({
-                            label: label,
-                            data: data,
-                            backgroundColor: color
-                        });
-                        previousYear = year;
-                        data = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-                    }
-
-                    for (let x = 0; x < data.length; x++) {
-                        if ((month - 1) === x) {
-                            data[x] = average;
-                        }
-                    }
-                }
-
-                setPreparedChartData(averages);
-
-                setChartData({
-                    labels: months,
-                    datasets: datasets
-                });
-            })
-            .catch((error) => {
-                if (error.response) {
-                    if (error.response.status === 403 || error.response.status === 401) {
-                        console.log(error.response.body);
-                    }
-                    else {
-                        console.log("Malfunction in the B&C Engine...");
-                    }
-                }
-                else if (error.request) {
-                    console.log("Could not reach b&C Engine...");
-                }
-            });
     }
 
     useEffect(() => {
@@ -327,7 +222,7 @@ const Dashboard = () => {
                         <div className="card shadow my-3 mx-3">
                             <h3 className="text-center">{t('dashboard.criteria.Title')}</h3>
 
-                            <InputGroup className="my-2  px-2" >
+                            <InputGroup className="my-2 px-2" >
                                 <FormControl
                                     id='chartName'
                                     className="my-1"
