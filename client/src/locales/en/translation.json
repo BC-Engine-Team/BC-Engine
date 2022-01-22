@@ -52,7 +52,7 @@
                     "LoadChartButton":"Load Chart",
                     "Title":"Chart Criteria",
                     "Compare":"Compare selected employee with all employees",
-                    "All":"Tous",
+                    "All":"All",
                     "labels": {
                         "Employee":"Employee"
                     }

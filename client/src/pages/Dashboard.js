@@ -85,6 +85,46 @@ const Dashboard = () => {
         name: "All"
     });
 
+    const createEmployeeCriteria = async () => {
+        let listEmployee = [];
+
+        let header = {
+            'authorization': "Bearer " + cookies.get("accessToken"),
+        }
+
+        await Axios.get(`${process.env.REACT_APP_API}/invoice/employees`, { headers: header })
+            .then((res) => {
+                if (res.status === 403 && res.status === 401) {
+                    setAuthorized(false);
+                    return;
+                }
+                setAuthorized(true);
+
+                for(let i = 0; i < res.data.length; i++) {
+
+                    listEmployee.push({
+                        label: res.data[i].firstName + " " + res.data[i].lastName,
+                        value: res.data[i].nameID
+                    });
+                }
+
+                SetEmployeeSelect(listEmployee);
+            })
+            .catch((error) => {
+                if (error.response) {
+                    if (error.response.status === 403 || error.response.status === 401) {
+                        console.log(error.response.body);
+                    }
+                    else {
+                        console.log("Malfunction in the B&C Engine...");
+                    }
+                }
+                else if (error.request) {
+                    console.log("Could not reach b&C Engine...");
+                }
+            });
+    }
+
     const chart = async () => {
         let datasets = [];
 
@@ -165,31 +205,11 @@ const Dashboard = () => {
             });
     }
 
-    const createEmployeeCriteria = async () => {
-        let listEmployee = [];
-
-        let header = {
-            'authorization': "Bearer " + cookies.get("accessToken"),
+    const loadChartData = () => {
+        if (preparedChartData) {
+            setChartData(chartData);
+            console.log('lol')
         }
-
-        await Axios.get(`${process.env.REACT_APP_API}/invoice/employees`, { headers: header })
-            .then((res) => {
-                if (res.status === 403 && res.status === 401) {
-                    setAuthorized(false);
-                    return;
-                }
-                setAuthorized(true);
-
-                for(let i = 0; i < res.data.length; i++) {
-
-                    listEmployee.push({
-                        label: res.data[i].firstName + " " + res.data[i].lastName,
-                        value: res.data[i].nameID
-                    });
-                }
-
-                SetEmployeeSelect(listEmployee);
-            })
     }
 
     useEffect(() => {
@@ -206,23 +226,16 @@ const Dashboard = () => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
-    const loadChartData = () => {
-        if (preparedChartData) {
-            setChartData(chartData);
-        }
-
-    }
-
     return (
         <div>
             <NavB />
             <div className='mainContainer mainDiv'>
                 <div className="justify-content-center main">
                     <div className="container-criteria">
-                        <div className="card shadow my-3 mx-3">
+                        <div className="card shadow my-3 mx-3 p-2">
                             <h3 className="text-center">{t('dashboard.criteria.Title')}</h3>
 
-                            <InputGroup className="my-2 px-2" >
+                            <InputGroup className="my-2" >
                                 <FormControl
                                     id='chartName'
                                     className="my-1"
@@ -232,7 +245,7 @@ const Dashboard = () => {
                                 />
                             </InputGroup>
 
-                            <FormLabel htmlFor="inputPassword5" className="ms-1">{t('dashboard.criteria.labels.Employee')}</FormLabel>
+                            <FormLabel htmlFor="employeeCriteriaDashboard" className="ms-1">{t('dashboard.criteria.labels.Employee')}</FormLabel>
                             <InputGroup className="mb-2">
          
                                 {employeeCriteria.name !== "All"}
