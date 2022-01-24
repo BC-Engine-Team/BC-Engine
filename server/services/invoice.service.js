@@ -96,8 +96,33 @@ exports.getNamesAndCountries = async (clientsID) => {
 
             if(data){
                 data.forEach(i => {
-                    formattedName = i.name1 + " " + i.name2 + " " + i.name3;
 
+
+                    if(i.name1 && i.name2 === null && i.name3 === null){
+                        formattedName = i.name1;
+                    }
+                    else if(i.name1 === null && i.name2 && i.name3 === null){
+                        formattedName = i.name2;
+                    }
+                    else if(i.name1 === null && i.name2 === null && i.name3){
+                        formattedName = i.name3;
+                    }
+                    else if(i.name1 && i.name2 && i.name3 === null){
+                        formattedName = i.name1 + " " + i.name2;
+                    }
+                    else if(i.name1 && i.name2 === null && i.name3){
+                        formattedName = i.name1 + " " + i.name3;
+                    }
+                    else if(i.name1 === null && i.name2 && i.name3){
+                        formattedName = i.name2 + " " + i.name3;
+                    }
+                    else if(i.name1 === null && i.name2 === null && i.name3 === null){
+                        formattedName = "Unknown user";
+                    }
+                    else{
+                        formattedName = i.name1 + " " + i.name2 + " " + i.name3;
+                    }
+                    
                     formattedClientList.push({
                         name: formattedName,
                         country: i.country

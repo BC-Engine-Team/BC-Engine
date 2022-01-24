@@ -3,7 +3,8 @@ import { useNavigate } from 'react-router';
 import Axios from 'axios';
 import Cookies from 'universal-cookie';
 import NavB from '../components/NavB'
-import ClientTable from '../components/ClientTable'
+//import ClientTable from '../components/ClientTable'
+import Table from 'react-bootstrap/Table'
 import '../styles/dashboardPage.css'
 import { InputGroup, FormControl, Button } from 'react-bootstrap'
 
@@ -72,46 +73,48 @@ const Dashboard = () => {
         }
     ];
 
+    
+    //const [preparedChartData, setPreparedChartData] = useState();
 
     const [chartData, setChartData] = useState(fallbackChartData);
-    const [preparedChartData, setPreparedChartData] = useState();
     const [authorized, setAuthorized] = useState(false);
-    const [clients, setClients] = useState();
+    const [clientNameCountry, setClientNameCountry] = useState([{name: "", country: ""}]);
 
     const chart = async () => {
         let datasets = [];
+
+        let clientNameCountryList = [];
 
         let header = {
             'authorization': "Bearer " + cookies.get("accessToken"),
         }
 
         const dates = {
-            startDate: "2017-01-01",
-            endDate: "2020-12-01"
+            startDate: "2019-01-01",
+            endDate: "2020-01-01"
         };
 
         await Axios.get(`${process.env.REACT_APP_API}/invoice/defaultChartAndTable/${dates.startDate}/${dates.endDate}`, { headers: header })
-            .then((res) => {
+            .then(async (res) => {
                 if (res.status === 403 && res.status === 401) {
                     setAuthorized(false);
                     return;
                 }
                 setAuthorized(true);
 
-
-                let previousYear = parseInt(res.data[0].chart.month.toString().substring(0, 4));
+                let previousYear = parseInt(res.data[0].chart[0].month.toString().substring(0, 4));
                 let data = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
                 let color = colors[0];
                 let colorCounter = 0;
 
-                for (let i = 0; i < res.data.chart.length; i++) {
-                    let year = parseInt(res.data[i].chart.month.toString().substring(0, 4));
-                    let month = parseInt(res.data[i].chart.month.toString().substring(4));
-                    let average = parseFloat(res.data[i].chart.average);
+                for (let i = 0; i < res.data[0].chart.length; i++) {
+                    let year = parseInt(res.data[0].chart[i].month.toString().substring(0, 4));
+                    let month = parseInt(res.data[0].chart[i].month.toString().substring(4));
+                    let average = parseFloat(res.data[0].chart[i].average);
 
-                    if (year !== previousYear || res.data[i].chart.month === res.data[res.data.length - 1].chart.month) {
-                        if (res.data[i].chart.month === res.data[res.data.length - 1].chart.month) {
-                            for (let x = 0; x < data.chart.length; x++) {
+                    if (year !== previousYear || res.data[0].chart[i].month === res.data[0].chart[res.data[0].chart.length - 1].month) {
+                        if (res.data[0].chart[i].month === res.data[0].chart[res.data[0].chart.length - 1].month) {
+                            for (let x = 0; x < data.length; x++) {
                                 if ((month - 1) === x) {
                                     data[x] = average;
                                 }
@@ -128,9 +131,11 @@ const Dashboard = () => {
                             data: data,
                             backgroundColor: color
                         });
+                        
                         previousYear = year;
                         data = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
                     }
+
 
                     for (let x = 0; x < data.length; x++) {
                         if ((month - 1) === x) {
@@ -139,12 +144,21 @@ const Dashboard = () => {
                     }
                 }
 
-                setPreparedChartData(datasets);
+                setChartData(datasets);
 
-                setChartData(datasets); 
+                for(let i = 0; i < res.data[0].table.length; i++)
+                {
+                    clientNameCountryList.push({
+                        name: res.data[0].table[i].name,
+                        country: res.data[0].table[i].country
+                    });
+                    
+                }
 
-                setClients(res.data.table)
+                console.log(clientNameCountryList);
 
+                setClientNameCountry(clientNameCountryList);
+                //setPreparedChartData(datasets);
             })
             .catch((error) => {
                 if (error.response) {
@@ -176,12 +190,11 @@ const Dashboard = () => {
         
 
     const loadChartData = () => {
-        if (preparedChartData) {
-            setChartData(chartData);
-        }
+        setChartData(chartData);
     }
 
-    
+
+
     return (
         <div>
             <NavB />
@@ -260,7 +273,43 @@ const Dashboard = () => {
                             }
                         </div>
                     </div>
-                    <ClientTable data={clients}/>
+                    <div className="justify-content-center">
+                        <div>
+                            <div className="card shadow m-5 uTable">
+
+                                <Table responsive="xl" hover>
+
+                                    <thead className='bg-light'>
+                                        <tr key="0">
+                                            <th className='row-style'>NAME</th>
+                                            <th className='row-style'>COUNTRY</th>
+                                            <th className='row-style'>AVERAGE COLLECTION DAYS</th>
+                                            <th className='row-style'>AMOUNT OWED</th>
+                                            <th className='row-style'>AMOUNT DUE</th>
+                                            <th className='row-style'>CLIENT GRADING</th>
+                                            <th className='row-style'>CURRENT STATUS</th>
+                                        </tr>
+                                    </thead>
+
+                                    <tbody>
+                                        {clientNameCountry.map ((client, index) => {
+                                            return(
+                                                <tr key={index}>
+                                                    <td className='row-style'>{client.name}</td>
+                                                    <td className='row-style'>{client.country}</td>
+                                                    {/* <td className='row-style'>{c.averagecollection}</td>
+                                                    <td className='amount-owed'>{c.amountowed}</td>
+                                                    <td className='amount-due'>{c.amountdue}</td>
+                                                    <td className='row-style'>{c.clientgrading}</td>
+                                                    <td className='row-style'>{c.status}</td> */}
+                                                </tr>
+                                            );
+                                        })}
+                                    </tbody>
+                                </Table>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
