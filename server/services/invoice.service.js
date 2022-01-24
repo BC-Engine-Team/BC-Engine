@@ -59,6 +59,7 @@ exports.getAverages = async (startDateStr, endDateStr) => {
         })
 
 
+
         // Populate average list with average for each month
         if (totalDuesList.length === 0 || billedList.length === 0) return;
         let counter = 0;
@@ -89,14 +90,12 @@ exports.getNamesAndCountries = async (clientsID) => {
 
     let formattedClientList = [];
     let formattedName = "";
-
     return new Promise(async (resolve, reject) => {
         
         await ClientDao.getClientByID(clientsID).then(async data => {
 
             if(data){
                 data.forEach(i => {
-
 
                     if(i.name1 && i.name2 === null && i.name3 === null){
                         formattedName = i.name1;
@@ -122,13 +121,13 @@ exports.getNamesAndCountries = async (clientsID) => {
                     else{
                         formattedName = i.name1 + " " + i.name2 + " " + i.name3;
                     }
-                    
+
                     formattedClientList.push({
                         name: formattedName,
                         country: i.country
                     });
-
                 });
+
                 resolve(formattedClientList);
             }
             resolve(false);
@@ -191,6 +190,7 @@ exports.getBilled = async (startDateStr, endDateStr, yearMonthList) => {
                         }
                     });
 
+                    clientIDList = [...new Set(clientIDList)];
                     
                     billedList.push({
                         month: ym,

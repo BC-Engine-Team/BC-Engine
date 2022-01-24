@@ -9,7 +9,7 @@ exports.getClientByID = async (clientIDList, db=database) => {
 
         try{
             const data = await db.query(
-                "SELECT N.NAME_ID, N.NAME_1, N.NAME_2, N.NAME_3, C.COUNTRY_LABEL \
+                "SELECT DISTINCT N.NAME_ID, N.NAME_1, N.NAME_2, N.NAME_3, C.COUNTRY_LABEL \
                 FROM [Bosco reduction].[dbo].[NAME] N, [Bosco reduction].[dbo].[NAME_CONNECTION] NC, [Bosco reduction].[dbo].[COUNTRY] C \
                 WHERE NC.CONNECTION_NAME_ID in (?) \
                 AND NC.NAME_ID = N.NAME_ID \
