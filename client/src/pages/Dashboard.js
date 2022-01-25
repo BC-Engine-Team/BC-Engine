@@ -78,12 +78,12 @@ const Dashboard = () => {
 
     const [chartData, setChartData] = useState(fallbackChartData);
     const [authorized, setAuthorized] = useState(false);
-    const [clientNameCountry, setClientNameCountry] = useState([{name: "", country: ""}]);
+    const [clientNameCountry, setClientNameCountry] = useState([{name: "", country: "", clientgrading: ""}]);
+
+    let clientInfoList = [];
 
     const chart = async () => {
         let datasets = [];
-
-        let clientNameCountryList = [];
 
         let header = {
             'authorization': "Bearer " + cookies.get("accessToken"),
@@ -146,18 +146,16 @@ const Dashboard = () => {
 
                 setChartData(datasets);
 
-                for(let i = 0; i < res.data[0].table.length; i++)
+                for(let i = 0; i < res.data[0].clientNameCountry.length; i++)
                 {
-                    clientNameCountryList.push({
-                        name: res.data[0].table[i].name,
-                        country: res.data[0].table[i].country
+                    clientInfoList.push({
+                        name: res.data[0].clientNameCountry[i].name,
+                        country: res.data[0].clientNameCountry[i].country
                     });
-                    
                 }
 
-                console.log(clientNameCountryList);
 
-                setClientNameCountry(clientNameCountryList);
+                setClientNameCountry(clientInfoList);
                 //setPreparedChartData(datasets);
             })
             .catch((error) => {
@@ -176,6 +174,46 @@ const Dashboard = () => {
     }
 
     
+    const grading = async() =>{
+        let header = {
+            'authorization': "Bearer " + cookies.get("accessToken"),
+        }
+
+        await Axios.get(`${process.env.REACT_APP_API}/invoice/grading`, { headers: header })
+            .then(async (res) => {
+                if (res.status === 403 && res.status === 401) {
+                    setAuthorized(false);
+                    return;
+                }
+                setAuthorized(true);
+
+
+                for(let i = 0; i < res.data[0].grading.length; i++)
+                {
+                    clientInfoList.push({
+                        clientgrading: res.data[0].realGrading
+                    });
+                }
+
+                setClientNameCountry(clientInfoList)
+            })
+            .catch((error) => {
+                if (error.response) {
+                    if (error.response.status === 403 || error.response.status === 401) {
+                        console.log(error.response.body);
+                    }
+                    else {
+                        console.log("Malfunction in the B&C Engine...");
+                    }
+                }
+                else if (error.request) {
+                    console.log("Could not reach b&C Engine...");
+                }
+            });
+    }
+
+
+
     useEffect(() => {
         if (cookies.get("accessToken") === undefined) {
             navigate("/login");
@@ -185,6 +223,7 @@ const Dashboard = () => {
         }
 
         chart();
+        //grading();
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
         
@@ -297,11 +336,11 @@ const Dashboard = () => {
                                                 <tr key={index}>
                                                     <td className='row-style'>{client.name}</td>
                                                     <td className='row-style'>{client.country}</td>
-                                                    {/* <td className='row-style'>{c.averagecollection}</td>
-                                                    <td className='amount-owed'>{c.amountowed}</td>
-                                                    <td className='amount-due'>{c.amountdue}</td>
-                                                    <td className='row-style'>{c.clientgrading}</td>
-                                                    <td className='row-style'>{c.status}</td> */}
+                                                    <td className='row-style'></td>
+                                                    <td className='amount-owed'></td>
+                                                    <td className='amount-due'></td>
+                                                    <td className='row-style'>{client.clientgrading}</td>
+                                                    <td className='row-style'></td>
                                                 </tr>
                                             );
                                         })}

@@ -23,6 +23,7 @@ exports.getClientByID = async (clientIDList, db=database) => {
                 let returnData = [];
                 data.forEach(c => {
                     returnData.push({
+                        nameId: c["NAME_ID"],
                         name1: c["NAME_1"],
                         name2: c["NAME_2"],
                         name3: c["NAME_3"],

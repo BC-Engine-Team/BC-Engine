@@ -1,7 +1,7 @@
 const TransacStatDao = require("../data_access_layer/daos/transac_stat.dao");
 const InvoiceAffectDao = require("../data_access_layer/daos/invoice_affect.dao");
 const ClientDao = require("../data_access_layer/daos/client.dao");
-
+const ClientGradingDao = require("../data_access_layer/daos/client_grading.dao")
 
 exports.getAverages = async (startDateStr, endDateStr) => {
     const startYear = parseInt(startDateStr.split('-')[0]);
@@ -26,7 +26,7 @@ exports.getAverages = async (startDateStr, endDateStr) => {
         let averagesList = [];
         let totalDuesList = [];
         let billedList = [];
-        let clientList = [];
+        let clientNameCountryList = [];
         let returnData = [];
 
 
@@ -53,11 +53,10 @@ exports.getAverages = async (startDateStr, endDateStr) => {
 
         //Get list of client based by actor id
         await this.getNamesAndCountries(clientIDList).then(async data => {
-            clientList = data;
+            clientNameCountryList = data;
         }).catch(err => {
             reject(err);
         })
-
 
 
         // Populate average list with average for each month
@@ -71,16 +70,48 @@ exports.getAverages = async (startDateStr, endDateStr) => {
             });
             counter++;
         });
+        
+        
+        clientNameCountryList.forEach(c => {
+            nameIdList.push({
+                id: c.nameId
+            });
+        });
 
+        console.log(nameIdList[1].id);
 
         returnData.push({
             chart: averagesList,
-            table: clientList
+            clientNameCountry: clientNameCountryList
         });
 
         resolve(returnData);
     });
 }
+
+
+let nameIdList = [];
+
+exports.getClientGrading = async() => {
+    let gradingList = [];
+
+    return new Promise(async (resolve, reject) => {
+        await ClientGradingDao.getClientGrading(nameIdList.id).then(async data => {
+            if(data){
+                nameIdList.forEach(g => {
+                    gradingList.push({
+                        realGrading: g.grading
+                    });
+                });
+                resolve(gradingList);
+            }
+            resolve(false);
+        }).catch(err => {
+            reject(err);
+        })
+    });
+}
+
 
 
 let clientIDList = [];
@@ -123,6 +154,7 @@ exports.getNamesAndCountries = async (clientsID) => {
                     }
 
                     formattedClientList.push({
+                        nameId: i.nameId,
                         name: formattedName,
                         country: i.country
                     });
@@ -134,6 +166,9 @@ exports.getNamesAndCountries = async (clientsID) => {
         });
     });
 }
+
+
+
 
 
 exports.getDues = async (yearMonthList) => {
@@ -209,73 +244,3 @@ exports.getBilled = async (startDateStr, endDateStr, yearMonthList) => {
         });
     });
 };
-
-
-
-
-
-
-
-
-//to get the averages for the chart
-// exports.getAverages = async (startDateStr, endDateStr) => {
-//     const startYear = parseInt(startDateStr.split('-')[0]);
-//     let startMonth = parseInt(startDateStr.split('-')[1]);
-//     const endYear = parseInt(endDateStr.split('-')[0]);
-//     const endMonth = parseInt(endDateStr.split('-')[1]);
-
-
-//     // make list of yearMonth [201911,202001,202002,...] to select dues
-//     let yearMonthList = [];
-//     for (let y = startYear; y <= endYear; y++) {
-//         if (y != startYear) startMonth = 1;
-//         for (let m = startMonth; m <= 12; m++) {
-//             if (y == endYear && m > endMonth) break;
-//             let yearMonthStr = y.toString();
-//             if (m < 10) yearMonthStr += '0';
-//             yearMonthStr += m.toString();
-//             yearMonthList.push(parseInt(yearMonthStr));
-//         }
-//     }
-
-
-//     return new Promise(async (resolve, reject) => {
-//         let averagesList = [];
-//         let totalDuesList = [];
-//         let billedList = [];
-
-//         // Get the list of total dues for each month
-//         await this.getDues(yearMonthList).then(async data => {
-//             totalDuesList = data;
-//         }).catch(err => {
-//             reject(err.message);
-//         });
-
-//         // prepare startDate to get billed
-//         let startDate = new Date(`${startDateStr} 00:00:00`);
-//         startDate.setMonth(startDate.getMonth() - 12);
-//         let theMonth = startDate.getMonth() + 1;
-//         startDateStr = startDate.getFullYear() + "-" + theMonth + "-01";
-
-//         // Get list of amount billed for each month (previous 12 months)
-//         await this.getBilled(startDateStr, endDateStr, yearMonthList).then(async data => {
-//             billedList = data;
-//         }).catch(err => {
-//             reject(err.message);
-//         });
-
-
-//         // Populate average list with average for each month
-//         let counter = 0;
-//         yearMonthList.forEach(ym => {
-//             let average = totalDuesList[counter].totalDues / billedList[counter].billed * 365;
-//             averagesList.push({
-//                 month: ym,
-//                 average: average.toFixed(2)
-//             });
-//             counter++;
-//         });
-        
-//         resolve(averagesList);
-//     });
-// }

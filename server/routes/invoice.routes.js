@@ -5,6 +5,8 @@ const authService = require('../services/auth.service');
 
 router.get("/defaultChartAndTable/:startDate/:endDate", authService.authenticateToken, invoiceController.getAverages);
 
+router.get("/grading", authService.authenticateToken, invoiceController.getGradings);
+
 router.get("/defaultChartTest", invoiceController.getAveragesTest);
 
 router.get("/testInvoices", invoiceController.testInvoices);

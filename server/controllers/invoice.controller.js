@@ -42,18 +42,19 @@ exports.getAverages = async (req, res) => {
         });
 }
 
-// exports.getNamesAndCountries = async(req, res) => {
-//     await invoiceService.getNamesAndCountries()
-//         .then(response => {
-//             if(response){
-//                 return res.status(200).send(response);
-//             }
-//             return res.status(404).send({message: "The name and countries could not be fetched from invoice controller because the url is unrecognizable."});
-//         })
-//         .catch(err => {
-//             return res.status(500).send({message: "The name and countries could not be fetched from invoice controller because invoice service don't work properly."})
-//         });
-// }
+
+exports.getGradings = async(res) => {
+    await invoiceService.getClientGrading()
+        .then(response => {
+            if(response){
+                return res.status(200).send(response);
+            }
+            return res.status(404).send({message: "The gradings could not be fetched from invoice controller because the url is unrecognizable."});
+        })
+        .catch(err => {
+            return res.status(500).send({message: "The gradings could not be fetched from invoice controller because invoice service don't work properly."})
+        });
+}
 
 
 exports.getAveragesTest = async (req, res) => {
