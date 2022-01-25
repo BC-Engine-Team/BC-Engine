@@ -146,11 +146,12 @@ const Dashboard = () => {
 
                 setChartData(datasets);
 
-                for(let i = 0; i < res.data[0].clientNameCountry.length; i++)
+                for(let i = 0; i < res.data[0].table.length; i++)
                 {
                     clientInfoList.push({
-                        name: res.data[0].clientNameCountry[i].name,
-                        country: res.data[0].clientNameCountry[i].country
+                        name: res.data[0].table[i].name,
+                        country: res.data[0].table[i].country,
+                        clientgrading: res.data[0].table[i].grading
                     });
                 }
 
@@ -223,7 +224,7 @@ const Dashboard = () => {
         }
 
         chart();
-        //grading();
+        // grading();
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
         

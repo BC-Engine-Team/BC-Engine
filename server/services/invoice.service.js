@@ -26,7 +26,8 @@ exports.getAverages = async (startDateStr, endDateStr) => {
         let averagesList = [];
         let totalDuesList = [];
         let billedList = [];
-        let clientNameCountryList = [];
+        let clientList = [];
+        let clientGradingList = [];
         let returnData = [];
 
 
@@ -53,7 +54,7 @@ exports.getAverages = async (startDateStr, endDateStr) => {
 
         //Get list of client based by actor id
         await this.getNamesAndCountries(clientIDList).then(async data => {
-            clientNameCountryList = data;
+            clientList = data;
         }).catch(err => {
             reject(err);
         })
@@ -72,41 +73,59 @@ exports.getAverages = async (startDateStr, endDateStr) => {
         });
         
         
-        clientNameCountryList.forEach(c => {
-            nameIdList.push({
-                id: c.nameId
+        clientList.forEach(c => {
+            nameIdList.push(c.nameId);
+        });
+
+
+        await this.getClientGrading(nameIdList).then(async data => {
+            clientGradingList = data;
+        }).catch(err => {
+            reject(err);
+        });
+
+
+        clientList.forEach(c => {
+            clientGradingList.forEach(g => {
+                if(c.nameId == g.nameId){
+                    c.grading = g.grading;
+                }
             });
         });
 
-        console.log(nameIdList[1].id);
+        console.log(clientList);
+
 
         returnData.push({
             chart: averagesList,
-            clientNameCountry: clientNameCountryList
+            table: clientList     
         });
 
         resolve(returnData);
     });
 }
 
-
 let nameIdList = [];
 
-exports.getClientGrading = async() => {
+//method to get the client grading
+exports.getClientGrading = async(idList) => {
+
     let gradingList = [];
 
     return new Promise(async (resolve, reject) => {
-        await ClientGradingDao.getClientGrading(nameIdList.id).then(async data => {
+        await ClientGradingDao.getClientGrading(idList).then(async data => {
             if(data){
-                nameIdList.forEach(g => {
+                data.forEach(g => {
                     gradingList.push({
-                        realGrading: g.grading
+                      nameId: g.nameId,
+                      grading: g.grading
                     });
                 });
                 resolve(gradingList);
             }
             resolve(false);
         }).catch(err => {
+            console.log({message: err})
             reject(err);
         })
     });
@@ -156,7 +175,8 @@ exports.getNamesAndCountries = async (clientsID) => {
                     formattedClientList.push({
                         nameId: i.nameId,
                         name: formattedName,
-                        country: i.country
+                        country: i.country,
+                        grading: ""
                     });
                 });
 

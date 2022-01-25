@@ -10,7 +10,7 @@ exports.getClientGrading = async (clientIDList, db=database) => {
             const data = await db.query(
                 "SELECT DISTINCT [NAME_ID], [DROPDOWN_CODE] \
                 FROM [Bosco reduction].[dbo].[NAME_QUALITY] WHERE QUALITY_TYPE_ID = 15 \
-                AND WHERE NAME_ID IN (?)",
+                AND NAME_ID IN (?)",
                 {
                     replacements: [clientIDList],
                     type: QueryTypes.SELECT
@@ -20,6 +20,7 @@ exports.getClientGrading = async (clientIDList, db=database) => {
                 let returnData = [];
                 data.forEach(c => {
                     returnData.push({
+                        nameId: c["NAME_ID"],
                         grading: c["DROPDOWN_CODE"]
                     });
                 });
