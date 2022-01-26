@@ -90,7 +90,7 @@ const Dashboard = () => {
         }
 
         const dates = {
-            startDate: "2019-01-01",
+            startDate: "2018-01-01",
             endDate: "2020-01-01"
         };
 

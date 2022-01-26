@@ -43,20 +43,6 @@ exports.getAverages = async (req, res) => {
 }
 
 
-// exports.getGradings = async(req, res) => {
-//     await invoiceService.getClientGrading()
-//         .then(response => {
-//             if(response){
-//                 return res.status(200).send(response);
-//             }
-//             return res.status(404).send({message: "The gradings could not be fetched from invoice controller because the url is unrecognizable."});
-//         })
-//         .catch(err => {
-//             return res.status(500).send({message: "The gradings could not be fetched from invoice controller because invoice service don't work properly."})
-//         });
-// }
-
-
 exports.getAveragesTest = async (req, res) => {
     return res.send([
         {

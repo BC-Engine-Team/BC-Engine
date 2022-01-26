@@ -93,8 +93,6 @@ exports.getAverages = async (startDateStr, endDateStr) => {
             });
         });
 
-        console.log(clientList);
-
 
         returnData.push({
             chart: averagesList,
@@ -105,32 +103,78 @@ exports.getAverages = async (startDateStr, endDateStr) => {
     });
 }
 
-let nameIdList = [];
 
-//method to get the client grading
-exports.getClientGrading = async(idList) => {
-
-    let gradingList = [];
+exports.getDues = async (yearMonthList) => {
+    let totalDuesList = [];
 
     return new Promise(async (resolve, reject) => {
-        await ClientGradingDao.getClientGrading(idList).then(async data => {
-            if(data){
-                data.forEach(g => {
-                    gradingList.push({
-                      nameId: g.nameId,
-                      grading: g.grading
+        await TransacStatDao.getTransactionsStatByYearMonth(yearMonthList).then(async data => {
+            if (data) {
+
+                yearMonthList.forEach(ym => {
+                    let totalDues = 0;
+                    data.forEach(e => {
+                        if (e.yearMonth === ym) {
+                            totalDues += (e.dueCurrent + e.due1Month + e.due2Month + e.due3Month);
+                        }
+                    });
+                    totalDuesList.push({
+                        month: ym.toString(),
+                        totalDues: totalDues.toFixed(2)
                     });
                 });
-                resolve(gradingList);
+                resolve(totalDuesList);
             }
             resolve(false);
         }).catch(err => {
-            console.log({message: err})
             reject(err);
-        })
+        });
     });
 }
 
+
+//method to get the billed amount
+exports.getBilled = async (startDateStr, endDateStr, yearMonthList) => {
+    let billedList = [];
+    let startDate = new Date(parseInt(startDateStr.substring(5, 7)) + " " + parseInt(startDateStr.substring(8)) + " " + parseInt(startDateStr.substring(0, 4)));
+    let endDate = new Date(parseInt(endDateStr.substring(5, 7)) + " " + parseInt(endDateStr.substring(8)) + " " + parseInt(endDateStr.substring(0, 4)));
+    endDate.setMonth(endDate.getMonth() - (yearMonthList.length - 1));
+
+    startDate.setUTCHours(0, 0, 0, 0);
+    endDate.setUTCHours(0, 0, 0, 0);
+
+    return new Promise(async (resolve, reject) => {
+        await InvoiceAffectDao.getInvoicesByDate(startDateStr, endDateStr).then(async data => {
+            if (data) {
+                yearMonthList.forEach(ym => {
+                    let billed = 0;
+
+                    data.forEach(i => {
+                        if (i.invoiceDate >= startDate && i.invoiceDate < endDate) {
+                            billed += i.amount;
+                            clientIDList.push(i.actorId);
+                        }
+                    });
+
+                    clientIDList = [...new Set(clientIDList)];
+                    
+                    billedList.push({
+                        month: ym,
+                        billed: billed
+                    });
+
+                    startDate.setUTCMonth(startDate.getUTCMonth() + 1);
+                    endDate.setUTCMonth(endDate.getUTCMonth() + 1);
+                });
+
+                resolve(billedList);
+            }
+            resolve(false);
+        }).catch(err => {
+            reject(err);
+        });
+    });
+};
 
 
 let clientIDList = [];
@@ -188,79 +232,27 @@ exports.getNamesAndCountries = async (clientsID) => {
 }
 
 
+let nameIdList = [];
 
+//method to get the client grading
+exports.getClientGrading = async(idList) => {
 
-
-exports.getDues = async (yearMonthList) => {
-    let totalDuesList = [];
+    let gradingList = [];
 
     return new Promise(async (resolve, reject) => {
-        await TransacStatDao.getTransactionsStatByYearMonth(yearMonthList).then(async data => {
-            if (data) {
-
-                yearMonthList.forEach(ym => {
-                    let totalDues = 0;
-                    data.forEach(e => {
-                        if (e.yearMonth === ym) {
-                            totalDues += (e.dueCurrent + e.due1Month + e.due2Month + e.due3Month);
-                        }
-                    });
-                    totalDuesList.push({
-                        month: ym.toString(),
-                        totalDues: totalDues.toFixed(2)
+        await ClientGradingDao.getClientGrading(idList).then(async data => {
+            if(data){
+                data.forEach(g => {
+                    gradingList.push({
+                      nameId: g.nameId,
+                      grading: g.grading
                     });
                 });
-                resolve(totalDuesList);
+                resolve(gradingList);
             }
             resolve(false);
         }).catch(err => {
             reject(err);
-        });
+        })
     });
 }
-
-
-
-
-//method to get the billed amount
-exports.getBilled = async (startDateStr, endDateStr, yearMonthList) => {
-    let billedList = [];
-    let startDate = new Date(parseInt(startDateStr.substring(5, 7)) + " " + parseInt(startDateStr.substring(8)) + " " + parseInt(startDateStr.substring(0, 4)));
-    let endDate = new Date(parseInt(endDateStr.substring(5, 7)) + " " + parseInt(endDateStr.substring(8)) + " " + parseInt(endDateStr.substring(0, 4)));
-    endDate.setMonth(endDate.getMonth() - (yearMonthList.length - 1));
-
-    startDate.setUTCHours(0, 0, 0, 0);
-    endDate.setUTCHours(0, 0, 0, 0);
-
-    return new Promise(async (resolve, reject) => {
-        await InvoiceAffectDao.getInvoicesByDate(startDateStr, endDateStr).then(async data => {
-            if (data) {
-                yearMonthList.forEach(ym => {
-                    let billed = 0;
-
-                    data.forEach(i => {
-                        if (i.invoiceDate >= startDate && i.invoiceDate < endDate) {
-                            billed += i.amount;
-                            clientIDList.push(i.actorId);
-                        }
-                    });
-
-                    clientIDList = [...new Set(clientIDList)];
-                    
-                    billedList.push({
-                        month: ym,
-                        billed: billed
-                    });
-
-                    startDate.setUTCMonth(startDate.getUTCMonth() + 1);
-                    endDate.setUTCMonth(endDate.getUTCMonth() + 1);
-                });
-
-                resolve(billedList);
-            }
-            resolve(false);
-        }).catch(err => {
-            reject(err);
-        });
-    });
-};
