@@ -7,7 +7,6 @@ import Axios from 'axios';
 import Table from 'react-bootstrap/Table'
 import Button from 'react-bootstrap/Button'
 
-import UnderConstruction from '../components/UnderConstruction'
 import NavB from '../components/NavB'
 import DeleteButton from '../components/DeleteButton'
 import EditButton from '../components/EditButton'
@@ -16,7 +15,6 @@ const Reports = () => {
     const { t } = useTranslation();
     let navigate = useNavigate();
     const cookies = new Cookies();
-    let counter = 0;
 
     const [chartReports, setChartReports] = useState([{
         chartReportId: "",
