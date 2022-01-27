@@ -1,8 +1,8 @@
-const { ParameterStatusMessage } = require('pg-protocol/dist/messages');
 const reportService = require('../services/report.service');
 
 exports.getChartReportsByUserId = async (req, res) => {
-
+    if (!req.user || !req.user.userId || req.user.userId === "" || req.user.userId === undefined)
+        return res.status(400).send({ message: "Content cannot be empty." });
     await reportService.getChartReportsByUserId(req.user.userId)
         .then(async response => {
             if (response) {

@@ -69,27 +69,41 @@ db.sync = async (database, options) => {
       });
       await db[database].chartReports.bulkCreate([
         {
-          chartReportId: 'fakeUUID1',
           name: 'CR1',
           startDate: new Date(),
           endDate: new Date(),
-          employee1: 12345,
+          employee1Id: 12345,
+          employee1Name: 'France Cote',
+          country: 'Canada',
+          clientType: 'Corr',
+          ageOfAccount: 'All',
+          accountType: 'Receivable',
           user_user_id: data[0].userId
         },
         {
-          chartReportId: 'fakeUUID2',
           name: 'CR2',
           startDate: new Date(),
           endDate: new Date(),
-          employee1: 12345,
+          employee1Id: -1,
+          employee1Name: 'All',
+          employee2Id: 12345,
+          employee2Name: 'France Cote',
+          country: 'All',
+          clientType: 'Direct',
+          ageOfAccount: '60-90',
+          accountType: 'Receivable',
           user_user_id: data[0].userId
         },
         {
-          chartReportId: 'fakeUUID3',
           name: 'CR3',
           startDate: new Date(),
           endDate: new Date(),
-          employee1: 12345,
+          employee1Id: 12345,
+          employee1Name: 'France Cote',
+          country: 'All',
+          clientType: 'Any',
+          ageOfAccount: '<30',
+          accountType: 'Payable',
           user_user_id: data[1].userId
         }
       ]);

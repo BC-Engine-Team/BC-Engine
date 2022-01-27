@@ -5,7 +5,7 @@ const { sequelize,
     checkHookDefined
 } = require('sequelize-test-helpers');
 
-const UserModel = require('../../data_access_layer/models/localdb/user.model');
+const [UserModel, ChartReportModel] = require('../../data_access_layer/models/localdb/localdb.model')(sequelize, dataTypes);
 const UserDAO = require('../../data_access_layer/daos/user.dao');
 
 let returnedUser = {
@@ -46,8 +46,7 @@ const dbMock = new SequelizeMock();
 var UserMock = dbMock.define('users', returnedUser);
 
 describe("Test User DAL", () => {
-    const Model = UserModel(sequelize, dataTypes);
-    const instance = new Model();
+    const instance = new UserModel();
 
     afterEach(() => {
         UserMock.$queryInterface.$clearResults();
@@ -58,7 +57,7 @@ describe("Test User DAL", () => {
     })
 
     // testing the user model properties
-    checkModelName(Model)('users');
+    checkModelName(UserModel)('users');
     ['userId', 'email', 'password', 'name', 'role']
         .forEach(checkPropertyExists(instance));
     ['beforeCreate', 'beforeUpdate'].forEach(checkHookDefined(instance));

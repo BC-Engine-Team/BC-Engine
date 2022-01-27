@@ -124,7 +124,8 @@
                     "AccountType":"ACCOUNT TYPE",
                     "StartDate":"START DATE",
                     "EndDate":"END DATE",
-                    "LoadButton":"Load"
+                    "LoadButton":"Load",
+                    "CreateButton": "Create"
                 }
             },
             "form":{

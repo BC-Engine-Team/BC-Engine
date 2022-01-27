@@ -68,14 +68,22 @@ module.exports = (localdb, Sequelize) => {
             type: Sequelize.DATEONLY,
             allowNull: false
         },
-        employee1: {
+        employee1Id: {
             field: 'chart_report_emp1',
             type: Sequelize.INTEGER,
             allowNull: false
         },
-        employee2: {
+        employee1Name: {
+            field: 'chart_report_emp1_name',
+            type: Sequelize.STRING
+        },
+        employee2Id: {
             field: 'chart_report_emp2',
             type: Sequelize.INTEGER
+        },
+        employee2Name: {
+            field: 'chart_report_emp2_name',
+            type: Sequelize.STRING
         },
         country: {
             field: 'chart_report_country',

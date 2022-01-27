@@ -62,9 +62,6 @@ const Reports = () => {
         if (cookies.get("accessToken") === undefined) {
             navigate("/login");
         }
-        else if (cookies.get("role") !== "admin") {
-            navigate("/dashboard");
-        }
 
         handleRefresh();
 
@@ -92,7 +89,7 @@ const Reports = () => {
                                         <div className="d-flex justify-content-center">
                                             <Button
                                                 className="btn py-0 shadow-sm border">
-                                                {t('user.table.AddButton')}
+                                                {t('reports.chartReports.CreateButton')}
                                             </Button>
                                         </div>
                                     </th>
@@ -102,9 +99,9 @@ const Reports = () => {
                             <tbody>
                                 {chartReports.map(r => {
                                     return (
-                                        <tr key={r.chartReportId}>
+                                        <tr key={r.chartReportId} id={r.chartReportId}>
                                             <td>{r.name}</td>
-                                            <td>{r.employee1}{r.employee2 === null ? "" : ", " + r.employee2}</td>
+                                            <td>{r.employee1Name}{r.employee2Name === null ? "" : ", " + r.employee2Name}</td>
                                             <td>{r.clientType}</td>
                                             <td>{r.country}</td>
                                             <td>{r.ageOfAccount}</td>
