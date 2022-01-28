@@ -7,7 +7,7 @@ import NavB from '../components/NavB'
 import Table from 'react-bootstrap/Table'
 import '../styles/clientTable.css'
 import '../styles/dashboardPage.css'
-import { InputGroup, FormControl, Button } from 'react-bootstrap'
+import { InputGroup, FormControl, Button, ButtonGroup, DropdownButton, Dropdown } from 'react-bootstrap'
 
 import { useTranslation } from 'react-i18next';
 import { Bar } from 'react-chartjs-2';
@@ -347,10 +347,20 @@ const Dashboard = () => {
                                     })}
                                 </tbody>
                             </Table>
-                            {/* <div className='popup-inner'>
-                                <button className='right-button'>&#60;</button>
-                                <button className='left-button'>&#62;</button>
-                            </div> */}
+
+                            <ButtonGroup className='col-md-5 w-auto ms-auto client-swap'>
+
+                                <DropdownButton title="Rows per page" variant="Default" id="bg-vertical-dropdown-3" className='rowsViewerSelectionStyle'>
+                                    <Dropdown.Item eventKey="1">Show 10 employees</Dropdown.Item>
+                                    <Dropdown.Item eventKey="2">Show 40 employees</Dropdown.Item>
+                                    <Dropdown.Item eventKey="3">Show all employees</Dropdown.Item>
+                                </DropdownButton>
+
+                                <button className='left-button'>&#60;</button>
+                                <button className='right-button'>&#62;</button>
+                            </ButtonGroup>
+
+                            
                         </div>
                     </div>
                 </div>
