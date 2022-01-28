@@ -276,7 +276,7 @@ const Dashboard = () => {
                     <div className="container-table">
                         <div className="card shadow my-3 mx-3 uTable">
 
-                            <Table responsive="xl" hover>
+                            <Table id='table' responsive="xl" hover>
 
                                 <thead className='bg-light'>
                                     <tr key="0">
@@ -294,13 +294,13 @@ const Dashboard = () => {
                                     {clientNameCountry.map ((client, index) => {
                                         return(
                                             <tr key={index}>
-                                                <td>{client.name}</td>
-                                                <td className='row-style'>{client.country}</td>
-                                                <td className='row-style'>23</td>
-                                                <td className='amount-owed'>55645</td>
-                                                <td className='amount-due'>66643</td>
-                                                <td className='row-style'>{client.clientgrading}</td>
-                                                <td className='row-style'>Active</td>
+                                                <td id="clientName">{client.name}</td>
+                                                <td id= "clientCountry" className='row-style'>{client.country}</td>
+                                                <td id="clientAverageCollectionDays" className='row-style'>23</td>
+                                                <td id="clientAmountOwed" className='amount-owed'>55645</td>
+                                                <td id="clientAmountDue" className='amount-due'>66643</td>
+                                                <td id="clientGrading" className='row-style'>{client.clientgrading}</td>
+                                                <td id="clientStatus" className='row-style'>Active</td>
                                             </tr>
                                         );
                                     })}
