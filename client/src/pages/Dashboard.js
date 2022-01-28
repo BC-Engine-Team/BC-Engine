@@ -280,13 +280,13 @@ const Dashboard = () => {
 
                                 <thead className='bg-light'>
                                     <tr key="0">
-                                        <th className='row-style'>NAME</th>
-                                        <th className='row-style'>COUNTRY</th>
-                                        <th className='row-style'>AVERAGE COLLECTION DAYS</th>
-                                        <th className='row-style'>AMOUNT OWED</th>
-                                        <th className='row-style'>AMOUNT DUE</th>
-                                        <th className='row-style'>CLIENT GRADING</th>
-                                        <th className='row-style'>CURRENT STATUS</th>
+                                        <th className='row-style'>{t('dashboard.table.Name')}</th>
+                                        <th className='row-style'>{t('dashboard.table.Country')}</th>
+                                        <th className='row-style'>{t('dashboard.table.AverageCollectionDays')}</th>
+                                        <th className='row-style'>{t('dashboard.table.AmountOwed')}</th>
+                                        <th className='row-style'>{t('dashboard.table.AmountDue')}</th>
+                                        <th className='row-style'>{t('dashboard.table.ClientGrading')}</th>
+                                        <th className='row-style'>{t('dashboard.table.CurrentStatus')}</th>
                                     </tr>
                                 </thead>
 
@@ -309,10 +309,10 @@ const Dashboard = () => {
 
                             <ButtonGroup className='col-md-5 w-auto ms-auto client-swap'>
 
-                                <DropdownButton title="Rows per page" variant="Default" id="bg-vertical-dropdown-3" className='rowsViewerSelectionStyle'>
-                                    <Dropdown.Item eventKey="1">Show 10 employees</Dropdown.Item>
-                                    <Dropdown.Item eventKey="2">Show 40 employees</Dropdown.Item>
-                                    <Dropdown.Item eventKey="3">Show all employees</Dropdown.Item>
+                                <DropdownButton title={t('dashboard.dropdownButtonTable.Title')} variant="Default" id="bg-vertical-dropdown-3" className='rowsViewerSelectionStyle'>
+                                    <Dropdown.Item eventKey="1">{t('dashboard.dropdownButtonTable.Option1')}</Dropdown.Item>
+                                    <Dropdown.Item eventKey="2">{t('dashboard.dropdownButtonTable.Option2')}</Dropdown.Item>
+                                    <Dropdown.Item eventKey="3">{t('dashboard.dropdownButtonTable.Option3')}</Dropdown.Item>
                                 </DropdownButton>
 
                                 <button className='left-button'>&#60;</button>
