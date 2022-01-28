@@ -85,14 +85,17 @@ exports.getAverages = async (startDateStr, endDateStr) => {
         });
 
 
-        clientList.forEach(c => {
-            clientGradingList.forEach(g => {
-                if(c.nameId == g.nameId){
+        for(const c of clientList){
+            for(const g of clientGradingList){
+                if(c.nameId === g.nameId){
                     c.grading = g.grading;
+                    break;
                 }
-            });
-        });
-
+                else if(c.nameId !== g.nameId){
+                    c.grading = "N/A"
+                }
+            }
+        }
 
         returnData.push({
             chart: averagesList,

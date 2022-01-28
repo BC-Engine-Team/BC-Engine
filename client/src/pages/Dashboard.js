@@ -5,6 +5,7 @@ import Cookies from 'universal-cookie';
 import NavB from '../components/NavB'
 //import ClientTable from '../components/ClientTable'
 import Table from 'react-bootstrap/Table'
+import '../styles/clientTable.css'
 import '../styles/dashboardPage.css'
 import { InputGroup, FormControl, Button } from 'react-bootstrap'
 
@@ -335,17 +336,19 @@ const Dashboard = () => {
                                         {clientNameCountry.map ((client, index) => {
                                             return(
                                                 <tr key={index}>
-                                                    <td className='row-style'>{client.name}</td>
+                                                    <td>{client.name}</td>
                                                     <td className='row-style'>{client.country}</td>
-                                                    <td className='row-style'></td>
-                                                    <td className='amount-owed'></td>
-                                                    <td className='amount-due'></td>
+                                                    <td className='row-style'>23</td>
+                                                    <td className='amount-owed'>55645</td>
+                                                    <td className='amount-due'>66643</td>
                                                     <td className='row-style'>{client.clientgrading}</td>
-                                                    <td className='row-style'></td>
+                                                    <td className='row-style'>Active</td>
                                                 </tr>
                                             );
                                         })}
                                     </tbody>
+                                    <button className='table-page-button'>Next</button>
+                                    <button className='table-page-button'>Previous</button>
                                 </Table>
                             </div>
                         </div>

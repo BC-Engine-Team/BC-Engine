@@ -107,13 +107,13 @@ let fakeExpectedGetAverageResponse = [
                 nameId: 36052,
                 name: "Moussa Cisse KEITA",
                 country: "Canada",
-                grading: ""
+                grading: "N/A"
             },
             {
                 nameId: 37960,
                 name: "FROST BROWN TODD LLC",
                 country: "United States",
-                grading: ""
+                grading: "N/A"
             }
         ]
     }
@@ -126,7 +126,7 @@ let fakeClientNameCountryList = [
         nameId: 32590,
         name: "IRIS DYNAMICS LTD",
         country: "Canada",
-        grading: "C"
+        grading: ""
     },
     {
         nameId: 36052,
@@ -209,11 +209,11 @@ let fakeClientGradingList = [
         grading: "C"
     },
     {
-        nameId: 36052,
+        nameId: 360521,
         grading: ""
     },
     {
-        nameId: 37960,
+        nameId: 379602,
         grading: ""
     }
 ]
@@ -305,6 +305,18 @@ describe("Test Invoice Service", () => {
         describe("IS1.1 - given two dates", () => {
             it("IS1.1.1 - should respond with the list of averages per month", async () => {
 
+                //arrange
+                getClientSpy = jest.spyOn(InvoiceService, 'getNamesAndCountries')
+                    .mockImplementation(() => new Promise((resolve) => {
+                        resolve(fakeClientNameCountryList);
+                    }));
+
+
+                getClientGradingSpy = jest.spyOn(InvoiceService, 'getClientGrading')
+                    .mockImplementation(() => new Promise((resolve) => {
+                        resolve(fakeClientGradingList);
+                    }));
+
                 // act
                 const response = await InvoiceService.getAverages("2020-11-01", "2021-01-01");
 
@@ -312,6 +324,9 @@ describe("Test Invoice Service", () => {
                 expect(response).toEqual(fakeExpectedGetAverageResponse);
                 expect(getDuesSpy).toBeCalledTimes(1);
                 expect(getDuesSpy).toBeCalledWith(yearMonthList);
+                
+                expect(getClientSpy).toBeCalledTimes(1);
+                expect(getClientGradingSpy).toBeCalledTimes(1);
             });
 
             it("IS1.1.2 - should respond with error thrown by getDues", async () => {
