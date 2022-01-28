@@ -12,12 +12,31 @@
     color: #05a105;
 }
 
-.table-page-button{
-  background-color: black;
-  color: white;
-  font-size: 20px;
-  padding: 10px 60px;
-  border-radius: 5px;
-  margin: 10px 0px;
+
+.popup-inner{
+    padding: 32px;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+}
+
+.popup-inner .right-button{
+    background-color: white;
+    box-sizing: border-box;
+    color: black;
+    font-size: 30px;
+    padding: 16px 24px;
+    margin: 10px 70px;
+    cursor: pointer;
+  }
+
+
+.popup-inner .left-button{
+  background-color: white;
+  box-sizing: border-box;
+  color: black;
+  font-size: 30px;
+  padding: 16px 24px;
+  margin: 10px 500px;
   cursor: pointer;
 }

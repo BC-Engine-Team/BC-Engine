@@ -314,43 +314,43 @@ const Dashboard = () => {
                             }
                         </div>
                     </div>
-                    <div className="justify-content-center">
-                        <div>
-                            <div className="card shadow m-5 uTable">
+                    <div className="container-table">
+                        <div className="card shadow my-3 mx-3 uTable">
 
-                                <Table responsive="xl" hover>
+                            <Table responsive="xl" hover>
 
-                                    <thead className='bg-light'>
-                                        <tr key="0">
-                                            <th className='row-style'>NAME</th>
-                                            <th className='row-style'>COUNTRY</th>
-                                            <th className='row-style'>AVERAGE COLLECTION DAYS</th>
-                                            <th className='row-style'>AMOUNT OWED</th>
-                                            <th className='row-style'>AMOUNT DUE</th>
-                                            <th className='row-style'>CLIENT GRADING</th>
-                                            <th className='row-style'>CURRENT STATUS</th>
-                                        </tr>
-                                    </thead>
+                                <thead className='bg-light'>
+                                    <tr key="0">
+                                        <th className='row-style'>NAME</th>
+                                        <th className='row-style'>COUNTRY</th>
+                                        <th className='row-style'>AVERAGE COLLECTION DAYS</th>
+                                        <th className='row-style'>AMOUNT OWED</th>
+                                        <th className='row-style'>AMOUNT DUE</th>
+                                        <th className='row-style'>CLIENT GRADING</th>
+                                        <th className='row-style'>CURRENT STATUS</th>
+                                    </tr>
+                                </thead>
 
-                                    <tbody>
-                                        {clientNameCountry.map ((client, index) => {
-                                            return(
-                                                <tr key={index}>
-                                                    <td>{client.name}</td>
-                                                    <td className='row-style'>{client.country}</td>
-                                                    <td className='row-style'>23</td>
-                                                    <td className='amount-owed'>55645</td>
-                                                    <td className='amount-due'>66643</td>
-                                                    <td className='row-style'>{client.clientgrading}</td>
-                                                    <td className='row-style'>Active</td>
-                                                </tr>
-                                            );
-                                        })}
-                                    </tbody>
-                                    <button className='table-page-button'>Next</button>
-                                    <button className='table-page-button'>Previous</button>
-                                </Table>
-                            </div>
+                                <tbody>
+                                    {clientNameCountry.map ((client, index) => {
+                                        return(
+                                            <tr key={index}>
+                                                <td>{client.name}</td>
+                                                <td className='row-style'>{client.country}</td>
+                                                <td className='row-style'>23</td>
+                                                <td className='amount-owed'>55645</td>
+                                                <td className='amount-due'>66643</td>
+                                                <td className='row-style'>{client.clientgrading}</td>
+                                                <td className='row-style'>Active</td>
+                                            </tr>
+                                        );
+                                    })}
+                                </tbody>
+                            </Table>
+                            {/* <div className='popup-inner'>
+                                <button className='right-button'>&#60;</button>
+                                <button className='left-button'>&#62;</button>
+                            </div> */}
                         </div>
                     </div>
                 </div>
