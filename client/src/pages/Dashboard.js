@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { InputGroup, FormControl, Button } from 'react-bootstrap'
-
 import { useTranslation } from 'react-i18next';
+
+import Form from 'react-bootstrap/Form'
 
 import Axios from 'axios';
 import Cookies from 'universal-cookie';
@@ -71,10 +72,62 @@ const Dashboard = () => {
         }
     ];
 
-
     const [chartData, setChartData] = useState(fallbackChartData);
     const [preparedChartData, setPreparedChartData] = useState();
     const [authorized, setAuthorized] = useState(false);
+
+    const [errors, setErrors] = useState({});
+    const [criteria, setCriteria] = useState({
+        name: "",
+        startYear: 0,
+        startMonth: 0,
+        endYear: 0,
+        endMonth: 0
+    });
+
+    const setField = (field, value) => {
+        if (field === "startYear") {
+            let yearList = [];
+            startYearList.forEach(y => {
+                yearList.push(y);
+            });
+
+            for (let i = 0; i < yearList.length; i++) {
+                if (yearList[i] === parseInt(value)) {
+                    yearList.splice(0, i);
+                    break;
+                }
+            }
+            setEndYearList(yearList);
+        }
+
+        setCriteria({
+            ...criteria,
+            [field]: value
+        });
+
+        if (!!errors[field]) {
+            setErrors({
+                ...errors,
+                [field]: null
+            });
+        }
+    };
+
+    let endYearL = [];
+    let startYearL = [];
+    let endMonthL = [];
+    let startMonthL = [];
+    const [latestYear, setLatestYear] = useState(2022);
+    const [earliestYear, setEarliestYear] = useState(2008);
+    const [startYearList, setStartYearList] = useState([]);
+    const [endYearList, setEndYearList] = useState([]);
+    const [startMonthList, setStartMonthList] = useState([]);
+    const [endMonthList, setEndMonthList] = useState([]);
+    const [startYear, setStartYear] = useState();
+    const [endYear, setEndYear] = useState();
+    const [startMonth, setStartMonth] = useState();
+    const [endMonth, setEndMonth] = useState();
 
     const chart = async () => {
         let datasets = [];
@@ -156,6 +209,15 @@ const Dashboard = () => {
             });
     }
 
+    const initCriteria = async () => {
+        for (let i = earliestYear; i <= latestYear; i++) {
+            startYearL.push(i);
+            endYearL.push(i);
+        }
+        setStartYearList(startYearL);
+        setEndYearList(endYearL);
+    }
+
     useEffect(() => {
         if (cookies.get("accessToken") === undefined) {
             navigate("/login");
@@ -165,6 +227,7 @@ const Dashboard = () => {
         }
 
         chart();
+        initCriteria();
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
@@ -173,7 +236,6 @@ const Dashboard = () => {
         if (preparedChartData) {
             setChartData(chartData);
         }
-
     }
 
     return (
@@ -191,6 +253,90 @@ const Dashboard = () => {
                                     aria-describedby="basic-addon1"
                                 />
                             </InputGroup>
+
+                            <Form.Group className="my-2  px-2" controlId="floatingModifyStartDate">
+                                <Form.Label>{t('dashboard.criteria.StartDateLabel')}</Form.Label>
+                                <div className='row'>
+                                    <div className='col-md-6 col-sm-6'>
+                                        <Form.Select required
+                                            size="sm"
+                                            aria-label="Default select example"
+                                            onChange={(e) => setField('startYear', e.target.value)}
+                                            value={criteria.startYear}>
+
+                                            {startYearList.map(y => {
+                                                return (
+                                                    <option value={y}>{y}</option>
+                                                );
+                                            })}
+
+                                        </Form.Select>
+
+                                        <Form.Control.Feedback type="invalid">
+
+                                        </Form.Control.Feedback>
+                                    </div>
+                                    <div className='col-md-6 col-sm-6'>
+                                        <Form.Select required
+                                            size="sm"
+                                            aria-label="Default select example"
+                                            onChange={(e) => setField('startMonth', e.target.value)}
+                                            value={criteria.startMonth}>
+
+
+                                        </Form.Select>
+
+
+                                        <Form.Control.Feedback type="invalid">
+
+                                        </Form.Control.Feedback>
+                                    </div>
+                                </div>
+
+                            </Form.Group>
+
+                            <Form.Group className="my-2  px-2" controlId="floatingModifyStartDate">
+                                <Form.Label>{t('dashboard.criteria.EndDateLabel')}</Form.Label>
+                                <div className='row'>
+                                    <div className='col-md-6 col-sm-6'>
+                                        <Form.Select required
+                                            size="sm"
+                                            aria-label="Default select example"
+                                            onChange={(e) => setField('endYear', e.target.value)}
+                                            value={criteria.endYear}>
+
+                                            {endYearList.map(y => {
+                                                return (
+                                                    <option value={y}>{y}</option>
+                                                );
+                                            })}
+                                        </Form.Select>
+
+                                        <Form.Control.Feedback type="invalid">
+
+                                        </Form.Control.Feedback>
+                                    </div>
+                                    <div className='col-md-6 col-sm-6'>
+                                        <Form.Select required
+                                            size="sm"
+                                            aria-label="Default select example"
+                                            onChange={(e) => setField('endMonth', e.target.value)}
+                                            value={criteria.endMonth}>
+
+                                            <option value="">{t('user.table.select.Default')}</option>
+                                            <option value="admin">{t('user.table.select.Admin')}</option>
+                                            <option value="employee">{t('user.table.select.Employee')}</option>
+                                        </Form.Select>
+
+
+                                        <Form.Control.Feedback type="invalid">
+
+                                        </Form.Control.Feedback>
+                                    </div>
+                                </div>
+
+                            </Form.Group>
+
                             <Button
                                 onClick={loadChartData}
                                 className='my-2 mx-2'

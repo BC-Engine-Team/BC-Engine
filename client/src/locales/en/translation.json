@@ -49,7 +49,9 @@
             "dashboard":{
                 "criteria":{
                     "NamePlaceHolder":"Enter Chart Report Name",
-                    "LoadChartButton":"Load Chart"
+                    "LoadChartButton":"Load Chart",
+                    "StartDateLabel": "Start Month",
+                    "EndDateLabel": "End Month"
                 },
                 "chart":{
                     "Title":"Average Collection Days over Time",
