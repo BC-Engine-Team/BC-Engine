@@ -57,7 +57,7 @@ exports.getAverages = async (startDateStr, endDateStr) => {
             clientList = data;
         }).catch(err => {
             reject(err);
-        })
+        });
 
 
         // Populate average list with average for each month
@@ -227,7 +227,9 @@ exports.getNamesAndCountries = async (clientsID) => {
                 resolve(formattedClientList);
             }
             resolve(false);
-        });
+        }).catch(err => {
+            reject(err);
+        })
     });
 }
 
