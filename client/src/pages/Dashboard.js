@@ -176,46 +176,6 @@ const Dashboard = () => {
     }
 
     
-    const grading = async() =>{
-        let header = {
-            'authorization': "Bearer " + cookies.get("accessToken"),
-        }
-
-        await Axios.get(`${process.env.REACT_APP_API}/invoice/grading`, { headers: header })
-            .then(async (res) => {
-                if (res.status === 403 && res.status === 401) {
-                    setAuthorized(false);
-                    return;
-                }
-                setAuthorized(true);
-
-
-                for(let i = 0; i < res.data[0].grading.length; i++)
-                {
-                    clientInfoList.push({
-                        clientgrading: res.data[0].realGrading
-                    });
-                }
-
-                setClientNameCountry(clientInfoList)
-            })
-            .catch((error) => {
-                if (error.response) {
-                    if (error.response.status === 403 || error.response.status === 401) {
-                        console.log(error.response.body);
-                    }
-                    else {
-                        console.log("Malfunction in the B&C Engine...");
-                    }
-                }
-                else if (error.request) {
-                    console.log("Could not reach b&C Engine...");
-                }
-            });
-    }
-
-
-
     useEffect(() => {
         if (cookies.get("accessToken") === undefined) {
             navigate("/login");
@@ -225,7 +185,6 @@ const Dashboard = () => {
         }
 
         chart();
-        // grading();
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
         
