@@ -79,28 +79,13 @@ const Dashboard = () => {
     const [errors, setErrors] = useState({});
     const [criteria, setCriteria] = useState({
         name: "",
-        startYear: 0,
+        startYear: 2008,
         startMonth: 0,
-        endYear: 0,
+        endYear: 2008,
         endMonth: 0
     });
 
     const setField = (field, value) => {
-        if (field === "startYear") {
-            let yearList = [];
-            startYearList.forEach(y => {
-                yearList.push(y);
-            });
-
-            for (let i = 0; i < yearList.length; i++) {
-                if (yearList[i] === parseInt(value)) {
-                    yearList.splice(0, i);
-                    break;
-                }
-            }
-            setEndYearList(yearList);
-        }
-
         setCriteria({
             ...criteria,
             [field]: value
@@ -114,20 +99,13 @@ const Dashboard = () => {
         }
     };
 
-    let endYearL = [];
-    let startYearL = [];
-    let endMonthL = [];
-    let startMonthL = [];
-    const [latestYear, setLatestYear] = useState(2022);
+    const [latestYear, setLatestYear] = useState(new Date().getFullYear());
+    const [latestMonth, setLatestMonth] = useState(new Date().getMonth());
     const [earliestYear, setEarliestYear] = useState(2008);
     const [startYearList, setStartYearList] = useState([]);
     const [endYearList, setEndYearList] = useState([]);
     const [startMonthList, setStartMonthList] = useState([]);
     const [endMonthList, setEndMonthList] = useState([]);
-    const [startYear, setStartYear] = useState();
-    const [endYear, setEndYear] = useState();
-    const [startMonth, setStartMonth] = useState();
-    const [endMonth, setEndMonth] = useState();
 
     const chart = async () => {
         let datasets = [];
@@ -210,12 +188,50 @@ const Dashboard = () => {
     }
 
     const initCriteria = async () => {
+        let yearList = [];
         for (let i = earliestYear; i <= latestYear; i++) {
-            startYearL.push(i);
-            endYearL.push(i);
+            yearList.push(i);
         }
-        setStartYearList(startYearL);
-        setEndYearList(endYearL);
+        setStartYearList(yearList);
+        setEndYearList(yearList);
+
+        setStartMonthList(months);
+        setEndMonthList(months);
+
+    }
+
+    const loadChartData = (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+
+        const newErrors = findCriteriaErrors();
+
+        if (Object.keys(newErrors).length > 0) {
+            setErrors(newErrors);
+        }
+    }
+
+    const findCriteriaErrors = () => {
+        const { name, startYear, startMonth, endYear, endMonth } = criteria;
+        const newErrors = {};
+
+        // endYear errors
+        if (parseInt(endYear) < parseInt(startYear)) newErrors.endYear = "End Year cannot be before Start Year";
+
+        // endMonth errors
+        if (endMonth < startMonth && startYear === endYear)
+            newErrors.endMonth = "End Month cannot be before Start Month";
+        else
+            delete newErrors["endMonth"];
+
+        if (endMonth > latestMonth && endYear === latestYear.toString())
+            newErrors.endMonth = "End Month cannot exceed current month";
+
+        // startMonth errors
+        if (startMonth > latestMonth && startYear === latestYear.toString())
+            newErrors.startMonth = "Start Month cannot exceed current month";
+
+        return newErrors;
     }
 
     useEffect(() => {
@@ -232,11 +248,7 @@ const Dashboard = () => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
-    const loadChartData = () => {
-        if (preparedChartData) {
-            setChartData(chartData);
-        }
-    }
+
 
     return (
         <div>
@@ -262,18 +274,19 @@ const Dashboard = () => {
                                             size="sm"
                                             aria-label="Default select example"
                                             onChange={(e) => setField('startYear', e.target.value)}
-                                            value={criteria.startYear}>
+                                            value={criteria.startYear}
+                                            isInvalid={!!errors.startYear}>
 
-                                            {startYearList.map(y => {
+                                            {startYearList.map((y, i) => {
                                                 return (
-                                                    <option value={y}>{y}</option>
+                                                    <option key={i} value={y}>{y}</option>
                                                 );
                                             })}
 
                                         </Form.Select>
 
                                         <Form.Control.Feedback type="invalid">
-
+                                            {errors.startYear}
                                         </Form.Control.Feedback>
                                     </div>
                                     <div className='col-md-6 col-sm-6'>
@@ -281,14 +294,18 @@ const Dashboard = () => {
                                             size="sm"
                                             aria-label="Default select example"
                                             onChange={(e) => setField('startMonth', e.target.value)}
-                                            value={criteria.startMonth}>
+                                            value={criteria.startMonth}
+                                            isInvalid={!!errors.startMonth}>
 
+                                            {startMonthList.map((m, i) => {
+                                                return (<option key={i} value={i}>{m}</option>);
+                                            })}
 
                                         </Form.Select>
 
 
                                         <Form.Control.Feedback type="invalid">
-
+                                            {errors.startMonth}
                                         </Form.Control.Feedback>
                                     </div>
                                 </div>
@@ -303,17 +320,18 @@ const Dashboard = () => {
                                             size="sm"
                                             aria-label="Default select example"
                                             onChange={(e) => setField('endYear', e.target.value)}
-                                            value={criteria.endYear}>
+                                            value={criteria.endYear}
+                                            isInvalid={!!errors.endYear}>
 
-                                            {endYearList.map(y => {
+                                            {endYearList.map((y, i) => {
                                                 return (
-                                                    <option value={y}>{y}</option>
+                                                    <option key={i} value={y}>{y}</option>
                                                 );
                                             })}
                                         </Form.Select>
 
                                         <Form.Control.Feedback type="invalid">
-
+                                            {errors.endYear}
                                         </Form.Control.Feedback>
                                     </div>
                                     <div className='col-md-6 col-sm-6'>
@@ -321,16 +339,17 @@ const Dashboard = () => {
                                             size="sm"
                                             aria-label="Default select example"
                                             onChange={(e) => setField('endMonth', e.target.value)}
-                                            value={criteria.endMonth}>
+                                            value={criteria.endMonth}
+                                            isInvalid={!!errors.endMonth}>
 
-                                            <option value="">{t('user.table.select.Default')}</option>
-                                            <option value="admin">{t('user.table.select.Admin')}</option>
-                                            <option value="employee">{t('user.table.select.Employee')}</option>
+                                            {endMonthList.map((m, i) => {
+                                                return (<option key={i} value={i}>{m}</option>);
+                                            })}
                                         </Form.Select>
 
 
                                         <Form.Control.Feedback type="invalid">
-
+                                            {errors.endMonth}
                                         </Form.Control.Feedback>
                                     </div>
                                 </div>
