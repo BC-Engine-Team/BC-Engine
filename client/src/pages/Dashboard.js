@@ -79,10 +79,10 @@ const Dashboard = () => {
     const [errors, setErrors] = useState({});
     const [criteria, setCriteria] = useState({
         name: "",
-        startYear: 2008,
+        startYear: 2017,
         startMonth: 0,
-        endYear: 2008,
-        endMonth: 0
+        endYear: 2021,
+        endMonth: 11
     });
 
     const setField = (field, value) => {
@@ -114,12 +114,15 @@ const Dashboard = () => {
             'authorization': "Bearer " + cookies.get("accessToken"),
         }
 
+        let startDate = new Date(criteria.startYear, criteria.startMonth, 1).toISOString().split("T")[0];
+        let endDate = new Date(criteria.endYear, criteria.endMonth, 1).toISOString().split("T")[0];
+
         const dates = {
             startDate: "2017-01-01",
             endDate: "2020-12-01"
         };
 
-        await Axios.get(`${process.env.REACT_APP_API}/invoice/defaultChartAndTable/${dates.startDate}/${dates.endDate}`, { headers: header })
+        await Axios.get(`${process.env.REACT_APP_API}/invoice/defaultChartAndTable/${startDate}/${endDate}`, { headers: header })
             .then((res) => {
                 if (res.status === 403 && res.status === 401) {
                     setAuthorized(false);
@@ -209,6 +212,9 @@ const Dashboard = () => {
         if (Object.keys(newErrors).length > 0) {
             setErrors(newErrors);
         }
+        else {
+            chart();
+        }
     }
 
     const findCriteriaErrors = () => {
@@ -217,6 +223,8 @@ const Dashboard = () => {
 
         // endYear errors
         if (parseInt(endYear) < parseInt(startYear)) newErrors.endYear = "End Year cannot be before Start Year";
+        else
+            delete newErrors["endyear"];
 
         // endMonth errors
         if (endMonth < startMonth && startYear === endYear)
