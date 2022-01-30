@@ -150,6 +150,7 @@ const Dashboard = () => {
         const newErrors = findCriteriaErrors();
 
         setErrors(newErrors);
+        if (Object.keys(newErrors).length !== 0) return;
         await chart();
     }
 
