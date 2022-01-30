@@ -75,20 +75,27 @@ let fakeInvoiceAffectList = [
     }
 ];
 
-let expectedGetAverageResponse = [
-    {
-        month: 202011,
-        average: (fakeDuesList[0].totalDues / fakeBilledList[0].billed * 365).toFixed(2)
-    },
-    {
-        month: 202012,
-        average: (fakeDuesList[1].totalDues / fakeBilledList[1].billed * 365).toFixed(2)
-    },
-    {
-        month: 202101,
-        average: (fakeDuesList[2].totalDues / fakeBilledList[2].billed * 365).toFixed(2)
-    }
-];
+let expectedGetAverageResponse = {
+    2020: [
+        {
+            month: 202011,
+            average: (fakeDuesList[0].totalDues / fakeBilledList[0].billed * 365).toFixed(2),
+            group: 2020
+        },
+        {
+            month: 202012,
+            average: (fakeDuesList[1].totalDues / fakeBilledList[1].billed * 365).toFixed(2),
+            group: 2020
+        }
+    ],
+    2021: [
+        {
+            month: 202101,
+            average: (fakeDuesList[2].totalDues / fakeBilledList[2].billed * 365).toFixed(2),
+            group: 2021
+        }
+    ]
+};
 
 
 
@@ -128,7 +135,7 @@ describe("Test Invoice Service", () => {
 
     describe("IS1 - getAverages", () => {
         describe("IS1.1 - given two dates", () => {
-            it("IS1.1.1 - should respond with the list of averages per month", async () => {
+            it("IS1.1.1 - should respond with the list of averages per month with group key", async () => {
                 // arrange
                 getDuesSpy = jest.spyOn(InvoiceService, 'getDues')
                     .mockImplementation(() => new Promise((resolve) => {

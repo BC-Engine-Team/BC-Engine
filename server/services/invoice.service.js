@@ -51,13 +51,21 @@ exports.getAverages = async (startDateStr, endDateStr) => {
         let counter = 0;
         yearMonthList.forEach(ym => {
             let average = totalDuesList[counter].totalDues / billedList[counter].billed * 365;
+            let year = parseInt(ym.toString().substring(0, 4));
             averagesList.push({
                 month: ym,
-                average: average.toFixed(2)
+                average: average.toFixed(2),
+                group: year
             });
             counter++;
         });
-        resolve(averagesList);
+
+        const groupedAverages = averagesList.reduce((groups, item) => ({
+            ...groups,
+            [item.group]: [...(groups[item.group] || []), item]
+        }), {});
+
+        resolve(groupedAverages);
     });
 }
 

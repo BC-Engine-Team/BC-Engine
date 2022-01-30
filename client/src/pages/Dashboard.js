@@ -73,54 +73,34 @@ const Dashboard = () => {
     ];
 
     const [chartData, setChartData] = useState(fallbackChartData);
-    const [preparedChartData, setPreparedChartData] = useState();
     const [authorized, setAuthorized] = useState(false);
 
     const [errors, setErrors] = useState({});
     const [criteria, setCriteria] = useState({
         name: "",
-        startYear: 2017,
+        startYear: 2019,
         startMonth: 0,
         endYear: 2021,
         endMonth: 11
     });
 
-    const setField = (field, value) => {
-        setCriteria({
-            ...criteria,
-            [field]: value
-        });
 
-        if (!!errors[field]) {
-            setErrors({
-                ...errors,
-                [field]: null
-            });
-        }
-    };
 
     const [latestYear, setLatestYear] = useState(new Date().getFullYear());
     const [latestMonth, setLatestMonth] = useState(new Date().getMonth());
-    const [earliestYear, setEarliestYear] = useState(2008);
+    const [earliestYear, setEarliestYear] = useState(2009);
     const [startYearList, setStartYearList] = useState([]);
     const [endYearList, setEndYearList] = useState([]);
     const [startMonthList, setStartMonthList] = useState([]);
     const [endMonthList, setEndMonthList] = useState([]);
 
     const chart = async () => {
-        let datasets = [];
-
         let header = {
             'authorization': "Bearer " + cookies.get("accessToken"),
         }
 
         let startDate = new Date(criteria.startYear, criteria.startMonth, 1).toISOString().split("T")[0];
         let endDate = new Date(criteria.endYear, criteria.endMonth, 1).toISOString().split("T")[0];
-
-        const dates = {
-            startDate: "2017-01-01",
-            endDate: "2020-12-01"
-        };
 
         await Axios.get(`${process.env.REACT_APP_API}/invoice/defaultChartAndTable/${startDate}/${endDate}`, { headers: header })
             .then((res) => {
@@ -130,48 +110,21 @@ const Dashboard = () => {
                 }
                 setAuthorized(true);
 
+                let datasets = [];
+                let groupedChartData = res.data;
 
-                let previousYear = parseInt(res.data[0].month.toString().substring(0, 4));
-                let data = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-                let color = colors[0];
                 let colorCounter = 0;
+                for (let i = 0; i < Object.keys(groupedChartData).length; i++) {
+                    const data = groupedChartData[Object.keys(groupedChartData)[i]].map(m => m.average)
+                    datasets.push({
+                        label: groupedChartData[Object.keys(groupedChartData)[i]][0]['group'],
+                        data: data,
+                        backgroundColor: colors[colorCounter]
+                    });
 
-                for (let i = 0; i < res.data.length; i++) {
-                    let year = parseInt(res.data[i].month.toString().substring(0, 4));
-                    let month = parseInt(res.data[i].month.toString().substring(4));
-                    let average = parseFloat(res.data[i].average);
-
-                    if (year !== previousYear || res.data[i].month === res.data[res.data.length - 1].month) {
-                        if (res.data[i].month === res.data[res.data.length - 1].month) {
-                            for (let x = 0; x < data.length; x++) {
-                                if ((month - 1) === x) {
-                                    data[x] = average;
-                                }
-                            }
-                        }
-
-                        color = colors[colorCounter];
-                        colorCounter++;
-                        if (colorCounter === colors.length) colorCounter = 0;
-
-                        label = previousYear;
-                        datasets.push({
-                            label: label,
-                            data: data,
-                            backgroundColor: color
-                        });
-                        previousYear = year;
-                        data = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-                    }
-
-                    for (let x = 0; x < data.length; x++) {
-                        if ((month - 1) === x) {
-                            data[x] = average;
-                        }
-                    }
+                    colorCounter++;
+                    if (colorCounter === colors.length - 1) colorCounter = 0;
                 }
-
-                setPreparedChartData(datasets);
 
                 setChartData(datasets);
             })
@@ -190,6 +143,52 @@ const Dashboard = () => {
             });
     }
 
+    const loadChartData = async (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+
+        const newErrors = findCriteriaErrors();
+
+        setErrors(newErrors);
+        await chart();
+    }
+
+    const setField = (field, value) => {
+        setCriteria({
+            ...criteria,
+            [field]: value
+        });
+
+        if (!!errors[field]) {
+            setErrors({
+                ...errors,
+                [field]: null
+            });
+        }
+    };
+
+    const findCriteriaErrors = () => {
+        const { startYear, startMonth, endYear, endMonth } = criteria;
+        let newErrors = {};
+
+        // endYear errors
+        if (parseInt(endYear) < parseInt(startYear))
+            newErrors.endYear = t("dashboard.criteria.EndYearExceedError");
+
+        // endMonth errors
+        if (parseInt(endMonth) < parseInt(startMonth) && parseInt(startYear) === parseInt(endYear))
+            newErrors.endMonth = t("dashboard.criteria.EndMonthExceedError");
+
+        if (parseInt(endMonth) > latestMonth && endYear === latestYear.toString())
+            newErrors.endMonth = t("dashboard.criteria.EndMonthExceedCurrentError");
+
+        // startMonth errors
+        if (startMonth > latestMonth && startYear === latestYear.toString())
+            newErrors.startMonth = t("dashboard.criteria.StartMonthExceedCurrentError");
+
+        return newErrors;
+    }
+
     const initCriteria = async () => {
         let yearList = [];
         for (let i = earliestYear; i <= latestYear; i++) {
@@ -200,46 +199,6 @@ const Dashboard = () => {
 
         setStartMonthList(months);
         setEndMonthList(months);
-
-    }
-
-    const loadChartData = (event) => {
-        event.preventDefault();
-        event.stopPropagation();
-
-        const newErrors = findCriteriaErrors();
-
-        if (Object.keys(newErrors).length > 0) {
-            setErrors(newErrors);
-        }
-        else {
-            chart();
-        }
-    }
-
-    const findCriteriaErrors = () => {
-        const { name, startYear, startMonth, endYear, endMonth } = criteria;
-        const newErrors = {};
-
-        // endYear errors
-        if (parseInt(endYear) < parseInt(startYear)) newErrors.endYear = "End Year cannot be before Start Year";
-        else
-            delete newErrors["endyear"];
-
-        // endMonth errors
-        if (endMonth < startMonth && startYear === endYear)
-            newErrors.endMonth = "End Month cannot be before Start Month";
-        else
-            delete newErrors["endMonth"];
-
-        if (endMonth > latestMonth && endYear === latestYear.toString())
-            newErrors.endMonth = "End Month cannot exceed current month";
-
-        // startMonth errors
-        if (startMonth > latestMonth && startYear === latestYear.toString())
-            newErrors.startMonth = "Start Month cannot exceed current month";
-
-        return newErrors;
     }
 
     useEffect(() => {
@@ -255,8 +214,6 @@ const Dashboard = () => {
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
-
-
 
     return (
         <div>
@@ -311,13 +268,11 @@ const Dashboard = () => {
 
                                         </Form.Select>
 
-
                                         <Form.Control.Feedback type="invalid">
                                             {errors.startMonth}
                                         </Form.Control.Feedback>
                                     </div>
                                 </div>
-
                             </Form.Group>
 
                             <Form.Group className="my-2  px-2" controlId="floatingModifyStartDate">
@@ -355,19 +310,18 @@ const Dashboard = () => {
                                             })}
                                         </Form.Select>
 
-
                                         <Form.Control.Feedback type="invalid">
                                             {errors.endMonth}
                                         </Form.Control.Feedback>
                                     </div>
                                 </div>
-
                             </Form.Group>
 
                             <Button
                                 onClick={loadChartData}
                                 className='my-2 mx-2'
-                                variant='primary'>{loadChartButtonText}</Button>
+                                variant='primary'>{loadChartButtonText}
+                            </Button>
                         </div>
                     </div>
                     <div className="container-chart">
@@ -379,7 +333,6 @@ const Dashboard = () => {
                                         labels: months,
                                         datasets: chartData.length === 0 || authorized === false ? fallbackChartData : chartData
                                     }}
-
                                     options={{
                                         responsive: true,
                                         maintainAspectRatio: false,
@@ -422,7 +375,6 @@ const Dashboard = () => {
                                             }
                                         }
                                     }}
-
                                 />
                             }
                         </div>
