@@ -148,12 +148,14 @@ describe("Test Invoice Controller", () => {
         });
 
         describe("IC1.4 - given service throws an error", () => {
-            it("IC1.4.1 - should respond with 500 status code and err message", async () => {
+            it("IC1.4.1 - should respond with 500 status code and message when not specified", async () => {
                 // arrange
-                let expectedErrorMessage = "An error occured in the backend.";
+                let expectedError = {
+                    message: "Malfunction in the B&C Engine."
+                };
                 invoiceServiceSpy = jest.spyOn(InvoiceService, 'getAverages')
                     .mockImplementation(async () => {
-                        await Promise.reject({ message: expectedErrorMessage });
+                        await Promise.reject({});
                     });
 
                 // act
@@ -161,7 +163,26 @@ describe("Test Invoice Controller", () => {
 
                 // assert
                 expect(response.status).toBe(500);
-                expect(response.body.message).toBe(expectedErrorMessage);
+                expect(response.body).toEqual(expectedError);
+            });
+
+            it("IC1.4.2 - should respond with caught error's status and message", async () => {
+                // arrange
+                let expectedError = {
+                    status: 400,
+                    message: "Custom message."
+                };
+                invoiceServiceSpy = jest.spyOn(InvoiceService, 'getAverages')
+                    .mockImplementation(async () => {
+                        await Promise.reject(expectedError);
+                    });
+
+                // act
+                const response = await request.get("/api/invoice/defaultChartAndTable/2019-12-01/2020-04-01");
+
+                // assert
+                expect(response.status).toBe(400);
+                expect(response.body.message).toBe(expectedError.message);
             });
         });
     });
