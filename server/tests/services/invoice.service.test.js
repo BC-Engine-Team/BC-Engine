@@ -178,6 +178,20 @@ describe("Test Invoice Service", () => {
                 await expect(InvoiceService.getAverages("2020-11-01", "2021-01-01")).rejects
                     .toEqual({ message: "getBilled failed" });
             });
+
+            it("IS1.1.4 - should respond with error message 400 when start date is after end date", async () => {
+                // arrange
+                let startDate = "2020-11-01";
+                let endDate = "2019-11-01";
+                let expectedError = {
+                    status: 400,
+                    message: "Invalid date order."
+                }
+
+                // act and assert
+                await expect(InvoiceService.getAverages(startDate, endDate)).rejects
+                    .toEqual(expectedError);
+            });
         });
     });
 

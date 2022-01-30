@@ -2,25 +2,35 @@ const TransacStatDao = require("../data_access_layer/daos/transac_stat.dao");
 const InvoiceAffectDao = require("../data_access_layer/daos/invoice_affect.dao");
 
 exports.getAverages = async (startDateStr, endDateStr) => {
-    const startYear = parseInt(startDateStr.split('-')[0]);
-    let startMonth = parseInt(startDateStr.split('-')[1]);
-    const endYear = parseInt(endDateStr.split('-')[0]);
-    const endMonth = parseInt(endDateStr.split('-')[1]);
-
-    // make list of yearMonth [201911,202001,202002,...] to select dues
-    let yearMonthList = [];
-    for (let y = startYear; y <= endYear; y++) {
-        if (y != startYear) startMonth = 1;
-        for (let m = startMonth; m <= 12; m++) {
-            if (y == endYear && m > endMonth) break;
-            let yearMonthStr = y.toString();
-            if (m < 10) yearMonthStr += '0';
-            yearMonthStr += m.toString();
-            yearMonthList.push(parseInt(yearMonthStr));
-        }
-    }
-
     return new Promise(async (resolve, reject) => {
+        let startDate = new Date(`${startDateStr} 00:00:00`);
+        let endDate = new Date(`${endDateStr} 00:00:00`);
+        if (startDate > endDate) {
+            const response = {
+                status: 400,
+                message: "Invalid date order."
+            }
+            reject(response);
+        }
+
+        const startYear = parseInt(startDateStr.split('-')[0]);
+        let startMonth = parseInt(startDateStr.split('-')[1]);
+        const endYear = parseInt(endDateStr.split('-')[0]);
+        const endMonth = parseInt(endDateStr.split('-')[1]);
+
+        // make list of yearMonth [201911,202001,202002,...] to select dues
+        let yearMonthList = [];
+        for (let y = startYear; y <= endYear; y++) {
+            if (y != startYear) startMonth = 1;
+            for (let m = startMonth; m <= 12; m++) {
+                if (y == endYear && m > endMonth) break;
+                let yearMonthStr = y.toString();
+                if (m < 10) yearMonthStr += '0';
+                yearMonthStr += m.toString();
+                yearMonthList.push(parseInt(yearMonthStr));
+            }
+        }
+
         let averagesList = [];
         let totalDuesList = [];
         let billedList = [];
@@ -33,7 +43,6 @@ exports.getAverages = async (startDateStr, endDateStr) => {
         });
 
         // prepare startDate to get billed amount for each month
-        let startDate = new Date(`${startDateStr} 00:00:00`);
         startDate.setMonth(startDate.getMonth() - 12);
         let theMonth = startDate.getMonth() + 1;
         startDateStr = startDate.getFullYear() + "-" + theMonth + "-01";
