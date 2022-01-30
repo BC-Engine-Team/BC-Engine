@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router';
 import Axios from 'axios';
 import Cookies from 'universal-cookie';
 import NavB from '../components/NavB'
-//import ClientTable from '../components/ClientTable'
 import Table from 'react-bootstrap/Table'
 import '../styles/clientTable.css'
 import '../styles/dashboardPage.css'
@@ -75,7 +74,6 @@ const Dashboard = () => {
     ];
 
     
-    //const [preparedChartData, setPreparedChartData] = useState();
 
     const [chartData, setChartData] = useState(fallbackChartData);
     const [authorized, setAuthorized] = useState(false);
@@ -158,7 +156,6 @@ const Dashboard = () => {
 
 
                 setClientNameCountry(clientInfoList);
-                //setPreparedChartData(datasets);
             })
             .catch((error) => {
                 if (error.response) {

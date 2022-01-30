@@ -24,35 +24,3 @@ exports.getTransactionsStatByYearMonth = async (yearMonthList, transacStatModel=
         })
     })
 }
-
-exports.getTransactionsByTransactionDate = async (startDate, endDate, transacStatModel=TransacStatModel) => {
-    return new Promise((resolve, reject) => {
-        transacStatModel.findAll({
-            where: {
-                connectionId: 3,
-                amount: {
-                    [Op.gt]: 0
-                },
-                dueCurrent: {
-                    [Op.not]: 0
-                },
-                transactionDate: {
-                    [Op.lt]: endDate,
-                    [Op.gte]: startDate
-                }
-            }
-        }).then(async data => {
-            if(data){
-                let returnData = [];
-                for(let i=0; i<data.length;i++){
-                    returnData.push(data[i].dataValues);
-                }
-                resolve(returnData);
-            }
-            resolve(false);
-        })
-        .catch(err => {
-            reject(err);
-        });
-    })
-}

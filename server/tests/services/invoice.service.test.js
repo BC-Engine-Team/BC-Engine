@@ -146,59 +146,51 @@ let fakeClientNameCountryList = [
 let fakeClientDAOList = [
     {
         nameId: 1,
-        name1: "Banque Royale",
-        name2: null,
-        name3: null,
-        country: "Canada"
+        name: "Banque Royale",
+        country: "Canada",
+        grading: ""
     },
     {
         nameId: 2,
-        name1: null,
-        name2: "Benoit Cote",
-        name3: null,
-        country: "Canada"
+        name: "Benoit Cote",
+        country: "Canada",
+        grading: ""
     },
     {
         nameId: 3,
-        name1: null,
-        name2: null,
-        name3: "FrostBrown Todd",
-        country: "United States"
+        name: "FrostBrown Todd",
+        country: "United States",
+        grading: ""
     },
     {
         nameId: 4,
-        name1: "Enterprise",
-        name2: null,
-        name3: "Engine",
-        country: "Australia"
+        name: "Enterprise Engine",
+        country: "Australia",
+        grading: ""
     },
     {
         nameId: 5,
-        name1: null,
-        name2: "Beinjing Xia Long Inc.",
-        name3: "Train",
-        country: "China"
+        name: "Beinjing Xia Long Inc. Train",
+        country: "China",
+        grading: ""
     },
     {
         nameId: 6,
-        name1: "Mappa",
-        name2: "Design Studio",
-        name3: null,
-        country: "Japan"
+        name: "Mappa Design Studio",
+        country: "Japan",
+        grading: ""
     },
     {
         nameId: 7,
-        name1: "Plank",
-        name2: "Productions",
-        name3: "Inc.",
-        country: "Canada"
+        name: "Plank Productions Inc.",
+        country: "Canada",
+        grading: ""
     },
     {
         nameId: 8,
-        name1: null,
-        name2: null,
-        name3: null,
-        country: "Canada"
+        name: "Unknown user",
+        country: "Canada",
+        grading: ""
     }
 ]
 

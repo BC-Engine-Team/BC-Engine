@@ -4,23 +4,17 @@ const ClientDao = require("../../data_access_layer/daos/client.dao");
 let fakeClientList = [
     {
         NAME_ID: 20100,
-        NAME_1: "National Research Council of Canada",
-        NAME_2: null,
-        NAME_3: null,
+        NAME: "National Research Council of Canada",
         COUNTRY_LABEL: "CA"
     },
     {
         NAME_ID: 20234,
-        NAME_1: "Groupe Patrick Ménard Assurances Inc.",
-        NAME_2: "Groupe Jetté",
-        NAME_3: null,
+        NAME: "Groupe Patrick Ménard Assurances Inc. Groupe Jetté",
         COUNTRY_LABEL: "CA"
     },
     {
         NAME_ID: 20330,
-        NAME_1: "Martin",
-        NAME_2: null,
-        NAME_3: "Aubé",
+        NAME: "Martin Aubé",
         COUNTRY_LABEL: "CA"
     }
 ];
@@ -42,23 +36,17 @@ describe("Test Client DAO", () => {
             let expectedResponse = [
                 {
                     nameId: fakeClientList[0].NAME_ID,
-                    name1: fakeClientList[0].NAME_1,
-                    name2: fakeClientList[0].NAME_2,
-                    name3: fakeClientList[0].NAME_3,
+                    name: fakeClientList[0].NAME,
                     country: fakeClientList[0].COUNTRY_LABEL
                 },
                 {
                     nameId: fakeClientList[1].NAME_ID,
-                    name1: fakeClientList[1].NAME_1,
-                    name2: fakeClientList[1].NAME_2,
-                    name3: fakeClientList[1].NAME_3,
+                    name: fakeClientList[1].NAME,
                     country: fakeClientList[1].COUNTRY_LABEL
                 },
                 {
                     nameId: fakeClientList[2].NAME_ID,
-                    name1: fakeClientList[2].NAME_1,
-                    name2: fakeClientList[2].NAME_2,
-                    name3: fakeClientList[2].NAME_3,
+                    name: fakeClientList[2].NAME,
                     country: fakeClientList[2].COUNTRY_LABEL
                 }
             ];

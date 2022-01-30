@@ -29,7 +29,7 @@ exports.getAverages = async (startDateStr, endDateStr) => {
         let clientList = [];
         let clientGradingList = [];
         let returnData = [];
-
+        let nameIdList = [];
 
         // Get the list of total dues for each month
         await this.getDues(yearMonthList).then(async data => {
@@ -186,42 +186,16 @@ let clientIDList = [];
 exports.getNamesAndCountries = async (clientsID) => {
 
     let formattedClientList = [];
-    let formattedName = "";
     return new Promise(async (resolve, reject) => {
         
         await ClientDao.getClientByID(clientsID).then(async data => {
 
             if(data){
                 data.forEach(i => {
-
-                    if(i.name1 && i.name2 === null && i.name3 === null){
-                        formattedName = i.name1;
-                    }
-                    else if(i.name1 === null && i.name2 && i.name3 === null){
-                        formattedName = i.name2;
-                    }
-                    else if(i.name1 === null && i.name2 === null && i.name3){
-                        formattedName = i.name3;
-                    }
-                    else if(i.name1 && i.name2 && i.name3 === null){
-                        formattedName = i.name1 + " " + i.name2;
-                    }
-                    else if(i.name1 && i.name2 === null && i.name3){
-                        formattedName = i.name1 + " " + i.name3;
-                    }
-                    else if(i.name1 === null && i.name2 && i.name3){
-                        formattedName = i.name2 + " " + i.name3;
-                    }
-                    else if(i.name1 === null && i.name2 === null && i.name3 === null){
-                        formattedName = "Unknown user";
-                    }
-                    else{
-                        formattedName = i.name1 + " " + i.name2 + " " + i.name3;
-                    }
-
+ 
                     formattedClientList.push({
                         nameId: i.nameId,
-                        name: formattedName,
+                        name:  i.name,
                         country: i.country,
                         grading: ""
                     });
@@ -237,7 +211,6 @@ exports.getNamesAndCountries = async (clientsID) => {
 }
 
 
-let nameIdList = [];
 
 //method to get the client grading
 exports.getClientGrading = async(idList) => {

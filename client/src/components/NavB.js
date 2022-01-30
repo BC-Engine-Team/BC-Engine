@@ -27,7 +27,7 @@ const NavB = (props) => {
     const SignOutLabel = t('navbar.SignOutLabel');
 
     //in lngs, the brackets value don't work as intended 
-    const [languageTitle, setLanguageTitle] = useState(lngs["en"].nativeName);
+    const [languageTitle, setLanguageTitle] = useState(lngs[i18n.language].nativeName);
     
     let username;
     let role;

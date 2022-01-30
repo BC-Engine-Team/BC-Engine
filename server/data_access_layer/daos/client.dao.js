@@ -9,7 +9,7 @@ exports.getClientByID = async (clientIDList, db=database) => {
 
         try{
             const data = await db.query(
-                "SELECT DISTINCT N.NAME_ID, N.NAME_1, N.NAME_2, N.NAME_3, C.COUNTRY_LABEL \
+                "SELECT DISTINCT N.NAME_ID, ISNULL(N.NAME_1,'')+ISNULL(' '+N.NAME_2,'')+ISNULL(' '+N.NAME_3,'') as NAME, C.COUNTRY_LABEL \
                 FROM [Bosco reduction].[dbo].[NAME] N, [Bosco reduction].[dbo].[NAME_CONNECTION] NC, [Bosco reduction].[dbo].[COUNTRY] C \
                 WHERE NC.CONNECTION_NAME_ID in (?) \
                 AND NC.NAME_ID = N.NAME_ID \
@@ -24,9 +24,7 @@ exports.getClientByID = async (clientIDList, db=database) => {
                 data.forEach(c => {
                     returnData.push({
                         nameId: c["NAME_ID"],
-                        name1: c["NAME_1"],
-                        name2: c["NAME_2"],
-                        name3: c["NAME_3"],
+                        name: c["NAME"],
                         country: c["COUNTRY_LABEL"]
                     });
                 });
