@@ -117,7 +117,6 @@ exports.getBilled = async (startDateStr, endDateStr, yearMonthList) => {
     return new Promise(async (resolve, reject) => {
         await InvoiceAffectDao.getInvoicesByDate(startDateStr, endDateStr).then(async data => {
             if (data) {
-
                 yearMonthList.forEach(ym => {
                     let billed = 0;
 

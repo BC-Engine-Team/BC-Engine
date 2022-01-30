@@ -4,6 +4,7 @@ const bodyParser = require("body-parser");
 const logger = require('morgan');
 const userRoutes = require('./routes/user.routes');
 const invoiceRoutes = require('./routes/invoice.routes');
+const reportRoutes = require('./routes/report.routes');
 require("../config.js");
 
 module.exports = (database) => {
@@ -36,9 +37,10 @@ module.exports = (database) => {
     res.json({ message: "Hello from B&C Engine!" });
   });
 
-  // User routes CRUD
+  // Routes
   app.use('/api/invoice', invoiceRoutes);
   app.use('/api/users', userRoutes);
+  app.use('/api/reports', reportRoutes);
 
   // Handles page refresh on the client side
   // (view index.hmtl and 404.html located in the client/public folder)

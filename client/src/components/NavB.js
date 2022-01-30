@@ -7,7 +7,7 @@ import Axios from 'axios'
 import { useNavigate } from 'react-router-dom'
 import Cookies from 'universal-cookie'
 import { useTranslation } from 'react-i18next';
-import { Container, NavDropdown} from 'react-bootstrap'
+import { Container, NavDropdown } from 'react-bootstrap'
 
 const NavB = (props) => {
     const [page] = useState(props);
@@ -16,7 +16,8 @@ const NavB = (props) => {
 
     const lngs = {
         en: { nativeName: 'English' },
-        fr: { nativeName: 'Français' }
+        fr: { nativeName: 'Français' },
+        'en-US': { nativeName: 'English' }
     };
 
     const DashboardLabel = t('navbar.DashboardLabel');
@@ -27,7 +28,7 @@ const NavB = (props) => {
     const SignOutLabel = t('navbar.SignOutLabel');
 
     const [languageTitle, setLanguageTitle] = useState(lngs[i18n.language].nativeName);
-    
+
     let username;
     let role;
 
@@ -113,8 +114,8 @@ const NavB = (props) => {
                     <Nav className="ms-auto">
                         <NavDropdown title={languageTitle} id="navbar-language-dropdown-login">
                             {Object.keys(lngs).map((lng) => (
-                                <NavDropdown.Item 
-                                    id={lng} 
+                                <NavDropdown.Item
+                                    id={lng}
                                     key={lng}
                                     onClick={() => {
                                         i18n.changeLanguage(lng);
@@ -125,9 +126,7 @@ const NavB = (props) => {
                             ))}
                         </NavDropdown>
                     </Nav>
-                        
                 </Container>
-                
             </Navbar>
         )
     }
@@ -182,8 +181,8 @@ const NavB = (props) => {
 
                             <NavDropdown title={languageTitle} id="navbar-language-dropdown">
                                 {Object.keys(lngs).map((lng) => (
-                                    <NavDropdown.Item 
-                                        id={lng} 
+                                    <NavDropdown.Item
+                                        id={lng}
                                         key={lng}
                                         onClick={() => {
                                             i18n.changeLanguage(lng);

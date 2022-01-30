@@ -142,7 +142,7 @@ const Login = () => {
                         {
                             InvalidCredential.length > 0 ?
                                 <Alert variant="danger">
-                                    (InvalidCredential)
+                                    {InvalidCredential}
                                 </Alert> :
                                 <></>
                         }
@@ -180,7 +180,7 @@ const Login = () => {
                                     size={1} />
 
                                 <Form.Control.Feedback type="invalid">
-                                    (errorMessage.password)
+                                    {errorMessage.password}
                                 </Form.Control.Feedback>
                             </FloatingLabel>
                         </Form.Group >
