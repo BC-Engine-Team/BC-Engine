@@ -55,7 +55,6 @@ const Dashboard = () => {
     ];
     const chartFallbackLegendLabel = t('dashboard.chart.FallbackLegendLabel');
 
-    let label = ""
     let colors = [
         'rgb(255, 192, 159)',
         'rgb(191, 175, 192)',
@@ -86,9 +85,9 @@ const Dashboard = () => {
 
 
 
-    const [latestYear, setLatestYear] = useState(new Date().getFullYear());
-    const [latestMonth, setLatestMonth] = useState(new Date().getMonth());
-    const [earliestYear, setEarliestYear] = useState(2009);
+    const latestYear = new Date().getFullYear();
+    const latestMonth = new Date().getMonth();
+    const earliestYear = 2009;
     const [startYearList, setStartYearList] = useState([]);
     const [endYearList, setEndYearList] = useState([]);
     const [startMonthList, setStartMonthList] = useState([]);
