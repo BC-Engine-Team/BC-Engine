@@ -72,7 +72,7 @@ const Reports = () => {
             <div className='justify-content-center mainContainer'>
                 <div>
                     <div className='card shadow'>
-                        <Table responsive="xl" hover>
+                        <Table responsive="xl" hover id='chartReportsTable'>
                             <thead className='bg-light'>
                                 <tr key="0">
                                     <th>{t('reports.chartReports.Name')}</th>

@@ -80,7 +80,7 @@ const Dashboard = () => {
         startYear: 2019,
         startMonth: 0,
         endYear: 2021,
-        endMonth: 11
+        endMonth: 6
     });
 
 
