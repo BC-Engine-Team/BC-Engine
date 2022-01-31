@@ -141,7 +141,8 @@
           "AccountType": "TYPE DU COMPTE",
           "StartDate": "DATE DE DÉBUT",
           "EndDate": "DATE DE FIN",
-          "LoadButton": "Charger"
+          "LoadButton": "Charger",
+          "CreateButton": "Ajouter"
        }
     },
     "form": {
