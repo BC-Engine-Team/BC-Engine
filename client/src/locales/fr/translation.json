@@ -55,7 +55,7 @@
          "StartDateLabel": "Mois de début",
          "EndDateLabel": "Mois de fin",
          "StartMonthExceedCurrentError": "Mois de début ne peut pas être après le mois actuel.",
-         "EndMonthExceedError": "Mois de fin new peut pas être avant le Mois de début.",
+         "EndMonthExceedError": "Mois de fin ne peut pas être avant le Mois de début.",
          "EndMonthExceedCurrentError": "Mois de fin ne peut pas être après le mois actuel.",
          "EndYearExceedError": "Année de fin ne peut pas être avant l'Année de début."
        },
