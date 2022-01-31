@@ -17,9 +17,6 @@ let fakeClientGradingList = [
 ];
 
 
-// nameId: c["NAME_ID"],
-// grading: c["DROPDOWN_CODE"]
-
 
 describe("Test Client Grading DAO", () => {
     describe("CGD1 - getClientGrading", () => {
