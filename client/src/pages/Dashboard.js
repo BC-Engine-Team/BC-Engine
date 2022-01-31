@@ -231,11 +231,12 @@ const Dashboard = () => {
                                 />
                             </InputGroup>
 
-                            <Form.Group className="my-2  px-2" controlId="floatingModifyStartDate">
+                            <Form.Group className="my-2  px-2" controlId="floatingModifyStartMonth">
                                 <Form.Label>{t('dashboard.criteria.StartDateLabel')}</Form.Label>
                                 <div className='row'>
                                     <div className='col-md-6 col-sm-6'>
                                         <Form.Select required
+                                            id='startYearSelect'
                                             size="sm"
                                             aria-label="Default select example"
                                             onChange={(e) => setField('startYear', e.target.value)}
@@ -256,6 +257,7 @@ const Dashboard = () => {
                                     </div>
                                     <div className='col-md-6 col-sm-6'>
                                         <Form.Select required
+                                            id='startMonthSelect'
                                             size="sm"
                                             aria-label="Default select example"
                                             onChange={(e) => setField('startMonth', e.target.value)}
@@ -275,11 +277,12 @@ const Dashboard = () => {
                                 </div>
                             </Form.Group>
 
-                            <Form.Group className="my-2  px-2" controlId="floatingModifyStartDate">
+                            <Form.Group className="my-2  px-2" controlId="floatingModifyEndMonth">
                                 <Form.Label>{t('dashboard.criteria.EndDateLabel')}</Form.Label>
                                 <div className='row'>
                                     <div className='col-md-6 col-sm-6'>
                                         <Form.Select required
+                                            id='endYearSelect'
                                             size="sm"
                                             aria-label="Default select example"
                                             onChange={(e) => setField('endYear', e.target.value)}
@@ -299,6 +302,7 @@ const Dashboard = () => {
                                     </div>
                                     <div className='col-md-6 col-sm-6'>
                                         <Form.Select required
+                                            id='endMonthSelect'
                                             size="sm"
                                             aria-label="Default select example"
                                             onChange={(e) => setField('endMonth', e.target.value)}
