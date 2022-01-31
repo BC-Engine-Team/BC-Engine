@@ -173,6 +173,28 @@ const Dashboard = () => {
             });
     }
 
+
+    const countrySelectBox = async () => {
+
+        let countryList = [];
+
+        let header = {
+            'authorization': "Bearer " + cookies.get("accessToken"),
+        }
+
+        await Axios.get(`${process.env.REACT_APP_API}/getCountry`, { headers: header })
+            .then(async (res) => {
+                if (res.status === 403 && res.status === 401) {
+                    setAuthorized(false);
+                    return;
+                }
+                setAuthorized(true);
+
+                
+            });
+    }
+
+
     
     useEffect(() => {
         if (cookies.get("accessToken") === undefined) {

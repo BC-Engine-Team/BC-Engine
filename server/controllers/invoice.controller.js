@@ -23,3 +23,14 @@ exports.getAverages = async (req, res) => {
             return res.status(500).send({ message: err.message });
         });
 }
+
+exports.getCountriesName = async (req, res) => {
+
+    await invoiceService.getCountriesName()
+        .then(response => {
+            return res.send(response);
+        })
+        .catch(err => {
+            return res.status(500).send({ message: "The data could not be fetched." });
+    });
+}

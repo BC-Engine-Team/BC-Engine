@@ -2,6 +2,8 @@ const TransacStatDao = require("../data_access_layer/daos/transac_stat.dao");
 const InvoiceAffectDao = require("../data_access_layer/daos/invoice_affect.dao");
 const ClientDao = require("../data_access_layer/daos/client.dao");
 const ClientGradingDao = require("../data_access_layer/daos/client_grading.dao")
+const CountryDao = require("../data_access_layer/daos/country.dao")
+
 
 exports.getAverages = async (startDateStr, endDateStr) => {
     const startYear = parseInt(startDateStr.split('-')[0]);
@@ -233,5 +235,27 @@ exports.getClientGrading = async(idList) => {
         }).catch(err => {
             reject(err);
         })
+    });
+}
+
+
+exports.getCountriesName = async () => {
+    let countryList = [];
+
+    return new Promise(async (resolve, reject) => {
+        await CountryDao.getAllCountries().then(async data => {
+            if(data){
+                data.forEach(country => {
+                    countryList.push({
+                        countryCode: country.countryCode,
+                        countryLabel: country.countryLabel
+                     });
+                });
+                resolve(countryList);
+            }
+            resolve(false);
+        }).catch(err => {
+            reject(err);
+        });
     });
 }
