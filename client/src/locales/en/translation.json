@@ -124,7 +124,8 @@
                     "AccountType":"ACCOUNT TYPE",
                     "StartDate":"START DATE",
                     "EndDate":"END DATE",
-                    "LoadButton":"Load"
+                    "LoadButton":"Load",
+                    "CreateButton": "Create"
                 }
             },
             "form":{
@@ -138,6 +139,6 @@
                 "Empty":"This field cannot be empty!",
                 "Incorrect":"Incorrect email or password.",
                 "NotFound":"Could not reach B&C Engine...",
-                "PasswordMatch":"Password must match!"
+                "PasswordMatch":"Passwords must match!"
             }
 }
