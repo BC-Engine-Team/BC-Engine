@@ -1,5 +1,7 @@
 const TransacStatDao = require("../data_access_layer/daos/transac_stat.dao");
 const InvoiceAffectDao = require("../data_access_layer/daos/invoice_affect.dao");
+const ClientDao = require("../data_access_layer/daos/client.dao");
+const ClientGradingDao = require("../data_access_layer/daos/client_grading.dao")
 
 exports.getAverages = async (startDateStr, endDateStr) => {
     const startYear = parseInt(startDateStr.split('-')[0]);
@@ -24,6 +26,10 @@ exports.getAverages = async (startDateStr, endDateStr) => {
         let averagesList = [];
         let totalDuesList = [];
         let billedList = [];
+        let clientList = [];
+        let clientGradingList = [];
+        let returnData = [];
+        let nameIdList = [];
 
         // Get the list of total dues for each month
         await this.getDues(yearMonthList).then(async data => {
@@ -46,6 +52,14 @@ exports.getAverages = async (startDateStr, endDateStr) => {
         });
 
 
+        //Get list of client based by actor id
+        await this.getNamesAndCountries(clientIDList).then(async data => {
+            clientList = data;
+        }).catch(err => {
+            reject(err);
+        });
+
+
         // Populate average list with average for each month
         if (totalDuesList.length === 0 || billedList.length === 0) return;
         let counter = 0;
@@ -57,9 +71,41 @@ exports.getAverages = async (startDateStr, endDateStr) => {
             });
             counter++;
         });
-        resolve(averagesList);
+        
+        
+        clientList.forEach(c => {
+            nameIdList.push(c.nameId);
+        });
+
+
+        await this.getClientGrading(nameIdList).then(async data => {
+            clientGradingList = data;
+        }).catch(err => {
+            reject(err);
+        });
+
+
+        for(const c of clientList){
+            for(const g of clientGradingList){
+                if(c.nameId === g.nameId){
+                    c.grading = g.grading;
+                    break;
+                }
+                else if(c.nameId !== g.nameId){
+                    c.grading = "N/A"
+                }
+            }
+        }
+
+        returnData.push({
+            chart: averagesList,
+            table: clientList     
+        });
+
+        resolve(returnData);
     });
 }
+
 
 exports.getDues = async (yearMonthList) => {
     let totalDuesList = [];
@@ -67,6 +113,7 @@ exports.getDues = async (yearMonthList) => {
     return new Promise(async (resolve, reject) => {
         await TransacStatDao.getTransactionsStatByYearMonth(yearMonthList).then(async data => {
             if (data) {
+
                 yearMonthList.forEach(ym => {
                     let totalDues = 0;
                     data.forEach(e => {
@@ -88,6 +135,8 @@ exports.getDues = async (yearMonthList) => {
     });
 }
 
+
+//method to get the billed amount
 exports.getBilled = async (startDateStr, endDateStr, yearMonthList) => {
     let billedList = [];
     let startDate = new Date(parseInt(startDateStr.substring(5, 7)) + " " + parseInt(startDateStr.substring(8)) + " " + parseInt(startDateStr.substring(0, 4)));
@@ -106,9 +155,12 @@ exports.getBilled = async (startDateStr, endDateStr, yearMonthList) => {
                     data.forEach(i => {
                         if (i.invoiceDate >= startDate && i.invoiceDate < endDate) {
                             billed += i.amount;
+                            clientIDList.push(i.actorId);
                         }
                     });
 
+                    
+                    
                     billedList.push({
                         month: ym,
                         billed: billed
@@ -117,7 +169,40 @@ exports.getBilled = async (startDateStr, endDateStr, yearMonthList) => {
                     startDate.setUTCMonth(startDate.getUTCMonth() + 1);
                     endDate.setUTCMonth(endDate.getUTCMonth() + 1);
                 });
+                
+                clientIDList = [...new Set(clientIDList)];
                 resolve(billedList);
+            }
+            resolve(false);
+        }).catch(err => {
+            reject(err);
+        });
+    });
+};
+
+
+let clientIDList = [];
+
+// method to get the names and countries based by clients id
+exports.getNamesAndCountries = async (clientsID) => {
+
+    let formattedClientList = [];
+    return new Promise(async (resolve, reject) => {
+        
+        await ClientDao.getClientByID(clientsID).then(async data => {
+
+            if(data){
+                data.forEach(i => {
+ 
+                    formattedClientList.push({
+                        nameId: i.nameId,
+                        name:  i.name,
+                        country: i.country,
+                        grading: ""
+                    });
+                });
+
+                resolve(formattedClientList);
             }
             resolve(false);
         }).catch(err => {
@@ -126,3 +211,27 @@ exports.getBilled = async (startDateStr, endDateStr, yearMonthList) => {
     });
 }
 
+
+
+//method to get the client grading
+exports.getClientGrading = async(idList) => {
+
+    let gradingList = [];
+
+    return new Promise(async (resolve, reject) => {
+        await ClientGradingDao.getClientGrading(idList).then(async data => {
+            if(data){
+                data.forEach(g => {
+                    gradingList.push({
+                      nameId: g.nameId,
+                      grading: g.grading
+                    });
+                });
+                resolve(gradingList);
+            }
+            resolve(false);
+        }).catch(err => {
+            reject(err);
+        })
+    });
+}

@@ -1,13 +1,14 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
-import { InputGroup, FormControl, Button } from 'react-bootstrap'
-
-import { useTranslation } from 'react-i18next';
-
 import Axios from 'axios';
 import Cookies from 'universal-cookie';
-import NavB from '../components/NavB';
+import NavB from '../components/NavB'
+import Table from 'react-bootstrap/Table'
+import '../styles/clientTable.css'
 import '../styles/dashboardPage.css'
+import { InputGroup, FormControl, Button, ButtonGroup, DropdownButton, Dropdown } from 'react-bootstrap'
+
+import { useTranslation } from 'react-i18next';
 import { Bar } from 'react-chartjs-2';
 import {
     Chart as ChartJS,
@@ -18,6 +19,7 @@ import {
     Tooltip,
     Legend,
 } from 'chart.js';
+
 ChartJS.register(
     CategoryScale,
     LinearScale,
@@ -71,44 +73,47 @@ const Dashboard = () => {
         }
     ];
 
+    
 
     const [chartData, setChartData] = useState(fallbackChartData);
-    const [preparedChartData, setPreparedChartData] = useState();
     const [authorized, setAuthorized] = useState(false);
+    const [clientNameCountry, setClientNameCountry] = useState([{name: "", country: "", clientgrading: ""}]);
+
+   
 
     const chart = async () => {
         let datasets = [];
-
+        let clientInfoList = [];
+        
         let header = {
             'authorization': "Bearer " + cookies.get("accessToken"),
         }
 
         const dates = {
-            startDate: "2017-01-01",
-            endDate: "2020-12-01"
+            startDate: "2018-01-01",
+            endDate: "2020-01-01"
         };
 
         await Axios.get(`${process.env.REACT_APP_API}/invoice/defaultChartAndTable/${dates.startDate}/${dates.endDate}`, { headers: header })
-            .then((res) => {
+            .then(async (res) => {
                 if (res.status === 403 && res.status === 401) {
                     setAuthorized(false);
                     return;
                 }
                 setAuthorized(true);
 
-
-                let previousYear = parseInt(res.data[0].month.toString().substring(0, 4));
+                let previousYear = parseInt(res.data[0].chart[0].month.toString().substring(0, 4));
                 let data = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
                 let color = colors[0];
                 let colorCounter = 0;
 
-                for (let i = 0; i < res.data.length; i++) {
-                    let year = parseInt(res.data[i].month.toString().substring(0, 4));
-                    let month = parseInt(res.data[i].month.toString().substring(4));
-                    let average = parseFloat(res.data[i].average);
+                for (let i = 0; i < res.data[0].chart.length; i++) {
+                    let year = parseInt(res.data[0].chart[i].month.toString().substring(0, 4));
+                    let month = parseInt(res.data[0].chart[i].month.toString().substring(4));
+                    let average = parseFloat(res.data[0].chart[i].average);
 
-                    if (year !== previousYear || res.data[i].month === res.data[res.data.length - 1].month) {
-                        if (res.data[i].month === res.data[res.data.length - 1].month) {
+                    if (year !== previousYear || res.data[0].chart[i].month === res.data[0].chart[res.data[0].chart.length - 1].month) {
+                        if (res.data[0].chart[i].month === res.data[0].chart[res.data[0].chart.length - 1].month) {
                             for (let x = 0; x < data.length; x++) {
                                 if ((month - 1) === x) {
                                     data[x] = average;
@@ -126,9 +131,11 @@ const Dashboard = () => {
                             data: data,
                             backgroundColor: color
                         });
+                        
                         previousYear = year;
                         data = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
                     }
+
 
                     for (let x = 0; x < data.length; x++) {
                         if ((month - 1) === x) {
@@ -137,9 +144,19 @@ const Dashboard = () => {
                     }
                 }
 
-                setPreparedChartData(datasets);
-
                 setChartData(datasets);
+
+                for(let i = 0; i < res.data[0].table.length; i++)
+                {
+                    clientInfoList.push({
+                        name: res.data[0].table[i].name,
+                        country: res.data[0].table[i].country,
+                        clientgrading: res.data[0].table[i].grading
+                    });
+                }
+
+
+                setClientNameCountry(clientInfoList);
             })
             .catch((error) => {
                 if (error.response) {
@@ -156,6 +173,7 @@ const Dashboard = () => {
             });
     }
 
+    
     useEffect(() => {
         if (cookies.get("accessToken") === undefined) {
             navigate("/login");
@@ -165,16 +183,15 @@ const Dashboard = () => {
         }
 
         chart();
-
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
+        
 
     const loadChartData = () => {
-        if (preparedChartData) {
-            setChartData(chartData);
-        }
-
+        setChartData(chartData);
     }
+
+
 
     return (
         <div>
@@ -252,6 +269,55 @@ const Dashboard = () => {
 
                                 />
                             }
+                        </div>
+                    </div>
+                    <div className="container-table">
+                        <div className="card shadow my-3 mx-3 uTable">
+
+                            <Table id='table' responsive="xl" hover>
+
+                                <thead className='bg-light'>
+                                    <tr key="0">
+                                        <th className='row-style'>{t('dashboard.table.Name')}</th>
+                                        <th className='row-style'>{t('dashboard.table.Country')}</th>
+                                        <th className='row-style'>{t('dashboard.table.AverageCollectionDays')}</th>
+                                        <th className='row-style'>{t('dashboard.table.AmountOwed')}</th>
+                                        <th className='row-style'>{t('dashboard.table.AmountDue')}</th>
+                                        <th className='row-style'>{t('dashboard.table.ClientGrading')}</th>
+                                        <th className='row-style'>{t('dashboard.table.CurrentStatus')}</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody>
+                                    {clientNameCountry.map ((client, index) => {
+                                        return(
+                                            <tr key={index}>
+                                                <td id="clientName">{client.name}</td>
+                                                <td id= "clientCountry" className='row-style'>{client.country}</td>
+                                                <td id="clientAverageCollectionDays" className='row-style'>23</td>
+                                                <td id="clientAmountOwed" className='amount-owed'>55645</td>
+                                                <td id="clientAmountDue" className='amount-due'>66643</td>
+                                                <td id="clientGrading" className='row-style'>{client.clientgrading}</td>
+                                                <td id="clientStatus" className='row-style'>Active</td>
+                                            </tr>
+                                        );
+                                    })}
+                                </tbody>
+                            </Table>
+
+                            <ButtonGroup className='col-md-5 w-auto ms-auto client-swap'>
+
+                                <DropdownButton title={t('dashboard.dropdownButtonTable.Title')} variant="Default" id="bg-vertical-dropdown-3" className='rowsViewerSelectionStyle'>
+                                    <Dropdown.Item eventKey="1">{t('dashboard.dropdownButtonTable.Option1')}</Dropdown.Item>
+                                    <Dropdown.Item eventKey="2">{t('dashboard.dropdownButtonTable.Option2')}</Dropdown.Item>
+                                    <Dropdown.Item eventKey="3">{t('dashboard.dropdownButtonTable.Option3')}</Dropdown.Item>
+                                </DropdownButton>
+
+                                <button className='left-button'>&#60;</button>
+                                <button className='right-button'>&#62;</button>
+                            </ButtonGroup>
+
+                            
                         </div>
                     </div>
                 </div>
