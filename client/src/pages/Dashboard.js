@@ -71,23 +71,22 @@ const Dashboard = () => {
         }
     ];
 
+    const currentYear = new Date().getFullYear();
+    const currentMonth = new Date().getMonth();
+    const earliestYear = 2009;
+
     const [chartData, setChartData] = useState(fallbackChartData);
     const [authorized, setAuthorized] = useState(false);
 
     const [errors, setErrors] = useState({});
     const [criteria, setCriteria] = useState({
         name: "",
-        startYear: 2019,
+        startYear: currentYear - 2,
         startMonth: 0,
-        endYear: 2021,
-        endMonth: 6
+        endYear: currentMonth === 0 ? currentYear - 1 : currentYear,
+        endMonth: currentMonth === 0 ? 11 : currentMonth - 1
     });
 
-
-
-    const latestYear = new Date().getFullYear();
-    const latestMonth = new Date().getMonth();
-    const earliestYear = 2009;
     const [startYearList, setStartYearList] = useState([]);
     const [endYearList, setEndYearList] = useState([]);
     const [startMonthList, setStartMonthList] = useState([]);
@@ -179,11 +178,11 @@ const Dashboard = () => {
         if (parseInt(endMonth) < parseInt(startMonth) && parseInt(startYear) === parseInt(endYear))
             newErrors.endMonth = t("dashboard.criteria.EndMonthExceedError");
 
-        if (parseInt(endMonth) > latestMonth && endYear === latestYear.toString())
+        if (parseInt(endMonth) > currentMonth && endYear === currentYear.toString())
             newErrors.endMonth = t("dashboard.criteria.EndMonthExceedCurrentError");
 
         // startMonth errors
-        if (startMonth > latestMonth && startYear === latestYear.toString())
+        if (startMonth > currentMonth && startYear === currentYear.toString())
             newErrors.startMonth = t("dashboard.criteria.StartMonthExceedCurrentError");
 
         return newErrors;
@@ -191,7 +190,7 @@ const Dashboard = () => {
 
     const initCriteria = async () => {
         let yearList = [];
-        for (let i = earliestYear; i <= latestYear; i++) {
+        for (let i = earliestYear; i <= currentYear; i++) {
             yearList.push(i);
         }
         setStartYearList(yearList);
@@ -322,6 +321,7 @@ const Dashboard = () => {
                             </Form.Group>
 
                             <Button
+                                id='loadChartButton'
                                 onClick={loadChartData}
                                 className='my-2 mx-2'
                                 variant='primary'>{loadChartButtonText}
