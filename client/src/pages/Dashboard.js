@@ -79,11 +79,12 @@ const Dashboard = () => {
     const [authorized, setAuthorized] = useState(false);
     const [clientNameCountry, setClientNameCountry] = useState([{name: "", country: "", clientgrading: ""}]);
 
-    let clientInfoList = [];
+   
 
     const chart = async () => {
         let datasets = [];
-
+        let clientInfoList = [];
+        
         let header = {
             'authorization': "Bearer " + cookies.get("accessToken"),
         }

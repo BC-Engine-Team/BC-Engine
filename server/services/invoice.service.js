@@ -159,7 +159,7 @@ exports.getBilled = async (startDateStr, endDateStr, yearMonthList) => {
                         }
                     });
 
-                    clientIDList = [...new Set(clientIDList)];
+                    
                     
                     billedList.push({
                         month: ym,
@@ -169,7 +169,8 @@ exports.getBilled = async (startDateStr, endDateStr, yearMonthList) => {
                     startDate.setUTCMonth(startDate.getUTCMonth() + 1);
                     endDate.setUTCMonth(endDate.getUTCMonth() + 1);
                 });
-
+                
+                clientIDList = [...new Set(clientIDList)];
                 resolve(billedList);
             }
             resolve(false);

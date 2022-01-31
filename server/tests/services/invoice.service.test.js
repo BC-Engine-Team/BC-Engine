@@ -530,63 +530,12 @@ describe("Test Invoice Service", () => {
 
                 //arrange 
                 getClientSpy.mockRestore()
-                let expectedNameDAOList = [
-                    {
-                        nameId: 1,
-                        name: "Banque Royale",
-                        country: "Canada",
-                        grading: ""
-                    },
-                    {
-                        nameId: 2,
-                        name: "Benoit Cote",
-                        country: "Canada",
-                        grading: ""
-                    },
-                    {
-                        nameId: 3,
-                        name: "FrostBrown Todd",
-                        country: "United States",
-                        grading: ""
-                    },
-                    {
-                        nameId: 4,
-                        name: "Enterprise Engine",
-                        country: "Australia",
-                        grading: ""
-                    },
-                    {
-                        nameId: 5,
-                        name: "Beinjing Xia Long Inc. Train",
-                        country: "China",
-                        grading: ""
-                    },
-                    {
-                        nameId: 6,
-                        name: "Mappa Design Studio",
-                        country: "Japan",
-                        grading: ""
-                    },
-                    {
-                        nameId: 7,
-                        name: "Plank Productions Inc.",
-                        country: "Canada",
-                        grading: ""
-                    },
-                    {
-                        nameId: 8,
-                        name: "Unknown user",
-                        country: "Canada",
-                        grading: ""
-                    }
-                ];
-
                 
                 // act
                 const response = await InvoiceService.getNamesAndCountries(fakeClientIdList);
 
                 // assert
-                expect(response).toEqual(expectedNameDAOList);
+                expect(response).toEqual(fakeClientDAOList);
                 expect(clientDaoSpy).toHaveBeenCalledTimes(1);
                 expect(clientDaoSpy).toHaveBeenCalledWith(fakeClientIdList);
             });
