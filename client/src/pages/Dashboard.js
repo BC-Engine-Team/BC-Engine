@@ -6,7 +6,7 @@ import NavB from '../components/NavB'
 import Table from 'react-bootstrap/Table'
 import '../styles/clientTable.css'
 import '../styles/dashboardPage.css'
-import { InputGroup, FormControl, Button, ButtonGroup, DropdownButton, Dropdown } from 'react-bootstrap'
+import { InputGroup, FormControl, Button, ButtonGroup, DropdownButton, Dropdown, Form } from 'react-bootstrap'
 
 import { useTranslation } from 'react-i18next';
 import { Bar } from 'react-chartjs-2';
@@ -78,7 +78,7 @@ const Dashboard = () => {
     const [chartData, setChartData] = useState(fallbackChartData);
     const [authorized, setAuthorized] = useState(false);
     const [clientNameCountry, setClientNameCountry] = useState([{name: "", country: "", clientgrading: ""}]);
-
+    const [countries, setCountries] = useState([{countryCode: "", countryLabel: ""}]);
    
 
     const chart = async () => {
@@ -182,7 +182,7 @@ const Dashboard = () => {
             'authorization': "Bearer " + cookies.get("accessToken"),
         }
 
-        await Axios.get(`${process.env.REACT_APP_API}/getCountry`, { headers: header })
+        await Axios.get(`${process.env.REACT_APP_API}/invoice/getCountries`, { headers: header })
             .then(async (res) => {
                 if (res.status === 403 && res.status === 401) {
                     setAuthorized(false);
@@ -190,7 +190,14 @@ const Dashboard = () => {
                 }
                 setAuthorized(true);
 
-                
+                for(let i = 0; i < res.data.length; i++)
+                {
+                    countryList.push({
+                        countryCode: res.data[i].countryCode,
+                        countryLabel: res.data[i].countryLabel
+                    });
+                }
+                setCountries(countryList);
             });
     }
 
@@ -205,6 +212,7 @@ const Dashboard = () => {
         }
 
         chart();
+        countrySelectBox();
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
         
@@ -230,6 +238,21 @@ const Dashboard = () => {
                                     aria-describedby="basic-addon1"
                                 />
                             </InputGroup>
+
+                            
+                            <Form.Group className="my-2  px-2" controlId="floatingModifyStartMonth">
+                                <Form.Label>Country</Form.Label>
+                                <Form.Select 
+                                    className='my-2 px-2'>
+                                    <option value="*">All countries</option>
+                                    {countries.map ((country, index) => {
+                                        return(
+                                            <option key={index} value={country.countryCode}>{country.countryLabel}</option>    
+                                        );
+                                    })}
+                                </Form.Select>
+                            </Form.Group>
+
                             <Button
                                 onClick={loadChartData}
                                 className='my-2 mx-2'
