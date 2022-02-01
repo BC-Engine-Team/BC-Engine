@@ -54,7 +54,7 @@ const NavB = (props) => {
                 .then((response) => {
 
                     if (response.status === 204) {
-                       console.log("Successfully logged out!")
+                       // Future pop-up animation
                     }
                 })
                 .catch((error) => {
