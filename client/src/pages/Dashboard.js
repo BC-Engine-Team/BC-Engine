@@ -206,7 +206,6 @@ const Dashboard = () => {
 
     const countryFiltering = (country) => {
         setFilteredCountry(country);
-        chart(filteredCountry);
     }
 
     
@@ -218,7 +217,7 @@ const Dashboard = () => {
             setAuthorized(false);
         }
 
-        chart();
+        chart(filteredCountry);
         countrySelectBox();
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
