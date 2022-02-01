@@ -42,8 +42,7 @@ db['mssql_pat'].invoice_affect = require("./models/mssql_pat/invoice_affect.mode
 db['mssql_bosco'].transactions = require("./models/mssql_bosco/accounting_client.model")(db['mssql_bosco'], Sequelize);
 db['mssql_bosco'].transactions_stat = require("./models/mssql_bosco/accounting_client_stat.model")(db['mssql_bosco'], Sequelize);
 db['mssql_bosco'].nameEmployee = require("./models/mssql_bosco/name.model")(db['mssql_bosco'], Sequelize);
-db['mssql_bosco'].nameQuality = require("./models/mssql_bosco/name_quality.model")(db['mssql_bosco'], Sequelize);
-db['mssql_bosco'].nameConnection = require("./models/mssql_bosco/name_connection.model")(db['mssql_bosco'], Sequelize);
+
 
 
 db.sync = async (database, options) => {
