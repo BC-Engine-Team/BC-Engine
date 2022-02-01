@@ -13,7 +13,6 @@ exports.getTokens = (user) => {
   const accessToken = jwt.sign(user, ACCESS_TOKEN_SECRET, { expiresIn: '900s' });
   const refreshToken = jwt.sign(user, REFRESH_TOKEN_SECRET);
 
-
   //it acts as the database for the token, of course it is going to be different
   refreshTokens.push(refreshToken);
 

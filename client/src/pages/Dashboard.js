@@ -1,12 +1,10 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
-import { InputGroup, FormControl, FormLabel, Button, ButtonGroup, OverlayTrigger, DropdownButton, Dropdown, Tooltip as ToolTipBootstrap, FormCheck } from 'react-bootstrap';
+import { Form, Table, InputGroup, FormControl, FormLabel, Button, ButtonGroup, OverlayTrigger, DropdownButton, Dropdown, Tooltip as ToolTipBootstrap, FormCheck } from 'react-bootstrap';
 import { useTranslation } from 'react-i18next';
-import Form from 'react-bootstrap/Form'
 import Axios from 'axios';
 import Cookies from 'universal-cookie';
 import NavB from '../components/NavB'
-import Table from 'react-bootstrap/Table'
 import '../styles/clientTable.css'
 import '../styles/dashboardPage.css'
 import { Oval } from  'react-loader-spinner'
