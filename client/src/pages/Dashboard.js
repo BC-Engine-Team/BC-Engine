@@ -1,10 +1,13 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
-import { InputGroup, FormControl, FormLabel, Button, OverlayTrigger, Tooltip as ToolTipBootstrap, FormCheck } from 'react-bootstrap';
+import { InputGroup, FormControl, FormLabel, Button, ButtonGroup, OverlayTrigger, DropdownButton, Dropdown, Tooltip as ToolTipBootstrap, FormCheck } from 'react-bootstrap';
 import { useTranslation } from 'react-i18next';
+import Form from 'react-bootstrap/Form'
 import Axios from 'axios';
 import Cookies from 'universal-cookie';
-import NavB from '../components/NavB';
+import NavB from '../components/NavB'
+import Table from 'react-bootstrap/Table'
+import '../styles/clientTable.css'
 import '../styles/dashboardPage.css'
 import { Oval } from  'react-loader-spinner'
 import { Bar } from 'react-chartjs-2';
@@ -17,6 +20,7 @@ import {
     Tooltip,
     Legend,
 } from 'chart.js';
+
 ChartJS.register(
     CategoryScale,
     LinearScale,
@@ -55,7 +59,6 @@ const Dashboard = () => {
     ];
     const chartFallbackLegendLabel = t('dashboard.chart.FallbackLegendLabel');
 
-    let label = ""
     let colors = [
         'rgb(255, 192, 159)',
         'rgb(191, 175, 192)',
@@ -74,7 +77,25 @@ const Dashboard = () => {
 
     const [chartData, setChartData] = useState(fallbackChartData);
     const [chartLoading, setChartLoading] = useState(false);
+    const currentYear = new Date().getFullYear();
+    const currentMonth = new Date().getMonth();
+    const earliestYear = 2009;
     const [authorized, setAuthorized] = useState(false);
+    const [clientNameCountry, setClientNameCountry] = useState([{ name: "", country: "", clientgrading: "" }]);
+
+    const [errors, setErrors] = useState({});
+    const [criteria, setCriteria] = useState({
+        name: "",
+        startYear: currentYear - 2,
+        startMonth: 0,
+        endYear: currentMonth === 0 ? currentYear - 1 : currentYear,
+        endMonth: currentMonth === 0 ? 11 : currentMonth - 1
+    });
+
+    const [startYearList, setStartYearList] = useState([]);
+    const [endYearList, setEndYearList] = useState([]);
+    const [startMonthList, setStartMonthList] = useState([]);
+    const [endMonthList, setEndMonthList] = useState([]);
 
     const [employeeSelect, SetEmployeeSelect] = useState([]);
 
@@ -126,6 +147,7 @@ const Dashboard = () => {
     }
 
     const chart = async (employeeId = undefined) => {
+        let clientInfoList = [];
         setChartLoading(true);
         setChartData(fallbackChartData);
 
@@ -135,10 +157,8 @@ const Dashboard = () => {
             'authorization': "Bearer " + cookies.get("accessToken"),
         }
 
-        const dates = {
-            startDate: "2017-01-01",
-            endDate: "2020-12-01"
-        };
+        let startDate = new Date(criteria.startYear, criteria.startMonth, 1).toISOString().split("T")[0];
+        let endDate = new Date(criteria.endYear, criteria.endMonth, 1).toISOString().split("T")[0];
 
         let param = {};
         if(employeeId !== undefined) {
@@ -147,7 +167,7 @@ const Dashboard = () => {
             }
         }
 
-        await Axios.get(`${process.env.REACT_APP_API}/invoice/defaultChartAndTable/${dates.startDate}/${dates.endDate}`, { params: param, headers: header })
+        await Axios.get(`${process.env.REACT_APP_API}/invoice/defaultChartAndTable/${startDate}/${endDate}`, { params: param, headers: header })
             .then((res) => {
                 if (res.status === 403 && res.status === 401) {
                     setAuthorized(false);
@@ -155,48 +175,36 @@ const Dashboard = () => {
                 }
                 setAuthorized(true);
 
-                let previousYear = parseInt(res.data[0].month.toString().substring(0, 4));
-                let data = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-                let color = colors[0];
+                let datasets = [];
+                let groupedChartData = res.data[0].chart;
+
                 let colorCounter = 0;
+                for (let i = 0; i < Object.keys(groupedChartData).length; i++) {
+                    const data = groupedChartData[Object.keys(groupedChartData)[i]].map(m => m.average)
+                    datasets.push({
+                        label: groupedChartData[Object.keys(groupedChartData)[i]][0]['group'],
+                        data: data,
+                        backgroundColor: colors[colorCounter]
+                    });
 
-                for (let i = 0; i < res.data.length; i++) {
-                    let year = parseInt(res.data[i].month.toString().substring(0, 4));
-                    let month = parseInt(res.data[i].month.toString().substring(4));
-                    let average = parseFloat(res.data[i].average);
+                    colorCounter++;
+                    if (colorCounter === colors.length - 1) colorCounter = 0;
+                }
 
-                    if (year !== previousYear || res.data[i].month === res.data[res.data.length - 1].month) {
-                        if (res.data[i].month === res.data[res.data.length - 1].month) {
-                            for (let x = 0; x < data.length; x++) {
-                                if ((month - 1) === x) {
-                                    data[x] = average;
-                                }
-                            }
-                        }
+                setChartData(datasets);
 
-                        color = colors[colorCounter];
-                        colorCounter++;
-                        if (colorCounter === colors.length) colorCounter = 0;
-
-                        label = previousYear;
-                        datasets.push({
-                            label: label,
-                            data: data,
-                            backgroundColor: color
-                        });
-                        previousYear = year;
-                        data = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-                    }
-
-                    for (let x = 0; x < data.length; x++) {
-                        if ((month - 1) === x) {
-                            data[x] = average;
-                        }
-                    }
+                for (let i = 0; i < res.data[0].table.length; i++) {
+                    clientInfoList.push({
+                        name: res.data[0].table[i].name,
+                        country: res.data[0].table[i].country,
+                        clientgrading: res.data[0].table[i].grading
+                    });
                 }
 
                 setChartData(datasets);
                 setChartLoading(false);
+
+                setClientNameCountry(clientInfoList);
             })
             .catch((error) => {
                 setChartLoading(false);
@@ -219,7 +227,7 @@ const Dashboard = () => {
         if(!chartLoading) {
             if (employeeCriteria.id !== "All") {
                 if(compareEmployeeChecked) {
-                    chart();
+                    chart(); // ?
                 } else {
                     chart(employeeCriteria.id);
                 }
@@ -228,6 +236,63 @@ const Dashboard = () => {
                 chart();
             }
         }
+
+        event.preventDefault();
+        event.stopPropagation();
+
+        const newErrors = findCriteriaErrors();
+
+        setErrors(newErrors);
+        if (Object.keys(newErrors).length !== 0) return;
+        await chart();
+    }
+
+    const setField = (field, value) => {
+        setCriteria({
+            ...criteria,
+            [field]: value
+        });
+
+        if (!!errors[field]) {
+            setErrors({
+                ...errors,
+                [field]: null
+            });
+        }
+    };
+
+    const findCriteriaErrors = () => {
+        const { startYear, startMonth, endYear, endMonth } = criteria;
+        let newErrors = {};
+
+        // endYear errors
+        if (parseInt(endYear) < parseInt(startYear))
+            newErrors.endYear = t("dashboard.criteria.EndYearExceedError");
+
+        // endMonth errors
+        if (parseInt(endMonth) < parseInt(startMonth) && parseInt(startYear) === parseInt(endYear))
+            newErrors.endMonth = t("dashboard.criteria.EndMonthExceedError");
+
+        if (parseInt(endMonth) > currentMonth && endYear === currentYear.toString())
+            newErrors.endMonth = t("dashboard.criteria.EndMonthExceedCurrentError");
+
+        // startMonth errors
+        if (startMonth > currentMonth && startYear === currentYear.toString())
+            newErrors.startMonth = t("dashboard.criteria.StartMonthExceedCurrentError");
+
+        return newErrors;
+    }
+
+    const initCriteria = async () => {
+        let yearList = [];
+        for (let i = earliestYear; i <= currentYear; i++) {
+            yearList.push(i);
+        }
+        setStartYearList(yearList);
+        setEndYearList(yearList);
+
+        setStartMonthList(months);
+        setEndMonthList(months);
     }
 
     useEffect(() => {
@@ -240,6 +305,7 @@ const Dashboard = () => {
 
         chart();
         createEmployeeCriteria()
+        initCriteria();
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
@@ -262,6 +328,96 @@ const Dashboard = () => {
                                     aria-describedby="basic-addon1"
                                 />
                             </InputGroup>
+
+                            <Form.Group className="my-2  px-2" controlId="floatingModifyStartMonth">
+                                <Form.Label>{t('dashboard.criteria.StartDateLabel')}</Form.Label>
+                                <div className='row'>
+                                    <div className='col-md-6 col-sm-6'>
+                                        <Form.Select required
+                                            id='startYearSelect'
+                                            size="sm"
+                                            aria-label="Default select example"
+                                            onChange={(e) => setField('startYear', e.target.value)}
+                                            value={criteria.startYear}
+                                            isInvalid={!!errors.startYear}>
+
+                                            {startYearList.map((y, i) => {
+                                                return (
+                                                    <option key={i} value={y}>{y}</option>
+                                                );
+                                            })}
+
+                                        </Form.Select>
+
+                                        <Form.Control.Feedback type="invalid">
+                                            {errors.startYear}
+                                        </Form.Control.Feedback>
+                                    </div>
+                                    <div className='col-md-6 col-sm-6'>
+                                        <Form.Select required
+                                            id='startMonthSelect'
+                                            size="sm"
+                                            aria-label="Default select example"
+                                            onChange={(e) => setField('startMonth', e.target.value)}
+                                            value={criteria.startMonth}
+                                            isInvalid={!!errors.startMonth}>
+
+                                            {startMonthList.map((m, i) => {
+                                                return (<option key={i} value={i}>{m}</option>);
+                                            })}
+
+                                        </Form.Select>
+
+                                        <Form.Control.Feedback type="invalid">
+                                            {errors.startMonth}
+                                        </Form.Control.Feedback>
+                                    </div>
+                                </div>
+                            </Form.Group>
+
+                            <Form.Group className="my-2  px-2" controlId="floatingModifyEndMonth">
+                                <Form.Label>{t('dashboard.criteria.EndDateLabel')}</Form.Label>
+                                <div className='row'>
+                                    <div className='col-md-6 col-sm-6'>
+                                        <Form.Select required
+                                            id='endYearSelect'
+                                            size="sm"
+                                            aria-label="Default select example"
+                                            onChange={(e) => setField('endYear', e.target.value)}
+                                            value={criteria.endYear}
+                                            isInvalid={!!errors.endYear}>
+
+                                            {endYearList.map((y, i) => {
+                                                return (
+                                                    <option key={i} value={y}>{y}</option>
+                                                );
+                                            })}
+                                        </Form.Select>
+
+                                        <Form.Control.Feedback type="invalid">
+                                            {errors.endYear}
+                                        </Form.Control.Feedback>
+                                    </div>
+                                    <div className='col-md-6 col-sm-6'>
+                                        <Form.Select required
+                                            id='endMonthSelect'
+                                            size="sm"
+                                            aria-label="Default select example"
+                                            onChange={(e) => setField('endMonth', e.target.value)}
+                                            value={criteria.endMonth}
+                                            isInvalid={!!errors.endMonth}>
+
+                                            {endMonthList.map((m, i) => {
+                                                return (<option key={i} value={i}>{m}</option>);
+                                            })}
+                                        </Form.Select>
+
+                                        <Form.Control.Feedback type="invalid">
+                                            {errors.endMonth}
+                                        </Form.Control.Feedback>
+                                    </div>
+                                </div>
+                            </Form.Group>
 
                             <FormLabel htmlFor="employeeCriteriaDashboard" className="ms-1">{t('dashboard.criteria.labels.Employee')}</FormLabel>
                             <InputGroup className="mb-2">
@@ -315,8 +471,9 @@ const Dashboard = () => {
                                 </OverlayTrigger>
 
                             </InputGroup>
-                            
+
                             <Button
+                                id='loadChartButton'
                                 onClick={loadChartData}
                                 className='my-2 mx-2 d-flex justify-content-center'
                                 variant='primary'>
@@ -344,7 +501,6 @@ const Dashboard = () => {
                                         labels: months,
                                         datasets: chartData.length === 0 || authorized === false ? fallbackChartData : chartData
                                     }}
-
                                     options={{
                                         responsive: true,
                                         maintainAspectRatio: false,
@@ -387,9 +543,57 @@ const Dashboard = () => {
                                             }
                                         }
                                     }}
-
                                 />
                             }
+                        </div>
+                    </div>
+                    <div className="container-table">
+                        <div className="card shadow my-3 mx-3 uTable">
+
+                            <Table id='table' responsive="xl" hover>
+
+                                <thead className='bg-light'>
+                                    <tr key="0">
+                                        <th className='row-style'>{t('dashboard.table.Name')}</th>
+                                        <th className='row-style'>{t('dashboard.table.Country')}</th>
+                                        <th className='row-style'>{t('dashboard.table.AverageCollectionDays')}</th>
+                                        <th className='row-style'>{t('dashboard.table.AmountOwed')}</th>
+                                        <th className='row-style'>{t('dashboard.table.AmountDue')}</th>
+                                        <th className='row-style'>{t('dashboard.table.ClientGrading')}</th>
+                                        <th className='row-style'>{t('dashboard.table.CurrentStatus')}</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody>
+                                    {clientNameCountry.map((client, index) => {
+                                        return (
+                                            <tr key={index}>
+                                                <td id="clientName">{client.name}</td>
+                                                <td id="clientCountry" className='row-style'>{client.country}</td>
+                                                <td id="clientAverageCollectionDays" className='row-style'>23</td>
+                                                <td id="clientAmountOwed" className='amount-owed'>55645</td>
+                                                <td id="clientAmountDue" className='amount-due'>66643</td>
+                                                <td id="clientGrading" className='row-style'>{client.clientgrading}</td>
+                                                <td id="clientStatus" className='row-style'>Active</td>
+                                            </tr>
+                                        );
+                                    })}
+                                </tbody>
+                            </Table>
+
+                            <ButtonGroup className='col-md-5 w-auto ms-auto client-swap'>
+
+                                <DropdownButton title={t('dashboard.dropdownButtonTable.Title')} variant="Default" id="bg-vertical-dropdown-3" className='rowsViewerSelectionStyle'>
+                                    <Dropdown.Item eventKey="1">{t('dashboard.dropdownButtonTable.Option1')}</Dropdown.Item>
+                                    <Dropdown.Item eventKey="2">{t('dashboard.dropdownButtonTable.Option2')}</Dropdown.Item>
+                                    <Dropdown.Item eventKey="3">{t('dashboard.dropdownButtonTable.Option3')}</Dropdown.Item>
+                                </DropdownButton>
+
+                                <button className='left-button'>&#60;</button>
+                                <button className='right-button'>&#62;</button>
+                            </ButtonGroup>
+
+
                         </div>
                     </div>
                 </div>

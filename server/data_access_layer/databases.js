@@ -30,10 +30,10 @@ for (let i = 0; i < databases.length; i++) {
 db.Sequelize = Sequelize;
 
 // Add any tables to the database here
-// Local database tables
-db['localdb'].users = require("./models/localdb/user.model")(db['localdb'], Sequelize);
+// Add any tables to the local database here
+[db['localdb'].users, db['localdb'].chartReports] = require("./models/localdb/localdb.model")(db['localdb'], Sequelize);
 
-// Patricia database tables
+// patricia database tables
 db['mssql_pat'].employees = require("./models/mssql_pat/employee.model")(db['mssql_pat'], Sequelize);
 db['mssql_pat'].invoice_header = require("./models/mssql_pat/invoice_header.model")(db['mssql_pat'], Sequelize);
 db['mssql_pat'].invoice_affect = require("./models/mssql_pat/invoice_affect.model")(db['mssql_pat'], Sequelize);
@@ -48,8 +48,8 @@ db['mssql_bosco'].nameConnection = require("./models/mssql_bosco/name_connection
 
 db.sync = async (database, options) => {
   await db[database].sync(options)
-    .then(() => {
-      return db[database].users.bulkCreate([
+    .then(async () => {
+      return await db[database].users.bulkCreate([
         {
           email: 'first@benoit-cote.com',
           password: 'verySecurePassword1',
@@ -67,14 +67,54 @@ db.sync = async (database, options) => {
           individualHooks: true
         });
     })
-    .then((data) => {
+    .then(async (data) => {
       data.forEach((e) => {
         console.log(e.toJSON());
       });
+      await db[database].chartReports.bulkCreate([
+        {
+          name: 'CR1',
+          startDate: new Date(2019, 11, 1),
+          endDate: new Date(2019, 11, 1),
+          employee1Id: 12345,
+          employee1Name: 'France Cote',
+          country: 'Canada',
+          clientType: 'Corr',
+          ageOfAccount: 'All',
+          accountType: 'Receivable',
+          user_user_id: data[0].userId
+        },
+        {
+          name: 'CR2',
+          startDate: new Date(2019, 11, 1),
+          endDate: new Date(2019, 11, 1),
+          employee1Id: -1,
+          employee1Name: 'All',
+          employee2Id: 12345,
+          employee2Name: 'France Cote',
+          country: 'All',
+          clientType: 'Direct',
+          ageOfAccount: '60-90',
+          accountType: 'Receivable',
+          user_user_id: data[0].userId
+        },
+        {
+          name: 'CR3',
+          startDate: new Date(2019, 11, 1),
+          endDate: new Date(2019, 11, 1),
+          employee1Id: 12345,
+          employee1Name: 'France Cote',
+          country: 'All',
+          clientType: 'Any',
+          ageOfAccount: '<30',
+          accountType: 'Payable',
+          user_user_id: data[1].userId
+        }
+      ]);
     })
     .catch((err) => {
       if (err) {
-        console.log('Could not sync with the Database.');
+        console.log(err);
       }
     });
 }
