@@ -35,7 +35,6 @@ db.Sequelize = Sequelize;
 
 // patricia database tables
 db['mssql_pat'].employees = require("./models/mssql_pat/employee.model")(db['mssql_pat'], Sequelize);
-db['mssql_pat'].invoice_header = require("./models/mssql_pat/invoice_header.model")(db['mssql_pat'], Sequelize);
 db['mssql_pat'].invoice_affect = require("./models/mssql_pat/invoice_affect.model")(db['mssql_pat'], Sequelize);
 
 // Bosco database tables
