@@ -83,7 +83,6 @@ const Dashboard = () => {
 
     const [chartData, setChartData] = useState(fallbackChartData);
     const [chartLoading, setChartLoading] = useState(false);
-    const [compareData, setCompareData] = useState([]);
     const currentYear = new Date().getFullYear();
     const currentMonth = new Date().getMonth();
     const earliestYear = 2009;
@@ -156,6 +155,7 @@ const Dashboard = () => {
     const chart = async (employeeId = undefined, compare = false) => {
         setChartLoading(true);
         setChartData(fallbackChartData);
+        let compareData = [];
 
         let arrayLength = 1;
         if(compare) arrayLength = 2;
@@ -236,13 +236,13 @@ const Dashboard = () => {
                 }
 
                 if(compare && c === 0) {
-                    setCompareData([]);
-                    setCompareData(datasets);
+                    compareData = datasets;
                 }
                 else if(compare && c === 1) {
                     for(let d = 0; d < compareData.length; d++) {
                         datasets.push(compareData[d]);
                     }
+
                     setChartData(datasets);
                     setChartLoading(false);
                 }
@@ -284,7 +284,6 @@ const Dashboard = () => {
             if (employeeCriteria.id !== "All") {
                 
                 if(compareEmployeeChecked) {
-                    setCompareData([]);
                     await chart(employeeCriteria.id, true);
                 } else {
                     await chart(employeeCriteria.id);
