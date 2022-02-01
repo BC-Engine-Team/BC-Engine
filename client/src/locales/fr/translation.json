@@ -78,6 +78,21 @@
              "Dec": "Decembre"
           },
           "FallbackLegendLabel": "En attente des données..."
+       },
+       "table": {
+         "Name": "NOM",
+         "Country": "PAYS",
+         "AverageCollectionDays": "MOYENNE DES JOURS DE COLLECTION",
+         "AmountOwed": "MONTANT DÛ",
+         "AmountDue": "MONTANT À RECEVOIR",
+         "ClientGrading": "GRADE DU CLIENT",
+         "CurrentStatus": "STATUS ACTUEL"
+       },
+       "dropdownButtonTable":{
+         "Title": "Clients par page",
+         "Option1": "Voir 10 clients",
+         "Option2": "Voir 40 clients",
+         "Option3": "Voir tout les clients"
        }
     },
     "manage": {

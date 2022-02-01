@@ -1,5 +1,6 @@
 const invoiceService = require('../services/invoice.service');
 
+
 exports.getAverages = async (req, res) => {
     let regexDateStr = /^\d{4}-\d{2}-\d{2}$/;
     let regexDate = new RegExp(regexDateStr);
@@ -17,7 +18,7 @@ exports.getAverages = async (req, res) => {
                 return res.status(200).send(response);
             }
             return res.status(500).send({ message: "The data could not be fetched." });
-        })
+    })
         .catch(err => {
             return res.status(err.status || 500)
                 .send({ message: !!err.message ? err.message : "Malfunction in the B&C Engine." });

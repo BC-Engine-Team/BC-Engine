@@ -4,13 +4,18 @@
 }
 
 .container-criteria {
-    width: 25%;
-    float: left;
+  width: 25%;
+  float: left;
+}
+
+.container-table {
+  width: 75%;
+  float: left;
 }
 
 .chart {
-    height: 600px;
-    position: relative;
+  height: 600px;
+  position: relative;
 }
 
 .main {
@@ -30,7 +35,8 @@
     flex-direction: column;
   }
   .container-chart, 
-  .container-criteria {
+  .container-criteria,
+  .container-table{
     width: 100%;
   }
 }
