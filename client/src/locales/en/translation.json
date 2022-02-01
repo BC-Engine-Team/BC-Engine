@@ -52,6 +52,7 @@
                     "LoadChartButton":"Load Chart",
                     "Title":"Chart Criteria",
                     "Compare":"Compare selected employee with all employees",
+                    "CompareBTN":"Compare",
                     "All":"All",
                     "labels": {
                         "Employee":"Employee"

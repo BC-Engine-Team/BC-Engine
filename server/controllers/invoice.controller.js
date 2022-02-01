@@ -11,17 +11,17 @@ exports.getAverages = async (req, res) => {
     if (!regexDate.test(req.params.startDate) || !regexDate.test(req.params.endDate))
         return res.status(400).send({ message: "Wrong format." });
 
-
-    await invoiceService.getAverages(req.params.startDate, req.params.endDate)
-        .then(response => {
-            if (response) {
-                return res.status(200).send(response);
-            }
-            return res.status(500).send({ message: "The data could not be fetched." });
-        })
-        .catch(err => {
-            return res.status(500).send({ message: err.message });
-        });
+    await invoiceService.getAverages(req.params.startDate, req.params.endDate, req.query.employeeId)
+    .then(response => {
+        if (response) {
+            return res.status(200).send(response);
+        }
+        return res.status(500).send({ message: "The data could not be fetched." });
+    })
+    .catch(err => {
+        console.log(err)
+        return res.status(500).send({ message: err.message });
+    });
 }
 
 exports.getAllEmployeesDropdown = async (req, res) => {
@@ -32,7 +32,7 @@ exports.getAllEmployeesDropdown = async (req, res) => {
             if(response) {
                 return res.status(200).send(response);
             }
-            return res.status(404).send("The data could not be fetched.");
+            return res.status(500).send({ message: "The data could not be fetched." });
         })
         .catch(err => {
             return res.status(500).send(err.message);

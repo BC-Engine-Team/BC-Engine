@@ -17,6 +17,10 @@ module.exports = (mssql_pat, DataTypes) => {
             field: 'INVOICE_TYPE',
             type: DataTypes.INTEGER
         },
+        clientResponsibleId: {
+            field: 'CLIENT_RESPONSIBLE_ID',
+            type: DataTypes.INTEGER
+        },
         foreignCurrencyValue: {
             field: 'FOREIGN_CURR_VALUE',
             type: DataTypes.DECIMAL(14,2)

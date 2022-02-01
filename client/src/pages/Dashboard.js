@@ -5,8 +5,8 @@ import { useTranslation } from 'react-i18next';
 import Axios from 'axios';
 import Cookies from 'universal-cookie';
 import NavB from '../components/NavB';
-//import DashboardChart from '../components/DashboardChart';
 import '../styles/dashboardPage.css'
+import { Oval } from  'react-loader-spinner'
 import { Bar } from 'react-chartjs-2';
 import {
     Chart as ChartJS,
@@ -73,7 +73,7 @@ const Dashboard = () => {
     ];
 
     const [chartData, setChartData] = useState(fallbackChartData);
-    const [preparedChartData, setPreparedChartData] = useState();
+    const [chartLoading, setChartLoading] = useState(false);
     const [authorized, setAuthorized] = useState(false);
 
     const [employeeSelect, SetEmployeeSelect] = useState([]);
@@ -125,7 +125,10 @@ const Dashboard = () => {
             });
     }
 
-    const chart = async () => {
+    const chart = async (employeeId = undefined) => {
+        setChartLoading(true);
+        setChartData(fallbackChartData);
+
         let datasets = [];
 
         let header = {
@@ -137,14 +140,20 @@ const Dashboard = () => {
             endDate: "2020-12-01"
         };
 
-        await Axios.get(`${process.env.REACT_APP_API}/invoice/defaultChartAndTable/${dates.startDate}/${dates.endDate}`, { headers: header })
+        let param = {};
+        if(employeeId !== undefined) {
+            param = {
+                employeeId: employeeId
+            }
+        }
+
+        await Axios.get(`${process.env.REACT_APP_API}/invoice/defaultChartAndTable/${dates.startDate}/${dates.endDate}`, { params: param, headers: header })
             .then((res) => {
                 if (res.status === 403 && res.status === 401) {
                     setAuthorized(false);
                     return;
                 }
                 setAuthorized(true);
-
 
                 let previousYear = parseInt(res.data[0].month.toString().substring(0, 4));
                 let data = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
@@ -186,11 +195,12 @@ const Dashboard = () => {
                     }
                 }
 
-                setPreparedChartData(datasets);
-
                 setChartData(datasets);
+                setChartLoading(false);
             })
             .catch((error) => {
+                setChartLoading(false);
+
                 if (error.response) {
                     if (error.response.status === 403 || error.response.status === 401) {
                         console.log(error.response.body);
@@ -206,9 +216,17 @@ const Dashboard = () => {
     }
 
     const loadChartData = () => {
-        if (preparedChartData) {
-            setChartData(chartData);
-            console.log('lol')
+        if(!chartLoading) {
+            if (employeeCriteria.id !== "All") {
+                if(compareEmployeeChecked) {
+                    chart();
+                } else {
+                    chart(employeeCriteria.id);
+                }
+            }
+            else {
+                chart();
+            }
         }
     }
 
@@ -289,7 +307,7 @@ const Dashboard = () => {
 
                                             <FormCheck 
                                             type="switch" 
-                                            label="Compare"
+                                            label={t('dashboard.criteria.CompareBTN')}
                                             disabled={employeeCriteria.id === "All"}
                                             checked={compareEmployeeChecked}
                                             />
@@ -300,9 +318,20 @@ const Dashboard = () => {
                             
                             <Button
                                 onClick={loadChartData}
-                                className='my-2 mx-2'
+                                className='my-2 mx-2 d-flex justify-content-center'
                                 variant='primary'>
-                                {loadChartButtonText}
+                                    {chartLoading 
+                                    ? 
+                                    <span className='me-3 align-self-center'>
+                                        <Oval 
+                                            height="20"
+                                            width="20"
+                                            color='black'
+                                            ariaLabel='loading' />
+                                    </span>
+                                    : 
+                                    <></>}
+                                    {loadChartButtonText}
                             </Button>
                         </div>
                     </div>

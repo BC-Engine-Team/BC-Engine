@@ -54,6 +54,7 @@
           "LoadChartButton": "Mettre à jour le Graphique",
           "Title":"Filtres du graphique",
           "Compare":"Comparer l'employé selectionné avec tous les employés",
+          "CompareBTN":"Comparer",
           "All":"Tous",
           "labels": {
              "Employee":"Employé"
