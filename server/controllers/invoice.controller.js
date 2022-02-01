@@ -20,8 +20,8 @@ exports.getAverages = async (req, res) => {
         return res.status(500).send({ message: "The data could not be fetched." });
     })
     .catch(err => {
-        console.log(err)
-        return res.status(500).send({ message: err.message });
+        return res.status(err.status || 500)
+            .send({ message: !!err.message ? err.message : "Malfunction in the B&C Engine." });
     });
 }
 

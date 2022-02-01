@@ -8,6 +8,15 @@ let clientIDList = [];
 
 exports.getAverages = async (startDateStr, endDateStr,  employeeId = undefined) => {
     return new Promise(async (resolve, reject) => {
+        let averagesList = [];
+        let totalDuesList = [];
+        let billedList = [];
+        let clientList = [];
+        let clientsList;
+        let nameIdList = [];
+        let clientGradingList = [];
+        let returnData = [];
+
         let startDate = new Date(`${startDateStr} 00:00:00`);
         let endDate = new Date(`${endDateStr} 00:00:00`);
         if (startDate > endDate) {
@@ -19,15 +28,6 @@ exports.getAverages = async (startDateStr, endDateStr,  employeeId = undefined) 
         }
 
         let yearMonthList = this.getYearMonth(startDateStr, endDateStr);
-
-        let averagesList = [];
-        let totalDuesList = [];
-        let billedList = [];
-        let clientList = [];
-        let clientsList;
-        let nameIdList = [];
-        let clientGradingList = [];
-        let returnData = [];
 
         if(employeeId !== undefined) {
             clientsList = [];

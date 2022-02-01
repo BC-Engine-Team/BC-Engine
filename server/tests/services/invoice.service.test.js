@@ -319,7 +319,7 @@ describe("Test Invoice Service", () => {
                 // assert
                 expect(response).toEqual(fakeExpectedGetAverageResponse);
                 expect(getDuesSpy).toBeCalledTimes(1);
-                expect(getDuesSpy).toBeCalledWith(yearMonthList);
+                expect(getDuesSpy).toBeCalledWith(yearMonthList, undefined);
 
                 expect(getClientSpy).toBeCalledTimes(1);
                 expect(getClientGradingSpy).toBeCalledTimes(1);

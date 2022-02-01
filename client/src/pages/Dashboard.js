@@ -151,8 +151,6 @@ const Dashboard = () => {
         setChartLoading(true);
         setChartData(fallbackChartData);
 
-        let datasets = [];
-
         let header = {
             'authorization': "Bearer " + cookies.get("accessToken"),
         }
@@ -223,17 +221,17 @@ const Dashboard = () => {
             });
     }
 
-    const loadChartData = () => {
+    const loadChartData = async (event) => {
         if(!chartLoading) {
             if (employeeCriteria.id !== "All") {
                 if(compareEmployeeChecked) {
-                    chart(); // ?
+                    await chart(); // ?
                 } else {
-                    chart(employeeCriteria.id);
+                    await chart(employeeCriteria.id);
                 }
             }
             else {
-                chart();
+                await chart();
             }
         }
 
