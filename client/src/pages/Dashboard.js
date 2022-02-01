@@ -352,7 +352,6 @@ const Dashboard = () => {
             setAuthorized(false);
         }
 
-        setCompareData([]);
         chart();
         createEmployeeCriteria();
         initCriteria();
