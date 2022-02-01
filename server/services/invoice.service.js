@@ -4,25 +4,35 @@ const ClientDao = require("../data_access_layer/daos/client.dao");
 const ClientGradingDao = require("../data_access_layer/daos/client_grading.dao")
 
 exports.getAverages = async (startDateStr, endDateStr) => {
-    const startYear = parseInt(startDateStr.split('-')[0]);
-    let startMonth = parseInt(startDateStr.split('-')[1]);
-    const endYear = parseInt(endDateStr.split('-')[0]);
-    const endMonth = parseInt(endDateStr.split('-')[1]);
-
-    // make list of yearMonth [201911,202001,202002,...] to select dues
-    let yearMonthList = [];
-    for (let y = startYear; y <= endYear; y++) {
-        if (y != startYear) startMonth = 1;
-        for (let m = startMonth; m <= 12; m++) {
-            if (y == endYear && m > endMonth) break;
-            let yearMonthStr = y.toString();
-            if (m < 10) yearMonthStr += '0';
-            yearMonthStr += m.toString();
-            yearMonthList.push(parseInt(yearMonthStr));
-        }
-    }
-
     return new Promise(async (resolve, reject) => {
+        let startDate = new Date(`${startDateStr} 00:00:00`);
+        let endDate = new Date(`${endDateStr} 00:00:00`);
+        if (startDate > endDate) {
+            const response = {
+                status: 400,
+                message: "Invalid date order."
+            }
+            reject(response);
+        }
+
+        const startYear = parseInt(startDateStr.split('-')[0]);
+        let startMonth = parseInt(startDateStr.split('-')[1]);
+        const endYear = parseInt(endDateStr.split('-')[0]);
+        const endMonth = parseInt(endDateStr.split('-')[1]);
+
+        // make list of yearMonth [201911,202001,202002,...] to select dues
+        let yearMonthList = [];
+        for (let y = startYear; y <= endYear; y++) {
+            if (y != startYear) startMonth = 1;
+            for (let m = startMonth; m <= 12; m++) {
+                if (y == endYear && m > endMonth) break;
+                let yearMonthStr = y.toString();
+                if (m < 10) yearMonthStr += '0';
+                yearMonthStr += m.toString();
+                yearMonthList.push(parseInt(yearMonthStr));
+            }
+        }
+
         let averagesList = [];
         let totalDuesList = [];
         let billedList = [];
@@ -39,7 +49,6 @@ exports.getAverages = async (startDateStr, endDateStr) => {
         });
 
         // prepare startDate to get billed amount for each month
-        let startDate = new Date(`${startDateStr} 00:00:00`);
         startDate.setMonth(startDate.getMonth() - 12);
         let theMonth = startDate.getMonth() + 1;
         startDateStr = startDate.getFullYear() + "-" + theMonth + "-01";
@@ -65,18 +74,23 @@ exports.getAverages = async (startDateStr, endDateStr) => {
         let counter = 0;
         yearMonthList.forEach(ym => {
             let average = totalDuesList[counter].totalDues / billedList[counter].billed * 365;
+            let year = parseInt(ym.toString().substring(0, 4));
             averagesList.push({
                 month: ym,
-                average: average.toFixed(2)
+                average: average.toFixed(2),
+                group: year
             });
             counter++;
         });
-        
-        
+
+        const groupedAverages = averagesList.reduce((groups, item) => ({
+            ...groups,
+            [item.group]: [...(groups[item.group] || []), item]
+        }), {});
+
         clientList.forEach(c => {
             nameIdList.push(c.nameId);
         });
-
 
         await this.getClientGrading(nameIdList).then(async data => {
             clientGradingList = data;
@@ -84,22 +98,21 @@ exports.getAverages = async (startDateStr, endDateStr) => {
             reject(err);
         });
 
-
-        for(const c of clientList){
-            for(const g of clientGradingList){
-                if(c.nameId === g.nameId){
+        for (const c of clientList) {
+            for (const g of clientGradingList) {
+                if (c.nameId === g.nameId) {
                     c.grading = g.grading;
                     break;
                 }
-                else if(c.nameId !== g.nameId){
+                else if (c.nameId !== g.nameId) {
                     c.grading = "N/A"
                 }
             }
         }
 
         returnData.push({
-            chart: averagesList,
-            table: clientList     
+            chart: groupedAverages,
+            table: clientList
         });
 
         resolve(returnData);
@@ -159,8 +172,8 @@ exports.getBilled = async (startDateStr, endDateStr, yearMonthList) => {
                         }
                     });
 
-                    
-                    
+
+
                     billedList.push({
                         month: ym,
                         billed: billed
@@ -169,7 +182,7 @@ exports.getBilled = async (startDateStr, endDateStr, yearMonthList) => {
                     startDate.setUTCMonth(startDate.getUTCMonth() + 1);
                     endDate.setUTCMonth(endDate.getUTCMonth() + 1);
                 });
-                
+
                 clientIDList = [...new Set(clientIDList)];
                 resolve(billedList);
             }
@@ -188,15 +201,15 @@ exports.getNamesAndCountries = async (clientsID) => {
 
     let formattedClientList = [];
     return new Promise(async (resolve, reject) => {
-        
+
         await ClientDao.getClientByID(clientsID).then(async data => {
 
-            if(data){
+            if (data) {
                 data.forEach(i => {
- 
+
                     formattedClientList.push({
                         nameId: i.nameId,
-                        name:  i.name,
+                        name: i.name,
                         country: i.country,
                         grading: ""
                     });
@@ -214,17 +227,17 @@ exports.getNamesAndCountries = async (clientsID) => {
 
 
 //method to get the client grading
-exports.getClientGrading = async(idList) => {
+exports.getClientGrading = async (idList) => {
 
     let gradingList = [];
 
     return new Promise(async (resolve, reject) => {
         await ClientGradingDao.getClientGrading(idList).then(async data => {
-            if(data){
+            if (data) {
                 data.forEach(g => {
                     gradingList.push({
-                      nameId: g.nameId,
-                      grading: g.grading
+                        nameId: g.nameId,
+                        grading: g.grading
                     });
                 });
                 resolve(gradingList);

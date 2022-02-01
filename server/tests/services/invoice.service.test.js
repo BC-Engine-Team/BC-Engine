@@ -82,20 +82,27 @@ let fakeInvoiceAffectList = [
 
 let fakeExpectedGetAverageResponse = [
     {
-        chart: [
-            {
-                month: 202011,
-                average: (fakeDuesList[0].totalDues / fakeBilledList[0].billed * 365).toFixed(2)
-            },
-            {
-                month: 202012,
-                average: (fakeDuesList[1].totalDues / fakeBilledList[1].billed * 365).toFixed(2)
-            },
-            {
-                month: 202101,
-                average: (fakeDuesList[2].totalDues / fakeBilledList[2].billed * 365).toFixed(2)
-            }
-        ],
+        chart: {
+            2020: [
+                {
+                    month: 202011,
+                    average: (fakeDuesList[0].totalDues / fakeBilledList[0].billed * 365).toFixed(2),
+                    group: 2020
+                },
+                {
+                    month: 202012,
+                    average: (fakeDuesList[1].totalDues / fakeBilledList[1].billed * 365).toFixed(2),
+                    group: 2020
+                }
+            ],
+            2021: [
+                {
+                    month: 202101,
+                    average: (fakeDuesList[2].totalDues / fakeBilledList[2].billed * 365).toFixed(2),
+                    group: 2021
+                }
+            ]
+        },
         table: [
             {
                 nameId: 32590,
@@ -118,8 +125,6 @@ let fakeExpectedGetAverageResponse = [
         ]
     }
 ];
-
-
 
 let fakeClientNameCountryList = [
     {
@@ -277,7 +282,7 @@ let clientGradingDaoSpy = jest.spyOn(ClientGradingDao, 'getClientGrading')
     }));
 
 
-    
+
 describe("Test Invoice Service", () => {
 
     beforeEach(() => {
@@ -295,8 +300,7 @@ describe("Test Invoice Service", () => {
     //to fix
     describe("IS1 - getAverages", () => {
         describe("IS1.1 - given two dates", () => {
-            it("IS1.1.1 - should respond with the list of averages per month", async () => {
-
+            it("IS1.1.1 - should respond with the list of averages per month with group key", async () => {
                 //arrange
                 getClientSpy = jest.spyOn(InvoiceService, 'getNamesAndCountries')
                     .mockImplementation(() => new Promise((resolve) => {
@@ -316,7 +320,7 @@ describe("Test Invoice Service", () => {
                 expect(response).toEqual(fakeExpectedGetAverageResponse);
                 expect(getDuesSpy).toBeCalledTimes(1);
                 expect(getDuesSpy).toBeCalledWith(yearMonthList);
-                
+
                 expect(getClientSpy).toBeCalledTimes(1);
                 expect(getClientGradingSpy).toBeCalledTimes(1);
             });
@@ -344,13 +348,27 @@ describe("Test Invoice Service", () => {
                     .mockImplementation(() => new Promise((resolve, reject) => {
                         reject({ message: "getBilled failed" });
                     }));
-                
+
                 // act and assert
                 await expect(InvoiceService.getAverages("2020-11-01", "2021-01-01")).rejects
                     .toEqual({ message: "getBilled failed" });
             });
 
-            it("IS1.1.4 - should respond with error thrown by getNamesAndCountries", async () => {
+            it("IS1.1.4 - should respond with error message 400 when start date is after end date", async () => {
+                // arrange
+                let startDate = "2020-11-01";
+                let endDate = "2019-11-01";
+                let expectedError = {
+                    status: 400,
+                    message: "Invalid date order."
+                }
+
+                // act and assert
+                await expect(InvoiceService.getAverages(startDate, endDate)).rejects
+                    .toEqual(expectedError);
+            });
+
+            it("IS1.1.5 - should respond with error thrown by getNamesAndCountries", async () => {
 
                 // arrange
                 getDuesSpy = jest.spyOn(InvoiceService, 'getDues')
@@ -362,7 +380,7 @@ describe("Test Invoice Service", () => {
                     .mockImplementation(() => new Promise((resolve) => {
                         resolve(fakeBilledList);
                     }));
-                
+
                 getClientSpy = jest.spyOn(InvoiceService, 'getNamesAndCountries')
                     .mockImplementation(() => new Promise((resolve, reject) => {
                         reject({ message: "getNamesAndCountries failed" });
@@ -372,12 +390,12 @@ describe("Test Invoice Service", () => {
                 // act and assert
                 await expect(InvoiceService.getAverages("2020-11-01", "2021-01-01")).rejects
                     .toEqual({ message: "getNamesAndCountries failed" });
-                    
+
             });
 
-            it("IS1.1.5 - should respond with error thrown by getClientGrading", async () => {
+            it("IS1.1.6 - should respond with error thrown by getClientGrading", async () => {
 
-                
+
                 // arrange
                 getDuesSpy = jest.spyOn(InvoiceService, 'getDues')
                     .mockImplementation(() => new Promise((resolve) => {
@@ -388,12 +406,12 @@ describe("Test Invoice Service", () => {
                     .mockImplementation(() => new Promise((resolve) => {
                         resolve(fakeBilledList);
                     }));
-                
+
                 getClientSpy = jest.spyOn(InvoiceService, 'getNamesAndCountries')
                     .mockImplementation(() => new Promise((resolve) => {
                         resolve(fakeClientNameCountryList);
                     }));
-                
+
                 getClientGradingSpy = jest.spyOn(InvoiceService, 'getClientGrading')
                     .mockImplementation(() => new Promise((resolve, reject) => {
                         reject({ message: "getClientGrading failed" });
@@ -530,7 +548,7 @@ describe("Test Invoice Service", () => {
 
                 //arrange 
                 getClientSpy.mockRestore()
-                
+
                 // act
                 const response = await InvoiceService.getNamesAndCountries(fakeClientIdList);
 

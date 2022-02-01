@@ -7,12 +7,14 @@ exports.getChartReportsByUserId = async (userId, chartReportModel = ChartReportM
         chartReportModel.findAll({
             where: {
                 user_user_id: userId
+            },
+            order: [['name', 'ASC']]
+        }).then(async data => {
+            if (data) {
+                resolve(data)
             }
+            resolve(false);
         })
-            .then(async data => {
-                if (data) resolve(data)
-                resolve(false);
-            })
             .catch(async err => {
                 const response = {
                     status: err.status || 500,
@@ -20,5 +22,6 @@ exports.getChartReportsByUserId = async (userId, chartReportModel = ChartReportM
                 };
                 reject(response);
             });
+
     });
 };
