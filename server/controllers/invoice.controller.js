@@ -12,7 +12,7 @@ exports.getAverages = async (req, res) => {
         return res.status(400).send({ message: "Wrong format." });
 
 
-    await invoiceService.getAverages(req.params.startDate, req.params.endDate)
+    await invoiceService.getAverages(req.params.startDate, req.params.endDate, req.params.countryCode)
         .then(response => {
             if (response) {
                 return res.status(200).send(response);

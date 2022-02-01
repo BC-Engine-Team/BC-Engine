@@ -79,7 +79,7 @@ const Dashboard = () => {
     const [authorized, setAuthorized] = useState(false);
     const [clientNameCountry, setClientNameCountry] = useState([{name: "", country: "", clientgrading: ""}]);
     const [countries, setCountries] = useState([{countryCode: "", countryLabel: ""}]);
-   
+    const [filteredCountry, setFilteredCountry] = useState({countryCode: ""});
 
     const chart = async () => {
         let datasets = [];
@@ -94,7 +94,11 @@ const Dashboard = () => {
             endDate: "2020-01-01"
         };
 
-        await Axios.get(`${process.env.REACT_APP_API}/invoice/defaultChartAndTable/${dates.startDate}/${dates.endDate}`, { headers: header })
+        const country = {
+            countryCode: filteredCountry
+        }
+
+        await Axios.get(`${process.env.REACT_APP_API}/invoice/defaultChartAndTable/${dates.startDate}/${dates.endDate}/${country.countryCode}`, { headers: header })
             .then(async (res) => {
                 if (res.status === 403 && res.status === 401) {
                     setAuthorized(false);
@@ -247,7 +251,7 @@ const Dashboard = () => {
                                     <option value="*">All countries</option>
                                     {countries.map ((country, index) => {
                                         return(
-                                            <option key={index} value={country.countryCode}>{country.countryLabel}</option>    
+                                            <option key={index} value={country.countryCode} onClick={() => setFilteredCountry(country.countryCode)}>{country.countryLabel}</option>    
                                         );
                                     })}
                                 </Form.Select>

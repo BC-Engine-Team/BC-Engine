@@ -5,7 +5,7 @@ const ClientGradingDao = require("../data_access_layer/daos/client_grading.dao")
 const CountryDao = require("../data_access_layer/daos/country.dao")
 
 
-exports.getAverages = async (startDateStr, endDateStr) => {
+exports.getAverages = async (startDateStr, endDateStr, countryCode="") => {
     const startYear = parseInt(startDateStr.split('-')[0]);
     let startMonth = parseInt(startDateStr.split('-')[1]);
     const endYear = parseInt(endDateStr.split('-')[0]);
