@@ -284,6 +284,7 @@ const Dashboard = () => {
             if (employeeCriteria.id !== "All") {
                 
                 if(compareEmployeeChecked) {
+                    setCompareData([]);
                     await chart(employeeCriteria.id, true);
                 } else {
                     await chart(employeeCriteria.id);
@@ -351,8 +352,9 @@ const Dashboard = () => {
             setAuthorized(false);
         }
 
+        setCompareData([]);
         chart();
-        createEmployeeCriteria()
+        createEmployeeCriteria();
         initCriteria();
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
