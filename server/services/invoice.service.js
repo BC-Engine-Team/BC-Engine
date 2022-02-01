@@ -5,7 +5,7 @@ const ClientGradingDao = require("../data_access_layer/daos/client_grading.dao")
 const CountryDao = require("../data_access_layer/daos/country.dao")
 
 
-exports.getAverages = async (startDateStr, endDateStr, countryCode="") => {
+exports.getAverages = async (startDateStr, endDateStr, countryCode) => {
     const startYear = parseInt(startDateStr.split('-')[0]);
     let startMonth = parseInt(startDateStr.split('-')[1]);
     const endYear = parseInt(endDateStr.split('-')[0]);
@@ -32,6 +32,14 @@ exports.getAverages = async (startDateStr, endDateStr, countryCode="") => {
         let clientGradingList = [];
         let returnData = [];
         let nameIdList = [];
+
+
+        if(countryCode === ""){
+            countryCode = "";
+        }
+
+        console.log(countryCode);
+
 
         // Get the list of total dues for each month
         await this.getDues(yearMonthList).then(async data => {

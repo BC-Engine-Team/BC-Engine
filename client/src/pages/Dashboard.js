@@ -81,7 +81,7 @@ const Dashboard = () => {
     const [countries, setCountries] = useState([{countryCode: "", countryLabel: ""}]);
     const [filteredCountry, setFilteredCountry] = useState({countryCode: ""});
 
-    const chart = async () => {
+    const chart = async (countryData) => {
         let datasets = [];
         let clientInfoList = [];
         
@@ -95,7 +95,7 @@ const Dashboard = () => {
         };
 
         const country = {
-            countryCode: filteredCountry
+            countryCode: countryData
         }
 
         await Axios.get(`${process.env.REACT_APP_API}/invoice/defaultChartAndTable/${dates.startDate}/${dates.endDate}/${country.countryCode}`, { headers: header })
@@ -179,7 +179,6 @@ const Dashboard = () => {
 
 
     const countrySelectBox = async () => {
-
         let countryList = [];
 
         let header = {
@@ -205,6 +204,10 @@ const Dashboard = () => {
             });
     }
 
+    const countryFiltering = (country) => {
+        setFilteredCountry(country);
+        chart(filteredCountry);
+    }
 
     
     useEffect(() => {
@@ -251,7 +254,7 @@ const Dashboard = () => {
                                     <option value="*">All countries</option>
                                     {countries.map ((country, index) => {
                                         return(
-                                            <option key={index} value={country.countryCode} onClick={() => setFilteredCountry(country.countryCode)}>{country.countryLabel}</option>    
+                                            <option key={index} value={country.countryCode} onClick={() => countryFiltering(country.countryCode)}>{country.countryLabel}</option>    
                                         );
                                     })}
                                 </Form.Select>
