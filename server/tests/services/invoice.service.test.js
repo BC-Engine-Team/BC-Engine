@@ -4,7 +4,7 @@ var { expect, jest } = require('@jest/globals');
 const InvoiceService = require("../../services/invoice.service");
 const TransacStatDao = require("../../data_access_layer/daos/transac_stat.dao");
 const InvoiceAffectDao = require("../../data_access_layer/daos/invoice_affect.dao");
-const ClientDao = require("../../data_access_layer/daos/client.dao");
+const ClientDao = require("../../data_access_layer/daos/name.dao");
 const ClientGradingDao = require("../../data_access_layer/daos/client_grading.dao");
 
 let yearMonthList = [202011, 202012, 202101];

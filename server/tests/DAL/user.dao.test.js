@@ -101,6 +101,22 @@ describe("Test User DAL", () => {
             expect(response.message).toEqual("Error with the UserModel.");
 
         });
+
+        it("UD1.4 - Should reject error with 500 status and predefined message when model does not define them", async () => {
+            // arrange
+            let expectedError = {
+                status: 500,
+                message: "some error occured"
+            };
+
+            UserMock.$queryInterface.$useHandler(function (query, queryOptions, done) {
+                return Promise.reject({});
+            });
+
+            // act and assert
+            await expect(UserDAO.getUserByEmail("", UserMock)).rejects
+                .toEqual(expectedError);
+        });
     });
 
     describe("UD2 - createUser", () => {
@@ -242,17 +258,20 @@ describe("Test User DAL", () => {
             expect(resp).toBe("User has failed to be deleted.");
         });
 
-        it("UD5.3 - should catch error thrown by user model", async () => {
+        it("UD5.3 - Should reject error with 500 status and predefined message when model does not define them", async () => {
             // arrange
+            let expectedError = {
+                status: 500,
+                message: "some error occured"
+            };
+
             UserMock.$queryInterface.$useHandler(function (query, queryOptions, done) {
-                return new Error("Error with the UserModel.");
+                return Promise.reject({});
             });
 
-            // act
-            const resp = await UserDAO.getUserByEmail("", UserMock);
-
-            // assert
-            expect(resp.message).toBe("Error with the UserModel.");
+            // act and assert
+            await expect(UserDAO.deleteUser("", UserMock)).rejects
+                .toEqual(expectedError);
         });
     });
 });

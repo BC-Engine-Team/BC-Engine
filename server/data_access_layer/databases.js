@@ -68,9 +68,6 @@ db.sync = async (database, options) => {
         });
     })
     .then(async (data) => {
-      data.forEach((e) => {
-        console.log(e.toJSON());
-      });
       await db[database].chartReports.bulkCreate([
         {
           name: 'CR1',
@@ -113,9 +110,7 @@ db.sync = async (database, options) => {
       ]);
     })
     .catch((err) => {
-      if (err) {
-        console.log(err);
-      }
+      console.log(err);
     });
 }
 

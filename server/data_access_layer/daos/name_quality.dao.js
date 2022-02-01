@@ -26,7 +26,11 @@ exports.getClientsByEmployee = async (employeeId, db = database) => {
             resolve(false);
         }
         catch (err) {
-            reject(err);
+            const response = {
+                status: err.status || 500,
+                message: err.message || "some error occured"
+            }
+            reject(response);
         }
     });
 }

@@ -57,8 +57,7 @@ exports.getAllEmployees = async (empModel = EmployeeModel) => {
         })
         .catch(err => {
             const response = {
-                status: 500,
-                data: {},
+                status: err.status || 500,
                 message: err.message || "some error occured"
             }
             reject(response);

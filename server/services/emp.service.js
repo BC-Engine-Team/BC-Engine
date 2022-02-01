@@ -49,7 +49,15 @@ exports.getAllEmployees = async () => {
                     if(data) {
                         listEmployeesWithNameID.push(data.dataValues);
                         if(listEmployees.length === listEmployeesWithNameID.length) {
-                            resolve(listEmployeesWithNameID);
+                            // Puts users in alphabetical order for the users table
+                            let sortedList = listEmployeesWithNameID.sort((a, b) => {
+                                a = a.firstName.concat(a.lastName)
+                                b = b.firstName.concat(b.lastName)
+                                let userA = a.toUpperCase();
+                                let userB = b.toUpperCase();
+                                return (userA < userB) ? -1 : (userA > userB) ? 1 : 0;
+                            });
+                            resolve(sortedList);
                         }
                     }
                     else {
