@@ -183,7 +183,6 @@ const Dashboard = () => {
 
             await Axios.get(`${process.env.REACT_APP_API}/invoice/defaultChartAndTable/${startDate}/${endDate}`, { params: param, headers: header })
             .then((res) => {
-                console.log(res)
                 if (res.status === 403 && res.status === 401) {
                     setAuthorized(false);
                     return;
@@ -239,13 +238,10 @@ const Dashboard = () => {
                 }
 
                 if(compare && c === 0) {
-                    console.log(datasets)
                     setCompareData([]);
                     setCompareData(datasets);
                 }
                 else if(compare && c === 1) {
-                    console.log(compareData)
-                    console.log(datasets)
                     for(let d = 0; d < compareData.length; d++) {
                         datasets.push(compareData[d]);
                     }
@@ -261,7 +257,6 @@ const Dashboard = () => {
             })
             .catch((error) => {
                 setChartLoading(false);
-                console.log(error)
 
                 if (error.response) {
                     if (error.response.status === 403 || error.response.status === 401) {
