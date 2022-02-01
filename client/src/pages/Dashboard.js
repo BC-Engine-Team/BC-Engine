@@ -67,6 +67,14 @@ const Dashboard = () => {
         'rgb(173, 247, 182)'
     ];
 
+    let compareColors = [
+        'rgb(255, 139, 77)',
+        'rgb(127, 101, 129)',
+        'rgb(255, 224, 51)',
+        'rgb(65, 144, 164)',
+        'rgb(46, 234, 68)'
+    ]
+
     const fallbackChartData = [
         {
             label: chartFallbackLegendLabel,
@@ -77,6 +85,7 @@ const Dashboard = () => {
 
     const [chartData, setChartData] = useState(fallbackChartData);
     const [chartLoading, setChartLoading] = useState(false);
+    const [compareData, setCompareData] = useState([]);
     const currentYear = new Date().getFullYear();
     const currentMonth = new Date().getMonth();
     const earliestYear = 2009;
@@ -146,27 +155,35 @@ const Dashboard = () => {
             });
     }
 
-    const chart = async (employeeId = undefined) => {
-        let clientInfoList = [];
+    const chart = async (employeeId = undefined, compare = false) => {
         setChartLoading(true);
         setChartData(fallbackChartData);
 
-        let header = {
-            'authorization': "Bearer " + cookies.get("accessToken"),
-        }
+        let arrayLength = 1;
+        if(compare) arrayLength = 2;
+        for(let c = 0; c < arrayLength; c++) {
+            let clientInfoList = [];
 
-        let startDate = new Date(criteria.startYear, criteria.startMonth, 1).toISOString().split("T")[0];
-        let endDate = new Date(criteria.endYear, criteria.endMonth, 1).toISOString().split("T")[0];
-
-        let param = {};
-        if(employeeId !== undefined) {
-            param = {
-                employeeId: employeeId
+            let header = {
+                'authorization': "Bearer " + cookies.get("accessToken"),
             }
-        }
 
-        await Axios.get(`${process.env.REACT_APP_API}/invoice/defaultChartAndTable/${startDate}/${endDate}`, { params: param, headers: header })
+            let startDate = new Date(criteria.startYear, criteria.startMonth, 1).toISOString().split("T")[0];
+            let endDate = new Date(criteria.endYear, criteria.endMonth, 1).toISOString().split("T")[0];
+
+            let param = {};
+            if(employeeId !== undefined) {
+                param = {
+                    employeeId: employeeId
+                }
+            }
+            if(c === 1) {
+                param = {};
+            }
+
+            await Axios.get(`${process.env.REACT_APP_API}/invoice/defaultChartAndTable/${startDate}/${endDate}`, { params: param, headers: header })
             .then((res) => {
+                console.log(res)
                 if (res.status === 403 && res.status === 401) {
                     setAuthorized(false);
                     return;
@@ -177,19 +194,41 @@ const Dashboard = () => {
                 let groupedChartData = res.data[0].chart;
 
                 let colorCounter = 0;
+
                 for (let i = 0; i < Object.keys(groupedChartData).length; i++) {
-                    const data = groupedChartData[Object.keys(groupedChartData)[i]].map(m => m.average)
+                    let data = [];
+                    const dataGroup = groupedChartData[Object.keys(groupedChartData)[i]];
+                    let startMonth = parseInt(dataGroup[0].month.toString().substring(4)) - 1;
+                    let endMonth = parseInt(dataGroup[dataGroup.length - 1].month.toString().substring(4)) - 1;
+                    let counter = 0;
+
+                    for (let j = 0; j < 12; j++) {
+                        if (j >= startMonth && j <= endMonth) {
+                            data.push(dataGroup[counter].average);
+                            counter++;
+                        }
+                        else {
+                            data.push(0);
+                        }
+                    }
+
+                    let datasetLabel = groupedChartData[Object.keys(groupedChartData)[i]][0]['group'];
+                    let colorBG = colors[colorCounter];
+
+                    if(compare && c == 0) {
+                        datasetLabel = groupedChartData[Object.keys(groupedChartData)[i]][0]['group'].toString().concat(" - employee");
+                        colorBG = compareColors[colorCounter]
+                    }
+
                     datasets.push({
-                        label: groupedChartData[Object.keys(groupedChartData)[i]][0]['group'],
+                        label: datasetLabel,
                         data: data,
-                        backgroundColor: colors[colorCounter]
+                        backgroundColor: colorBG
                     });
 
                     colorCounter++;
                     if (colorCounter === colors.length - 1) colorCounter = 0;
                 }
-
-                setChartData(datasets);
 
                 for (let i = 0; i < res.data[0].table.length; i++) {
                     clientInfoList.push({
@@ -199,13 +238,30 @@ const Dashboard = () => {
                     });
                 }
 
-                setChartData(datasets);
-                setChartLoading(false);
-
+                if(compare && c === 0) {
+                    console.log(datasets)
+                    setCompareData([]);
+                    setCompareData(datasets);
+                }
+                else if(compare && c === 1) {
+                    console.log(compareData)
+                    console.log(datasets)
+                    for(let d = 0; d < compareData.length; d++) {
+                        datasets.push(compareData[d]);
+                    }
+                    setChartData(datasets);
+                    setChartLoading(false);
+                }
+                else if(!compare){
+                    setChartData(datasets);
+                    setChartLoading(false);
+                }
+                
                 setClientNameCountry(clientInfoList);
             })
             .catch((error) => {
                 setChartLoading(false);
+                console.log(error)
 
                 if (error.response) {
                     if (error.response.status === 403 || error.response.status === 401) {
@@ -219,13 +275,23 @@ const Dashboard = () => {
                     console.log("Could not reach b&C Engine...");
                 }
             });
+        }
     }
 
     const loadChartData = async (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+
         if(!chartLoading) {
+            const newErrors = findCriteriaErrors();
+
+            setErrors(newErrors);
+            if (Object.keys(newErrors).length !== 0) return;
+
             if (employeeCriteria.id !== "All") {
+                
                 if(compareEmployeeChecked) {
-                    await chart(); // ?
+                    await chart(employeeCriteria.id, true);
                 } else {
                     await chart(employeeCriteria.id);
                 }
@@ -234,15 +300,6 @@ const Dashboard = () => {
                 await chart();
             }
         }
-
-        event.preventDefault();
-        event.stopPropagation();
-
-        const newErrors = findCriteriaErrors();
-
-        setErrors(newErrors);
-        if (Object.keys(newErrors).length !== 0) return;
-        await chart();
     }
 
     const setField = (field, value) => {
@@ -314,7 +371,7 @@ const Dashboard = () => {
             <div className='mainContainer mainDiv'>
                 <div className="justify-content-center main">
                     <div className="container-criteria">
-                        <div className="card shadow my-3 mx-3 p-2">
+                        <div className="card shadow my-3 mx-3 px-3 py-2">
                             <h3 className="text-center">{t('dashboard.criteria.Title')}</h3>
 
                             <InputGroup className="my-2" >
@@ -327,7 +384,7 @@ const Dashboard = () => {
                                 />
                             </InputGroup>
 
-                            <Form.Group className="my-2  px-2" controlId="floatingModifyStartMonth">
+                            <Form.Group className="my-2" controlId="floatingModifyStartMonth">
                                 <Form.Label>{t('dashboard.criteria.StartDateLabel')}</Form.Label>
                                 <div className='row'>
                                     <div className='col-md-6 col-sm-6'>
@@ -373,7 +430,7 @@ const Dashboard = () => {
                                 </div>
                             </Form.Group>
 
-                            <Form.Group className="my-2  px-2" controlId="floatingModifyEndMonth">
+                            <Form.Group className="my-2" controlId="floatingModifyEndMonth">
                                 <Form.Label>{t('dashboard.criteria.EndDateLabel')}</Form.Label>
                                 <div className='row'>
                                     <div className='col-md-6 col-sm-6'>
@@ -417,7 +474,7 @@ const Dashboard = () => {
                                 </div>
                             </Form.Group>
 
-                            <FormLabel htmlFor="employeeCriteriaDashboard" className="ms-1">{t('dashboard.criteria.labels.Employee')}</FormLabel>
+                            <FormLabel htmlFor="employeeCriteriaDashboard" className="mt-2">{t('dashboard.criteria.labels.Employee')}</FormLabel>
                             <InputGroup className="mb-2">
          
                                 {employeeCriteria.name !== "All"}
@@ -473,7 +530,7 @@ const Dashboard = () => {
                             <Button
                                 id='loadChartButton'
                                 onClick={loadChartData}
-                                className='my-2 mx-2 d-flex justify-content-center'
+                                className='my-2 d-flex justify-content-center'
                                 variant='primary'>
                                     {chartLoading 
                                     ? 
@@ -568,9 +625,9 @@ const Dashboard = () => {
                                             <tr key={index}>
                                                 <td id="clientName">{client.name}</td>
                                                 <td id="clientCountry" className='row-style'>{client.country}</td>
-                                                <td id="clientAverageCollectionDays" className='row-style'>23</td>
-                                                <td id="clientAmountOwed" className='amount-owed'>55645</td>
-                                                <td id="clientAmountDue" className='amount-due'>66643</td>
+                                                <td id="clientAverageCollectionDays" className='row-style'>0</td>
+                                                <td id="clientAmountOwed" className='amount-owed'>0</td>
+                                                <td id="clientAmountDue" className='amount-due'>0</td>
                                                 <td id="clientGrading" className='row-style'>{client.clientgrading}</td>
                                                 <td id="clientStatus" className='row-style'>Active</td>
                                             </tr>
