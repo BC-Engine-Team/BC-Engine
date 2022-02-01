@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
-import { InputGroup, FormControl, Button } from 'react-bootstrap'
 import { useTranslation } from 'react-i18next';
 import Form from 'react-bootstrap/Form'
 import Axios from 'axios';
@@ -10,8 +9,6 @@ import Table from 'react-bootstrap/Table'
 import '../styles/clientTable.css'
 import '../styles/dashboardPage.css'
 import { InputGroup, FormControl, Button, ButtonGroup, DropdownButton, Dropdown } from 'react-bootstrap'
-
-import { useTranslation } from 'react-i18next';
 import { Bar } from 'react-chartjs-2';
 import {
     Chart as ChartJS,

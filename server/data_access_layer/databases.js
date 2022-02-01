@@ -70,8 +70,8 @@ db.sync = async (database, options) => {
       await db[database].chartReports.bulkCreate([
         {
           name: 'CR1',
-          startDate: new Date(),
-          endDate: new Date(),
+          startDate: new Date(2019, 11, 1),
+          endDate: new Date(2019, 11, 1),
           employee1Id: 12345,
           employee1Name: 'France Cote',
           country: 'Canada',
@@ -82,8 +82,8 @@ db.sync = async (database, options) => {
         },
         {
           name: 'CR2',
-          startDate: new Date(),
-          endDate: new Date(),
+          startDate: new Date(2019, 11, 1),
+          endDate: new Date(2019, 11, 1),
           employee1Id: -1,
           employee1Name: 'All',
           employee2Id: 12345,
@@ -96,8 +96,8 @@ db.sync = async (database, options) => {
         },
         {
           name: 'CR3',
-          startDate: new Date(),
-          endDate: new Date(),
+          startDate: new Date(2019, 11, 1),
+          endDate: new Date(2019, 11, 1),
           employee1Id: 12345,
           employee1Name: 'France Cote',
           country: 'All',
