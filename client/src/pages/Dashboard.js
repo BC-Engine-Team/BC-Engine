@@ -268,6 +268,7 @@ const Dashboard = () => {
                     console.log("Could not reach b&C Engine...");
                 }
             });
+            /*eslint no-loop-func: 0*/
         }
     }
 
