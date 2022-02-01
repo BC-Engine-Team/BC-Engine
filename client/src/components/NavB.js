@@ -1,5 +1,3 @@
-import Navbar from 'react-bootstrap/Navbar'
-import Nav from 'react-bootstrap/Nav'
 import { LinkContainer } from "react-router-bootstrap"
 import logo from '../Images/logo.png'
 import { useState } from 'react'
@@ -7,7 +5,7 @@ import Axios from 'axios'
 import { useNavigate } from 'react-router-dom'
 import Cookies from 'universal-cookie'
 import { useTranslation } from 'react-i18next';
-import { Container, NavDropdown } from 'react-bootstrap'
+import { Container, NavDropdown, Nav, Navbar } from 'react-bootstrap'
 
 const NavB = (props) => {
     const [page] = useState(props);
@@ -44,19 +42,8 @@ const NavB = (props) => {
     const logout = () => {
         let refreshToken = cookies.get("refreshToken");
 
-        if (refreshToken === undefined) {
-            cookies.remove("refreshToken");
-            cookies.remove("accessToken");
-            cookies.remove("username");
-            cookies.remove("role");
-            navigate("/login");
-        }
-        else {
-            navigate("/login");
-            cookies.remove("refreshToken");
-            cookies.remove("accessToken");
-            cookies.remove("username");
-            cookies.remove("role");
+        if (refreshToken !== undefined) {
+            
             let conf = {
                 headers: {
                     authorization: "Bearer " + refreshToken
@@ -67,11 +54,7 @@ const NavB = (props) => {
                 .then((response) => {
 
                     if (response.status === 204) {
-                        cookies.remove("refreshToken");
-                        cookies.remove("accessToken");
-                        cookies.remove("username");
-                        cookies.remove("role");
-                        navigate("/login");
+                       // Future pop-up animation
                     }
                 })
                 .catch((error) => {
@@ -86,13 +69,14 @@ const NavB = (props) => {
                     else if (error.request) {
                         console.log("Could not reach b&C Engine...");
                     }
-                    cookies.remove("refreshToken");
-                    cookies.remove("accessToken");
-                    cookies.remove("username");
-                    cookies.remove("role");
-                    navigate("/login");
                 });
         }
+
+        navigate("/login");
+        cookies.remove("refreshToken");
+        cookies.remove("accessToken");
+        cookies.remove("username");
+        cookies.remove("role");
     }
 
     //For Login page navBar
@@ -131,7 +115,7 @@ const NavB = (props) => {
         )
     }
 
-    //When user is loged in, show app's Admin navBar
+    // When user is loged in, show app's Admin navBar
     else {
         return (
             <Navbar variant="dark" bg="dark" expand="md" className="mb-2" collapseOnSelect>

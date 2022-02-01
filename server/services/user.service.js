@@ -1,13 +1,14 @@
 const databases = require("../data_access_layer/databases");
 const User = databases['localdb'].users;
-const UserDAO = require('../data_access_layer/daos/user.dao');
+const UserDAO  = require('../data_access_layer/daos/user.dao');
 const Op = databases.Sequelize.Op;
 
 exports.createUser = async (user) => {
     return new Promise((resolve, reject) => {
         UserDAO.createUser(user)
             .then(async data => {
-                resolve(data);
+                if(data)resolve(data);
+                resolve(false);
             })
             .catch(err => {
                 reject(err);
@@ -29,7 +30,7 @@ exports.getAllUsers = async () => {
                     });
                     resolve(sortedUser);
                 }
-                resolve("Could not get all users.");
+                resolve(false);
             })
             .catch(err => {
                 reject(err);
@@ -51,7 +52,6 @@ exports.authenticateUser = async (user) => {
         }).catch(err => {
             const response = {
                 status: 500,
-                data: {},
                 message: err.message || "some error occured"
             }
             reject(response);
@@ -63,7 +63,8 @@ exports.modifyUser = async (user) => {
     return new Promise((resolve, reject) => {
         UserDAO.updateUser(user)
             .then(async data => {
-                resolve(data);
+                if(data) resolve(data);
+                resolve(false);
             })
             .catch(err => {
                 reject(err);
@@ -75,7 +76,8 @@ exports.deleteUser = async (email) => {
     return new Promise((resolve, reject) => {
         UserDAO.deleteUser(email)
             .then(async data => {
-                resolve(data);
+                if(data) resolve(data);
+                resolve(false)
             })
             .catch(err => {
                 reject(err);

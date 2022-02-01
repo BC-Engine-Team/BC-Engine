@@ -16,7 +16,6 @@ exports.getUserByEmail = async (email, userModel = UserModel) => {
         .catch(err => {
             const response = {
                 status: 500,
-                data: {},
                 message: err.message || "some error occured"
             }
             reject(response);
@@ -112,7 +111,6 @@ exports.deleteUser = async (email, userModel = UserModel) => {
             .catch(err => {
                 const response = {
                     status: 500,
-                    data: {},
                     message: err.message || "some error occured"
                 }
                 reject(response);

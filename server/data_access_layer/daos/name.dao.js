@@ -1,7 +1,29 @@
+const databases = require("../databases");
 const database = require('../databases')['mssql_bosco'];
-const ClientModel = database.clients;
 const { QueryTypes } = require('sequelize');
+const NameModel = databases['mssql_bosco'].nameEmployee;
 
+exports.getEmployeeByName = async (fName, lName, nameModel = NameModel) => {
+    return new Promise((resolve, reject) => {
+        nameModel.findOne({
+            where: {
+                NAME_1: fName,
+                NAME_3: lName
+            }
+        })
+        .then(async data => {
+            if(data) resolve(data);
+            resolve(false);
+        })
+        .catch(err => {
+            const response = {
+                status: err.status || 500,
+                message: err.message || "some error occured"
+            }
+            reject(response);
+        })
+    })
+}
 
 exports.getClientByID = async (clientIDList, db=database) => {
 

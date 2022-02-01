@@ -4,8 +4,7 @@ import Cookies from 'universal-cookie'
 import { useTranslation } from 'react-i18next';
 import Axios from 'axios';
 
-import Table from 'react-bootstrap/Table'
-import Button from 'react-bootstrap/Button'
+import { Button, Table } from 'react-bootstrap'
 
 import NavB from '../components/NavB'
 import DeleteButton from '../components/DeleteButton'

@@ -139,10 +139,35 @@ describe("Test Authentication Service", () => {
             });
         });
     });
+
+    describe("A32 - refreshToken", () => {
     
-    describe("AS3 - getTokens", () => {
-        describe("AS3.1 - given a valid user", () => {
-            it("AS3.1.1 - should return access and refresh token for given user", () => {
+        describe("AS3.1 - given no token in header", () =>{
+            it("AS3.1.1 - should return 403 Forbidden", async () =>{
+                // act
+                const response = await request.post("/api/users/refresh")
+                .set("authorization", `Bearer 545`)
+                .send(reqEmp);
+
+                // assert
+                expect(response.status).toBe(403);
+            });
+
+            it("AS3.1.2 - should return 401 Forbidden", async () =>{
+                // act
+                const response = await request.post("/api/users/refresh")
+                .set("authorization", `Bearer `)
+                .send(reqEmp);
+
+                // assert
+                expect(response.status).toBe(401);
+            });
+        });
+    });
+    
+    describe("AS4 - getTokens", () => {
+        describe("AS4.1 - given a valid user", () => {
+            it("AS4.1.1 - should return access and refresh token for given user", () => {
                 // act
                 const [aToken, rToken] = AuthService.getTokens(reqUser);
         
@@ -165,11 +190,6 @@ describe("Test Authentication Service", () => {
                 expect(rTokenPayload.exp);
             });
         });
-
-        describe("AS3.2 - given invalid user", () => {
-
-        });
-        
     });
 });
 

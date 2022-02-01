@@ -8,11 +8,7 @@ import Icon from '@mdi/react'
 import { mdiEye } from '@mdi/js';
 import { mdiEyeOff } from '@mdi/js';
 
-import CloseButton from 'react-bootstrap/CloseButton'
-import Button from 'react-bootstrap/Button'
-import Alert from 'react-bootstrap/Alert'
-import Form from 'react-bootstrap/Form'
-import FloatingLabel from 'react-bootstrap/esm/FloatingLabel'
+import { Form, CloseButton, Button, Alert, FloatingLabel } from 'react-bootstrap'
 
 const UsersForm = (props) => {
     let navigate = useNavigate();

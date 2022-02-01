@@ -1,14 +1,13 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
+import { Form, Table, InputGroup, FormControl, FormLabel, Button, ButtonGroup, OverlayTrigger, DropdownButton, Dropdown, Tooltip as ToolTipBootstrap, FormCheck } from 'react-bootstrap';
 import { useTranslation } from 'react-i18next';
-import Form from 'react-bootstrap/Form'
 import Axios from 'axios';
 import Cookies from 'universal-cookie';
 import NavB from '../components/NavB'
-import Table from 'react-bootstrap/Table'
 import '../styles/clientTable.css'
 import '../styles/dashboardPage.css'
-import { InputGroup, FormControl, Button, ButtonGroup, DropdownButton, Dropdown } from 'react-bootstrap'
+import { Oval } from  'react-loader-spinner'
 import { Bar } from 'react-chartjs-2';
 import {
     Chart as ChartJS,
@@ -30,6 +29,8 @@ ChartJS.register(
 );
 
 const Dashboard = () => {
+
+    let counter = 1;
     let navigate = useNavigate();
     const cookies = new Cookies();
     const { t } = useTranslation();
@@ -64,6 +65,14 @@ const Dashboard = () => {
         'rgb(173, 247, 182)'
     ];
 
+    let compareColors = [
+        'rgb(255, 139, 77)',
+        'rgb(127, 101, 129)',
+        'rgb(255, 224, 51)',
+        'rgb(65, 144, 164)',
+        'rgb(46, 234, 68)'
+    ]
+
     const fallbackChartData = [
         {
             label: chartFallbackLegendLabel,
@@ -72,15 +81,13 @@ const Dashboard = () => {
         }
     ];
 
+    const [chartData, setChartData] = useState(fallbackChartData);
+    const [chartLoading, setChartLoading] = useState(false);
     const currentYear = new Date().getFullYear();
     const currentMonth = new Date().getMonth();
     const earliestYear = 2009;
-
-    const [chartData, setChartData] = useState(fallbackChartData);
     const [authorized, setAuthorized] = useState(false);
     const [clientNameCountry, setClientNameCountry] = useState([{ name: "", country: "", clientgrading: "" }]);
-
-
 
     const [errors, setErrors] = useState({});
     const [criteria, setCriteria] = useState({
@@ -96,17 +103,23 @@ const Dashboard = () => {
     const [startMonthList, setStartMonthList] = useState([]);
     const [endMonthList, setEndMonthList] = useState([]);
 
-    const chart = async () => {
-        let clientInfoList = [];
+    const [employeeSelect, SetEmployeeSelect] = useState([]);
+
+    // Criteria
+    const [compareEmployeeChecked, setCompareEmployeeChecked] = useState(false);
+    const [employeeCriteria, SetEmployeeCriteria] = useState({
+        id: "All",
+        name: "All"
+    });
+
+    const createEmployeeCriteria = async () => {
+        let listEmployee = [];
 
         let header = {
             'authorization': "Bearer " + cookies.get("accessToken"),
         }
 
-        let startDate = new Date(criteria.startYear, criteria.startMonth, 1).toISOString().split("T")[0];
-        let endDate = new Date(criteria.endYear, criteria.endMonth, 1).toISOString().split("T")[0];
-
-        await Axios.get(`${process.env.REACT_APP_API}/invoice/defaultChartAndTable/${startDate}/${endDate}`, { headers: header })
+        await Axios.get(`${process.env.REACT_APP_API}/invoice/employees`, { headers: header })
             .then((res) => {
                 if (res.status === 403 && res.status === 401) {
                     setAuthorized(false);
@@ -114,34 +127,15 @@ const Dashboard = () => {
                 }
                 setAuthorized(true);
 
-                let datasets = [];
-                let groupedChartData = res.data[0].chart;
+                for(let i = 0; i < res.data.length; i++) {
 
-                let colorCounter = 0;
-                for (let i = 0; i < Object.keys(groupedChartData).length; i++) {
-                    const data = groupedChartData[Object.keys(groupedChartData)[i]].map(m => m.average)
-                    datasets.push({
-                        label: groupedChartData[Object.keys(groupedChartData)[i]][0]['group'],
-                        data: data,
-                        backgroundColor: colors[colorCounter]
-                    });
-
-                    colorCounter++;
-                    if (colorCounter === colors.length - 1) colorCounter = 0;
-                }
-
-                setChartData(datasets);
-
-                for (let i = 0; i < res.data[0].table.length; i++) {
-                    clientInfoList.push({
-                        name: res.data[0].table[i].name,
-                        country: res.data[0].table[i].country,
-                        clientgrading: res.data[0].table[i].grading
+                    listEmployee.push({
+                        label: res.data[i].firstName + " " + res.data[i].lastName,
+                        value: res.data[i].nameID
                     });
                 }
 
-
-                setClientNameCountry(clientInfoList);
+                SetEmployeeSelect(listEmployee);
             })
             .catch((error) => {
                 if (error.response) {
@@ -158,15 +152,148 @@ const Dashboard = () => {
             });
     }
 
+    const chart = async (employeeId = undefined, compare = false) => {
+        setChartLoading(true);
+        setChartData(fallbackChartData);
+        let compareData = [];
+
+        let arrayLength = 1;
+        if(compare) arrayLength = 2;
+        for(let c = 0; c < arrayLength; c++) {
+            let clientInfoList = [];
+
+            let header = {
+                'authorization': "Bearer " + cookies.get("accessToken"),
+            }
+
+            let startDate = new Date(criteria.startYear, criteria.startMonth, 1).toISOString().split("T")[0];
+            let endDate = new Date(criteria.endYear, criteria.endMonth, 1).toISOString().split("T")[0];
+
+            let param = {};
+            if(employeeId !== undefined) {
+                param = {
+                    employeeId: employeeId
+                }
+            }
+            if(c === 1) {
+                param = {};
+            }
+
+            await Axios.get(`${process.env.REACT_APP_API}/invoice/defaultChartAndTable/${startDate}/${endDate}`, { params: param, headers: header })
+            .then((res) => {
+                if (res.status === 403 && res.status === 401) {
+                    setAuthorized(false);
+                    return;
+                }
+                setAuthorized(true);
+
+                let datasets = [];
+                let groupedChartData = res.data[0].chart;
+
+                let colorCounter = 0;
+
+                for (let i = 0; i < Object.keys(groupedChartData).length; i++) {
+                    let data = [];
+                    const dataGroup = groupedChartData[Object.keys(groupedChartData)[i]];
+                    let startMonth = parseInt(dataGroup[0].month.toString().substring(4)) - 1;
+                    let endMonth = parseInt(dataGroup[dataGroup.length - 1].month.toString().substring(4)) - 1;
+                    let counter = 0;
+
+                    for (let j = 0; j < 12; j++) {
+                        if (j >= startMonth && j <= endMonth) {
+                            data.push(dataGroup[counter].average);
+                            counter++;
+                        }
+                        else {
+                            data.push(0);
+                        }
+                    }
+
+                    let datasetLabel = groupedChartData[Object.keys(groupedChartData)[i]][0]['group'];
+                    let colorBG = colors[colorCounter];
+
+                    if(compare && c === 0) {
+                        datasetLabel = groupedChartData[Object.keys(groupedChartData)[i]][0]['group'].toString().concat(" - employee");
+                        colorBG = compareColors[colorCounter]
+                    }
+
+                    datasets.push({
+                        label: datasetLabel,
+                        data: data,
+                        backgroundColor: colorBG
+                    });
+
+                    colorCounter++;
+                    if (colorCounter === colors.length - 1) colorCounter = 0;
+                }
+
+                for (let i = 0; i < res.data[0].table.length; i++) {
+                    clientInfoList.push({
+                        name: res.data[0].table[i].name,
+                        country: res.data[0].table[i].country,
+                        clientgrading: res.data[0].table[i].grading
+                    });
+                }
+
+                if(compare && c === 0) {
+                    compareData = datasets;
+                }
+                else if(compare && c === 1) {
+                    for(let d = 0; d < compareData.length; d++) {
+                        datasets.push(compareData[d]);
+                    }
+
+                    setChartData(datasets);
+                    setChartLoading(false);
+                }
+                else if(!compare){
+                    setChartData(datasets);
+                    setChartLoading(false);
+                }
+                
+                setClientNameCountry(clientInfoList);
+            })
+            .catch((error) => {
+                setChartLoading(false);
+
+                if (error.response) {
+                    if (error.response.status === 403 || error.response.status === 401) {
+                        console.log(error.response.body);
+                    }
+                    else {
+                        console.log("Malfunction in the B&C Engine...");
+                    }
+                }
+                else if (error.request) {
+                    console.log("Could not reach b&C Engine...");
+                }
+            });
+            /*eslint no-loop-func: 0*/
+        }
+    }
+
     const loadChartData = async (event) => {
         event.preventDefault();
         event.stopPropagation();
 
-        const newErrors = findCriteriaErrors();
+        if(!chartLoading) {
+            const newErrors = findCriteriaErrors();
 
-        setErrors(newErrors);
-        if (Object.keys(newErrors).length !== 0) return;
-        await chart();
+            setErrors(newErrors);
+            if (Object.keys(newErrors).length !== 0) return;
+
+            if (employeeCriteria.id !== "All") {
+                
+                if(compareEmployeeChecked) {
+                    await chart(employeeCriteria.id, true);
+                } else {
+                    await chart(employeeCriteria.id);
+                }
+            }
+            else {
+                await chart();
+            }
+        }
     }
 
     const setField = (field, value) => {
@@ -217,7 +344,6 @@ const Dashboard = () => {
         setEndMonthList(months);
     }
 
-
     useEffect(() => {
         if (cookies.get("accessToken") === undefined) {
             navigate("/login");
@@ -227,11 +353,11 @@ const Dashboard = () => {
         }
 
         chart();
+        createEmployeeCriteria();
         initCriteria();
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
-
 
     return (
         <div>
@@ -239,17 +365,20 @@ const Dashboard = () => {
             <div className='mainContainer mainDiv'>
                 <div className="justify-content-center main">
                     <div className="container-criteria">
-                        <div className="card shadow my-3 mx-3">
-                            <InputGroup className="my-2  px-2" >
+                        <div className="card shadow my-3 mx-3 px-3 py-2">
+                            <h3 className="text-center">{t('dashboard.criteria.Title')}</h3>
+
+                            <InputGroup className="my-2" >
                                 <FormControl
                                     id='chartName'
+                                    className="my-1"
                                     placeholder={chartReportNamePlaceHolder}
                                     aria-label="Username"
                                     aria-describedby="basic-addon1"
                                 />
                             </InputGroup>
 
-                            <Form.Group className="my-2  px-2" controlId="floatingModifyStartMonth">
+                            <Form.Group className="my-2" controlId="floatingModifyStartMonth">
                                 <Form.Label>{t('dashboard.criteria.StartDateLabel')}</Form.Label>
                                 <div className='row'>
                                     <div className='col-md-6 col-sm-6'>
@@ -295,7 +424,7 @@ const Dashboard = () => {
                                 </div>
                             </Form.Group>
 
-                            <Form.Group className="my-2  px-2" controlId="floatingModifyEndMonth">
+                            <Form.Group className="my-2" controlId="floatingModifyEndMonth">
                                 <Form.Label>{t('dashboard.criteria.EndDateLabel')}</Form.Label>
                                 <div className='row'>
                                     <div className='col-md-6 col-sm-6'>
@@ -339,16 +468,81 @@ const Dashboard = () => {
                                 </div>
                             </Form.Group>
 
+                            <FormLabel htmlFor="employeeCriteriaDashboard" className="mt-2">{t('dashboard.criteria.labels.Employee')}</FormLabel>
+                            <InputGroup className="mb-2">
+         
+                                {employeeCriteria.name !== "All"}
+                                    <OverlayTrigger
+                                        placement="top"
+                                        overlay={employeeCriteria.name !== "All" ?
+                                            <ToolTipBootstrap id="compareBTN-tooltip" className="transparent">
+                                                {employeeCriteria.name}
+                                            </ToolTipBootstrap> : <></>
+                                        } >
+
+                                        <FormControl id="employeeCriteriaDashboard" as="select" onChange={e => SetEmployeeCriteria({
+                                                id: e.target.value.split("/")[0], 
+                                                name: e.target.value.split("/")[1]
+                                            })}>
+
+                                            <option key="1" value="All/All">{t('dashboard.criteria.All')}</option>
+                                            {employeeSelect.map(e => {
+                                                counter++
+                                                return (
+                                                    <option key={counter} value={e.value + "/" + e.label}>{e.label}</option>
+                                                )
+                                            })}
+                                        </FormControl>
+                                    </OverlayTrigger>
+
+                                <OverlayTrigger
+                                    placement="top"
+                                    overlay={
+                                        <ToolTipBootstrap id="compareBTN-tooltip">
+                                            {t('dashboard.criteria.Compare')}
+                                        </ToolTipBootstrap>
+                                    } >
+
+                                    <Button 
+                                        id="compareToAllBTN" 
+                                        variant="light" 
+                                        disabled={employeeCriteria.id === "All"}
+                                        onClick={() => setCompareEmployeeChecked(!compareEmployeeChecked)}
+                                        className="btn btn-light shadow-sm border inputSelect ms-1">
+
+                                            <FormCheck 
+                                            type="switch" 
+                                            label={t('dashboard.criteria.CompareBTN')}
+                                            disabled={employeeCriteria.id === "All"}
+                                            checked={compareEmployeeChecked}
+                                            />
+                                    </Button>
+                                </OverlayTrigger>
+
+                            </InputGroup>
+
                             <Button
                                 id='loadChartButton'
                                 onClick={loadChartData}
-                                className='my-2 mx-2'
-                                variant='primary'>{loadChartButtonText}
+                                className='my-2 d-flex justify-content-center'
+                                variant='primary'>
+                                    {chartLoading 
+                                    ? 
+                                    <span className='me-3 align-self-center'>
+                                        <Oval 
+                                            height="20"
+                                            width="20"
+                                            color='black'
+                                            ariaLabel='loading' />
+                                    </span>
+                                    : 
+                                    <></>}
+                                    {loadChartButtonText}
                             </Button>
                         </div>
                     </div>
                     <div className="container-chart">
-                        <div className="card shadow my-3 mx-3">
+                        <div className="card shadow my-3 mx-3 p-2 pt-3">
                             {chartData &&
                                 <Bar
                                     id='chart'
@@ -425,9 +619,9 @@ const Dashboard = () => {
                                             <tr key={index}>
                                                 <td id="clientName">{client.name}</td>
                                                 <td id="clientCountry" className='row-style'>{client.country}</td>
-                                                <td id="clientAverageCollectionDays" className='row-style'>23</td>
-                                                <td id="clientAmountOwed" className='amount-owed'>55645</td>
-                                                <td id="clientAmountDue" className='amount-due'>66643</td>
+                                                <td id="clientAverageCollectionDays" className='row-style'>0</td>
+                                                <td id="clientAmountOwed" className='amount-owed'>0</td>
+                                                <td id="clientAmountDue" className='amount-due'>0</td>
                                                 <td id="clientGrading" className='row-style'>{client.clientgrading}</td>
                                                 <td id="clientStatus" className='row-style'>Active</td>
                                             </tr>

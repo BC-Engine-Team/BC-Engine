@@ -50,6 +50,13 @@
     },
     "dashboard": {
        "criteria": {
+          "Title":"Filtres du graphique",
+          "Compare":"Comparer l'employé selectionné avec tous les employés",
+          "CompareBTN":"Comparer",
+          "All":"Tous",
+          "labels": {
+             "Employee":"Employé"
+          },
          "NamePlaceHolder": "Entrez le nom de votre Rapport Graphique",
          "LoadChartButton": "Mettre à jour le Graphique",
          "StartDateLabel": "Mois de début",

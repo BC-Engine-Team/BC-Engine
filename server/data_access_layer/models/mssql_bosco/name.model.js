@@ -1,29 +1,26 @@
 module.exports = (mssql_bosco, DataTypes) => {
-    const Client = mssql_bosco.define("NAME", {
-        nameId:{
+    const Name = mssql_bosco.define("NAME", {
+        nameID: {
             field: 'NAME_ID',
-            type: DataTypes.INTEGER
+            type: DataTypes.INTEGER,
+            primaryKey: true
         },
-        name1: {
+        firstName: {
             field: 'NAME_1',
             type: DataTypes.STRING
         },
-        name2: {
-            field: 'NAME_2',
-            type: DataTypes.STRING
-        },
-        name3: {
+        lastName: {
             field: 'NAME_3',
             type: DataTypes.STRING
         }
     },
     {
-        modelName: 'Client',
+        modelName: 'Name',
         tableName: 'NAME',
         underscore: true,
         timestamps: false
     });
 
-    Client.removeAttribute('id');
-    return Client;
+    Name.removeAttribute('id');
+    return Name;
 };
