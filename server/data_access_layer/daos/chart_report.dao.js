@@ -11,7 +11,6 @@ exports.getChartReportsByUserId = async (userId, chartReportModel = ChartReportM
             order: [['name', 'ASC']]
         }).then(async data => {
             if (data) {
-                console.log(data)
                 resolve(data)
             }
             resolve(false);
