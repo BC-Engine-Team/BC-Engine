@@ -214,7 +214,7 @@ const Dashboard = () => {
                     let datasetLabel = groupedChartData[Object.keys(groupedChartData)[i]][0]['group'];
                     let colorBG = colors[colorCounter];
 
-                    if(compare && c == 0) {
+                    if(compare && c === 0) {
                         datasetLabel = groupedChartData[Object.keys(groupedChartData)[i]][0]['group'].toString().concat(" - employee");
                         colorBG = compareColors[colorCounter]
                     }
