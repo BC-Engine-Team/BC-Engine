@@ -322,7 +322,7 @@ const Dashboard = () => {
         if (parseInt(endMonth) < parseInt(startMonth) && parseInt(startYear) === parseInt(endYear))
             newErrors.endMonth = t("dashboard.criteria.EndMonthExceedError");
 
-        if (parseInt(endMonth) > currentMonth && endYear === currentYear.toString())
+        if (parseInt(endMonth) > parseInt(currentMonth) && parseInt(endYear) === parseInt(currentYear.toString()))
             newErrors.endMonth = t("dashboard.criteria.EndMonthExceedCurrentError");
 
         // startMonth errors
