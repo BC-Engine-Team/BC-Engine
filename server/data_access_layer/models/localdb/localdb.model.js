@@ -85,6 +85,10 @@ module.exports = (localdb, Sequelize) => {
             field: 'chart_report_emp2_name',
             type: Sequelize.STRING
         },
+        countryId: {
+            field: 'chart_report_country_id',
+            type: Sequelize.STRING
+        },
         country: {
             field: 'chart_report_country',
             type: Sequelize.STRING
@@ -107,8 +111,9 @@ module.exports = (localdb, Sequelize) => {
     ChartReport.belongsTo(User, {
         foreignKey: {
             name: 'user_user_id',
-            allowNull: false
-        }
+            allowNull: false,
+        },
+        onDelete: 'CASCADE'
     });
 
     return [User, ChartReport];

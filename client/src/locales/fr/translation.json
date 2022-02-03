@@ -50,6 +50,8 @@
     },
     "dashboard": {
        "criteria": {
+         "SaveChartButton":"Sauvegarder le Graphique",
+         "CreateNewChartButton":"Créer un Graphique",
           "Title":"Filtres du graphique",
           "Compare":"Comparer l'employé selectionné avec tous les employés",
           "CompareBTN":"Comparer",
@@ -64,7 +66,8 @@
          "StartMonthExceedCurrentError": "Mois de début ne peut pas être après le mois actuel.",
          "EndMonthExceedError": "Mois de fin ne peut pas être avant le Mois de début.",
          "EndMonthExceedCurrentError": "Mois de fin ne peut pas être après le mois actuel.",
-         "EndYearExceedError": "Année de fin ne peut pas être avant l'Année de début."
+         "EndYearExceedError": "Année de fin ne peut pas être avant l'Année de début.",
+         "SaveConfirmPrompt": "Êtes-vous certain de vouloir sauvegarder "
        },
        "chart": {
           "Title": "Moyenne de Jour de Collection par Mois",
