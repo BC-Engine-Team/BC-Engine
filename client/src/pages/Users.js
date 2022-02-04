@@ -224,7 +224,6 @@ const Users = () => {
                                             <td className="py-1">
                                                 <div className="d-flex justify-content-center">
                                                     <EditButton onEdit={() => editUser(u.email, u.role)} />
-
                                                     <DeleteButton onDelete={() => handleDeleteUser(u.email)} />
                                                 </div>
                                             </td>
