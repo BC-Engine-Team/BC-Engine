@@ -1,7 +1,7 @@
 # B&C Engine
 
 B&C Engine was created specially to communicate with an existing application used by the company Benoit & Côté.
-The goal of the application is for the comapny's managers and employees to be able to view their sales statistics, averages days of collection, billing goals and much more.
+The goal of the application is for the comapny's managers and employees to be able to view their sales statistics, averages days of collection, billing goals and much more. 
 
 Developed by `Jean-Christophe Benoit`, `Adam Mihajlovic` and `Nicolas Espitalier`.
 
