@@ -71,42 +71,123 @@ module.exports = (localdb, Sequelize) => {
         employee1Id: {
             field: 'chart_report_emp1',
             type: Sequelize.INTEGER,
-            allowNull: false
+            allowNull: false,
+            defaultValue: -1
         },
         employee1Name: {
             field: 'chart_report_emp1_name',
-            type: Sequelize.STRING
+            type: Sequelize.STRING,
+            defaultValue: 'All'
         },
         employee2Id: {
             field: 'chart_report_emp2',
-            type: Sequelize.INTEGER
+            type: Sequelize.INTEGER,
+            defaultValue: null
         },
         employee2Name: {
             field: 'chart_report_emp2_name',
-            type: Sequelize.STRING
+            type: Sequelize.STRING,
+            defaultValue: null
         },
         countryId: {
             field: 'chart_report_country_id',
-            type: Sequelize.STRING
+            type: Sequelize.STRING,
+            defaultValue: -1
         },
         country: {
             field: 'chart_report_country',
-            type: Sequelize.STRING
+            type: Sequelize.STRING,
+            defaultValue: 'All'
         },
         clientType: {
             field: 'chart_report_client_type',
-            type: Sequelize.STRING
+            type: Sequelize.STRING,
+            defaultValue: 'Any'
         },
         ageOfAccount: {
             field: 'chart_report_age_of_account',
-            type: Sequelize.STRING
+            type: Sequelize.STRING,
+            defaultValue: 'All'
         },
         accountType: {
             field: 'chart_report_account_type',
-            type: Sequelize.STRING
+            type: Sequelize.STRING,
+            defaultValue: 'Receivable'
         }
     },
         { underscored: true });
+
+    const ChartReportData = localdb.define("chart_reports_data", {
+        year: {
+            field: 'year',
+            type: Sequelize.INTEGER
+        },
+        employee: {
+            field: 'emp',
+            type: Sequelize.INTEGER,
+            defaultValue: -1
+        },
+        january: {
+            field: 'january',
+            type: Sequelize.FLOAT,
+            defaultValue: 0
+        },
+        february: {
+            field: 'february',
+            type: Sequelize.FLOAT,
+            defaultValue: 0
+        },
+        march: {
+            field: 'march',
+            type: Sequelize.FLOAT,
+            defaultValue: 0
+        },
+        april: {
+            field: 'april',
+            type: Sequelize.FLOAT,
+            defaultValue: 0
+        },
+        may: {
+            field: 'may',
+            type: Sequelize.FLOAT,
+            defaultValue: 0
+        },
+        june: {
+            field: 'june',
+            type: Sequelize.FLOAT,
+            defaultValue: 0
+        },
+        july: {
+            field: 'july',
+            type: Sequelize.FLOAT,
+            defaultValue: 0
+        },
+        august: {
+            field: 'august',
+            type: Sequelize.FLOAT,
+            defaultValue: 0
+        },
+        september: {
+            field: 'september',
+            type: Sequelize.FLOAT,
+            defaultValue: 0
+        },
+        october: {
+            field: 'october',
+            type: Sequelize.FLOAT,
+            defaultValue: 0
+        },
+        november: {
+            field: 'november',
+            type: Sequelize.FLOAT,
+            defaultValue: 0
+        },
+        december: {
+            field: 'december',
+            type: Sequelize.FLOAT,
+            defaultValue: 0
+        }
+    });
 
     ChartReport.belongsTo(User, {
         foreignKey: {
@@ -116,5 +197,13 @@ module.exports = (localdb, Sequelize) => {
         onDelete: 'CASCADE'
     });
 
-    return [User, ChartReport];
+    ChartReportData.belongsTo(ChartReport, {
+        foreignKey: {
+            name: 'chart_report_id',
+            allowNull: false
+        },
+        onDelete: 'CASCADE'
+    });
+
+    return [User, ChartReport, ChartReportData];
 };

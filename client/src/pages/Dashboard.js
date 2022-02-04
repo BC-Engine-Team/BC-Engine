@@ -30,8 +30,6 @@ ChartJS.register(
 );
 
 const Dashboard = () => {
-
-    let counter = 1;
     let navigate = useNavigate();
     const cookies = new Cookies();
     const { t } = useTranslation();
@@ -86,6 +84,9 @@ const Dashboard = () => {
     const [chartData, setChartData] = useState(fallbackChartData);
     const [chartLoading, setChartLoading] = useState(false);
     const [confirmSaveActivated, setConfirmSaveActivated] = useState(false);
+    const [chartSaved, setChartSaved] = useState(true);
+    const [navClicked, setNavClicked] = useState(false);
+
     const currentYear = new Date().getFullYear();
     const currentMonth = new Date().getMonth();
     const earliestYear = 2009;
@@ -93,12 +94,23 @@ const Dashboard = () => {
     const [clientNameCountry, setClientNameCountry] = useState([{ name: "", country: "", clientgrading: "" }]);
 
     const [errors, setErrors] = useState({});
+
+    // Criteria
+    const [compareEmployeeChecked, setCompareEmployeeChecked] = useState(false);
     const [criteria, setCriteria] = useState({
         name: "",
         startYear: currentYear - 2,
         startMonth: 0,
         endYear: currentMonth === 0 ? currentYear - 1 : currentYear,
         endMonth: currentMonth === 0 ? 11 : currentMonth - 1,
+        employee1: {
+            id: -1,
+            name: "All"
+        },
+        employee2: {
+            id: compareEmployeeChecked ? -1 : null,
+            name: compareEmployeeChecked ? "All" : null
+        },
         countryId: '-1',
         country: "All",
         clientType: "Any",
@@ -111,14 +123,7 @@ const Dashboard = () => {
     const [startMonthList, setStartMonthList] = useState([]);
     const [endMonthList, setEndMonthList] = useState([]);
 
-    const [employeeSelect, SetEmployeeSelect] = useState([]);
-
-    // Criteria
-    const [compareEmployeeChecked, setCompareEmployeeChecked] = useState(false);
-    const [employeeCriteria, SetEmployeeCriteria] = useState({
-        id: -1,
-        name: "All"
-    });
+    const [employeeSelect, setEmployeeSelect] = useState([]);
 
     const createEmployeeCriteria = async () => {
         let listEmployee = [];
@@ -136,14 +141,13 @@ const Dashboard = () => {
                 setAuthorized(true);
 
                 for (let i = 0; i < res.data.length; i++) {
-
                     listEmployee.push({
-                        label: res.data[i].firstName + " " + res.data[i].lastName,
-                        value: res.data[i].nameID
+                        name: res.data[i].firstName + " " + res.data[i].lastName,
+                        id: res.data[i].nameID
                     });
                 }
 
-                SetEmployeeSelect(listEmployee);
+                setEmployeeSelect(listEmployee);
             })
             .catch((error) => {
                 if (error.response) {
@@ -160,9 +164,10 @@ const Dashboard = () => {
             });
     }
 
-    const chart = async (employeeId = undefined, compare = false) => {
+    const chart = async (employeeId = -1, compare = false) => {
         setChartLoading(true);
         setChartData(fallbackChartData);
+        localStorage.setItem("dash_previous_criteria", JSON.stringify(criteria));
         let compareData = [];
 
         let arrayLength = 1;
@@ -178,7 +183,7 @@ const Dashboard = () => {
             let endDate = new Date(criteria.endYear, criteria.endMonth, 1).toISOString().split("T")[0];
 
             let param = {};
-            if (employeeId !== undefined) {
+            if (employeeId !== -1) {
                 param = {
                     employeeId: employeeId
                 }
@@ -210,7 +215,7 @@ const Dashboard = () => {
 
                         for (let j = 0; j < 12; j++) {
                             if (j >= startMonth && j <= endMonth) {
-                                data.push(dataGroup[counter].average);
+                                data.push(parseFloat(dataGroup[counter].average));
                                 counter++;
                             }
                             else {
@@ -260,6 +265,8 @@ const Dashboard = () => {
                         setChartLoading(false);
                     }
 
+                    localStorage.setItem("dash_previous_chart_data", JSON.stringify(datasets));
+
                     setClientNameCountry(clientInfoList);
                 })
                 .catch((error) => {
@@ -267,14 +274,14 @@ const Dashboard = () => {
 
                     if (error.response) {
                         if (error.response.status === 403 || error.response.status === 401) {
-                            console.log(error.response.body);
+                            alert("You are not authorized to perform this action.");
                         }
                         else {
-                            console.log("Malfunction in the B&C Engine...");
+                            alert("Malfunction in the B&C Engine...");
                         }
                     }
                     else if (error.request) {
-                        console.log("Could not reach b&C Engine...");
+                        alert("Could not reach b&C Engine...");
                     }
                 });
             /*eslint no-loop-func: 0*/
@@ -294,76 +301,98 @@ const Dashboard = () => {
     }
 
     const onSaveConfirmClick = async () => {
-        let header = {
-            'authorization': "Bearer " + cookies.get("accessToken"),
-        }
+        if (!chartLoading) {
+            const previouslyLoadedCriteriaStr = localStorage.getItem('dash_previous_criteria');
 
-        let data = {
-            name: criteria.name,
-            startDate: new Date(criteria.startYear, criteria.startMonth, 1),
-            endDate: new Date(criteria.endYear, criteria.endMonth, 1),
-            employee1Id: employeeCriteria.id,
-            employee1Name: employeeCriteria.name,
-            employee2Id: compareEmployeeChecked ? -1 : null,
-            employee2Name: compareEmployeeChecked ? "All" : null,
-            countryId: criteria.countryId,
-            country: criteria.country,
-            clientType: criteria.clientType,
-            ageOfAccount: criteria.ageOfAccount,
-            accountType: criteria.accountType,
-            user_user_id: cookies.get("userId")
-        }
+            if (!chartSaved && previouslyLoadedCriteriaStr !== JSON.stringify(criteria)) {
+                alert("Please load the chart by clicking on the 'Load Chart' button before saving it.")
+                return;
+            }
+            let header = {
+                'authorization': "Bearer " + cookies.get("accessToken"),
+            }
 
-        Axios.post(`${process.env.REACT_APP_API}/reports/chartReports`, data, { headers: header })
-            .then((response) => {
-                if (response.status === 200 || response.status === 201) {
-                    alert("Chart Report has been saved successfully!");
-                }
-            })
-            .catch((error) => {
-                if (error.response) {
-                    if (error.response.status === 403 || error.response.status === 401) {
-                        navigate("/login");
-                        alert("You are not authorized to perform this action.");
+            let data = {
+                chartReport: {
+                    name: criteria.name,
+                    startDate: new Date(criteria.startYear, criteria.startMonth, 1),
+                    endDate: new Date(criteria.endYear, criteria.endMonth, 1),
+                    employee1Id: criteria.employee1.id,
+                    employee1Name: criteria.employee1.name,
+                    employee2Id: compareEmployeeChecked ? -1 : null,
+                    employee2Name: compareEmployeeChecked ? "All" : null,
+                    countryId: criteria.countryId,
+                    country: criteria.country,
+                    clientType: criteria.clientType,
+                    ageOfAccount: criteria.ageOfAccount,
+                    accountType: criteria.accountType,
+                    user_user_id: cookies.get("userId")
+                },
+                chartReportData: chartData
+            }
+
+            Axios.post(`${process.env.REACT_APP_API}/reports/chartReport`, data, { headers: header })
+                .then((response) => {
+                    if (response.status === 200 || response.status === 201) {
+                        setChartSaved(true);
+                        alert("Chart Report has been saved successfully!");
                     }
-                    else {
-                        alert("Malfunction in the B&C Engine.");
+                })
+                .catch((error) => {
+                    if (error.response) {
+                        if (error.response.status === 403 || error.response.status === 401) {
+                            navigate("/login");
+                            alert("You are not authorized to perform this action.");
+                        }
+                        else {
+                            alert("Malfunction in the B&C Engine.");
+                        }
+                    } else if (error.request) {
+                        // The request was made but no response was received
+                        // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
+                        // http.ClientRequest in node.js
+                        alert("Could not reach the B&C Engine.");
                     }
-                } else if (error.request) {
-                    // The request was made but no response was received
-                    // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
-                    // http.ClientRequest in node.js
-                    alert("Could not reach the B&C Engine.");
-                }
-            });
-        setConfirmSaveActivated(false);
+                });
+            setConfirmSaveActivated(false);
+        }
     }
 
-    const loadChartData = async (event) => {
-        event.preventDefault();
-        event.stopPropagation();
+    const loadChartData = async () => {
 
         if (!chartLoading) {
             const newErrors = findCriteriaErrors();
 
-            setErrors(newErrors);
-            if (Object.keys(newErrors).length !== 0) return;
-
-            if (employeeCriteria.id !== "All") {
-
-                if (compareEmployeeChecked) {
-                    await chart(employeeCriteria.id, true);
-                } else {
-                    await chart(employeeCriteria.id);
+            if (Object.keys(newErrors).length !== 0) {
+                if (!(Object.keys(newErrors).length === 1 && Object.keys(newErrors)[0].toString() === 'name')) {
+                    delete newErrors['name'];
+                    setErrors(newErrors);
+                    return;
                 }
             }
-            else {
-                await chart();
-            }
+
+            setField('employee2', {
+                id: compareEmployeeChecked ? -1 : null,
+                name: compareEmployeeChecked ? "All" : null
+            }, true)
+
+            await chart(parseInt(criteria.employee1.id), compareEmployeeChecked);
         }
     };
 
-    const setField = (field, value) => {
+    const setField = (field, value, reset = false) => {
+        if (field === 'employee1' && parseInt(value.id) === -1) {
+            setCompareEmployeeChecked(false);
+            setField('employee2', {
+                id: null,
+                name: null
+            }, true);
+        }
+
+        if (field === 'employee2' && !reset) {
+            setCompareEmployeeChecked(!compareEmployeeChecked);
+        }
+
         setCriteria({
             ...criteria,
             [field]: value
@@ -375,6 +404,7 @@ const Dashboard = () => {
                 [field]: null
             });
         }
+        setChartSaved(false);
     };
 
     const findCriteriaErrors = () => {
@@ -415,24 +445,31 @@ const Dashboard = () => {
         setEndMonthList(months);
     };
 
+    const [pageToNavigateTo, setPageToNavigateTo] = useState("/reports");
+    const handleNavClick = async (whereTo) => {
+        setPageToNavigateTo("/" + whereTo.split("/").at(-1));
+        if (chartSaved) {
+            navigate("/" + whereTo.split("/").at(-1))
+        }
+        setNavClicked(true)
+    }
+
     useEffect(() => {
         if (cookies.get("accessToken") === undefined) {
             navigate("/login");
         }
-        else if (cookies.get("role") !== "admin") {
-            setAuthorized(false);
-        }
 
-        chart();
         createEmployeeCriteria();
         initCriteria();
+        chart();
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     return (
         <div>
-            <NavB />
+            <NavB page="dashboard"
+                handleNavClick={handleNavClick} />
             <div className='mainContainer mainDiv'>
                 <div className="justify-content-center main">
                     <div className="container-criteria">
@@ -548,25 +585,25 @@ const Dashboard = () => {
                             <FormLabel htmlFor="employeeCriteriaDashboard" className="mt-2">{t('dashboard.criteria.labels.Employee')}</FormLabel>
                             <InputGroup className="mb-2">
 
-                                {employeeCriteria.name !== "All"}
                                 <OverlayTrigger
                                     placement="top"
-                                    overlay={employeeCriteria.name !== "All" ?
+                                    overlay={criteria.employee1.name !== "All" ?
                                         <ToolTipBootstrap id="compareBTN-tooltip" className="transparent">
-                                            {employeeCriteria.name}
+                                            {criteria.employee1.name}
                                         </ToolTipBootstrap> : <></>
                                     } >
 
-                                    <FormControl id="employeeCriteriaDashboard" as="select" onChange={e => SetEmployeeCriteria({
-                                        id: e.target.value.split("/")[0],
-                                        name: e.target.value.split("/")[1]
-                                    })}>
+                                    <FormControl id="employeeCriteriaDashboard" as="select" onChange={(e) => {
+                                        setField('employee1', {
+                                            id: e.target.value,
+                                            name: e.target.options[e.target.selectedIndex].text
+                                        });
+                                    }}>
 
-                                        <option key="1" value="All/All">{t('dashboard.criteria.All')}</option>
+                                        <option key={-1} value={-1}>{t('dashboard.criteria.All')}</option>
                                         {employeeSelect.map(e => {
-                                            counter++
                                             return (
-                                                <option key={counter} value={e.value + "/" + e.label}>{e.label}</option>
+                                                <option key={e.id} value={e.id}>{e.name}</option>
                                             )
                                         })}
                                     </FormControl>
@@ -583,14 +620,17 @@ const Dashboard = () => {
                                     <Button
                                         id="compareToAllBTN"
                                         variant="light"
-                                        disabled={employeeCriteria.id === "All"}
-                                        onClick={() => setCompareEmployeeChecked(!compareEmployeeChecked)}
+                                        disabled={parseInt(criteria.employee1.id) === -1}
+                                        onClick={() => setField('employee2', {
+                                            id: compareEmployeeChecked ? null : -1,
+                                            name: compareEmployeeChecked ? null : "All"
+                                        })}
                                         className="btn btn-light shadow-sm border inputSelect ms-1">
 
                                         <FormCheck
                                             type="switch"
                                             label={t('dashboard.criteria.CompareBTN')}
-                                            disabled={employeeCriteria.id === -1}
+                                            disabled={parseInt(criteria.employee1.id) === -1}
                                             checked={compareEmployeeChecked}
                                         />
                                     </Button>
@@ -746,6 +786,12 @@ const Dashboard = () => {
                 onAccept={() => { onSaveConfirmClick() }}
                 onClose={() => { setConfirmSaveActivated(false) }}
             />
+            <ConfirmationPopup
+                open={navClicked && !chartSaved}
+                prompt="Are you sure you want to discard changes made to "
+                title={criteria.name}
+                onAccept={() => { navigate(pageToNavigateTo) }}
+                onClose={() => { setNavClicked(false) }} />
         </div >
     )
 }

@@ -14,3 +14,8 @@ exports.getChartReportsByUserId = async (req, res) => {
             return res.status(err.status).send({ message: err.message });
         });
 }
+
+exports.createChartReport = async (req, res) => {
+    console.log(req.body.chartReportData)
+    res.send({ message: "verycoolkanye" });
+}
