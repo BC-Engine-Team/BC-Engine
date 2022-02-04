@@ -22,6 +22,18 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Use Node.js ${{ matrix.node-version }}
+      env: 
+          ACCESS_TOKEN_SECRET: ${{ secrets.ACCESS_TOKEN_SECRET }}
+          LOCAL_DATABASE: ${{ secrets.LOCAL_DATABASE }}
+          LOCAL_DOCKER_PORT: ${{ secrets.LOCAL_DOCKER_PORT }}
+          LOCAL_HOST: ${{ secrets.LOCAL_HOST }}
+          LOCAL_PORT: ${{ secrets.LOCAL_PORT }}
+          LOCAL_ROOT_PASSWORD: ${{ secrets.LOCAL_ROOT_PASSWORD }}
+          LOCAL_USER: ${{ secrets.LOCAL_USER }}
+          NODE_ENV: ${{ secrets.NODE_ENV }}
+          REFRESH_TOKEN_SECRET: ${{ secrets.REFRESH_TOKEN_SECRET }}
+          SKIP_PREFLIGHT_CHECK: ${{ secrets.SKIP_PREFLIGHT_CHECK }}
+          
       uses: actions/setup-node@v2
       with:
         node-version: ${{ matrix.node-version }}
