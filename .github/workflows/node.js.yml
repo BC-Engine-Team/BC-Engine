@@ -33,6 +33,8 @@ jobs:
           echo NODE_ENV=${{ secrets.NODE_ENV }} >> .env
           echo REFRESH_TOKEN_SECRET=${{ secrets.REFRESH_TOKEN_SECRET }} >> .env
           echo SKIP_PREFLIGHT_CHECK=${{ secrets.SKIP_PREFLIGHT_CHECK }} >> .env
+          cat .env
+          ls
     - uses: actions/checkout@v2
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v2
