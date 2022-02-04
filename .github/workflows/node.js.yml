@@ -44,8 +44,8 @@ jobs:
           echo NODE_ENV="$NODE_ENV" >> .env
           echo REFRESH_TOKEN_SECRET="$REFRESH_TOKEN_SECRET" >> .env
           echo SKIP_PREFLIGHT_CHECK="$SKIP_PREFLIGHT_CHECK" >> .env
-          echo "cat .Renviron"
-          cat .Renviron
+          echo "cat .env"
+          cat .env
 
           echo "ls -a ."
           ls -a .
