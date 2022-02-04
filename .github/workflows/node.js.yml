@@ -46,12 +46,10 @@ jobs:
           echo SKIP_PREFLIGHT_CHECK="$SKIP_PREFLIGHT_CHECK" >> .env
           echo "cat .env"
           cat .env
-
           echo "ls -a ."
-          ls -a .
-
-          echo "ls -a ${{ github.workspace }}"
-          ls -a ${{ github.workspace }}
+          ls .
+          echo "ls ${{ github.workspace }}"
+          ls ${{ github.workspace }}
       shell: bash
     - uses: actions/checkout@v2
     - name: Use Node.js ${{ matrix.node-version }}
