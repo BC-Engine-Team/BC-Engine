@@ -20,6 +20,14 @@ jobs:
         # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
 
     steps:
+    - uses: actions/checkout@v2
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v2
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+    - run: npm ci
+    - run: npm run build --if-present
     - name: Create env file
       env:
         ACCESS_TOKEN_SECRET: ${{ secrets.ACCESS_TOKEN_SECRET }}
@@ -33,7 +41,7 @@ jobs:
         REFRESH_TOKEN_SECRET: ${{ secrets.REFRESH_TOKEN_SECRET }}
         SKIP_PREFLIGHT_CHECK: ${{ secrets.SKIP_PREFLIGHT_CHECK }}
       run: | 
-          touch ${{ github.workspace }} .env
+          touch .env
           echo ACCESS_TOKEN_SECRET="$ACCESS_TOKEN_SECRET" >> .env
           echo LOCAL_DATABASE="$LOCAL_DATABASE" >> .env
           echo LOCAL_DOCKER_PORT="$LOCAL_DOCKER_PORT" >> .env
@@ -44,19 +52,4 @@ jobs:
           echo NODE_ENV="$NODE_ENV" >> .env
           echo REFRESH_TOKEN_SECRET="$REFRESH_TOKEN_SECRET" >> .env
           echo SKIP_PREFLIGHT_CHECK="$SKIP_PREFLIGHT_CHECK" >> .env
-          echo "cat .env"
-          cat .env
-          echo "ls -a ."
-          ls .
-          echo "ls ${{ github.workspace }}"
-          ls ${{ github.workspace }}
-      shell: bash
-    - uses: actions/checkout@v2
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v2
-      with:
-        node-version: ${{ matrix.node-version }}
-        cache: 'npm'
-    - run: npm ci
-    - run: npm run build --if-present
     - run: npm test
