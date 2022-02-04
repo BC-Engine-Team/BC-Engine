@@ -33,7 +33,7 @@ jobs:
         REFRESH_TOKEN_SECRET: ${{ secrets.REFRESH_TOKEN_SECRET }}
         SKIP_PREFLIGHT_CHECK: ${{ secrets.SKIP_PREFLIGHT_CHECK }}
       run: | 
-          touch .env
+          touch ${{ github.workspace }} .env
           echo ACCESS_TOKEN_SECRET="$ACCESS_TOKEN_SECRET" >> .env
           echo LOCAL_DATABASE="$LOCAL_DATABASE" >> .env
           echo LOCAL_DOCKER_PORT="$LOCAL_DOCKER_PORT" >> .env
