@@ -12,7 +12,7 @@ exports.getAverages = async (req, res) => {
         return res.status(400).send({ message: "Wrong format." });
 
 
-    await invoiceService.getAverages(req.params.startDate, req.params.endDate, req.params.countryCode)
+    await invoiceService.getAverages(req.params.startDate, req.params.endDate, req.query.country)
         .then(response => {
             if (response) {
                 return res.status(200).send(response);
@@ -28,9 +28,12 @@ exports.getCountriesName = async (req, res) => {
 
     await invoiceService.getCountriesName()
         .then(response => {
-            return res.send(response);
+            if(response){
+                return res.status(200).send(response);
+            }
+            return res.status(500).send({ message: "The data could not be fetched." }); 
         })
         .catch(err => {
-            return res.status(500).send({ message: "The data could not be fetched." });
+            return res.status(err.status || 500).send({ message: !!err.message ? err.message : "The data could not be fetched." });
     });
 }

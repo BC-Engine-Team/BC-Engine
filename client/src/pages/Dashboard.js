@@ -81,7 +81,7 @@ const Dashboard = () => {
     const [countries, setCountries] = useState([{countryCode: "", countryLabel: ""}]);
     const [filteredCountry, setFilteredCountry] = useState({countryCode: ""});
 
-    const chart = async (countryData) => {
+    const chart = async (countryCode = undefined) => {
         let datasets = [];
         let clientInfoList = [];
         
@@ -94,11 +94,17 @@ const Dashboard = () => {
             endDate: "2020-01-01"
         };
 
-        const country = {
-            countryCode: countryData
+
+        let param = {};
+        
+        if(countryCode !== undefined) {
+            param = {
+                country: countryCode
+            }
         }
 
-        await Axios.get(`${process.env.REACT_APP_API}/invoice/defaultChartAndTable/${dates.startDate}/${dates.endDate}/${country.countryCode}`, { headers: header })
+
+        await Axios.get(`${process.env.REACT_APP_API}/invoice/defaultChartAndTable/${dates.startDate}/${dates.endDate}`, { params: param, headers: header })
             .then(async (res) => {
                 if (res.status === 403 && res.status === 401) {
                     setAuthorized(false);
@@ -178,6 +184,7 @@ const Dashboard = () => {
     }
 
 
+    //to display the list of all countries in the select box
     const countrySelectBox = async () => {
         let countryList = [];
 
@@ -204,10 +211,15 @@ const Dashboard = () => {
             });
     }
 
+
+
+    //to filter the chart and table based by country
     const countryFiltering = (country) => {
         setFilteredCountry(country);
+        chart(country);
     }
 
+    
     
     useEffect(() => {
         if (cookies.get("accessToken") === undefined) {
@@ -217,10 +229,11 @@ const Dashboard = () => {
             setAuthorized(false);
         }
 
-        chart(filteredCountry);
+        chart();
         countrySelectBox();
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
+    
         
 
     const loadChartData = () => {
@@ -248,14 +261,17 @@ const Dashboard = () => {
                             
                             <Form.Group className="my-2  px-2" controlId="floatingModifyStartMonth">
                                 <Form.Label>Country</Form.Label>
-                                <Form.Select 
-                                    className='my-2 px-2'>
-                                    <option value="*">All countries</option>
+                                <Form.Select
+                                    className='my-2 px-2'
+                                    onChange={e => countryFiltering(e.target.value)}>
+
+                                    <option value="all">All countries</option>
                                     {countries.map ((country, index) => {
                                         return(
-                                            <option key={index} value={country.countryCode} onClick={() => countryFiltering(country.countryCode)}>{country.countryLabel}</option>    
+                                            <option key={index} value={country.countryCode}> {country.countryLabel} </option>    
                                         );
                                     })}
+
                                 </Form.Select>
                             </Form.Group>
 

@@ -5,7 +5,7 @@ const ClientGradingDao = require("../data_access_layer/daos/client_grading.dao")
 const CountryDao = require("../data_access_layer/daos/country.dao")
 
 
-exports.getAverages = async (startDateStr, endDateStr, countryCode) => {
+exports.getAverages = async (startDateStr, endDateStr, countryCode = undefined) => {
     const startYear = parseInt(startDateStr.split('-')[0]);
     let startMonth = parseInt(startDateStr.split('-')[1]);
     const endYear = parseInt(endDateStr.split('-')[0]);
@@ -34,11 +34,9 @@ exports.getAverages = async (startDateStr, endDateStr, countryCode) => {
         let nameIdList = [];
 
 
-        if(countryCode === ""){
-            countryCode = "";
+        if(countryCode === undefined || countryCode === "all"){
+            countryCode = null;
         }
-
-        console.log(countryCode);
 
 
         // Get the list of total dues for each month
@@ -48,6 +46,7 @@ exports.getAverages = async (startDateStr, endDateStr, countryCode) => {
             reject(err);
         });
 
+
         // prepare startDate to get billed amount for each month
         let startDate = new Date(`${startDateStr} 00:00:00`);
         startDate.setMonth(startDate.getMonth() - 12);
@@ -55,7 +54,7 @@ exports.getAverages = async (startDateStr, endDateStr, countryCode) => {
         startDateStr = startDate.getFullYear() + "-" + theMonth + "-01";
 
         // Get list of amount billed for each month (previous 12 months)
-        await this.getBilled(startDateStr, endDateStr, yearMonthList).then(async data => {
+        await this.getBilled(startDateStr, endDateStr, yearMonthList, countryCode).then(async data => {
             billedList = data;
         }).catch(err => {
             reject(err);
@@ -63,7 +62,7 @@ exports.getAverages = async (startDateStr, endDateStr, countryCode) => {
 
 
         //Get list of client based by actor id
-        await this.getNamesAndCountries(clientIDList).then(async data => {
+        await this.getNamesAndCountries(clientIDList, countryCode).then(async data => {
             clientList = data;
         }).catch(err => {
             reject(err);
@@ -117,6 +116,8 @@ exports.getAverages = async (startDateStr, endDateStr, countryCode) => {
 }
 
 
+
+//method to get the dues
 exports.getDues = async (yearMonthList) => {
     let totalDuesList = [];
 
@@ -146,8 +147,10 @@ exports.getDues = async (yearMonthList) => {
 }
 
 
+
+
 //method to get the billed amount
-exports.getBilled = async (startDateStr, endDateStr, yearMonthList) => {
+exports.getBilled = async (startDateStr, endDateStr, yearMonthList, countryCode) => {
     let billedList = [];
     let startDate = new Date(parseInt(startDateStr.substring(5, 7)) + " " + parseInt(startDateStr.substring(8)) + " " + parseInt(startDateStr.substring(0, 4)));
     let endDate = new Date(parseInt(endDateStr.substring(5, 7)) + " " + parseInt(endDateStr.substring(8)) + " " + parseInt(endDateStr.substring(0, 4)));
@@ -157,7 +160,7 @@ exports.getBilled = async (startDateStr, endDateStr, yearMonthList) => {
     endDate.setUTCHours(0, 0, 0, 0);
 
     return new Promise(async (resolve, reject) => {
-        await InvoiceAffectDao.getInvoicesByDate(startDateStr, endDateStr).then(async data => {
+        await InvoiceAffectDao.getInvoicesByDate(startDateStr, endDateStr, countryCode).then(async data => {
             if (data) {
                 yearMonthList.forEach(ym => {
                     let billed = 0;
@@ -194,12 +197,12 @@ exports.getBilled = async (startDateStr, endDateStr, yearMonthList) => {
 let clientIDList = [];
 
 // method to get the names and countries based by clients id
-exports.getNamesAndCountries = async (clientsID) => {
+exports.getNamesAndCountries = async (clientsID, countryCode) => {
 
     let formattedClientList = [];
     return new Promise(async (resolve, reject) => {
         
-        await ClientDao.getClientByID(clientsID).then(async data => {
+        await ClientDao.getClientByID(clientsID, countryCode).then(async data => {
 
             if(data){
                 data.forEach(i => {
