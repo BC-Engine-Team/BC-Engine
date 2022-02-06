@@ -7,6 +7,7 @@ var MockExpressResponse = require('mock-express-response');
 const InvController = require('../../controllers/invoice.controller');
 const InvoiceService = require('../../services/invoice.service');
 const AuthService = require('../../services/auth.service');
+const EmpService = require('../../services/emp.service')
 
 let reqUser = {
     email: "valid@benoit-cote.com",
@@ -15,6 +16,14 @@ let reqUser = {
     role: "admin"
 };
 
+let reqUserEmployee = {
+    user: {
+        email: "valid@benoit-cote.com",
+        password: "validPassword1",
+        name: "validName",
+        role: "employee"
+    }
+};
 
 let sandbox = sinon.createSandbox();
 let authStub = sandbox.stub(AuthService, 'authenticateToken')
@@ -23,8 +32,12 @@ let authStub = sandbox.stub(AuthService, 'authenticateToken')
         return next();
     });
 
-
 let invoiceServiceSpy = jest.spyOn(InvoiceService, 'getAverages')
+    .mockImplementation(() => new Promise((resolve) => {
+        resolve(false);
+    }));
+
+let empServiceSpy = jest.spyOn(EmpService, 'getAllEmployees')
     .mockImplementation(() => new Promise((resolve) => {
         resolve(false);
     }));
@@ -148,12 +161,14 @@ describe("Test Invoice Controller", () => {
         });
 
         describe("IC1.4 - given service throws an error", () => {
-            it("IC1.4.1 - should respond with 500 status code and err message", async () => {
+            it("IC1.4.1 - should respond with 500 status code and message when not specified", async () => {
                 // arrange
-                let expectedErrorMessage = "An error occured in the backend.";
+                let expectedError = {
+                    message: "Malfunction in the B&C Engine."
+                };
                 invoiceServiceSpy = jest.spyOn(InvoiceService, 'getAverages')
                     .mockImplementation(async () => {
-                        await Promise.reject({ message: expectedErrorMessage });
+                        await Promise.reject({});
                     });
 
                 // act
@@ -161,7 +176,167 @@ describe("Test Invoice Controller", () => {
 
                 // assert
                 expect(response.status).toBe(500);
-                expect(response.body.message).toBe(expectedErrorMessage);
+                expect(response.body).toEqual(expectedError);
+            });
+
+            it("IC1.4.2 - should respond with caught error's status and message", async () => {
+                // arrange
+                let expectedError = {
+                    status: 400,
+                    message: "Custom message."
+                };
+                invoiceServiceSpy = jest.spyOn(InvoiceService, 'getAverages')
+                    .mockImplementation(async () => {
+                        await Promise.reject(expectedError);
+                    });
+
+                // act
+                const response = await request.get("/api/invoice/defaultChartAndTable/2019-12-01/2020-04-01");
+
+                // assert
+                expect(response.status).toBe(400);
+                expect(response.body.message).toBe(expectedError.message);
+            });
+        });
+
+        describe("IC1.5 - given valid start and end dates and employeeId", () => {
+            it("IC1.5.1 - should respond with 200 and averages per month", async () => {
+                // arrange
+                let expectedInvoiceServiceResponse = [
+                    { month: 201912, average: "90.1" },
+                    { month: 202001, average: "92.1" },
+                    { month: 202002, average: "93.1" },
+                    { month: 202003, average: "94.1" },
+                    { month: 202004, average: "95.1" }
+                ];
+                invoiceServiceSpy = jest.spyOn(InvoiceService, 'getAverages')
+                    .mockImplementation(() => new Promise((resolve) => {
+                        resolve(expectedInvoiceServiceResponse);
+                    }));
+
+                // act
+                const response = await request.get("/api/invoice/defaultChartAndTable/2019-12-01/2020-04-01?employeeId=22769");
+
+                // assert
+                expect(response.status).toBe(200);
+                expect(JSON.stringify(response.body)).toEqual(JSON.stringify(expectedInvoiceServiceResponse));
+                expect(invoiceServiceSpy).toHaveBeenCalledTimes(1);
+                expect(authStub.called).toBeTruthy();
+
+                authStub.resetHistory();
+            });
+        });
+    });
+
+    describe("IC2 - Get All Employees for Dropdown ", () => {
+        describe("IC2.1 - given an admin user", () => {
+            it("IC2.1.1 - Should respond with 200 and a list of employees", async () => {
+                // arrange
+                let expectedEmpServiceResponse = [
+                    {
+                        dataValues: {
+                            email: 'Cathia@benoit-cote.com',
+                            firstName: 'Cathia',
+                            lastName: 'Zeppetelli',
+                            isActive: true
+                        },
+                    },
+                    {
+                        dataValues: {
+                            email: 'Giuseppe@benoit-cote.com',
+                            firstName: 'Giuseppe',
+                            lastName: 'Calderone',
+                            isActive: true
+                        },
+                    },
+                    {
+                        dataValues: {
+                            email: 'Marilyne@benoit-cote.com',
+                            firstName: 'Marilyne',
+                            lastName: 'Séïde',
+                            isActive: true
+                        },
+                    }
+                ];
+
+                empServiceSpy = jest.spyOn(EmpService, 'getAllEmployees')
+                    .mockImplementation(() => new Promise((resolve) => {
+                        resolve(expectedEmpServiceResponse);
+                    }));
+
+                const response = await request.get("/api/invoice/employees");
+
+                // assert
+                expect(response.status).toBe(200);
+                expect(JSON.stringify(response.body)).toEqual(JSON.stringify(expectedEmpServiceResponse));
+                expect(empServiceSpy).toHaveBeenCalledTimes(1);
+                expect(authStub.called).toBeTruthy();
+
+                authStub.resetHistory();
+            });
+        });
+
+        describe("IC2.2 - given an employee user", () => {
+            it("IC2.2.1 - Should respond with 403 when user is not admin", async () => {
+                let response = await InvController.getAllEmployeesDropdown(reqUserEmployee, res);
+                expect(response.statusCode).toBe(403);
+            });
+        });
+
+        describe("IC2.3 - given service cannot fetch data", () => {
+            it("IC2.3.1 -  should respond with 500 and message", async () => {
+                // arrange
+                let expectedResponse = "The data could not be fetched.";
+                empServiceSpy = jest.spyOn(EmpService, 'getAllEmployees')
+                    .mockImplementation(() => new Promise((resolve) => {
+                        resolve(false);
+                    }));
+
+                // act
+                const response = await request.get("/api/invoice/employees");
+
+                // assert
+                expect(response.status).toBe(500);
+                expect(response.body.message).toBe(expectedResponse);
+            });
+        });
+
+        describe("IC2.4 - given service throws an error", () => {
+            it("IC2.4.1 - should respond with 500 status code and message when not specified", async () => {
+                // arrange
+                let expectedError = {
+                    message: "Malfunction in the B&C Engine."
+                };
+                empServiceSpy = jest.spyOn(EmpService, 'getAllEmployees')
+                    .mockImplementation(async () => {
+                        await Promise.reject({});
+                    });
+
+                // act
+                const response = await request.get("/api/invoice/employees");
+
+                // assert
+                expect(response.status).toBe(500);
+                expect(response.body).toEqual(expectedError);
+            });
+
+            it("IC2.4.2 - should respond with caught error's status and message", async () => {
+                // arrange
+                let expectedError = {
+                    status: 400,
+                    message: "Custom message."
+                };
+                empServiceSpy = jest.spyOn(EmpService, 'getAllEmployees')
+                    .mockImplementation(async () => {
+                        await Promise.reject(expectedError);
+                    });
+
+                // act
+                const response = await request.get("/api/invoice/employees");
+
+                // assert
+                expect(response.status).toBe(400);
+                expect(response.body.message).toBe(expectedError.message);
             });
         });
     });

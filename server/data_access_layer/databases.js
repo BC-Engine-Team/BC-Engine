@@ -29,18 +29,20 @@ for (let i = 0; i < databases.length; i++) {
 
 db.Sequelize = Sequelize;
 
+// Add any tables to the database here
 // Add any tables to the local database here
 [db['localdb'].users, db['localdb'].chartReports] = require("./models/localdb/localdb.model")(db['localdb'], Sequelize);
 
 // patricia database tables
 db['mssql_pat'].employees = require("./models/mssql_pat/employee.model")(db['mssql_pat'], Sequelize);
-db['mssql_pat'].invoice_header = require("./models/mssql_pat/invoice_header.model")(db['mssql_pat'], Sequelize);
 db['mssql_pat'].invoice_affect = require("./models/mssql_pat/invoice_affect.model")(db['mssql_pat'], Sequelize);
 
-// bosco database tables
+// Bosco database tables
 db['mssql_bosco'].transactions = require("./models/mssql_bosco/accounting_client.model")(db['mssql_bosco'], Sequelize);
 db['mssql_bosco'].transactions_stat = require("./models/mssql_bosco/accounting_client_stat.model")(db['mssql_bosco'], Sequelize);
-db['mssql_bosco'].clients = require("./models/mssql_bosco/client.model")(db['mssql_bosco'], Sequelize);
+db['mssql_bosco'].nameEmployee = require("./models/mssql_bosco/name.model")(db['mssql_bosco'], Sequelize);
+
+
 
 db.sync = async (database, options) => {
   await db[database].sync(options)
@@ -64,14 +66,11 @@ db.sync = async (database, options) => {
         });
     })
     .then(async (data) => {
-      data.forEach((e) => {
-        console.log(e.toJSON());
-      });
       await db[database].chartReports.bulkCreate([
         {
           name: 'CR1',
-          startDate: new Date(),
-          endDate: new Date(),
+          startDate: new Date(2019, 11, 1),
+          endDate: new Date(2019, 11, 1),
           employee1Id: 12345,
           employee1Name: 'France Cote',
           country: 'Canada',
@@ -82,8 +81,8 @@ db.sync = async (database, options) => {
         },
         {
           name: 'CR2',
-          startDate: new Date(),
-          endDate: new Date(),
+          startDate: new Date(2019, 11, 1),
+          endDate: new Date(2019, 11, 1),
           employee1Id: -1,
           employee1Name: 'All',
           employee2Id: 12345,
@@ -96,8 +95,8 @@ db.sync = async (database, options) => {
         },
         {
           name: 'CR3',
-          startDate: new Date(),
-          endDate: new Date(),
+          startDate: new Date(2019, 11, 1),
+          endDate: new Date(2019, 11, 1),
           employee1Id: 12345,
           employee1Name: 'France Cote',
           country: 'All',
@@ -109,9 +108,7 @@ db.sync = async (database, options) => {
       ]);
     })
     .catch((err) => {
-      if (err) {
-        console.log(err);
-      }
+      console.log(err);
     });
 }
 

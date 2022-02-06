@@ -115,7 +115,31 @@ describe("Test User Service", () => {
                 // assert
                 expect(serviceResponse).toEqual(expectedUser);
                 expect(userDAOSpy).toBeCalledTimes(1);
-            })
+            });
+
+            it("US1.1.2 - should return Dao error", async () => {
+                // arrange
+                userDAOSpy = jest.spyOn(UserDAO, 'createUser')
+                    .mockImplementation(() => new Promise((resolve, reject) => {
+                        reject({ message: "dao failed" });
+                    }));
+    
+                // act and assert
+                await expect(UserService.createUser(reqUser)).rejects
+                    .toEqual({ message: "dao failed" });
+            });
+
+            it("US1.1.2 - should return false", async () => {
+                // arrange
+                userDAOSpy = jest.spyOn(UserDAO, 'createUser')
+                    .mockImplementation(() => new Promise((resolve, reject) => {
+                        resolve(false);
+                    }));
+    
+                // act and assert
+                await expect(UserService.createUser(reqUser)).resolves
+                    .toEqual(false);
+            });
         });
     });
     
@@ -151,11 +175,162 @@ describe("Test User Service", () => {
                     }
                 ));
 
+                // act
                 const serviceResponse = await UserService.getAllUsers();
 
+                // assert
                 expect(serviceResponse).toEqual(listReqUsersorted);
-            })
+            });
+
+            it("US2.1.3 - should return Dao error", async () => {
+                // arrange
+                userDAOSpy = jest.spyOn(UserDAO, 'getAllUsers')
+                    .mockImplementation(() => new Promise((resolve, reject) => {
+                        reject({ message: "dao failed" });
+                    }));
+    
+                // act and assert
+                await expect(UserService.getAllUsers()).rejects
+                    .toEqual({ message: "dao failed" });
+            });
+
+            it("US2.1.3 - should return false", async () => {
+                // arrange
+                userDAOSpy = jest.spyOn(UserDAO, 'getAllUsers')
+                    .mockImplementation(() => new Promise((resolve, reject) => {
+                        resolve(false);
+                    }));
+    
+                // act and assert
+                await expect(UserService.getAllUsers()).resolves
+                    .toEqual(false);
+            });
         });
-    });    
+    });
+    
+    describe("US3 - Authenticate User", () => {
+        describe("US3.1 - given a valid user", () => {
+            it("US3.1.1 - should return Dao error", async () => {
+                // arrange
+                userDAOSpy = jest.spyOn(UserDAO, 'getUserByEmail')
+                    .mockImplementation(() => new Promise((resolve, reject) => {
+                        reject(expectedData);
+                    }));
+
+                let expectedData = {
+                    status: 500,
+                    message: "some error occured"
+                }
+    
+                // act and assert
+                await expect(UserService.authenticateUser(reqUser)).rejects
+                    .toEqual(expectedData);
+            });
+
+            it("US3.1.2 - should return false", async () => {
+                // arrange
+                userDAOSpy = jest.spyOn(UserDAO, 'getUserByEmail')
+                    .mockImplementation(() => new Promise((resolve, reject) => {
+                        resolve(false);
+                    }));
+    
+                // act and assert
+                await expect(UserService.authenticateUser(reqUser)).resolves
+                    .toEqual(false);
+            });
+        });
+    });
+
+    describe("US4 - Modify User", () => {
+        describe("US4.1 - given a valid user", () => {
+            it("US4.1.1 - Should return a user", async() => {
+                // arrange
+                userDAOSpy = jest.spyOn(UserDAO, 'updateUser')
+                .mockImplementation(() => new Promise((resolve, reject) => {
+                    resolve(reqUser);
+                }));
+
+                // act
+                const serviceResponse = await UserService.modifyUser(reqUser);
+
+                // assert
+                expect(serviceResponse).toEqual(reqUser);
+            });
+            it("US4.1.3 - should return Dao error", async () => {
+                // arrange
+                userDAOSpy = jest.spyOn(UserDAO, 'updateUser')
+                    .mockImplementation(() => new Promise((resolve, reject) => {
+                        reject(expectedData);
+                    }));
+
+                let expectedData = {
+                    status: 500,
+                    message: "some error occured"
+                }
+    
+                // act and assert
+                await expect(UserService.modifyUser(reqUser)).rejects
+                    .toEqual(expectedData);
+            });
+
+            it("US4.1.3 - should return false", async () => {
+                // arrange
+                userDAOSpy = jest.spyOn(UserDAO, 'updateUser')
+                    .mockImplementation(() => new Promise((resolve, reject) => {
+                        resolve(false);
+                    }));
+    
+                // act and assert
+                await expect(UserService.modifyUser(reqUser)).resolves
+                    .toEqual(false);
+            });
+        });
+    });
+
+    describe("US5 - Delete User", () => {
+        describe("US5.1 - given a valid user", () => {
+            it("US5.1.1 - Should return a user", async() => {
+                // arrange
+                userDAOSpy = jest.spyOn(UserDAO, 'deleteUser')
+                .mockImplementation(() => new Promise((resolve, reject) => {
+                    resolve(reqUser);
+                }));
+
+                // act
+                const serviceResponse = await UserService.deleteUser("valid@email.com");
+
+                // assert
+                expect(serviceResponse).toEqual(reqUser);
+            });
+            it("US5.1.3 - should return Dao error", async () => {
+                // arrange
+                userDAOSpy = jest.spyOn(UserDAO, 'deleteUser')
+                    .mockImplementation(() => new Promise((resolve, reject) => {
+                        reject(expectedData);
+                    }));
+
+                let expectedData = {
+                    status: 500,
+                    message: "some error occured"
+                }
+    
+                // act and assert
+                await expect(UserService.deleteUser("valid@email.com")).rejects
+                    .toEqual(expectedData);
+            });
+
+            it("US5.1.3 - should return false", async () => {
+                // arrange
+                userDAOSpy = jest.spyOn(UserDAO, 'deleteUser')
+                    .mockImplementation(() => new Promise((resolve, reject) => {
+                        resolve(false);
+                    }));
+    
+                // act and assert
+                await expect(UserService.deleteUser("valid@email.com")).resolves
+                    .toEqual(false);
+            });
+        });
+    });
 });
 

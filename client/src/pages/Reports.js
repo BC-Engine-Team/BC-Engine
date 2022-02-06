@@ -4,8 +4,7 @@ import Cookies from 'universal-cookie'
 import { useTranslation } from 'react-i18next';
 import Axios from 'axios';
 
-import Table from 'react-bootstrap/Table'
-import Button from 'react-bootstrap/Button'
+import { Button, Table } from 'react-bootstrap'
 
 import NavB from '../components/NavB'
 import DeleteButton from '../components/DeleteButton'
@@ -72,7 +71,7 @@ const Reports = () => {
             <div className='justify-content-center mainContainer'>
                 <div>
                     <div className='card shadow'>
-                        <Table responsive="xl" hover>
+                        <Table responsive="xl" hover id='chartReportsTable'>
                             <thead className='bg-light'>
                                 <tr key="0">
                                     <th>{t('reports.chartReports.Name')}</th>

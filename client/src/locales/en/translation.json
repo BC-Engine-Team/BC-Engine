@@ -49,7 +49,20 @@
             "dashboard":{
                 "criteria":{
                     "NamePlaceHolder":"Enter Chart Report Name",
-                    "LoadChartButton":"Load Chart"
+                    "LoadChartButton":"Load Chart",
+                    "Title":"Chart Criteria",
+                    "Compare":"Compare selected employee with all employees",
+                    "CompareBTN":"Compare",
+                    "All":"All",
+                    "labels": {
+                        "Employee":"Employee"
+                    },
+                    "StartDateLabel": "Start Month",
+                    "EndDateLabel": "End Month",
+                    "StartMonthExceedCurrentError": "Start Month cannot exceed current month.",
+                    "EndMonthExceedError": "End Month cannot be before Start Month.",
+                    "EndMonthExceedCurrentError": "End Month cannot exceed current month.",
+                    "EndYearExceedError": "End Year cannot be before Start Year."
                 },
                 "chart":{
                     "Title":"Average Collection Days over Time",

@@ -16,10 +16,37 @@ let returnedEmp = {
     }
 }
 
+let returnedEmployeeList = [
+    {
+        dataValues: {
+            email: 'Cathia@benoit-cote.com',
+            firstName: 'Cathia',
+            lastName: 'Zeppetelli',
+            isActive: true
+        },
+    },
+    {
+        dataValues: {
+            email: 'Giuseppe@benoit-cote.com',
+            firstName: 'Giuseppe',
+            lastName: 'Calderone',
+            isActive: true
+        },
+    },
+    {
+        dataValues: {
+            email: 'Marilyne@benoit-cote.com',
+            firstName: 'Marilyne',
+            lastName: 'Séïde',
+            isActive: true
+        },
+    }
+]
 
 let SequelizeMock = require('sequelize-mock');
 const dbMock = new SequelizeMock();
 var EmpMock = dbMock.define('employees', returnedEmp);
+var EmpListMock = dbMock.define('employees', returnedEmployeeList)
 
 describe("Test Employee DAL", () => {
     const Model = EmpModel(sequelize, dataTypes);
@@ -27,15 +54,17 @@ describe("Test Employee DAL", () => {
 
     afterEach(() => {
         EmpMock.$queryInterface.$clearResults();
+        EmpListMock.$queryInterface.$clearResults();
     });
 
     beforeEach(() => {
         EmpMock.$queryInterface.$clearResults();
+        EmpListMock.$queryInterface.$clearResults();
     });
 
     // testing the employee model properties
     checkModelName(Model)('PERSON');
-    ['firstName', 'lastName', 'email']
+    ['firstName', 'lastName', 'email', 'isActive']
         .forEach(checkPropertyExists(instance));
 
     describe("ED1 - getEmployeeByEmail", () => {
@@ -77,6 +106,65 @@ describe("Test Employee DAL", () => {
                 // assert
                 expect(err.message).toBe("Error with the Employee Model.");
             });
+        });
+    });
+
+    describe("ED2 - getAllEmployees", () => {
+        it("ED2.1 - should return a list of employees", async () => {
+            
+            // arrange
+            EmpListMock.$queryInterface.$useHandler(function(query, queryOptions, done){
+                return Promise.resolve(returnedEmployeeList);
+            });
+
+            // act
+            const response = await EmpDAO.getAllEmployees(EmpListMock);
+
+            // assert
+            expect(response.length).toBe(3);
+        });
+
+        it("ED2.2 - should resolve false when Model cant fetch data", async () => {
+            // arrange
+            EmpListMock.$queryInterface.$useHandler(function (query, queryOptions, done) {
+                return Promise.resolve(false);
+            });
+
+            // act and assert
+            await expect(EmpDAO.getAllEmployees(EmpListMock)).resolves
+                .toEqual(false);
+        });
+
+        it("ED2.3 - should reject error when Model throws error with defined status and message", async () => {
+            // arrange
+            let expectedError = {
+                status: 404,
+                message: "Error."
+            };
+
+            EmpListMock.$queryInterface.$useHandler(function (query, queryOptions, done) {
+                return Promise.reject(expectedError);
+            });
+
+            // act and assert
+            await expect(EmpDAO.getAllEmployees(EmpListMock)).rejects
+                .toEqual(expectedError);
+        });
+
+        it("ND2.4 - should reject error with 500 status and predefined message when model does not define them", async () => {
+            // arrange
+            let expectedError = {
+                status: 500,
+                message: "some error occured"
+            };
+
+            EmpListMock.$queryInterface.$useHandler(function (query, queryOptions, done) {
+                return Promise.reject({});
+            });
+
+            // act and assert
+            await expect(EmpDAO.getAllEmployees(EmpListMock)).rejects
+                .toEqual(expectedError);
         });
     });
 });

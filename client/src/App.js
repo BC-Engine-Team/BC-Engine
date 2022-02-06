@@ -20,7 +20,7 @@ function App() {
           <Route exact path="/users" element={<Users />} />
           <Route exact path="/manage" element={<Manage />} />
         </Routes>
-    </BrowserRouter>
+      </BrowserRouter>
     </div>
   );
 }

@@ -4,8 +4,7 @@ import Cookies from 'universal-cookie'
 import { useTranslation } from 'react-i18next';
 import Axios from 'axios';
 
-import Table from 'react-bootstrap/Table'
-import Button from 'react-bootstrap/Button'
+import { Table, Button } from 'react-bootstrap'
 
 import '../styles/Edit&DeleteButton.scss'
 import '../styles/usersPage.css'
@@ -225,7 +224,6 @@ const Users = () => {
                                             <td className="py-1">
                                                 <div className="d-flex justify-content-center">
                                                     <EditButton onEdit={() => editUser(u.email, u.role)} />
-
                                                     <DeleteButton onDelete={() => handleDeleteUser(u.email)} />
                                                 </div>
                                             </td>

@@ -50,8 +50,21 @@
     },
     "dashboard": {
        "criteria": {
-          "NamePlaceHolder": "Entrez le nom de votre Rapport Graphique",
-          "LoadChartButton": "Mettre à jour le Graphique"
+          "Title":"Filtres du graphique",
+          "Compare":"Comparer l'employé selectionné avec tous les employés",
+          "CompareBTN":"Comparer",
+          "All":"Tous",
+          "labels": {
+             "Employee":"Employé"
+          },
+         "NamePlaceHolder": "Entrez le nom de votre Rapport Graphique",
+         "LoadChartButton": "Mettre à jour le Graphique",
+         "StartDateLabel": "Mois de début",
+         "EndDateLabel": "Mois de fin",
+         "StartMonthExceedCurrentError": "Mois de début ne peut pas être après le mois actuel.",
+         "EndMonthExceedError": "Mois de fin ne peut pas être avant le Mois de début.",
+         "EndMonthExceedCurrentError": "Mois de fin ne peut pas être après le mois actuel.",
+         "EndYearExceedError": "Année de fin ne peut pas être avant l'Année de début."
        },
        "chart": {
           "Title": "Moyenne de Jour de Collection par Mois",

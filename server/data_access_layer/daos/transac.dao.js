@@ -19,7 +19,6 @@ exports.getTransactionsStatByYearMonth = async (yearMonthList, transacStatModel=
             }
             resolve(false);
         }).catch(err => {
-            console.log(err);
             reject(err);
         })
     })
