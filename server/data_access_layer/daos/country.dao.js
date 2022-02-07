@@ -17,7 +17,8 @@ exports.getAllCountries = async (db=database) => {
                 AND C.[COUNTRY_CODE] != 'A9' AND C.[COUNTRY_CODE] != 'AP' \
                 AND C.[COUNTRY_CODE] != 'W5' AND C.[COUNTRY_CODE] != 'WE' \
                 AND C.[COUNTRY_CODE] != 'WO' AND C.[COUNTRY_CODE] != 'XX' \
-                AND C.[COUNTRY_CODE] != 'YY' AND C.[COUNTRY_CODE] != 'ZZ'",
+                AND C.[COUNTRY_CODE] != 'YY' AND C.[COUNTRY_CODE] != 'ZZ' \
+                ORDER BY C.[COUNTRY_LABEL]",
                 {
                     type: QueryTypes.SELECT
                 }
@@ -26,7 +27,6 @@ exports.getAllCountries = async (db=database) => {
                 let returnData = [];
                 data.forEach(c => {
                     returnData.push({
-                        countryCode: c["COUNTRY_CODE"],
                         countryLabel: c["COUNTRY_LABEL"]
                     });
                 });

@@ -59,12 +59,12 @@ exports.getAverages = async (startDateStr, endDateStr,  employeeId = undefined, 
             });
         }
 
-        if(countryCode === undefined || countryCode === "all"){
-            countryCode = null;
+        if(countryCode === "all"){
+            countryCode = undefined;
         }
 
         // Get the list of total dues for each month
-        await this.getDues(yearMonthList, employeeId).then(async data => {
+        await this.getDues(yearMonthList, employeeId, countryCode).then(async data => {
             totalDuesList = data;
         }).catch(err => {
             reject(err);
@@ -85,12 +85,6 @@ exports.getAverages = async (startDateStr, endDateStr,  employeeId = undefined, 
         });
 
 
-        //Get list of client based by actor id
-        await this.getNamesAndCountries(clientIDList).then(async data => {
-            clientList = data;
-        }).catch(err => {
-            reject(err);
-        });
 
         
         //Get list of client based by actor id
@@ -153,7 +147,7 @@ exports.getAverages = async (startDateStr, endDateStr,  employeeId = undefined, 
     });
 }
 
-exports.getDues = async (yearMonthList, employeeId = undefined) => {
+exports.getDues = async (yearMonthList, employeeId = undefined, countryCode = undefined) => {
     let totalDuesList = [];
 
     return new Promise(async (resolve, reject) => {
@@ -174,8 +168,24 @@ exports.getDues = async (yearMonthList, employeeId = undefined) => {
             resolve(totalDuesList);
         }
 
-        if(employeeId === undefined) {
-            await TransacStatDao.getTransactionsStatByYearMonth(yearMonthList).then(async data => {
+        if(employeeId !== undefined && countryCode === undefined) {
+            await TransacStatDao.getTransactionsStatByYearMonthAndEmployee(yearMonthList, employeeId).then(async data => {
+                if (data) getDues_(yearMonthList, data);
+                else resolve(false);
+            }).catch(err => {
+                reject(err);
+            });
+        }
+        else if (employeeId === undefined && countryCode !== undefined){
+            await TransacStatDao.getTransactionsStatByYearMonthAndCountry(yearMonthList, countryCode).then(async data => {
+                if (data) getDues_(yearMonthList, data);
+                else resolve(false);
+            }).catch(err => {
+                reject(err);
+            });
+        }
+        else if (employeeId !== undefined && countryCode !== undefined){
+            await TransacStatDao.getTransactionsStatByYearMonthAndEmployeeAndCountry(yearMonthList, employeeId, countryCode).then(async data => {
                 if (data) getDues_(yearMonthList, data);
                 else resolve(false);
             }).catch(err => {
@@ -183,7 +193,7 @@ exports.getDues = async (yearMonthList, employeeId = undefined) => {
             });
         }
         else {
-            await TransacStatDao.getTransactionsStatByYearMonthAndEmployee(yearMonthList, employeeId).then(async data => {
+            await TransacStatDao.getTransactionsStatByYearMonth(yearMonthList).then(async data => {
                 if (data) getDues_(yearMonthList, data);
                 else resolve(false);
             }).catch(err => {
@@ -194,8 +204,12 @@ exports.getDues = async (yearMonthList, employeeId = undefined) => {
 }
 
 
+
+
+
+
 //method to get the bill amount
-exports.getBilled = async (startDateStr, endDateStr, yearMonthList, clientsList = undefined, countryCode) => {
+exports.getBilled = async (startDateStr, endDateStr, yearMonthList, clientsList = undefined, countryCode = undefined) => {
     let billedList = [];
     let startDate = new Date(parseInt(startDateStr.substring(5, 7)) + " " + parseInt(startDateStr.substring(8)) + " " + parseInt(startDateStr.substring(0, 4)));
     let endDate = new Date(parseInt(endDateStr.substring(5, 7)) + " " + parseInt(endDateStr.substring(8)) + " " + parseInt(endDateStr.substring(0, 4)));
@@ -229,8 +243,8 @@ exports.getBilled = async (startDateStr, endDateStr, yearMonthList, clientsList 
             resolve(billedList);
         }
 
-        if(clientsList === undefined) {
-            await InvoiceAffectDao.getInvoicesByDate(startDateStr, endDateStr).then(async data => {
+        if (clientsList !== undefined && countryCode === undefined) {
+            await InvoiceAffectDao.getInvoicesByDateAndEmployee(startDateStr, endDateStr, clientsList).then(async data => {
                 if (data) getBilled_(yearMonthList, data);
                 else resolve(false);
             }).catch(err => {
@@ -238,8 +252,17 @@ exports.getBilled = async (startDateStr, endDateStr, yearMonthList, clientsList 
             })
         }
 
-        else if (countryCode === undefined) {
-            await InvoiceAffectDao.getInvoicesByDate(startDateStr, endDateStr, countryCode).then(async data => {
+        else if (clientsList === undefined && countryCode !== undefined) {
+            await InvoiceAffectDao.getInvoicesByDateAndCountry(startDateStr, endDateStr, countryCode).then(async data => {
+                if (data) getBilled_(yearMonthList, data);
+                else resolve(false);
+            }).catch(err => {
+                reject(err);
+            })
+        }
+
+        else if (clientsList !== undefined && countryCode !== undefined) {
+            await InvoiceAffectDao.getInvoicesByDateAndEmployeeAndCountry(startDateStr, endDateStr, clientsList, countryCode).then(async data => {
                 if (data) getBilled_(yearMonthList, data);
                 else resolve(false);
             }).catch(err => {
@@ -248,7 +271,7 @@ exports.getBilled = async (startDateStr, endDateStr, yearMonthList, clientsList 
         }
 
         else {
-            await InvoiceAffectDao.getInvoicesByDateAndEmployee(startDateStr, endDateStr, clientsList).then(async data => {
+            await InvoiceAffectDao.getInvoicesByDate(startDateStr, endDateStr).then(async data => {
                 if (data) getBilled_(yearMonthList, data);
                 else resolve(false);
             }).catch(err => {
@@ -268,6 +291,7 @@ exports.getClientsByEmployee = async (employeeId) => {
         });
     });
 }
+
 
 exports.getYearMonth = (startDateStr, endDateStr) => {
     let yearMonthList = [];
@@ -294,32 +318,47 @@ exports.getYearMonth = (startDateStr, endDateStr) => {
 
 
 // method to get the names and countries based by clients id
-exports.getNamesAndCountries = async (clientsID, countryCode) => {
+exports.getNamesAndCountries = async (clientsID, countryCode = undefined) => {
 
     let formattedClientList = [];
     return new Promise(async (resolve, reject) => {
         
-        await ClientDao.getClientByID(clientsID, countryCode).then(async data => {
 
-            if(data){
-                data.forEach(i => {
- 
-                    formattedClientList.push({
-                        nameId: i.nameId,
-                        name:  i.name,
-                        country: i.country,
-                        grading: ""
-                    });
+        const getNamesAndCountries_ = (formattedClientList, data) => {
+           
+            data.forEach(i => {
+                formattedClientList.push({
+                    nameId: i.nameId,
+                    name:  i.name,
+                    country: i.country,
+                    grading: ""
                 });
+            });
 
-                resolve(formattedClientList);
-            }
-            resolve(false);
-        }).catch(err => {
-            reject(err);
-        })
+            resolve(formattedClientList);
+        }
+
+
+        if (countryCode !== undefined){
+            await ClientDao.getClientByIDAndCountry(clientsID, countryCode).then(async data => {
+                if (data) getNamesAndCountries_(formattedClientList, data);
+                else resolve(false);
+            }).catch(err => {
+                reject(err);
+            })
+        }
+
+        else{
+            await ClientDao.getClientByID(clientsID).then(async data => {
+                if (data) getNamesAndCountries_(formattedClientList, data);
+                else resolve(false);
+            }).catch(err => {
+                reject(err);
+            })
+        }
     });
 }
+
 
 
 //method to get the client grading
@@ -354,9 +393,8 @@ exports.getCountriesName = async () => {
             if(data){
                 data.forEach(country => {
                     countryList.push({
-                        countryCode: country.countryCode,
                         countryLabel: country.countryLabel
-                     });
+                    });
                 });
                 resolve(countryList);
             }

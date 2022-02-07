@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router';
 import Axios from 'axios';
 import Cookies from 'universal-cookie';
 import NavB from '../components/NavB'
-import Table from 'react-bootstrap/Table'
 import '../styles/clientTable.css'
 import '../styles/dashboardPage.css'
 import { InputGroup, FormControl, Button, ButtonGroup, DropdownButton, Dropdown, Form, Table, FormLabel, OverlayTrigger, Tooltip as ToolTipBootstrap, FormCheck  } from 'react-bootstrap'
@@ -89,8 +88,8 @@ const Dashboard = () => {
     const earliestYear = 2009;
     const [authorized, setAuthorized] = useState(false);
     const [clientNameCountry, setClientNameCountry] = useState([{ name: "", country: "", clientgrading: "" }]);
-    const [countries, setCountries] = useState([{countryCode: "", countryLabel: ""}]);
-    const [filteredCountry, setFilteredCountry] = useState({countryCode: ""});
+    const [countries, setCountries] = useState([{ countryLabel: "" }]);
+    const [filteredCountry, setFilteredCountry] = useState({country: ""});
     const [errors, setErrors] = useState({});
     
     const [criteria, setCriteria] = useState({
@@ -155,6 +154,35 @@ const Dashboard = () => {
             });
     }
 
+
+    //to display the list of all countries in the select box
+    const countrySelectBox = async () => {
+        let countryList = [];
+
+        let header = {
+            'authorization': "Bearer " + cookies.get("accessToken"),
+        }
+
+        await Axios.get(`${process.env.REACT_APP_API}/invoice/getCountries`, { headers: header })
+            .then(async (res) => {
+                if (res.status === 403 && res.status === 401) {
+                    setAuthorized(false);
+                    return;
+                }
+                setAuthorized(true);
+
+                for(let i = 0; i < res.data.length; i++)
+                {
+                    countryList.push({
+                        countryLabel: res.data[i].countryLabel
+                    });
+                }
+                setCountries(countryList);
+            });
+    }
+
+
+
     const chart = async (employeeId = undefined, countryCode = undefined, compare = false) => {
         setChartLoading(true);
         setChartData(fallbackChartData);
@@ -174,12 +202,12 @@ const Dashboard = () => {
 
             let param = {};
 
-            if(employeeId !== undefined) {
+            if(employeeId !== undefined && countryCode === undefined) {
                 param = {
                     employeeId: employeeId
                 }
             }
-            else if(countryCode !== undefined) {
+            else if(employeeId === undefined && countryCode !== undefined) {
                 param = {
                     country: countryCode
                 }
@@ -289,6 +317,8 @@ const Dashboard = () => {
         }
     }
 
+
+    //button to load the data and filtered the parameters of the chart method
     const loadChartData = async (event) => {
         event.preventDefault();
         event.stopPropagation();
@@ -302,13 +332,13 @@ const Dashboard = () => {
             if (employeeCriteria.id !== "All") {
                 
                 if(compareEmployeeChecked) {
-                    await chart(employeeCriteria.id, true);
+                    await chart(employeeCriteria.id, undefined, true);
                 } else {
-                    await chart(employeeCriteria.id);
+                    await chart(employeeCriteria.id, undefined, false);
                 }
-            }
+            }            
             else {
-                await chart();
+                await chart(undefined, filteredCountry, false);
             }
         }
     }
@@ -362,39 +392,10 @@ const Dashboard = () => {
     }
 
 
-    //to display the list of all countries in the select box
-    const countrySelectBox = async () => {
-        let countryList = [];
-
-        let header = {
-            'authorization': "Bearer " + cookies.get("accessToken"),
-        }
-
-        await Axios.get(`${process.env.REACT_APP_API}/invoice/getCountries`, { headers: header })
-            .then(async (res) => {
-                if (res.status === 403 && res.status === 401) {
-                    setAuthorized(false);
-                    return;
-                }
-                setAuthorized(true);
-
-                for(let i = 0; i < res.data.length; i++)
-                {
-                    countryList.push({
-                        countryCode: res.data[i].countryCode,
-                        countryLabel: res.data[i].countryLabel
-                    });
-                }
-                setCountries(countryList);
-            });
-    }
-
-
-
-    //to filter the chart and table based by country
+    
+    // assign the country selected inside the filteredCountry field
     const countryFiltering = (country) => {
-        setFilteredCountry(country);
-        chart(country);
+        setFilteredCountry(country)
     }
 
     
@@ -416,12 +417,6 @@ const Dashboard = () => {
     }, []);
     
         
-
-    const loadChartData = () => {
-        setChartData(chartData);
-    }
-
-
 
     return (
         <div>
@@ -533,7 +528,7 @@ const Dashboard = () => {
                             </Form.Group>
 
 
-                            <Form.Group className="my-2  px-2" controlId="floatingModifyStartMonth">
+                            <Form.Group className="my-2" controlId="floatingModifyStartMonth">
                                 <Form.Label>Country</Form.Label>
                                 <Form.Select
                                     className='my-2 px-2'
@@ -542,7 +537,7 @@ const Dashboard = () => {
                                     <option value="all">All countries</option>
                                     {countries.map ((country, index) => {
                                         return(
-                                            <option key={index} value={country.countryCode}> {country.countryLabel} </option>    
+                                            <option key={index} value={country.countryLabel}> {country.countryLabel} </option>    
                                         );
                                     })}
                                 </Form.Select>
