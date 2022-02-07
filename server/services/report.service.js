@@ -27,68 +27,30 @@ exports.createChartReportForUser = async (criteria, data, userId) => {
                 message: "Invalid content."
             });
 
-        let createdChartReport;
-        let createdData;
-
         await this.createChartReport(userId, criteria)
+            .then(async createdChartReport => {
+                if (createdChartReport) {
+                    return [await this.createChartReportData(createdChartReport, data),
+                        createdChartReport];
+                }
+                resolve(false);
+            })
             .then(async data => {
-                if (data) {
-                    createdChartReport = data;
+                if (data[0]) {
+                    let returnData = {
+                        createdChartReport: data[1],
+                        createdChartReportData: data[0]
+                    };
+                    resolve(returnData);
                 }
-                else {
-                    resolve(false);
-                }
-
+                resolve(false);
             })
             .catch(err => {
                 const response = {
                     status: err.status || 500,
                     message: err.message || "Malfunction in the B&C Engine."
-                }
-                return reject(response);
-            });
-
-        await this.createChartReportData(createdChartReport, data)
-            .then(async data => {
-                if (data) {
-                    createdData = data;
-                }
-                else {
-                    resolve(false);
-                }
-            })
-            .catch(err => {
-                const response = {
-                    status: err.status || 500,
-                    message: err.message || "Malfunction in the B&C Engine."
-                }
-                return reject(response);
-            })
-
-        let returnData = {
-            chartReport: createdChartReport,
-            data: createdData
-        };
-        resolve(returnData);
-    });
-}
-
-exports.createChartReport = async (userId, criteria) => {
-    return new Promise(async (resolve, reject) => {
-        await ChartReportDao.createChartReportForUser(userId, criteria)
-            .then(async data => {
-                if (data)
-                    resolve(data);
-                else
-                    resolve(false);
-            })
-            .catch(err => {
-                console.log("cmon bruh")
-                const response = {
-                    status: err.status || 500,
-                    message: err.message || "Malfunction in the B&C Engine."
-                }
-                return reject(response);
+                };
+                reject(response);
             });
     });
 }
@@ -137,7 +99,27 @@ exports.createChartReportData = async (createdChartReport, data) => {
     });
 }
 
+exports.createChartReport = async (userId, criteria) => {
+    return new Promise(async (resolve, reject) => {
+        ChartReportDao.createChartReportForUser(userId, criteria)
+            .then(async data => {
+                if (data)
+                    resolve(data);
+                else
+                    resolve(false);
+            })
+            .catch(err => {
+                const response = {
+                    status: err.status || 500,
+                    message: err.message || "Could not create Chart Report."
+                }
+                reject(response);
+            });
+    });
+}
+
 exports.verifyChartReport = (criteria) => {
+
     let verified = true;
 
     if (!('name' in criteria) || !('startDate' in criteria) || !('endDate' in criteria)
