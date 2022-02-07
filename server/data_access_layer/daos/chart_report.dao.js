@@ -58,10 +58,11 @@ exports.createDataForChartReport = async (chartReportId, data, chartReportDataMo
     console.log("what the hell???")
     return new Promise((resolve, reject) => {
         data.chart_report_id = chartReportId;
+        console.log(data)
         chartReportDataModel.bulkCreate(data)
             .then(async data => {
                 if (data) {
-                    let returnData = {};
+                    let returnData = [];
                     for (let i = 0; i < data.length; i++) {
                         returnData.push({
                             chartReportDataId: data[i].dataValues.id,

@@ -167,6 +167,7 @@ const Dashboard = () => {
     const chart = async (employeeId = -1, compare = false) => {
         setChartLoading(true);
         setChartData(fallbackChartData);
+        console.log(criteria)
         localStorage.setItem("dash_previous_criteria", JSON.stringify(criteria));
         let compareData = [];
 
@@ -297,17 +298,22 @@ const Dashboard = () => {
         setErrors(newErrors);
         if (Object.keys(newErrors).length !== 0) return;
 
+        const previouslyLoadedCriteriaStr = localStorage.getItem('dash_previous_criteria');
+        let previouslyLoadedCriteria = JSON.parse(previouslyLoadedCriteriaStr);
+        delete previouslyLoadedCriteria['name'];
+        let criteriaWithoutName = Object.assign({}, criteria);
+        delete criteriaWithoutName['name'];
+        if (!chartSaved && JSON.stringify(previouslyLoadedCriteria) !== JSON.stringify(criteriaWithoutName)) {
+            alert("Please load the chart by clicking on the 'Load Chart' button before saving it.")
+            return;
+        }
+
         setConfirmSaveActivated(true);
     }
 
     const onSaveConfirmClick = async () => {
         if (!chartLoading) {
-            const previouslyLoadedCriteriaStr = localStorage.getItem('dash_previous_criteria');
 
-            if (!chartSaved && previouslyLoadedCriteriaStr !== JSON.stringify(criteria)) {
-                alert("Please load the chart by clicking on the 'Load Chart' button before saving it.")
-                return;
-            }
             let header = {
                 'authorization': "Bearer " + cookies.get("accessToken"),
             }
@@ -359,7 +365,6 @@ const Dashboard = () => {
     }
 
     const loadChartData = async () => {
-
         if (!chartLoading) {
             const newErrors = findCriteriaErrors();
 
@@ -371,32 +376,29 @@ const Dashboard = () => {
                 }
             }
 
-            setField('employee2', {
-                id: compareEmployeeChecked ? -1 : null,
-                name: compareEmployeeChecked ? "All" : null
-            }, true)
-
             await chart(parseInt(criteria.employee1.id), compareEmployeeChecked);
         }
     };
 
-    const setField = (field, value, reset = false) => {
+    const setField = (field, value) => {
         if (field === 'employee1' && parseInt(value.id) === -1) {
             setCompareEmployeeChecked(false);
-            setField('employee2', {
-                id: null,
-                name: null
-            }, true);
+            setCriteria({
+                ...criteria,
+                [field]: value,
+                ['employee2']: { id: null, name: null }
+            });
         }
+        else {
+            if (field === 'employee2') {
+                setCompareEmployeeChecked(!compareEmployeeChecked);
+            }
 
-        if (field === 'employee2' && !reset) {
-            setCompareEmployeeChecked(!compareEmployeeChecked);
+            setCriteria({
+                ...criteria,
+                [field]: value
+            });
         }
-
-        setCriteria({
-            ...criteria,
-            [field]: value
-        });
 
         if (!!errors[field]) {
             setErrors({

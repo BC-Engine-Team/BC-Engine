@@ -67,7 +67,7 @@ exports.createChartReportData = async (createdChartReport, data) => {
                 year: year,
                 employee: createdChartReport.emp1Id === -1 ? -1 : createdChartReport.emp2Id === null ? createdChartReport.emp1Id : isEmpFiltered ? createdChartReport.emp1Id : createdChartReport.emp2Id,
                 january: data[i].data[0],
-                februray: data[i].data[1],
+                february: data[i].data[1],
                 march: data[i].data[2],
                 april: data[i].data[3],
                 may: data[i].data[4],
