@@ -158,10 +158,10 @@ const NavB = (props) => {
                                 </Nav>
                                 :
                                 <Nav className="me-auto">
-                                    <LinkContainer to="/dashboard" className="px-2">
+                                    <LinkContainer to="/dashboard" className="px-2" onClick={handleNavClick}>
                                         <Nav.Link>{DashboardLabel}</Nav.Link>
                                     </LinkContainer>
-                                    <LinkContainer to="/reports" className="px-2">
+                                    <LinkContainer to="/reports" className="px-2" onClick={handleNavClick}>
                                         <Nav.Link>{ReportsLabel}</Nav.Link>
                                     </LinkContainer>
                                 </Nav>
