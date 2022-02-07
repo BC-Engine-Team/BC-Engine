@@ -386,7 +386,7 @@ const Dashboard = () => {
             setCriteria({
                 ...criteria,
                 [field]: value,
-                ['employee2']: { id: null, name: null }
+                'employee2': { id: null, name: null }
             });
         }
         else {
