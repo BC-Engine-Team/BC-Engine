@@ -28,7 +28,6 @@ exports.getChartReportsByUserId = async (userId, chartReportModel = ChartReportM
 };
 
 exports.createChartReportForUser = async (userId, chartReport, chartReportModel = ChartReportModel) => {
-    console.log("cool stuff");
     return new Promise((resolve, reject) => {
         chartReport.user_user_id = userId;
         chartReportModel.create(chartReport)
@@ -44,10 +43,10 @@ exports.createChartReportForUser = async (userId, chartReport, chartReportModel 
                 }
                 resolve(false);
             })
-            .catch(async err => {
+            .catch(err => {
                 const response = {
                     status: err.status || 500,
-                    message: err.message || "Malfunction in the B&C Engine."
+                    message: err.message || "Could not create data."
                 }
                 reject(response);
             })
@@ -55,10 +54,8 @@ exports.createChartReportForUser = async (userId, chartReport, chartReportModel 
 }
 
 exports.createDataForChartReport = async (chartReportId, data, chartReportDataModel = ChartReportDataModel) => {
-    console.log("what the hell???")
     return new Promise((resolve, reject) => {
         data.chart_report_id = chartReportId;
-        console.log(data)
         chartReportDataModel.bulkCreate(data)
             .then(async data => {
                 if (data) {
@@ -77,7 +74,7 @@ exports.createDataForChartReport = async (chartReportId, data, chartReportDataMo
             .catch(async err => {
                 const response = {
                     status: err.status || 500,
-                    message: err.message || "Malfunction in the B&C Engine."
+                    message: err.message || "Could not create data."
                 }
                 reject(response);
             })

@@ -300,7 +300,6 @@ describe("Test Report Service", () => {
                 };
                 createChartReportDataSpy = jest.spyOn(ReportService, 'createChartReportData')
                     .mockImplementation(() => new Promise((resolve, reject) => {
-                        console.log("bro are you kidding me")
                         reject(expectedResponse);
                     }));
 
@@ -425,7 +424,7 @@ describe("Test Report Service", () => {
                 year: 2019,
                 employee: 12345,
                 january: 0,
-                februray: 0,
+                february: 0,
                 march: 0,
                 april: 0,
                 may: 0,
@@ -442,7 +441,7 @@ describe("Test Report Service", () => {
                 year: 2019,
                 employee: -1,
                 january: 0,
-                februray: 0,
+                february: 0,
                 march: 0,
                 april: 0,
                 may: 0,
