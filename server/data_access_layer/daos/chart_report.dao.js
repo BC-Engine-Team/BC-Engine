@@ -28,6 +28,7 @@ exports.getChartReportsByUserId = async (userId, chartReportModel = ChartReportM
 };
 
 exports.createChartReportForUser = async (userId, chartReport, chartReportModel = ChartReportModel) => {
+    console.log("cool stuff");
     return new Promise((resolve, reject) => {
         chartReport.user_user_id = userId;
         chartReportModel.create(chartReport)
@@ -54,12 +55,21 @@ exports.createChartReportForUser = async (userId, chartReport, chartReportModel 
 }
 
 exports.createDataForChartReport = async (chartReportId, data, chartReportDataModel = ChartReportDataModel) => {
+    console.log("what the hell???")
     return new Promise((resolve, reject) => {
         data.chart_report_id = chartReportId;
         chartReportDataModel.bulkCreate(data)
             .then(async data => {
                 if (data) {
-                    resolve(data)
+                    let returnData = {};
+                    for (let i = 0; i < data.length; i++) {
+                        returnData.push({
+                            chartReportDataId: data[i].dataValues.id,
+                            year: data[i].dataValues.year,
+                            employee: data[i].dataValues.employee
+                        });
+                    }
+                    resolve(returnData)
                 }
                 resolve(false);
             })

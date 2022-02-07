@@ -21,7 +21,7 @@ exports.getChartReportsByUserId = async (userId) => {
 
 exports.createChartReportForUser = async (criteria, data, userId) => {
     return new Promise(async (resolve, reject) => {
-        if (!verifyChartReport(criteria))
+        if (!this.verifyChartReport(criteria))
             return reject({
                 status: 400,
                 message: "Invalid content."
@@ -29,22 +29,72 @@ exports.createChartReportForUser = async (criteria, data, userId) => {
 
         let createdChartReport;
         let createdData;
-        await ChartReportDao.createChartReportForUser(userId, criteria)
+
+        await this.createChartReport(userId, criteria)
             .then(async data => {
-                if (data)
+                if (data) {
                     createdChartReport = data;
-                else
+                }
+                else {
                     resolve(false);
+                }
+
             })
-            .catch(async err => {
+            .catch(err => {
                 const response = {
                     status: err.status || 500,
                     message: err.message || "Malfunction in the B&C Engine."
                 }
-                reject(response);
+                return reject(response);
             });
 
+        await this.createChartReportData(createdChartReport, data)
+            .then(async data => {
+                if (data) {
+                    createdData = data;
+                }
+                else {
+                    resolve(false);
+                }
+            })
+            .catch(err => {
+                const response = {
+                    status: err.status || 500,
+                    message: err.message || "Malfunction in the B&C Engine."
+                }
+                return reject(response);
+            })
 
+        let returnData = {
+            chartReport: createdChartReport,
+            data: createdData
+        };
+        resolve(returnData);
+    });
+}
+
+exports.createChartReport = async (userId, criteria) => {
+    return new Promise(async (resolve, reject) => {
+        await ChartReportDao.createChartReportForUser(userId, criteria)
+            .then(async data => {
+                if (data)
+                    resolve(data);
+                else
+                    resolve(false);
+            })
+            .catch(err => {
+                console.log("cmon bruh")
+                const response = {
+                    status: err.status || 500,
+                    message: err.message || "Malfunction in the B&C Engine."
+                }
+                return reject(response);
+            });
+    });
+}
+
+exports.createChartReportData = async (createdChartReport, data) => {
+    return new Promise(async (resolve, reject) => {
         let preparedData = [];
 
         for (let i = 0; i < data.length; i++) {
@@ -73,27 +123,21 @@ exports.createChartReportForUser = async (criteria, data, userId) => {
         await ChartReportDao.createDataForChartReport(createdChartReport.chartReportId, preparedData)
             .then(async data => {
                 if (data)
-                    createdData = data;
+                    resolve(data);
                 else
                     resolve(false);
             })
-            .catch(async err => {
+            .catch(err => {
                 const response = {
                     status: err.status || 500,
                     message: err.message || "Malfunction in the B&C Engine."
                 }
                 reject(response);
             });
-
-        let returnData = {
-            chartReport: createdChartReport,
-            data: createdData
-        };
-        resolve(returnData);
     });
 }
 
-const verifyChartReport = (criteria) => {
+exports.verifyChartReport = (criteria) => {
     let verified = true;
 
     if (!('name' in criteria) || !('startDate' in criteria) || !('endDate' in criteria)

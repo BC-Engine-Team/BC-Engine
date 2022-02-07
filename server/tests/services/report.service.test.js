@@ -38,6 +38,7 @@ let chartReportDaoSpy = jest.spyOn(ChartReportDao, 'getChartReportsByUserId')
         resolve(expectedChartReports);
     }));
 
+
 describe("Test Report Service", () => {
 
     beforeEach(() => {
@@ -118,6 +119,161 @@ describe("Test Report Service", () => {
                 // act and assert
                 await expect(ReportService.getChartReportsByUserId()).rejects
                     .toEqual(expectedError);
+            });
+        });
+    });
+
+    describe("RS2 - createChartReportForUser", () => {
+        let fakeCreateChartReportDaoResponse = {
+            chartReportId: "fakeUUID",
+            name: "fakeName",
+            emp1Id: 12345,
+            emp2Id: -1
+        };
+        let fakeCreateDataForChartReportDaoResponse = [
+            {
+                chartReportDataId: "fakeUUID",
+                year: 2019,
+                employee: 12345
+            },
+            {
+                chartReportDataId: "fakeUUID",
+                year: 2019,
+                employee: -1
+            }
+        ];
+        let fakeChartReportRequest = {
+            chartReport: {
+                name: "CRname",
+                startDate: new Date(2019, 1, 1).toISOString(),
+                endDate: new Date(2019, 11, 1).toISOString(),
+                employee1Id: 12345,
+                employee1Name: "Emp1",
+                employee2Id: -1,
+                employee2Name: "All",
+                countryId: "CA",
+                country: "Canada",
+                clientType: "Corr",
+                ageOfAccount: "All",
+                accountType: "Receivable",
+                user_user_id: "fakeUUID"
+            },
+            chartReportData: [
+                {
+                    label: "2019 - employee",
+                    data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+                },
+                {
+                    label: "2019",
+                    data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+                }
+            ]
+        };
+        let fakePreparedData = [
+            {
+                chart_report_id: fakeCreateChartReportDaoResponse.chartReportId,
+                year: 2019,
+                employee: 12345,
+                january: 0,
+                februray: 0,
+                march: 0,
+                april: 0,
+                may: 0,
+                june: 0,
+                july: 0,
+                august: 0,
+                september: 0,
+                october: 0,
+                november: 0,
+                december: 0
+            },
+            {
+                chart_report_id: fakeCreateChartReportDaoResponse.chartReportId,
+                year: 2019,
+                employee: -1,
+                january: 0,
+                februray: 0,
+                march: 0,
+                april: 0,
+                may: 0,
+                june: 0,
+                july: 0,
+                august: 0,
+                september: 0,
+                october: 0,
+                november: 0,
+                december: 0
+            }
+        ];
+
+        let verifyChartReportSpy = jest.spyOn(ReportService, 'verifyChartReport')
+            .mockImplementation(() => {
+                return true;
+            });
+        // let createChartReportDaoSpy = jest.spyOn(ChartReportDao, 'createChartReportForUser')
+        //     .mockImplementation(() => new Promise((resolve) => {
+        //         resolve(fakeCreateChartReportDaoResponse);
+        //     }));
+        // let createDataForChartReportDaoSpy = jest.spyOn(ChartReportDao, 'createDataForChartReport')
+        //     .mockImplementation(() => new Promise((resolve) => {
+        //         resolve(fakeCreateDataForChartReportDaoResponse);
+        //     }));
+
+        let createChartReportSpy = jest.spyOn(ReportService, 'createChartReport')
+            .mockImplementation(() => new Promise((resolve, reject) => {
+                resolve(fakeCreateChartReportDaoResponse);
+            }));
+
+        let createChartReporDataSpy = jest.spyOn(ReportService, 'createChartReportData')
+            .mockImplementation(() => new Promise((resolve, reject) => {
+                resolve(fakeCreateDataForChartReportDaoResponse);
+            }));
+
+        describe("RS2.1 - given valid criteria", () => {
+            it("RS2.1.1 - when valid response from daos, should respond call daos with prepared data and respond with dao response", async () => {
+                // arrange
+                let expectedResponse = {
+                    chartReport: fakeCreateChartReportDaoResponse,
+                    data: fakeCreateDataForChartReportDaoResponse
+                };
+
+                // act
+                const response = await ReportService.createChartReportForUser(fakeChartReportRequest.chartReport,
+                    fakeChartReportRequest.chartReportData,
+                    "fakeUUID");
+
+                // assert
+                expect(response).toEqual(expectedResponse);
+                expect(createChartReportSpy).toHaveBeenCalledWith("fakeUUID", fakeChartReportRequest.chartReport);
+                expect(createChartReporDataSpy).toHaveBeenCalledWith(fakeCreateChartReportDaoResponse.chartReportId, fakePreparedData);
+            });
+
+            it("RS2.1.1 - when createChartReportDao throws error with specified status and message, should reject specified status and message", async () => {
+                // arrange
+                let expectedResponse = {
+                    status: 600,
+                    message: "Error."
+                };
+                // createChartReportDaoSpy = jest.spyOn(ChartReportDao, 'createChartReportForUser')
+                //     .mockImplementation(() => new Promise((resolve, reject) => {
+                //         reject(expectedResponse);
+                //     }));
+                createChartReportSpy = jest.spyOn(ReportService, 'createChartReport')
+                    .mockImplementation(() => new Promise((resolve, reject) => {
+                        console.log("watatatawpw")
+                        reject(expectedResponse);
+                    }));
+
+                // let createChartReportDataSpy = jest.spyOn(ReportService, 'createChartReportData')
+                //     .mockImplementation(() => new Promise((resolve, reject) => {
+                //         reject(expectedResponse);
+                //     }));
+
+
+                // act and assert
+                await expect(ReportService.createChartReportForUser(fakeChartReportRequest.chartReport,
+                    fakeChartReportRequest.chartReportData,
+                    "fakeUUID")).rejects.toEqual(expectedResponse);
             });
         });
     });

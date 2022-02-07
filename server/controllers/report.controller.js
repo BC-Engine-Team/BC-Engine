@@ -11,12 +11,15 @@ exports.getChartReportsByUserId = async (req, res) => {
             return res.status(500).send({ message: "The data could not be fetched." });
         })
         .catch(async err => {
-            return res.status(err.status).send({ message: err.message || "Malfunction in the B&C Engine." });
+            return res.status(err.status || 500).send({ message: err.message || "Malfunction in the B&C Engine." });
         });
 }
 
 exports.createChartReport = async (req, res) => {
-    if (!req.user || !req.user.userId || req.user.userId === "" || req.user.userId === undefined)
+    if (!req.user || !req.user.userId || req.user.userId === "" ||
+        req.user.userId === undefined || !req.body.chartReport ||
+        req.body.chartReport === undefined || !req.body.chartReportData ||
+        req.body.chartReportData === undefined)
         return res.status(400).send({ message: "Content cannot be empty." });
 
     let chartReportCriteria = req.body.chartReport;
@@ -30,6 +33,6 @@ exports.createChartReport = async (req, res) => {
             return res.status(500).send({ message: "The data could not be fetched." });
         })
         .catch(async err => {
-            return res.status(err.status).send({ message: err.message || "Malfunction in the B&C Engine." });
+            return res.status(err.status || 500).send({ message: err.message || "Malfunction in the B&C Engine." });
         });
 }
