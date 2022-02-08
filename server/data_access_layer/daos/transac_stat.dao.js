@@ -78,7 +78,7 @@ exports.getTransactionsStatByYearMonthAndCountry = async (yearMonthList, country
 
         try{
             const data = await db.query(
-                "SELECT DUE_CURRENT, DUE_1_MONTH, DUE_2_MONTH, DUE_3_MONTH \
+                "SELECT DUE_CURRENT, DUE_1_MONTH, DUE_2_MONTH, DUE_3_MONTH, YEAR_MONTH \
                 FROM ACCOUNTING_CLIENT_STAT \
                 WHERE ACC_NAME_ID IN (SELECT ACC_NAME_ID FROM ACCOUNTING_NAME WHERE ACC_NAME_COUNTRY = ?) \
                 AND CONNECTION_ID = 3 \

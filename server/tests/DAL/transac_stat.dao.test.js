@@ -186,4 +186,159 @@ describe("Test Transac Stat DAO", () => {
                 .toEqual(expectedError);
         });
     });
+
+
+    describe("TD3 - getTransactionsStatByYearMonthAndCountry", () => {
+        it("TD3.1 - Should return list of stats based by country", async () => {
+            // arrange
+            let countryName = "Canada";
+            let expectedResponse = [fakeStatsList[0].dataValues, fakeStatsList[1].dataValues];
+
+            let dbStub = {
+                query: () => {
+                    return fakeStatsListWithColumnName;
+                }
+            };
+
+            // act and assert
+            await expect(TransacStatDao.getTransactionsStatByYearMonthAndCountry(yearMonthList, countryName, dbStub)).resolves
+                .toEqual(expectedResponse);
+
+        });
+
+        it("TD3.2 - Should resolve false when Model cant fetch data", async () => {
+            // arrange
+            let countryName = "Canada";
+
+            let dbStub = {
+                query: () => {
+                    return false;
+                }
+            };
+
+            await expect(TransacStatDao.getTransactionsStatByYearMonthAndCountry(yearMonthList, countryName, dbStub)).resolves
+                .toEqual(false);
+        });
+
+        it("TD3.3 - Should reject error with 500 status and predefined message when model does not define them", async () => {
+            // arrange
+            let countryName = "Canada";
+
+            let expectedError = {
+                status: 500,
+                message: "some error occured"
+            };
+
+            let dbStub = {
+                query: () => {
+                    return Promise.reject(expectedError);
+                }
+            };
+
+            // act and assert
+            await expect(TransacStatDao.getTransactionsStatByYearMonthAndCountry(yearMonthList, countryName, dbStub)).rejects
+                .toEqual(expectedError);
+        });
+
+        it("TD3.4 - Should reject error when Model throws error with defined status and message", async () => {
+            // arrange
+            let countryName = "Canada";
+
+            let expectedError = {
+                status: 404,
+                message: "Error."
+            };
+
+            let dbStub = {
+                query: () => {
+                    return Promise.reject(expectedError);
+                }
+            };
+
+            // act and assert
+            await expect(TransacStatDao.getTransactionsStatByYearMonthAndCountry(yearMonthList, countryName, dbStub)).rejects
+                .toEqual(expectedError);
+        });
+    });
+
+    describe("TD4 - getTransactionsStatByYearMonthAndEmployeeAndCountry", () => {
+        it("TD4.1 - Should return list of stats based by employee and country", async () => {
+            // arrange
+            let employeeId = [22769];
+            let countryName = "Canada";
+            let expectedResponse = [fakeStatsList[0].dataValues, fakeStatsList[1].dataValues];
+
+            let dbStub = {
+                query: () => {
+                    return fakeStatsListWithColumnName;
+                }
+            };
+
+            // act and assert
+            await expect(TransacStatDao.getTransactionsStatByYearMonthAndEmployeeAndCountry(yearMonthList, employeeId, countryName, dbStub)).resolves
+                .toEqual(expectedResponse);
+
+        });
+
+        it("TD4.2 - Should resolve false when Model cant fetch data", async () => {
+            // arrange
+            let employeeId = [22769];
+            let countryName = "Canada";
+
+            let dbStub = {
+                query: () => {
+                    return false;
+                }
+            };
+
+            await expect(TransacStatDao.getTransactionsStatByYearMonthAndEmployeeAndCountry(yearMonthList, employeeId, countryName, dbStub)).resolves
+                .toEqual(false);
+        });
+
+        it("TD4.3 - Should reject error with 500 status and predefined message when model does not define them", async () => {
+            // arrange
+            let employeeId = [22769];
+            let countryName = "Canada";
+
+            let expectedError = {
+                status: 500,
+                message: "some error occured"
+            };
+
+            let dbStub = {
+                query: () => {
+                    return Promise.reject(expectedError);
+                }
+            };
+
+            // act and assert
+            await expect(TransacStatDao.getTransactionsStatByYearMonthAndEmployeeAndCountry(yearMonthList, employeeId, countryName, dbStub)).rejects
+                .toEqual(expectedError);
+        });
+
+        it("TD4.4 - Should reject error when Model throws error with defined status and message", async () => {
+
+            // arrange
+            let employeeId = [22769];
+            let countryName = "Canada";
+
+            let expectedError = {
+                status: 404,
+                message: "Error."
+            };
+
+            let dbStub = {
+                query: () => {
+                    return Promise.reject(expectedError);
+                }
+            };
+
+            // act and assert
+            await expect(TransacStatDao.getTransactionsStatByYearMonthAndEmployeeAndCountry(yearMonthList, employeeId, countryName, dbStub)).rejects
+                .toEqual(expectedError);
+        });
+    });
+
+
+
 });
