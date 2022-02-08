@@ -56,7 +56,7 @@ exports.getAllEmployeeNames = async (db = database) => {
                 let returnData = [];
                 data.forEach(c => {
                     returnData.push({
-                        nameId: c["NAME_ID"],
+                        nameID: c["NAME_ID"],
                         name: c["FULLNAME"],
                     });
                 });
