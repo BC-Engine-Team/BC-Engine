@@ -9,7 +9,7 @@ import { mdiEye, mdiEyeOff } from '@mdi/js';
 
 import NavB from '../components/NavB'
 import Form from 'react-bootstrap/Form'
-import { Alert, Button, FloatingLabel} from 'react-bootstrap'
+import { Alert, Button, FloatingLabel } from 'react-bootstrap'
 
 const Login = () => {
     const cookies = new Cookies();
@@ -60,11 +60,13 @@ const Login = () => {
                         let rToken = response.headers['authorization'].toString();
                         let username = response.data.authenticatedUser.name.toString();
                         let role = response.data.authenticatedUser.role.toString();
+                        let userId = response.data.authenticatedUser.userId.toString();
 
                         cookies.set("accessToken", aToken, { path: "/", expires: new Date(new Date().getTime() + 15 * 60 * 1000) });
                         cookies.set("refreshToken", rToken, { path: "/" });
                         cookies.set("username", username, { path: "/" });
                         cookies.set("role", role, { path: "/" });
+                        cookies.set("userId", userId, { path: "/" });
 
                         navigate("/dashboard");
                     }

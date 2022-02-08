@@ -31,7 +31,9 @@ db.Sequelize = Sequelize;
 
 // Add any tables to the database here
 // Add any tables to the local database here
-[db['localdb'].users, db['localdb'].chartReports] = require("./models/localdb/localdb.model")(db['localdb'], Sequelize);
+[db['localdb'].users,
+db['localdb'].chartReports,
+db['localdb'].chartReportsData] = require("./models/localdb/localdb.model")(db['localdb'], Sequelize);
 
 // patricia database tables
 db['mssql_pat'].employees = require("./models/mssql_pat/employee.model")(db['mssql_pat'], Sequelize);
@@ -73,6 +75,7 @@ db.sync = async (database, options) => {
           endDate: new Date(2019, 11, 1),
           employee1Id: 12345,
           employee1Name: 'France Cote',
+          countryId: 'CA',
           country: 'Canada',
           clientType: 'Corr',
           ageOfAccount: 'All',
@@ -87,6 +90,7 @@ db.sync = async (database, options) => {
           employee1Name: 'All',
           employee2Id: 12345,
           employee2Name: 'France Cote',
+          countryId: '-1',
           country: 'All',
           clientType: 'Direct',
           ageOfAccount: '60-90',
@@ -99,6 +103,7 @@ db.sync = async (database, options) => {
           endDate: new Date(2019, 11, 1),
           employee1Id: 12345,
           employee1Name: 'France Cote',
+          countryId: '-1',
           country: 'All',
           clientType: 'Any',
           ageOfAccount: '<30',

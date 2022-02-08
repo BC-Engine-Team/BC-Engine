@@ -4,4 +4,6 @@ const authService = require("../services/auth.service");
 
 router.get("/chartReport", authService.authenticateToken, reportController.getChartReportsByUserId);
 
+router.post("/chartReport", authService.authenticateToken, reportController.createChartReport);
+
 module.exports = router;
