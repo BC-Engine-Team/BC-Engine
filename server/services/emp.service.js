@@ -23,75 +23,22 @@ exports.checkEmail = async (req, res, next) => {
     
 };
 
-exports.getAllEmployees = async () => {
+exports.getAllEmployees = async (name = undefined) => {
     return new Promise(async (resolve, reject) => {
-        let listEmployeesWithNameID = [];
-        let listEmployees = [];
-
-        await this.getAllEmployeeNames().then(async data => {
-            listEmployees = data;
+        await NameDAO.getAllEmployeeNames().then(async data => {
+            if(data) {
+                if(name === undefined) resolve(data);
+                else {
+                    for(let i = 0; i < data.length; i++) {
+                        if(name === data[i].name) {
+                            resolve([data[i]]);
+                        } 
+                    }
+                }
+            }
+            resolve(false);
         }).catch(err => {
             reject(err);
         });
-
-        for(let i = 0; i < listEmployees.length; i++) {
-            await this.getEmployeeByfNameAndlName(listEmployees[i].firstName, listEmployees[i].lastName).then(async data => {
-                if(data) {
-                    listEmployeesWithNameID.push(data);
-
-                    if(listEmployees.length === listEmployeesWithNameID.length) {
-                        resolve(await this.sortListAlphabetically(listEmployeesWithNameID));
-                    }
-                }
-                else {
-                    resolve(false);
-                }
-                
-            }).catch(err => {
-                reject(err);
-            });
-        }
     });
-}
-
-exports.getEmployeeByfNameAndlName = async (firstName, lastName) => {
-    return new Promise(async (resolve, reject) => {
-        await NameDAO.getEmployeeByName(firstName, lastName)
-            .then(async data => {
-                if(data) {
-                    resolve(data.dataValues);
-                }
-                resolve(false);
-            })
-            .catch(err => {
-                reject(err);
-            });
-    });
-}
-
-exports.getAllEmployeeNames = async () => {
-    return new Promise(async (resolve, reject) => {
-        await EmpDAO.getAllEmployees()
-        .then(async data => {
-            if(data) {
-                resolve(data);
-            }
-            resolve(false);
-        })
-        .catch(err => {
-            reject(err);
-        });
-    });
-}
-
-exports.sortListAlphabetically = (list) => {
-    let sortedList = list.sort((a, b) => {
-        a = a.firstName.concat(a.lastName)
-        b = b.firstName.concat(b.lastName)
-        let userA = a.toUpperCase();
-        let userB = b.toUpperCase();
-        return (userA < userB) ? -1 : (userA > userB) ? 1 : 0;
-    });
-
-    return sortedList;
 }

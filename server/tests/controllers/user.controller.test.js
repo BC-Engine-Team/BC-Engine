@@ -110,6 +110,42 @@ describe("Test UserController", () => {
                 authStub.resetHistory();
                 empStub.resetHistory();
             });
+
+            describe("UC1.1.2 - Given service throws error", () => {
+                it("UC1.1.2.1 - when error message equals 'Validation error' should respond with 400", async () => {
+                    // arrange
+                    let userSpy = jest.spyOn(UserService, 'createUser')
+                    .mockImplementation(() => new Promise((resolve, reject) => {
+                        reject({message: "Validation error"});
+                    }));
+
+                    // act
+                    const response = await request.post("/api/users")
+                        .send(reqUser);
+
+                    // assert
+                    expect(response.status).toBe(400);
+                    expect(response.body.message).toBe("User already exists.")
+                    expect(userSpy).toHaveBeenCalledTimes(1);
+                });
+
+                it("UC1.1.2.2 - when error message equals 'Validation error' should respond with 500", async () => {
+                    // arrange
+                    let userSpy = jest.spyOn(UserService, 'createUser')
+                    .mockImplementation(() => new Promise((resolve, reject) => {
+                        reject({message: "error"});
+                    }));
+
+                    // act
+                    const response = await request.post("/api/users")
+                        .send(reqUser);
+
+                    // assert
+                    expect(response.status).toBe(500);
+                    expect(response.body.message).toBe("error")
+                    expect(userSpy).toHaveBeenCalledTimes(1);
+                });
+            })
         });
 
         describe("UC1.2 - given an invalid user body", () => {

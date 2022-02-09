@@ -25,9 +25,8 @@ let reqUserEmployee = {
     }
 };
 
-let sandbox = sinon.createSandbox();
-let authStub = sandbox.stub(AuthService, 'authenticateToken')
-    .callsFake(function (req, res, next) {
+let authSpy = jest.spyOn(AuthService, 'authenticateToken')
+    .mockImplementation((req, res, next) => {
         req.user = reqUser;
         return next();
     });
@@ -52,10 +51,6 @@ describe("Test Invoice Controller", () => {
     beforeEach(() => {
         jest.clearAllMocks();
         res = new MockExpressResponse();
-    });
-
-    afterEach(() => {
-        sandbox.restore();
     });
 
     afterAll(() => {
@@ -85,9 +80,7 @@ describe("Test Invoice Controller", () => {
                 expect(response.status).toBe(200);
                 expect(JSON.stringify(response.body)).toEqual(JSON.stringify(expectedInvoiceServiceResponse));
                 expect(invoiceServiceSpy).toHaveBeenCalledTimes(1);
-                expect(authStub.called).toBeTruthy();
-
-                authStub.resetHistory();
+                expect(authSpy).toHaveBeenCalledTimes(1);
             });
         });
 
@@ -129,7 +122,7 @@ describe("Test Invoice Controller", () => {
                 expect(response._responseData.toString('ascii')).toBe(JSON.stringify(expectedResponse));
             });
 
-            it("should respond with 400 and appropriate message when invalid date format", async () => {
+            it("1.2.3 - should respond with 400 and appropriate message when invalid date format", async () => {
                 // arrange
                 let expectedResponseMessage = "Wrong format.";
 
@@ -221,9 +214,7 @@ describe("Test Invoice Controller", () => {
                 expect(response.status).toBe(200);
                 expect(JSON.stringify(response.body)).toEqual(JSON.stringify(expectedInvoiceServiceResponse));
                 expect(invoiceServiceSpy).toHaveBeenCalledTimes(1);
-                expect(authStub.called).toBeTruthy();
-
-                authStub.resetHistory();
+                expect(authSpy).toHaveBeenCalledTimes(1);
             });
         });
     });
@@ -270,21 +261,10 @@ describe("Test Invoice Controller", () => {
                 expect(response.status).toBe(200);
                 expect(JSON.stringify(response.body)).toEqual(JSON.stringify(expectedEmpServiceResponse));
                 expect(empServiceSpy).toHaveBeenCalledTimes(1);
-                expect(authStub.called).toBeTruthy();
-
-                authStub.resetHistory();
+                expect(authSpy).toHaveBeenCalledTimes(1);
             });
-        });
 
-        describe("IC2.2 - given an employee user", () => {
-            it("IC2.2.1 - Should respond with 403 when user is not admin", async () => {
-                let response = await InvController.getAllEmployeesDropdown(reqUserEmployee, res);
-                expect(response.statusCode).toBe(403);
-            });
-        });
-
-        describe("IC2.3 - given service cannot fetch data", () => {
-            it("IC2.3.1 -  should respond with 500 and message", async () => {
+            it("IC2.1.2 -  should respond with 500 and message", async () => {
                 // arrange
                 let expectedResponse = "The data could not be fetched.";
                 empServiceSpy = jest.spyOn(EmpService, 'getAllEmployees')
@@ -299,10 +279,8 @@ describe("Test Invoice Controller", () => {
                 expect(response.status).toBe(500);
                 expect(response.body.message).toBe(expectedResponse);
             });
-        });
 
-        describe("IC2.4 - given service throws an error", () => {
-            it("IC2.4.1 - should respond with 500 status code and message when not specified", async () => {
+            it("IC2.1.3 - should respond with 500 status code and message when not specified", async () => {
                 // arrange
                 let expectedError = {
                     message: "Malfunction in the B&C Engine."
@@ -320,7 +298,96 @@ describe("Test Invoice Controller", () => {
                 expect(response.body).toEqual(expectedError);
             });
 
-            it("IC2.4.2 - should respond with caught error's status and message", async () => {
+            it("IC2.1.4 - should respond with caught error's status and message", async () => {
+                // arrange
+                let expectedError = {
+                    status: 400,
+                    message: "Custom message."
+                };
+                empServiceSpy = jest.spyOn(EmpService, 'getAllEmployees')
+                    .mockImplementation(async () => {
+                        await Promise.reject(expectedError);
+                    });
+
+                // act
+                const response = await request.get("/api/invoice/employees");
+
+                // assert
+                expect(response.status).toBe(400);
+                expect(response.body.message).toBe(expectedError.message);
+            });
+        });
+
+        describe("IC2.2 - given an employee user", () => {
+            it("IC2.2.1 - Should respond with 200 and one employee", async () => {
+                // arrange
+                let expectedEmpServiceResponse = [
+                    {
+                        dataValues: {
+                            email: 'Cathia@benoit-cote.com',
+                            firstName: 'Cathia',
+                            lastName: 'Zeppetelli',
+                            isActive: true
+                        },
+                    }
+                ];
+
+                authSpy = jest.spyOn(AuthService, 'authenticateToken')
+                    .mockImplementation((req, res, next) => {
+                        req.user = reqUserEmployee;
+                        return next();
+                    });
+
+                empServiceSpy = jest.spyOn(EmpService, 'getAllEmployees')
+                    .mockImplementation(() => new Promise((resolve) => {
+                        resolve(expectedEmpServiceResponse);
+                    }));
+
+                const response = await request.get("/api/invoice/employees")
+                    .send(reqUserEmployee);
+
+                // assert
+                expect(response.status).toBe(200);
+                expect(JSON.stringify(response.body)).toEqual(JSON.stringify(expectedEmpServiceResponse));
+                expect(empServiceSpy).toHaveBeenCalledTimes(1);
+                expect(authSpy).toHaveBeenCalledTimes(1);
+            });
+
+            it("IC2.2.2 -  should respond with 500 and message", async () => {
+                // arrange
+                let expectedResponse = "The data could not be fetched.";
+                empServiceSpy = jest.spyOn(EmpService, 'getAllEmployees')
+                    .mockImplementation(() => new Promise((resolve) => {
+                        resolve(false);
+                    }));
+
+                // act
+                const response = await request.get("/api/invoice/employees");
+
+                // assert
+                expect(response.status).toBe(500);
+                expect(response.body.message).toBe(expectedResponse);
+            });
+
+            it("IC2.2.3 - should respond with 500 status code and message when not specified", async () => {
+                // arrange
+                let expectedError = {
+                    message: "Malfunction in the B&C Engine."
+                };
+                empServiceSpy = jest.spyOn(EmpService, 'getAllEmployees')
+                    .mockImplementation(async () => {
+                        await Promise.reject({});
+                    });
+
+                // act
+                const response = await request.get("/api/invoice/employees");
+
+                // assert
+                expect(response.status).toBe(500);
+                expect(response.body).toEqual(expectedError);
+            });
+
+            it("IC2.2.4 - should respond with caught error's status and message", async () => {
                 // arrange
                 let expectedError = {
                     status: 400,

@@ -148,7 +148,7 @@ describe("Test Report Service", () => {
         },
         chartReportData: [
             {
-                label: "2019 - employee",
+                label: "2019 - emp",
                 data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
             },
             {
