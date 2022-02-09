@@ -23,11 +23,18 @@ exports.checkEmail = async (req, res, next) => {
     
 };
 
-exports.getAllEmployees = async () => {
+exports.getAllEmployees = async (name = undefined) => {
     return new Promise(async (resolve, reject) => {
         await NameDAO.getAllEmployeeNames().then(async data => {
             if(data) {
-                resolve(data);
+                if(name === undefined) resolve(data);
+                else {
+                    for(let i = 0; i < data.length; i++) {
+                        if(name === data[i].name) {
+                            resolve([data[i]]);
+                        } 
+                    }
+                }
             }
             resolve(false);
         }).catch(err => {

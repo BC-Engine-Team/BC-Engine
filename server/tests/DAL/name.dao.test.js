@@ -26,28 +26,22 @@ let fakeClientList = [
     }
 ];
 
-let returnedEmployee = [
+let returnedEmployeeList = [
     {
-        nameID: 29910,
-        firstName: 'Cathia',
-        lastName: 'Zeppetelli'
+        NAME_ID: 29910,
+        FULLNAME: 'Cathia Zeppetelli'
+    },
+    {
+        NAME_ID: 29569,
+        FULLNAME: 'France Cote'
     }
 ]
 
 let SequelizeMock = require('sequelize-mock');
 const dbMock = new SequelizeMock();
-var NameMock = dbMock.define('NAME', returnedEmployee);
 
 describe("Test Name DAO", () => {
     const instance = new NameModel();
-
-    afterEach(() => {
-        NameMock.$queryInterface.$clearResults();
-    })
-
-    beforeEach(() => {
-        NameMock.$queryInterface.$clearResults();
-    })
 
     // testing the chart report model properties
     checkModelName(NameModel)('NAME');
@@ -122,72 +116,57 @@ describe("Test Name DAO", () => {
         })
     });
 
-    describe("ND2 - getEmployeeByName", () => {
-        it("ND2.1 - Should return one employee corresponding to the name input", async () => {
-            
+    describe("ND2 - getAllEmployeeNames", () => {
+        it("ND2.1 - Should return a list of employees", async () => {
             // arrange
-            let firstName = 'Cathia';
-            let lastName = 'Seppetelli'
+            let dbStub = {
+                query: () => {
+                    return returnedEmployeeList;
+                }
+            };
 
-            NameMock.$queryInterface.$useHandler(function (query, queryOptions, done) {
-                return Promise.resolve(returnedEmployee);
-            });
+            let expectedEmployeeList = [
+                {
+                    nameID: 29910,
+                    name: 'Cathia Zeppetelli'
+                },
+                {
+                    nameID: 29569,
+                    name: 'France Cote'
+                }
+            ]
 
-            // act and assert
-            await expect(ClientDao.getEmployeeByName(firstName, lastName, NameMock)).resolves
-                .toEqual(returnedEmployee);
+            // act
+            const response = await ClientDao.getAllEmployeeNames(dbStub);
+
+            // assert
+            expect(response).toEqual(expectedEmployeeList);
         });
 
         it("ND2.2 - should resolve false when Model cant fetch data", async () => {
             // arrange
-            let firstName = 'Cathia';
-            let lastName = 'Seppetelli'
-
-            NameMock.$queryInterface.$useHandler(function (query, queryOptions, done) {
-                return Promise.resolve(false);
-            });
+            let dbStub = {
+                query: () => {
+                    return false;
+                }
+            };
 
             // act and assert
-            await expect(ClientDao.getEmployeeByName(firstName, lastName, NameMock)).resolves
+            await expect(ClientDao.getAllEmployeeNames(dbStub)).resolves
                 .toEqual(false);
         });
 
-        it("ND2.3 - should reject error when Model throws error with defined status and message", async () => {
+        it("ND2.3 - should reject error with 500 status with error message", async () => {
             // arrange
-            let firstName = 'Cathia';
-            let lastName = 'Seppetelli'
-
-            let expectedError = {
-                status: 404,
-                message: "Error."
+            let dbStub = {
+                query: () => {
+                    throw new Error("Error with the db.");
+                }
             };
 
-            NameMock.$queryInterface.$useHandler(function (query, queryOptions, done) {
-                return Promise.reject(expectedError);
-            });
-
             // act and assert
-            await expect(ClientDao.getEmployeeByName(firstName, lastName, NameMock)).rejects
-                .toEqual(expectedError);
-        });
-
-        it("ND2.4 - should reject error with 500 status and predefined message when model does not define them", async () => {
-            // arrange
-            let firstName = 'Cathia';
-            let lastName = 'Seppetelli'
-
-            let expectedError = {
-                status: 500,
-                message: "some error occured"
-            };
-
-            NameMock.$queryInterface.$useHandler(function (query, queryOptions, done) {
-                return Promise.reject({});
-            });
-
-            // act and assert
-            await expect(ClientDao.getEmployeeByName(firstName, lastName, NameMock)).rejects
-                .toEqual(expectedError);
+            await expect(ClientDao.getAllEmployeeNames(dbStub)).rejects
+                .toEqual(new Error("Error with the db."));
         });
     });
 });

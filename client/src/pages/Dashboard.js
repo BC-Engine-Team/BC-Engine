@@ -145,22 +145,20 @@ const Dashboard = () => {
                         name: res.data[i].name,
                         id: res.data[i].nameID
                     });
-                    
                 }
-
                 setEmployeeSelect(listEmployee);
             })
             .catch((error) => {
                 if (error.response) {
                     if (error.response.status === 403 || error.response.status === 401) {
-                        console.log(error.response.body);
+                        alert(error.response.body);
                     }
                     else {
-                        console.log("Malfunction in the B&C Engine...");
+                        alert("Malfunction in the B&C Engine...");
                     }
                 }
                 else if (error.request) {
-                    console.log("Could not reach b&C Engine...");
+                    alert("Could not reach b&C Engine...");
                 }
             });
     }
@@ -227,7 +225,7 @@ const Dashboard = () => {
                         let colorBG = colors[colorCounter];
 
                         if (compare && c === 0) {
-                            datasetLabel = groupedChartData[Object.keys(groupedChartData)[i]][0]['group'].toString().concat(" - employee");
+                            datasetLabel = groupedChartData[Object.keys(groupedChartData)[i]][0]['group'].toString().concat(" - emp");
                             colorBG = compareColors[colorCounter]
                         }
 
