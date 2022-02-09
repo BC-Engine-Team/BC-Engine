@@ -46,7 +46,7 @@ describe("Return unresolved page", () => {
 
     it("should respond with a 404 status code", async () => {
         const response = await supertest(app).get("/blabla");
-        expect(JSON.stringify(response.text)).toBe(response404);
+        expect(JSON.stringify(response.text)).toEqual(response404);
     });
     
 });
