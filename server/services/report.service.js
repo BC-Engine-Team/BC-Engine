@@ -60,7 +60,7 @@ exports.createChartReportData = async (createdChartReport, data) => {
         let preparedData = [];
 
         for (let i = 0; i < data.length; i++) {
-            let isEmpFiltered = data[i].label.toString().split(" - ").at(-1) === "employee";
+            let isEmpFiltered = data[i].label.toString().split(" - ").at(-1) !== undefined;
             let year = parseInt(data[i].label.toString().split(" - ")[0]);
             let set = {
                 chart_report_id: createdChartReport.chartReportId,
