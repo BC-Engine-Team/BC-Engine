@@ -87,12 +87,14 @@ exports.getAverages = async (startDateStr, endDateStr,  employeeId = undefined) 
             nameIdList.push(c.nameId);
         });
 
-        await this.getClientGrading(nameIdList).then(async data => {
-            clientGradingList = data;
-        }).catch(err => {
-            reject(err);
-        });
-
+        if(nameIdList.length !== 0) {
+            await this.getClientGrading(nameIdList).then(async data => {
+                clientGradingList = data;
+            }).catch(err => {
+                reject(err);
+            });
+        }
+        
         for (const c of clientList) {
             for (const g of clientGradingList) {
                 if (c.nameId === g.nameId) {
@@ -199,12 +201,17 @@ exports.getBilled = async (startDateStr, endDateStr, yearMonthList, clientsList 
             })
         }
         else {
-            await InvoiceAffectDao.getInvoicesByDateAndEmployee(startDateStr, endDateStr, clientsList).then(async data => {
-                if (data) getBilled_(yearMonthList, data);
-                else resolve(false);
-            }).catch(err => {
-                reject(err);
-            })
+            if(clientsList.length === 0) {
+                getBilled_(yearMonthList, [{invoiceDate: null, billed: null, actorId: null}])
+            }
+            else {
+                await InvoiceAffectDao.getInvoicesByDateAndEmployee(startDateStr, endDateStr, clientsList).then(async data => {
+                    if (data) getBilled_(yearMonthList, data);
+                    else resolve(false);
+                }).catch(err => {
+                    reject(err);
+                });
+            }
         }
     });
 }

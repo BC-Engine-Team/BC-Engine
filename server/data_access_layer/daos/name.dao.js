@@ -1,29 +1,5 @@
-const databases = require("../databases");
 const database = require('../databases')['mssql_bosco'];
 const { QueryTypes } = require('sequelize');
-const NameModel = databases['mssql_bosco'].nameEmployee;
-
-exports.getEmployeeByName = async (fName, lName, nameModel = NameModel) => {
-    return new Promise((resolve, reject) => {
-        nameModel.findOne({
-            where: {
-                NAME_1: fName,
-                NAME_3: lName
-            }
-        })
-        .then(async data => {
-            if(data) resolve(data);
-            resolve(false);
-        })
-        .catch(err => {
-            const response = {
-                status: err.status || 500,
-                message: err.message || "some error occured"
-            }
-            reject(response);
-        })
-    })
-}
 
 exports.getClientByID = async (clientIDList, db=database) => {
 
@@ -41,13 +17,47 @@ exports.getClientByID = async (clientIDList, db=database) => {
                     type: QueryTypes.SELECT
                 }
             );
-            if(data){
+            if(data) {
                 let returnData = [];
                 data.forEach(c => {
                     returnData.push({
                         nameId: c["NAME_ID"],
                         name: c["NAME"],
                         country: c["COUNTRY_LABEL"]
+                    });
+                });
+                resolve(returnData);
+            }
+            resolve(false);
+        }
+        catch(err){
+            reject(err);
+        }
+    });
+}
+
+exports.getAllEmployeeNames = async (db = database) => {
+
+    return new Promise(async (resolve, reject) => {
+
+        try{
+            const data = await db.query(
+                "SELECT ISNULL(NAME_1,'') + ISNULL(' '+NAME_2,'') + ISNULL(' '+NAME_3,'') AS FULLNAME, NAME_ID \
+                FROM NAME \
+                WHERE NAME_ID IN \
+                ( SELECT DISTINCT DROPDOWN_CODE FROM NAME_QUALITY \
+                WHERE DROPDOWN_ID = 5 ) \
+                ORDER BY NAME_1",
+                {
+                    type: QueryTypes.SELECT
+                }
+            );
+            if(data) {
+                let returnData = [];
+                data.forEach(c => {
+                    returnData.push({
+                        nameID: c["NAME_ID"],
+                        name: c["FULLNAME"],
                     });
                 });
                 resolve(returnData);

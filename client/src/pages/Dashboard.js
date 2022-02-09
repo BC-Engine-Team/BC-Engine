@@ -142,24 +142,23 @@ const Dashboard = () => {
 
                 for (let i = 0; i < res.data.length; i++) {
                     listEmployee.push({
-                        name: res.data[i].firstName + " " + res.data[i].lastName,
+                        name: res.data[i].name,
                         id: res.data[i].nameID
                     });
                 }
-
                 setEmployeeSelect(listEmployee);
             })
             .catch((error) => {
                 if (error.response) {
                     if (error.response.status === 403 || error.response.status === 401) {
-                        console.log(error.response.body);
+                        alert(error.response.body);
                     }
                     else {
-                        console.log("Malfunction in the B&C Engine...");
+                        alert("Malfunction in the B&C Engine...");
                     }
                 }
                 else if (error.request) {
-                    console.log("Could not reach b&C Engine...");
+                    alert("Could not reach b&C Engine...");
                 }
             });
     }
@@ -167,7 +166,6 @@ const Dashboard = () => {
     const chart = async (employeeId = -1, compare = false) => {
         setChartLoading(true);
         setChartData(fallbackChartData);
-        console.log(criteria)
         localStorage.setItem("dash_previous_criteria", JSON.stringify(criteria));
         let compareData = [];
 
@@ -195,7 +193,6 @@ const Dashboard = () => {
 
             await Axios.get(`${process.env.REACT_APP_API}/invoice/defaultChartAndTable/${startDate}/${endDate}`, { params: param, headers: header })
                 .then((res) => {
-                    console.log(res.data[0].table.length)
                     if (res.status === 403 && res.status === 401) {
                         setAuthorized(false);
                         return;
@@ -228,7 +225,7 @@ const Dashboard = () => {
                         let colorBG = colors[colorCounter];
 
                         if (compare && c === 0) {
-                            datasetLabel = groupedChartData[Object.keys(groupedChartData)[i]][0]['group'].toString().concat(" - employee");
+                            datasetLabel = groupedChartData[Object.keys(groupedChartData)[i]][0]['group'].toString().concat(" - emp");
                             colorBG = compareColors[colorCounter]
                         }
 
@@ -595,7 +592,7 @@ const Dashboard = () => {
                                         </ToolTipBootstrap> : <></>
                                     } >
 
-                                    <FormControl id="employeeCriteriaDashboard" as="select" onChange={(e) => {
+                                    <Form.Select id="employeeCriteriaDashboard" onChange={(e) => {
                                         setField('employee1', {
                                             id: e.target.value,
                                             name: e.target.options[e.target.selectedIndex].text
@@ -608,7 +605,7 @@ const Dashboard = () => {
                                                 <option key={e.id} value={e.id}>{e.name}</option>
                                             )
                                         })}
-                                    </FormControl>
+                                    </Form.Select>
                                 </OverlayTrigger>
 
                                 <OverlayTrigger
