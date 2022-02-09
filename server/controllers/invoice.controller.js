@@ -27,19 +27,31 @@ exports.getAverages = async (req, res) => {
 }
 
 exports.getAllEmployeesDropdown = async (req, res) => {
-    if (req.user.role !== "admin") return res.status(403).send();
-
-    await empService.getAllEmployees()
-        .then(response => {
-            if(response) {
-                return res.status(200).send(response);
-            }
-            return res.status(500).send({ message: "The data could not be fetched." });
-    })
-        .catch(err => {
-            return res.status(err.status || 500)
-                .send({ message: !!err.message ? err.message : "Malfunction in the B&C Engine." });
+    if (req.user.role === "admin") {
+        await empService.getAllEmployees()
+            .then(response => {
+                if(response) {
+                    return res.status(200).send(response);
+                }
+                return res.status(500).send({ message: "The data could not be fetched." });
+            })
+            .catch(err => {
+                return res.status(err.status || 500)
+                    .send({ message: !!err.message ? err.message : "Malfunction in the B&C Engine." });
         });
+    } else {
+        await empService.getAllEmployees(req.user.name)
+            .then(response => {
+                if(response) {
+                    return res.status(200).send(response);
+                }
+                return res.status(500).send({ message: "The data could not be fetched." });
+            })
+            .catch(err => {
+                return res.status(err.status || 500)
+                    .send({ message: !!err.message ? err.message : "Malfunction in the B&C Engine." });
+        });
+    }
 }
 
 exports.getCountriesName = async (req, res) => {

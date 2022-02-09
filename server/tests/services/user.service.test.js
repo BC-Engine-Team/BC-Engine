@@ -210,24 +210,44 @@ describe("Test User Service", () => {
     
     describe("US3 - Authenticate User", () => {
         describe("US3.1 - given a valid user", () => {
-            it("US3.1.1 - should return Dao error", async () => {
+            it("US3.1.1 - should return Dao error (custom error message)", async () => {
                 // arrange
+                let expectedData = {
+                    status: 500,
+                    message: "dao error"
+                }
+                
                 userDAOSpy = jest.spyOn(UserDAO, 'getUserByEmail')
                     .mockImplementation(() => new Promise((resolve, reject) => {
                         reject(expectedData);
                     }));
-
-                let expectedData = {
-                    status: 500,
-                    message: "some error occured"
-                }
     
                 // act and assert
                 await expect(UserService.authenticateUser(reqUser)).rejects
                     .toEqual(expectedData);
             });
 
-            it("US3.1.2 - should return false", async () => {
+            it("US3.1.2 - should return 'some error occured' (default error message)", async () => {
+                // arrange
+                let errorData = {
+                    status: 500
+                }
+                let expectedData = {
+                    status: 500,
+                    message: "some error occured"
+                }
+                
+                userDAOSpy = jest.spyOn(UserDAO, 'getUserByEmail')
+                .mockImplementation(() => new Promise((resolve, reject) => {
+                    reject(errorData);
+                }));
+
+                // act and assert
+                await expect(UserService.authenticateUser(reqUser)).rejects
+                    .toEqual(expectedData);
+            });
+
+            it("US3.1.3 - should return false", async () => {
                 // arrange
                 userDAOSpy = jest.spyOn(UserDAO, 'getUserByEmail')
                     .mockImplementation(() => new Promise((resolve, reject) => {
@@ -237,6 +257,23 @@ describe("Test User Service", () => {
                 // act and assert
                 await expect(UserService.authenticateUser(reqUser)).resolves
                     .toEqual(false);
+            });
+
+            it("US3.1.4 - should return a status 200 with valid data", async () => {
+                // arrange
+                let authUser = {
+                    password: 'CoolCool123',
+                    validPassword: () => {return true}
+                };
+
+                userDAOSpy = jest.spyOn(UserDAO, 'getUserByEmail')
+                    .mockImplementation(() => new Promise((resolve, reject) => {
+                        resolve(authUser);
+                    }));
+    
+                // act and assert
+                await expect(UserService.authenticateUser(reqUser)).resolves
+                    .toEqual(authUser);
             });
         });
     });

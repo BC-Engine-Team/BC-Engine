@@ -11,7 +11,7 @@ import '../styles/usersPage.css'
 import '../styles/popup.css'
 
 import NavB from '../components/NavB'
-import DeleteUserPopup from '../components/DeleteUserPopup'
+import ConfirmationPopup from '../components/ConfirmationPopup'
 import UsersForm from '../components/UsersForm'
 import DeleteButton from '../components/DeleteButton'
 import EditButton from '../components/EditButton'
@@ -249,10 +249,11 @@ const Users = () => {
                     </div>
                 </div>
             </div>
-            <DeleteUserPopup
+            <ConfirmationPopup
                 open={deleteButtonActivated}
+                prompt={t('user.delete.Title')}
                 title={email}
-                onDelete={() => { onDeleteClick() }}
+                onAccept={() => { onDeleteClick() }}
                 onClose={() => { setDeleteButtonActivated(false) }} />
         </div>
     )

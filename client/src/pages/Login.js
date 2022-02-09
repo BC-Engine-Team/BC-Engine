@@ -9,7 +9,7 @@ import { mdiEye, mdiEyeOff } from '@mdi/js';
 
 import NavB from '../components/NavB'
 import Form from 'react-bootstrap/Form'
-import { Alert, Button, FloatingLabel} from 'react-bootstrap'
+import { Alert, Button, FloatingLabel } from 'react-bootstrap'
 
 const Login = () => {
     const cookies = new Cookies();
@@ -60,11 +60,13 @@ const Login = () => {
                         let rToken = response.headers['authorization'].toString();
                         let username = response.data.authenticatedUser.name.toString();
                         let role = response.data.authenticatedUser.role.toString();
+                        let userId = response.data.authenticatedUser.userId.toString();
 
                         cookies.set("accessToken", aToken, { path: "/", expires: new Date(new Date().getTime() + 15 * 60 * 1000) });
                         cookies.set("refreshToken", rToken, { path: "/" });
                         cookies.set("username", username, { path: "/" });
                         cookies.set("role", role, { path: "/" });
+                        cookies.set("userId", userId, { path: "/" });
 
                         navigate("/dashboard");
                     }
@@ -127,11 +129,12 @@ const Login = () => {
         <div>
             <NavB page="login" />
             <div className="container">
-                <div className="card shadow p-3 m-5">
+                <div id="login-card" className="card shadow p-3 m-5">
                     <h1 className="display-1 font-weight-bold text-center mt-5 mb-4">{t('login.Title')}</h1>
 
                     <Form
                         noValidate
+                        id="loginForm"
                         className="mt-5 mx-5"
                         validated={validated}
                         onSubmit={handleSubmit}>
@@ -164,6 +167,7 @@ const Login = () => {
                             <FloatingLabel controlId="floatingPassword" label={t('form.Password')} className="mb-3 inputWithShowHide" >
                                 <Form.Control
                                     required
+                                    className='passwordValidationField'
                                     type={showPass ? "text" : "password"}
                                     value={password}
                                     isInvalid={validationError}

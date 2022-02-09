@@ -39,11 +39,20 @@ const NavB = (props) => {
 
     let navigate = useNavigate();
 
+    const handleNavClick = (e) => {
+
+        if (page.page === "dashboard") {
+            e.preventDefault();
+            props.handleNavClick(e.target.href);
+        }
+
+    }
+
     const logout = () => {
         let refreshToken = cookies.get("refreshToken");
 
         if (refreshToken !== undefined) {
-            
+
             let conf = {
                 headers: {
                     authorization: "Bearer " + refreshToken
@@ -54,7 +63,7 @@ const NavB = (props) => {
                 .then((response) => {
 
                     if (response.status === 204) {
-                       // Future pop-up animation
+                        // Future pop-up animation
                     }
                 })
                 .catch((error) => {
@@ -137,22 +146,22 @@ const NavB = (props) => {
                                     <LinkContainer to="/dashboard" className="px-2">
                                         <Nav.Link>{DashboardLabel}</Nav.Link>
                                     </LinkContainer>
-                                    <LinkContainer to="/reports" className="px-2">
-                                        <Nav.Link>{ReportsLabel}</Nav.Link>
+                                    <LinkContainer to="/reports" className="px-2" onClick={handleNavClick}>
+                                        <Nav.Link >{ReportsLabel}</Nav.Link>
                                     </LinkContainer>
-                                    <LinkContainer to="/users" className="px-2">
-                                        <Nav.Link>{UsersLabel}</Nav.Link>
+                                    <LinkContainer to="/users" className="px-2" onClick={handleNavClick}>
+                                        <Nav.Link >{UsersLabel}</Nav.Link>
                                     </LinkContainer>
-                                    <LinkContainer to="/manage" className="px-2">
+                                    <LinkContainer to="/manage" className="px-2" onClick={handleNavClick}>
                                         <Nav.Link>{ManageLabel}</Nav.Link>
                                     </LinkContainer>
                                 </Nav>
                                 :
                                 <Nav className="me-auto">
-                                    <LinkContainer to="/dashboard" className="px-2">
+                                    <LinkContainer to="/dashboard" className="px-2" onClick={handleNavClick}>
                                         <Nav.Link>{DashboardLabel}</Nav.Link>
                                     </LinkContainer>
-                                    <LinkContainer to="/reports" className="px-2">
+                                    <LinkContainer to="/reports" className="px-2" onClick={handleNavClick}>
                                         <Nav.Link>{ReportsLabel}</Nav.Link>
                                     </LinkContainer>
                                 </Nav>
