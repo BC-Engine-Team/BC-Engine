@@ -374,6 +374,7 @@ const UsersForm = (props) => {
                     <FloatingLabel controlId="floatingPassword1" label={t('form.Password')} className="mb-3" >
                         <Form.Control
                             required
+                            className='passwordValidationField'
                             type={showPass ? "text" : "password"}
                             onChange={(e) => setField('password1', e.target.value)}
                             autoComplete='new-password'
@@ -402,6 +403,7 @@ const UsersForm = (props) => {
                     <FloatingLabel controlId="floatingPassword2" label={t('form.ConfirmPassword')} className="mb-3" >
                         <Form.Control
                             required
+                            className='passwordValidationField'
                             type={showPass2 ? "text" : "password"}
                             onChange={(e) => setField('password2', e.target.value)}
                             autoComplete='off'

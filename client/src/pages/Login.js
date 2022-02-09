@@ -129,11 +129,12 @@ const Login = () => {
         <div>
             <NavB page="login" />
             <div className="container">
-                <div className="card shadow p-3 m-5">
+                <div id="login-card" className="card shadow p-3 m-5">
                     <h1 className="display-1 font-weight-bold text-center mt-5 mb-4">{t('login.Title')}</h1>
 
                     <Form
                         noValidate
+                        id="loginForm"
                         className="mt-5 mx-5"
                         validated={validated}
                         onSubmit={handleSubmit}>
@@ -166,6 +167,7 @@ const Login = () => {
                             <FloatingLabel controlId="floatingPassword" label={t('form.Password')} className="mb-3 inputWithShowHide" >
                                 <Form.Control
                                     required
+                                    className='passwordValidationField'
                                     type={showPass ? "text" : "password"}
                                     value={password}
                                     isInvalid={validationError}
