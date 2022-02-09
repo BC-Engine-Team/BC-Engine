@@ -44,7 +44,7 @@ exports.deleteChartReport = async (req, res) => {
         .then(response => {
             return res.send(response);
         })
-        .catch(err => {
-            return res.status(500).send(err);
+        .catch(async err => {
+            return res.status(err.status || 500).send({ message: err.message || "Malfunction in the B&C Engine." });
         });
 }

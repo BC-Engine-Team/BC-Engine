@@ -142,7 +142,11 @@ exports.deleteChartReportById = async (chartReportId) => {
                 resolve(false);
             })
             .catch(err => {
-                reject(err);
+                const response = {
+                    status: err.status || 500,
+                    message: err.message || "Malfunction in the B&C Engine."
+                }
+                reject(response);
             });
     });
 }

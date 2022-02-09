@@ -689,5 +689,27 @@ describe("Test Report Service", () => {
                 fakeChartReportRequest.chartReport['country'] = country;
             });
         });
+
+
+
+
+        describe("RS6 - deleteChartReportById", () => {
+
+            let chartReportId = "0ba47970-d667-4328-9711-84c4a8968c0d"
+            
+            describe("RS6.1 - given valid chart report id", () => {
+                it("RS6.1.1 - should return a message delete successful message", () => {
+                     // arrange
+                    chartReportDaoSpy = jest.spyOn(ChartReportDao, 'deleteChartReportById')
+                    .mockImplementation(() => new Promise((resolve, reject) => {
+                        resolve(chartReportId);
+                    }));
+
+                    await expect(ReportService.deleteChartReportById(chartReportId)).resolves
+                    .toEqual(chartReportId);
+                });
+            });
+        });
     });
 })
+
