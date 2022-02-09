@@ -36,3 +36,15 @@ exports.createChartReport = async (req, res) => {
             return res.status(err.status || 500).send({ message: err.message || "Malfunction in the B&C Engine." });
         });
 }
+
+
+exports.deleteChartReport = async (req, res) => {
+
+    await reportService.deleteChartReportById(req.body.chartReportId)
+        .then(response => {
+            return res.send(response);
+        })
+        .catch(err => {
+            return res.status(500).send(err);
+        });
+}

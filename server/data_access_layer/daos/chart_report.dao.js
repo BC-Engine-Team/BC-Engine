@@ -80,3 +80,22 @@ exports.createDataForChartReport = async (chartReportId, data, chartReportDataMo
             })
     });
 }
+
+exports.deleteChartReportById = async(chartReportId, chartReportModel = ChartReportModel) => {
+    return new Promise((resolve, reject) => {
+        chartReportModel.destroy({where: {chartReportId: chartReportId}})
+            .then(async data => {
+                if (data) {
+                    resolve("Chart report deleted successfully.");
+                }
+                resolve("Chart report has failed to be deleted.");
+            })
+            .catch(err =>{
+                const response = {
+                    status: 500,
+                    message: err.message || "Some error occured"
+                }
+                reject(response);
+            });
+    });
+}

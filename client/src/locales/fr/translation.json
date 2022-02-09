@@ -159,7 +159,12 @@
           "EndDate": "DATE DE FIN",
           "LoadButton": "Charger",
           "CreateButton": "Ajouter"
-       }
+       },
+      "delete":{
+         "NotAuthorized":"Vous n'ètes pas authoriser à performer cet action.",
+         "Title":"Êtes-vous sur de vouloir supprimer ",
+         "Confirmation": "Rapport effacé avec succès"
+      }
     },
     "form": {
        "Password": "Mot de passe",

@@ -131,3 +131,18 @@ exports.verifyChartReport = (criteria) => {
 
     return verified;
 }
+
+
+exports.deleteChartReportById = async (chartReportId) => {
+    return new Promise((resolve, reject) => {
+
+        ChartReportDao.deleteChartReportById(chartReportId)
+            .then(async data => {
+                if(data) resolve(data);
+                resolve(false);
+            })
+            .catch(err => {
+                reject(err);
+            });
+    });
+}
