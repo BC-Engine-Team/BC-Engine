@@ -161,7 +161,7 @@
           "CreateButton": "Ajouter"
        },
       "delete":{
-         "NotAuthorized":"Vous n'ètes pas authoriser à performer cet action.",
+         "NotAuthorized":"Vous n'êtes pas authorisé à effectuer cette action.",
          "Title":"Êtes-vous sur de vouloir supprimer ",
          "Confirmation": "Rapport effacé avec succès"
       }
@@ -177,6 +177,7 @@
        "Empty": "Ce champs est obligatoire!",
        "Incorrect": "Address couriel ou mot de passe invalide.",
        "NotFound": "Impossible d'atteindre B&C Engine...",
+       "Malfunction": "Malfonction dans B&C Engine",
        "PasswordMatch": "Les mots de passe ne correspondent pas!"
     }
  }

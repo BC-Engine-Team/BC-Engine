@@ -17,7 +17,7 @@ const Reports = () => {
 
 
     const cookies = new Cookies();
-    const notFoundError = t('error.NotFound');
+    const malfunctionError = t('error.Malfunction');
     
     const [chartReportId, setChartReportId] = useState("");
     const [chartReportName, setChartReportName] = useState("");
@@ -92,14 +92,14 @@ const Reports = () => {
             .catch((error) => {
                 if (error.response) {
                     if (error.response.status === 401 || error.response.status === 403) {
-                        alert(t('reports.delete'));
+                        alert(t('reports.delete.NotAuthorized'));
                     }
                     else{
-                        alert(notFoundError)
+                        alert(malfunctionError)
                     }
                 }
                 else if (error.request) {
-                    alert(notFoundError);
+                    alert(malfunctionError);
                 }
             });
             setDeleteButtonActivated(false);

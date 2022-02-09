@@ -88,7 +88,7 @@ exports.deleteChartReportById = async(chartReportId, chartReportModel = ChartRep
                 if (data) {
                     resolve("Chart report deleted successfully.");
                 }
-                resolve("Chart report has failed to be deleted.");
+                resolve(false);
             })
             .catch(err =>{
                 const response = {

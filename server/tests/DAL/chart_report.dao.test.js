@@ -297,19 +297,6 @@ describe("Test Chart Report DAO", () => {
         });
     });
 
-
-
-
-
-
-
-
-
-
-
-
-
-
     describe("CRD4 - deleteChartReportById", () => {
 
         let fakeDeleteChartIdModelResponse = {
@@ -325,18 +312,17 @@ describe("Test Chart Report DAO", () => {
         describe("CRD4.1 - given valid chartReportId", () => {
             it("UD4.1.1 - should return successful delete message", async () => {
                 // arrange
-                let expectedResponse = Promise.resolve({});
+                let expectedResponse = "Chart report deleted successfully."
 
                 fakeChartReportModel = {
                     destroy: () => {
-                        return Promise.resolve({});
+                        return Promise.resolve(expectedResponse);
                     }
                 };
 
                 // act and assert
-                const response =  ChartReportDAO.deleteChartReportById("fakeUUID", fakeChartReportModel);
-
-                expect(response).toEqual(expectedResponse);
+                await expect(ChartReportDAO.deleteChartReportById("fakeUUID", fakeChartReportModel))
+                    .resolves.toEqual(expectedResponse)
             });
         });
 
@@ -344,9 +330,8 @@ describe("Test Chart Report DAO", () => {
         describe("CRD4.1 - given invalid chartReportId", () => {
             it("CRD4.1.1 - when model resolves false, should resolve with an error message", async () => {
                 // arrange
-                let expectedResponse = "Chart report has failed to be deleted.";
+                let expectedResponse = false;
         
-
                 fakeChartReportModel = {
                     destroy: () => {
                         return Promise.resolve(false);

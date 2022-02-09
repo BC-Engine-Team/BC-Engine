@@ -178,6 +178,7 @@
         "Empty":"This field cannot be empty!",
         "Incorrect":"Incorrect email or password.",
         "NotFound":"Could not reach B&C Engine...",
+        "Malfunction": "Malfunction in the B&C Engine",
         "PasswordMatch":"Passwords must match!"
     }
 }

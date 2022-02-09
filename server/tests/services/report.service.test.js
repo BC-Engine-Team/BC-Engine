@@ -2,7 +2,6 @@ var { expect, jest } = require('@jest/globals');
 
 const ReportService = require("../../services/report.service");
 const ChartReportDao = require("../../data_access_layer/daos/chart_report.dao");
-const { resolve } = require('path/posix');
 
 
 
@@ -692,19 +691,24 @@ describe("Test Report Service", () => {
         });
 
         describe("RS6 - deleteChartReportById", () => {
+
+            let fakeChartIdObject = {
+                chartReportId: "fakeUUID"
+            };
+
             describe("RS6.1 - given valid chart report id", () => {
                 it("RS6.1.1 - should return an empty promise", () => {
 
                     //arrange
                     chartReportDaoSpy = jest.spyOn(ChartReportDao, 'deleteChartReportById')
                     .mockImplementation(() => new Promise((resolve, reject) => {
-                        resolve(fakeCreateChartReportDaoResponse);
+                        resolve({});
                     }));
                     
                     let expectedResponse = Promise.resolve({})
 
                     // act
-                    const response = ReportService.deleteChartReportById(fakeCreateChartReportDaoResponse.chartReportId);
+                    const response = ReportService.deleteChartReportById(fakeChartIdObject.chartReportId);
 
                     // assert
                     expect(response).toEqual(expectedResponse);
@@ -726,7 +730,7 @@ describe("Test Report Service", () => {
                    }
                    
                    //act and assert
-                   expect(ReportService.deleteChartReportById(fakeCreateChartReportDaoResponse.chartReportId)).rejects
+                   expect(ReportService.deleteChartReportById(fakeChartIdObject.chartReportId)).rejects
                     .toEqual(expectedData);
                    
                 });
@@ -739,7 +743,7 @@ describe("Test Report Service", () => {
                     }));
 
                     //act and assert
-                    expect(ReportService.deleteChartReportById(fakeCreateChartReportDaoResponse.chartReportId)).resolves
+                    expect(ReportService.deleteChartReportById(fakeChartIdObject.chartReportId)).resolves
                         .toEqual(false);
                 });
 
@@ -756,9 +760,9 @@ describe("Test Report Service", () => {
                         }));
     
                     // act and assert
-                    await expect(ReportService.deleteChartReportById(fakeCreateChartReportDaoResponse.chartReportId))
+                    await expect(ReportService.deleteChartReportById(fakeChartIdObject.chartReportId))
                         .rejects.toEqual(expectedResponse);
-                    expect(chartReportDaoSpy).toHaveBeenCalledWith(fakeCreateChartReportDaoResponse.chartReportId);
+                    expect(chartReportDaoSpy).toHaveBeenCalledWith(fakeChartIdObject.chartReportId);
                 });
     
                 it("RS6.2.4 - when dao rejects with unspecified status and message, should reject with default status and message", async () => {
@@ -773,9 +777,9 @@ describe("Test Report Service", () => {
                         }));
     
                     // act and assert
-                    await expect(ReportService.deleteChartReportById(fakeCreateChartReportDaoResponse.chartReportId))
+                    await expect(ReportService.deleteChartReportById(fakeChartIdObject.chartReportId))
                         .rejects.toEqual(expectedResponse);
-                    expect(chartReportDaoSpy).toHaveBeenCalledWith(fakeCreateChartReportDaoResponse.chartReportId);
+                    expect(chartReportDaoSpy).toHaveBeenCalledWith(fakeChartIdObject.chartReportId);
                 });
             });
         });
