@@ -2,6 +2,7 @@ var { expect, jest } = require('@jest/globals');
 
 const ReportService = require("../../services/report.service");
 const ChartReportDao = require("../../data_access_layer/daos/chart_report.dao");
+const { resolve } = require('path/posix');
 
 
 
@@ -690,23 +691,91 @@ describe("Test Report Service", () => {
             });
         });
 
-
-
-
         describe("RS6 - deleteChartReportById", () => {
-
-            let chartReportId = "0ba47970-d667-4328-9711-84c4a8968c0d"
-            
             describe("RS6.1 - given valid chart report id", () => {
-                it("RS6.1.1 - should return a message delete successful message", () => {
+                it("RS6.1.1 - should return an empty promise", () => {
+
+                    //arrange
+                    chartReportDaoSpy = jest.spyOn(ChartReportDao, 'deleteChartReportById')
+                    .mockImplementation(() => new Promise((resolve, reject) => {
+                        resolve(fakeCreateChartReportDaoResponse);
+                    }));
+                    
+                    let expectedResponse = Promise.resolve({})
+
+                    // act
+                    const response = ReportService.deleteChartReportById(fakeCreateChartReportDaoResponse.chartReportId);
+
+                    // assert
+                    expect(response).toEqual(expectedResponse);
+                });
+            });
+
+            describe("RS6.2 - given invalid chart report id", () => {
+
+                it("RS6.2.1 - should return Dao error", () => {
+                    // arrange
+                   chartReportDaoSpy = jest.spyOn(ChartReportDao, 'deleteChartReportById')
+                   .mockImplementation(() => new Promise((resolve, reject) => {
+                       reject(expectedData);
+                   }));
+
+                   let expectedData = {
+                       status: 500,
+                       message: "Some error occured"
+                   }
+                   
+                   //act and assert
+                   expect(ReportService.deleteChartReportById(fakeCreateChartReportDaoResponse.chartReportId)).rejects
+                    .toEqual(expectedData);
+                   
+                });
+
+                it("RS6.2.2 - should return false", () => {
                      // arrange
                     chartReportDaoSpy = jest.spyOn(ChartReportDao, 'deleteChartReportById')
                     .mockImplementation(() => new Promise((resolve, reject) => {
-                        resolve(chartReportId);
+                        resolve(false);
                     }));
 
-                    await expect(ReportService.deleteChartReportById(chartReportId)).resolves
-                    .toEqual(chartReportId);
+                    //act and assert
+                    expect(ReportService.deleteChartReportById(fakeCreateChartReportDaoResponse.chartReportId)).resolves
+                        .toEqual(false);
+                });
+
+
+                it("RS6.2.3 - when dao rejects with specified status and message, should reject with specified status and message", async () => {
+                    // arrange
+                    let expectedResponse = {
+                        status: 600,
+                        message: "Error."
+                    };
+                    chartReportDaoSpy = jest.spyOn(ChartReportDao, 'deleteChartReportById')
+                        .mockImplementation(() => new Promise((resolve, reject) => {
+                            reject(expectedResponse);
+                        }));
+    
+                    // act and assert
+                    await expect(ReportService.deleteChartReportById(fakeCreateChartReportDaoResponse.chartReportId))
+                        .rejects.toEqual(expectedResponse);
+                    expect(chartReportDaoSpy).toHaveBeenCalledWith(fakeCreateChartReportDaoResponse.chartReportId);
+                });
+    
+                it("RS6.2.4 - when dao rejects with unspecified status and message, should reject with default status and message", async () => {
+                    // arrange
+                    let expectedResponse = {
+                        status: 500,
+                        message: "Malfunction in the B&C Engine."
+                    };
+                    chartReportDaoSpy = jest.spyOn(ChartReportDao, 'deleteChartReportById')
+                        .mockImplementation(() => new Promise((resolve, reject) => {
+                            reject({});
+                        }));
+    
+                    // act and assert
+                    await expect(ReportService.deleteChartReportById(fakeCreateChartReportDaoResponse.chartReportId))
+                        .rejects.toEqual(expectedResponse);
+                    expect(chartReportDaoSpy).toHaveBeenCalledWith(fakeCreateChartReportDaoResponse.chartReportId);
                 });
             });
         });
