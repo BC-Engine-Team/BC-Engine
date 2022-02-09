@@ -33,7 +33,8 @@ db.Sequelize = Sequelize;
 // Add any tables to the local database here
 [db['localdb'].users,
 db['localdb'].chartReports,
-db['localdb'].chartReportsData] = require("./models/localdb/localdb.model")(db['localdb'], Sequelize);
+db['localdb'].chartReportsData,
+db['localdb'].reportTypes] = require("./models/localdb/localdb.model")(db['localdb'], Sequelize);
 
 // patricia database tables
 db['mssql_pat'].employees = require("./models/mssql_pat/employee.model")(db['mssql_pat'], Sequelize);
@@ -112,8 +113,14 @@ db.sync = async (database, options) => {
         }
       ]);
     })
+    .then(async () => {
+      await db['localdb'].reportTypes.create({
+        reportTypeName: 'Monthly Employee Performance Report',
+        frequency: 0
+      });
+    })
     .catch((err) => {
-      console.log(err);
+      console.log(err.message);
     });
 }
 

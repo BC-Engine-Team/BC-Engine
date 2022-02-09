@@ -117,6 +117,14 @@ module.exports = (localdb, Sequelize) => {
     },
         { underscored: true });
 
+    ChartReport.belongsTo(User, {
+        foreignKey: {
+            name: 'user_user_id',
+            allowNull: false,
+        },
+        onDelete: 'CASCADE'
+    });
+
     const ChartReportData = localdb.define("chart_reports_data", {
         year: {
             field: 'year',
@@ -189,14 +197,6 @@ module.exports = (localdb, Sequelize) => {
         }
     });
 
-    ChartReport.belongsTo(User, {
-        foreignKey: {
-            name: 'user_user_id',
-            allowNull: false,
-        },
-        onDelete: 'CASCADE'
-    });
-
     ChartReportData.belongsTo(ChartReport, {
         foreignKey: {
             name: 'chart_report_id',
@@ -205,5 +205,37 @@ module.exports = (localdb, Sequelize) => {
         onDelete: 'CASCADE'
     });
 
-    return [User, ChartReport, ChartReportData];
+    const ReportType = localdb.define("report_types", {
+        reportTypeName: {
+            field: 'report_type_name',
+            type: Sequelize.STRING
+        },
+        frequency: {
+            field: 'frequency',
+            type: Sequelize.INTEGER,
+            defaultValue: 0
+        }
+    });
+
+    const Recipients = localdb.define("report_recipients", {
+        name: {
+            field: 'recipient_name',
+            type: Sequelize.STRING
+        },
+        email: {
+            field: 'recipient_email',
+            type: Sequelize.STRING
+        }
+    });
+
+    Recipients.belongsTo(ReportType, {
+        foreignKey: {
+            name: 'report_type_id',
+            allowNull: false
+        },
+        onDelete: 'CASCADE'
+    })
+
+
+    return [User, ChartReport, ChartReportData, ReportType];
 };
