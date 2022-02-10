@@ -59,9 +59,6 @@ exports.getAverages = async (startDateStr, endDateStr,  employeeId = undefined, 
             });
         }
 
-        if(countryCode === "All"){
-            countryCode = undefined;
-        }
 
         // Get the list of total dues for each month
         await this.getDues(yearMonthList, employeeId, countryCode).then(async data => {

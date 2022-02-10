@@ -113,7 +113,7 @@ const Dashboard = () => {
             name: compareEmployeeChecked ? "All" : null
         },
         countryId: '-1',
-        country: "All",
+        country: "-1",
         clientType: "Any",
         ageOfAccount: "All",
         accountType: 'Receivable',
@@ -193,11 +193,13 @@ const Dashboard = () => {
     }
 
 
-    const chart = async (employeeId = -1, countryCode = undefined, compare = false) => {
+    const chart = async (employeeId = -1, countryCode = -1, compare = false) => {
         setChartLoading(true);
         setChartData(fallbackChartData);
         localStorage.setItem("dash_previous_criteria", JSON.stringify(criteria));
         let compareData = [];
+
+        console.log(countryCode);
 
         let arrayLength = 1;
         if (compare) arrayLength = 2;
@@ -213,17 +215,17 @@ const Dashboard = () => {
 
             let param = {};
 
-            if (employeeId !== -1 && countryCode === undefined) {
+            if (employeeId !== -1 && parseInt(countryCode) === -1) {
                 param = {
                     employeeId: employeeId
                 }
             }
-            else if(employeeId === -1 && countryCode !== undefined) {
+            else if(employeeId === -1 && parseInt(countryCode) !== -1) {
                 param = {
                     country: countryCode
                 }
             }
-            else if (employeeId !== -1 && countryCode !== undefined){
+            else if (employeeId !== -1 && parseInt(countryCode) !== -1){
                 param = {
                     employeeId: employeeId,
                     country: countryCode
@@ -446,9 +448,7 @@ const Dashboard = () => {
                 [field]: null
             });
         }
-
-        console.log(value);
-        
+   
         setChartSaved(false);
     };
 
@@ -647,7 +647,7 @@ const Dashboard = () => {
 
                                         <Form.Select id="countryCriteriaDashboard" 
                                                     onChange={(e) => setField('country', e.target.value)}>
-                                            <option value="All">{t('dashboard.criteria.All')}</option>
+                                            <option key={-1} value={-1}>{t('dashboard.criteria.All')}</option>
                                             {countries.map(c => {
                                                 return (
                                                     <option key={c.countryCode} value={c.countryLabel}>{c.countryLabel}</option>
