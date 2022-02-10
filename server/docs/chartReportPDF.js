@@ -1,4 +1,4 @@
-module.exports = (data) => {
+module.exports = (data, averagesList) => {
     const today = new Date();
 
     const months = [ 
@@ -15,7 +15,7 @@ module.exports = (data) => {
         "November", 
         "December" 
     ];
-    
+
     const formatTimes = (time) => {
         if(time < 10) time = "0" + time;
         return time;

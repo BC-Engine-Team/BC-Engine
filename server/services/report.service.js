@@ -1,4 +1,5 @@
 const ChartReportDao = require("../data_access_layer/daos/chart_report.dao");
+const invoiceService = require('./invoice.service');
 
 const pdf = require('html-pdf');
 const pdfTemplate = require("../docs/chartReportPDF");
@@ -65,14 +66,23 @@ exports.createChartReportPDFByReportId = async (reportId) => {
     return new Promise(async (resolve, reject) => {
         ChartReportDao.getChartReportById(reportId)
             .then(async data => {
-                if (data)
-                    pdf.create(pdfTemplate(data), pdfOptions)
+                if (data) {
+                    let averagesList = [];
+
+                    await this.getChartReportPDFAverages(data).then(async dataAvg => {
+                        averagesList = dataAvg;
+                    }).catch(err => {
+                        reject(err);
+                    });
+
+                    pdf.create(pdfTemplate(data, averagesList[0].chart), pdfOptions)
                     .toFile(`./docs/pdf_files/chartReport-${reportId}.pdf`, (err) => {
                         if(err) {
                             reject(err);
                         }
                         resolve(true);
                     });
+                }
                 else
                     resolve(false);
             })
@@ -83,6 +93,19 @@ exports.createChartReportPDFByReportId = async (reportId) => {
                 }
                 reject(response);
             });
+    });
+}
+
+exports.getChartReportPDFAverages = async (data) => {
+    return new Promise(async (resolve, reject) => {
+        await invoiceService.getAverages(data.startDate, data.endDate, data.employeeId === "All" ? undefined : data.employeeId)
+        .then(data => {
+            if (data) resolve(data);
+            resolve(false);
+        })
+        .catch(err => {
+            reject(err);
+        });
     });
 }
 
