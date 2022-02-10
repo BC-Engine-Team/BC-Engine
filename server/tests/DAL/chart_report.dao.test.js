@@ -298,7 +298,6 @@ describe("Test Chart Report DAO", () => {
     });
 
     describe("CRD4 - deleteChartReportById", () => {
-
         let fakeDeleteChartIdModelResponse = {
             chartReportId: "any"
         }
@@ -308,7 +307,6 @@ describe("Test Chart Report DAO", () => {
                 return Promise.resolve(fakeDeleteChartIdModelResponse);
             }
         };
-
         describe("CRD4.1 - given valid chartReportId", () => {
             it("UD4.1.1 - should return successful delete message", async () => {
                 // arrange
@@ -325,7 +323,6 @@ describe("Test Chart Report DAO", () => {
                     .resolves.toEqual(expectedResponse)
             });
         });
-
 
         describe("CRD4.1 - given invalid chartReportId", () => {
             it("CRD4.1.1 - when model resolves false, should resolve with an error message", async () => {
@@ -348,6 +345,7 @@ describe("Test Chart Report DAO", () => {
                     status: 600,
                     message: "Error."
                 };
+
                 fakeChartReportModel = {
                     destroy: () => {
                         return Promise.reject(expectedResponse);
@@ -365,6 +363,7 @@ describe("Test Chart Report DAO", () => {
                     status: 500,
                     message: "Could not delete data."
                 };
+
                 fakeChartReportModel = {
                     destroy: () => {
                         return Promise.reject({});
@@ -378,9 +377,3 @@ describe("Test Chart Report DAO", () => {
         });
     });
 });
-
-
-
-
-
-

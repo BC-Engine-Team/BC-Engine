@@ -15,7 +15,6 @@ const Reports = () => {
     const { t } = useTranslation();
     let navigate = useNavigate();
 
-
     const cookies = new Cookies();
     const malfunctionError = t('error.Malfunction');
     const notFoundError = t('error.NotFound')
@@ -106,7 +105,6 @@ const Reports = () => {
             setDeleteButtonActivated(false);
     };
 
-
     useEffect(() => {
         if (cookies.get("accessToken") === undefined) {
             navigate("/login");
@@ -144,7 +142,6 @@ const Reports = () => {
                                     </th>
                                 </tr>
                             </thead>
-
                             <tbody>
                                 {chartReports.map(r => {
                                     return (
@@ -160,7 +157,6 @@ const Reports = () => {
                                             <td className="py-1">
                                                 <div className="d-flex justify-content-center">
                                                     <EditButton />
-
                                                     <DeleteButton onDelete={() => handleDeleteChartReport(r.chartReportId, r.name)}/>
                                                 </div>
                                             </td>
@@ -172,14 +168,12 @@ const Reports = () => {
                     </div>
                 </div>
             </div>
-
             <ConfirmationPopup 
                 open={deleteButtonActivated}
                 prompt={t('reports.delete.Title')}
                 title={chartReportName}
                 onAccept={() => { onDeleteClick() }}
                 onClose={() => { setDeleteButtonActivated(false) }}/>
-
         </div>
     )
 }

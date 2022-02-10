@@ -452,7 +452,6 @@ describe("Test Report Controller", () => {
     });
 
     describe("RC3 - deleteChartReport", () => {
-        
         let chartReportIdObject = {
             chartReportId: "0ba47970-d667-4328-9711-84c4a8968c0d"
         };
@@ -460,7 +459,6 @@ describe("Test Report Controller", () => {
         let invalidChartReportId = {
             chartReportId: null
         }
-
         describe("RC3.1 - given a valid request", () => {
             it("RC3.1.1 - should return valid response from report service", async () => {
                 // arrange
@@ -495,7 +493,6 @@ describe("Test Report Controller", () => {
                 expect(reportServiceSpy).toHaveBeenCalledTimes(1);
                 expect(authSpy).toHaveBeenCalledTimes(1);
             });
-
 
             it("RC3.1.3 - when service throws error with specified status and message, should respond with specified status and message", async () => {
                 // arrange
@@ -543,4 +540,3 @@ describe("Test Report Controller", () => {
         });
     });
 });
-

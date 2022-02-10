@@ -691,11 +691,9 @@ describe("Test Report Service", () => {
         });
 
         describe("RS6 - deleteChartReportById", () => {
-
             let fakeChartIdObject = {
                 chartReportId: "fakeUUID"
             };
-
             describe("RS6.1 - given valid chart report id", () => {
                 it("RS6.1.1 - should return an empty promise", () => {
 
@@ -716,7 +714,6 @@ describe("Test Report Service", () => {
             });
 
             describe("RS6.2 - given invalid chart report id", () => {
-
                 it("RS6.2.1 - should return Dao error", () => {
                     // arrange
                    chartReportDaoSpy = jest.spyOn(ChartReportDao, 'deleteChartReportById')
@@ -746,7 +743,6 @@ describe("Test Report Service", () => {
                     expect(ReportService.deleteChartReportById(fakeChartIdObject.chartReportId)).resolves
                         .toEqual(false);
                 });
-
 
                 it("RS6.2.3 - when dao rejects with specified status and message, should reject with specified status and message", async () => {
                     // arrange
