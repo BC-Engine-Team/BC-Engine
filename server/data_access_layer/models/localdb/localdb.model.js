@@ -206,6 +206,12 @@ module.exports = (localdb, Sequelize) => {
     });
 
     const ReportType = localdb.define("report_types", {
+        reportTypeId: {
+            field: 'report_type_id',
+            type: Sequelize.UUID,
+            defaultValue: Sequelize.UUIDV4,
+            primaryKey: true
+        },
         reportTypeName: {
             field: 'report_type_name',
             type: Sequelize.STRING
@@ -217,7 +223,13 @@ module.exports = (localdb, Sequelize) => {
         }
     });
 
-    const Recipients = localdb.define("report_recipients", {
+    const Recipients = localdb.define("recipients", {
+        recipientId: {
+            field: 'recipient_id',
+            type: Sequelize.UUID,
+            defaultValue: Sequelize.UUIDV4,
+            primaryKey: true
+        },
         name: {
             field: 'recipient_name',
             type: Sequelize.STRING
@@ -226,16 +238,28 @@ module.exports = (localdb, Sequelize) => {
             field: 'recipient_email',
             type: Sequelize.STRING
         }
+    })
+
+    const ReportTypeRecipients = localdb.define("report_type_recipients", {
+
     });
 
-    Recipients.belongsTo(ReportType, {
+    ReportTypeRecipients.belongsTo(ReportType, {
         foreignKey: {
             name: 'report_type_id',
             allowNull: false
         },
         onDelete: 'CASCADE'
-    })
+    });
+
+    ReportTypeRecipients.belongsTo(Recipients, {
+        foreignKey: {
+            name: 'recipient_id',
+            allowNull: false
+        },
+        onDelete: 'CASCADE'
+    });
 
 
-    return [User, ChartReport, ChartReportData, ReportType];
+    return [User, ChartReport, ChartReportData, ReportType, Recipients, ReportTypeRecipients];
 };

@@ -1,6 +1,7 @@
 const ChartReportDao = require("../data_access_layer/daos/chart_report.dao");
+const ReportDao = require("../data_access_layer/daos/report.dao");
 
-
+// Chart Report Related functions
 exports.getChartReportsByUserId = async (userId) => {
     return new Promise(async (resolve, reject) => {
         await ChartReportDao.getChartReportsByUserId(userId)
@@ -130,4 +131,92 @@ exports.verifyChartReport = (criteria) => {
     }
 
     return verified;
+}
+
+
+// Reports Types related functions
+exports.getReportTypesWithRecipients = async () => {
+    return new Promise(async (resolve, reject) => {
+        this.getReportTypes()
+            .then(async reportTypes => {
+
+                if (reportTypes) {
+                    let returnData = {
+                        reportTypes: reportTypes
+                    };
+                    returnData.recipients = await this.getRecipients();
+                    return returnData;
+                }
+                resolve(false);
+            })
+            .then(async data => {
+                if (data.recipients) {
+                    for (let i = 0; i < data.reportTypes.length; i++) {
+                        for (let j = 0; j < data.recipients.length; j++) {
+                            let recipientId = data.recipients[j].recipientId;
+                            if (recipientId in data.reportTypes[i].recipients) {
+                                data.reportTypes[i].recipients[recipientId].name = data.recipients[j].name;
+                                data.reportTypes[i].recipients[recipientId].isRecipient = true;
+                            }
+                            else {
+                                data.reportTypes[i].recipients[recipientId] = data.recipients[j].name;
+                            }
+                        }
+                    }
+                    resolve(data.reportTypes);
+                }
+                resolve(false);
+            })
+            .then(async data => {
+                if (data[0]) {
+
+                }
+                resolve(false);
+            })
+            .catch(err => {
+                const response = {
+                    status: err.status || 500,
+                    message: err.message || "Malfunction in the B&C Engine."
+                };
+                reject(response);
+            });
+    });
+}
+
+exports.getReportTypes = async () => {
+    return new Promise(async (resolve, reject) => {
+        await ReportDao.getReportTypesWithRecipientIds()
+            .then(async data => {
+                if (data)
+                    resolve(data);
+                else
+                    resolve(false);
+            })
+            .catch(err => {
+                const response = {
+                    status: err.status || 500,
+                    message: err.message || "Could not create Chart Report."
+                }
+                reject(response);
+            });
+    });
+}
+
+exports.getRecipients = async () => {
+    return new Promise(async (resolve, reject) => {
+        await ReportDao.getRecipients()
+            .then(async data => {
+                if (data)
+                    resolve(data);
+                else
+                    resolve(false);
+            })
+            .catch(err => {
+                const response = {
+                    status: err.status || 500,
+                    message: err.message || "Could not create Chart Report."
+                }
+                reject(response);
+            });
+    });
 }

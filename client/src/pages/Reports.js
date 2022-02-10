@@ -4,11 +4,12 @@ import Cookies from 'universal-cookie'
 import { useTranslation } from 'react-i18next';
 import Axios from 'axios';
 
-import { Button, Table } from 'react-bootstrap'
+import { Button, Table, Form, ListGroup, ListGroupItem } from 'react-bootstrap'
+import '../styles/reportsPage.css';
 
 import NavB from '../components/NavB'
 import DeleteButton from '../components/DeleteButton'
-import EditButton from '../components/EditButton'
+import { BiExport } from "react-icons/bi";
 
 const Reports = () => {
     const { t } = useTranslation();
@@ -28,14 +29,55 @@ const Reports = () => {
         accountType: ""
     }]);
 
-    const handleRefresh = () => {
+    const [reportTypes, setReportTypes] = useState([]);
+    const [selectedReportType, setSelectedReportType] = useState({});
+
+    const handleRefresh = async () => {
+        await getChartReports();
+        await getReportTypesAndRecipients();
+    }
+
+    const getReportTypesAndRecipients = async () => {
         let header = {
             'authorization': "Bearer " + cookies.get("accessToken"),
         }
 
         Axios.defaults.withCredentials = true;
 
-        Axios.get(`${process.env.REACT_APP_API}/reports/chartReport`, { headers: header })
+        await Axios.get(`${process.env.REACT_APP_API}/reports/reportTypes`, { headers: header })
+            .then((response) => {
+                console.log(response)
+                if (response.data) {
+                    console.log(response.data)
+                    setReportTypes(response.data);
+                    setSelectedReportType(response.data[0]);
+                    return;
+                }
+                alert("The response from the B&C Engine was invalid.");
+            })
+            .catch((error) => {
+                if (error.response) {
+                    if (error.response.status === 403 || error.response.status === 401) {
+                        alert("You are not authorized to perform this action.");
+                    }
+                    else {
+                        alert("Malfunction in the B&C Engine.");
+                    }
+                }
+                else if (error.request) {
+                    alert("Could not reach b&C Engine...");
+                }
+            });
+    }
+
+    const getChartReports = async () => {
+        let header = {
+            'authorization': "Bearer " + cookies.get("accessToken"),
+        }
+
+        Axios.defaults.withCredentials = true;
+
+        await Axios.get(`${process.env.REACT_APP_API}/reports/chartReport`, { headers: header })
             .then((response) => {
                 setChartReports(response.data);
             })
@@ -45,7 +87,7 @@ const Reports = () => {
                         alert("You are not authorized to perform this action.");
                     }
                     else {
-                        alert("Could not reach b&C Engine...");
+                        alert("Malfunction in the B&C Engine.");
                     }
                 }
                 else if (error.request) {
@@ -53,7 +95,6 @@ const Reports = () => {
                 }
             });
     }
-
 
     useEffect(() => {
         if (cookies.get("accessToken") === undefined) {
@@ -68,10 +109,83 @@ const Reports = () => {
     return (
         <div>
             <NavB />
-            <div className='justify-content-center mainContainer'>
-                <div>
-                    <div className='card shadow'>
-                        <Table responsive="xl" hover id='chartReportsTable'>
+            <div className='justify-content-center mainContainer container-reportsPage'>
+                <div className='container-reportTable' >
+                    <div className='card shadow my-3 mx-3' >
+                        <h4 className="text-center bg-light">{t('reports.reports.Title')}</h4>
+                        <Table responsive hover id='reportTypesTable'>
+                            <thead className='bg-light'>
+                                <tr key="0">
+                                    <th>{t('reports.reports.NameLabel')}</th>
+                                    <th>{t('reports.reports.EmployeeLabel')}</th>
+                                    <th>{t('reports.reports.DateLabel')}</th>
+                                    <th className='text-center'>Actions</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+
+                            </tbody>
+                        </Table>
+                    </div>
+                </div>
+                <div className='container-reportsManagement'>
+                    <div className='card shadow my-3 mx-3 px-3 py-2'>
+                        <h3 className='text-center'>{t('reports.reportsManagement.Title')}</h3>
+                        <Form.Group className="my-2" controlId="floatingModifyReportType">
+                            <Form.Label>{t('reports.reportsManagement.reportType.Title')}</Form.Label>
+                            <Form.Select required
+                                id='reportTypeSelect'
+                                size="sm"
+                                aria-label="Default select example">
+                                {reportTypes.map((t) => {
+                                    return (
+                                        <option key={t.id} value={t.id}>
+                                            {t.name}
+                                        </option>)
+                                })}
+                            </Form.Select>
+                        </Form.Group>
+                        <Form.Group className="my-2" controlId="floatingModifyFrequency">
+                            <Form.Label>{t('reports.reportsManagement.frequency.Title')}</Form.Label>
+                            <Form.Select required
+                                id='reportFreqSelect'
+                                size="sm"
+                                aria-label="Default select example"
+                                disabled={true}>
+                                <option key={selectedReportType.frequency} value={selectedReportType.frequency}>
+                                    {selectedReportType.frequency === -2 ? t('reports.reportsManagement.frequency.Week') :
+                                        selectedReportType.frequency === -1 ? t('reports.reportsManagement.frequency.BiWeek') :
+                                            selectedReportType.frequency === 0 ? t('reports.reportsManagement.frequency.Month') :
+                                                selectedReportType.frequency === 1 ? t('reports.reportsManagement.frequency.BiMonth') :
+                                                    selectedReportType.frequency === 2 ? t('reports.reportsManagement.frequency.Yearly') :
+                                                        t('reports.reportsManagement.frequency.Month')}
+                                </option>
+                            </Form.Select>
+                        </Form.Group>
+
+                        <Form.Group className="my-2" controlId="floatingModifyFrequency">
+                            <Form.Label>{t('reports.reportsManagement.recipients.Title')}</Form.Label>
+                            <ListGroup id='reportRecipientList'>
+                                {selectedReportType.recipients ? Object.keys(selectedReportType.recipients).map((rId, i) => {
+                                    return (
+                                        <ListGroupItem
+                                            key={i}
+                                            value={rId}
+                                            id={rId}>
+                                            <Form.Check label={selectedReportType.recipients[rId].name}
+                                                defaultChecked={selectedReportType.recipients[rId].isRecipient} />
+                                        </ListGroupItem>
+                                    );
+                                }) : <></>}
+                            </ListGroup>
+                        </Form.Group>
+                    </div>
+                </div>
+                <div className='container-chartReports'>
+                    <div className='card shadow my-3 mx-3'>
+                        <h4 className="text-center bg-light">Chart Reports</h4>
+                        <Table responsive hover id='chartReportsTable'>
                             <thead className='bg-light'>
                                 <tr key="0">
                                     <th>{t('reports.chartReports.Name')}</th>
@@ -107,7 +221,8 @@ const Reports = () => {
                                             <td>{r.endDate.toString()}</td>
                                             <td className="py-1">
                                                 <div className="d-flex justify-content-center">
-                                                    <EditButton />
+
+                                                    <BiExport size={"1.7rem"} className="pt-1" />
 
                                                     <DeleteButton />
                                                 </div>
@@ -120,7 +235,7 @@ const Reports = () => {
                     </div>
                 </div>
             </div>
-        </div>
+        </div >
     )
 }
 

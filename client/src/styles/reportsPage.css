@@ -1,0 +1,47 @@
+#reportTypesTable {
+    width: 100%
+}
+
+#reportRecipientList {
+    border-radius: 0.7rem;
+    max-height: 15rem;
+    overflow-y: scroll;
+    overflow-x: hidden;
+}
+
+.container-reportsPage{
+    flex-flow: row wrap;
+    display: flex;
+    width: 100%;
+    justify-self: center;
+}
+
+.container-reportsManagement {
+    width: 40%;
+}
+
+.container-reportTable {
+    width: 60%;
+    float: left;
+}
+
+.container-chartReports {
+    width: 100%;
+    float: left;
+}
+
+h4 {
+    margin-bottom: 0;
+    padding-bottom: 0.3rem;
+}
+
+@media all and (max-width: 1000px) {
+    .container-reportsPage {
+      flex-direction: column;
+    }
+    .container-reportsManagement, 
+    .container-reportTable,
+    .container-chartReports{
+      width: 100%;
+    }
+  }

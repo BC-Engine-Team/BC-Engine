@@ -119,13 +119,13 @@
        }
     },
     "reports": {
+      "ExportButtonLabel": "Exporter",
        "reports": {
           "Title": "Rapports",
           "NameLabel": "Nom du Rapport",
           "DateLabel": "Date du Rapport",
           "EmployeeLabel": "Employé(es) concerné(es)",
-          "EmailButtonLabel": "Address Courriel",
-          "ExportButtonLabel": "Exporter"
+          "EmailButtonLabel": "Addresse Courriel"
        },
        "reportsManagement": {
           "Title": "Gestion des Rapports",
@@ -144,8 +144,8 @@
              "Bimonth": "Bimensuel",
              "Year": "Annuel"
           },
-          "employees": {
-             "Title": "Selectionnez les Employé(es)"
+          "recipients": {
+             "Title": "Selectionnez les Destinataires"
           }
        },
        "chartReports": {
