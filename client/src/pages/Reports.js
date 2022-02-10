@@ -62,14 +62,11 @@ const Reports = () => {
             });
     }
 
-
-
     const handleDeleteChartReport = (id, chartReportName) => {
         setChartReportId(id);
         setChartReportName(chartReportName);
         setDeleteButtonActivated(true);
     }
-
 
     const onDeleteClick = () => {
         let header = {
