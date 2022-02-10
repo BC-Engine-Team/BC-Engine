@@ -8,13 +8,21 @@ import { Button, Table, Form, ListGroup, ListGroupItem } from 'react-bootstrap'
 import '../styles/reportsPage.css';
 
 import NavB from '../components/NavB'
+import ConfirmationPopup from '../components/ConfirmationPopup'
 import DeleteButton from '../components/DeleteButton'
 import { BiExport } from "react-icons/bi";
 
 const Reports = () => {
     const { t } = useTranslation();
     let navigate = useNavigate();
+
     const cookies = new Cookies();
+    const malfunctionError = t('error.Malfunction');
+    const notFoundError = t('error.NotFound')
+
+    const [chartReportId, setChartReportId] = useState("");
+    const [chartReportName, setChartReportName] = useState("");
+    const [deleteButtonActivated, setDeleteButtonActivated] = useState(false);
 
     const [chartReports, setChartReports] = useState([{
         chartReportId: "",
@@ -72,11 +80,10 @@ const Reports = () => {
 
     const getChartReports = async () => {
         let header = {
-            'authorization': "Bearer " + cookies.get("accessToken"),
+            'authorization': "Bearer " + cookies.get("accessToken")
         }
 
         Axios.defaults.withCredentials = true;
-
         await Axios.get(`${process.env.REACT_APP_API}/reports/chartReport`, { headers: header })
             .then((response) => {
                 setChartReports(response.data);
@@ -94,7 +101,48 @@ const Reports = () => {
                     alert("Could not reach b&C Engine...");
                 }
             });
+    };
+
+    const handleDeleteChartReport = (id, chartReportName) => {
+        setChartReportId(id);
+        setChartReportName(chartReportName);
+        setDeleteButtonActivated(true);
     }
+
+    const onDeleteClick = () => {
+        let header = {
+            'authorization': "Bearer " + cookies.get("accessToken")
+        }
+
+        let data = {
+            chartReportId: chartReportId
+        }
+
+        Axios.defaults.withCredentials = true;
+
+
+        Axios.delete(`${process.env.REACT_APP_API}/reports/delete/${chartReportId}`, { headers: header, data: data })
+            .then((response) => {
+                if (response.status === 200 || response.status === 204) {
+                    handleRefresh();
+                    alert(t('reports.delete.Confirmation'));
+                }
+            })
+            .catch((error) => {
+                if (error.response) {
+                    if (error.response.status === 401 || error.response.status === 403) {
+                        alert(t('reports.delete.NotAuthorized'));
+                    }
+                    else {
+                        alert(malfunctionError)
+                    }
+                }
+                else if (error.request) {
+                    alert(notFoundError);
+                }
+            });
+        setDeleteButtonActivated(false);
+    };
 
     useEffect(() => {
         if (cookies.get("accessToken") === undefined) {
@@ -206,7 +254,6 @@ const Reports = () => {
                                     </th>
                                 </tr>
                             </thead>
-
                             <tbody>
                                 {chartReports.map(r => {
                                     return (
@@ -223,19 +270,24 @@ const Reports = () => {
                                                 <div className="d-flex justify-content-center">
 
                                                     <BiExport size={"1.7rem"} className="pt-1" />
-
-                                                    <DeleteButton />
-                                                </div>
-                                            </td>
-                                        </tr>
+                                                    <DeleteButton onDelete={() => handleDeleteChartReport(r.chartReportId, r.name)} />
+                                                </div >
+                                            </td >
+                                        </tr >
                                     );
                                 })}
-                            </tbody>
-                        </Table>
-                    </div>
-                </div>
-            </div>
-        </div >
+                            </tbody >
+                        </Table >
+                    </div >
+                </div >
+            </div >
+            <ConfirmationPopup
+                open={deleteButtonActivated}
+                prompt={t('reports.delete.Title')}
+                title={chartReportName}
+                onAccept={() => { onDeleteClick() }}
+                onClose={() => { setDeleteButtonActivated(false) }} />
+        </div>
     )
 }
 

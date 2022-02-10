@@ -80,6 +80,21 @@ let fakeInvoiceAffectList = [
     }
 ];
 
+let fakeInvoiceAffectListWithEmptyClientList= [
+    {
+        invoiceDate: new Date(2020, 9, 15),
+        amount: 0
+    },
+    {
+        invoiceDate: new Date(2020, 10, 15),
+        amount: 0
+    },
+    {
+        invoiceDate: new Date(2020, 11, 15),
+        amount: 0
+    }
+];
+
 let fakeExpectedGetAverageResponse = [
     {
         chart: {
@@ -801,6 +816,41 @@ describe("Test Invoice Service", () => {
                 // act and assert
                 await expect(InvoiceService.getBilled(startDateStr, endDateStr, yearMonthList, nameIdList)).resolves
                     .toEqual(false);
+            });
+        });
+
+        describe("IS3.3 - given a valid start and end date str, yearMonthList and an empty clientList", () => {
+            let startDateStr = '2019-11-01';
+            let endDateStr = '2021-01-01';
+            
+            it("IS3.3.1 - should return billed", async () => {
+                // arrange
+                
+                let expectedList = [
+                    {
+                        month: 202011,
+                        billed: 0
+                    },
+                    {
+                        month: 202012,
+                        billed: 0
+                    },
+                    {
+                        month: 202101,
+                        billed: 0
+                    }
+                ];
+
+                invoiceAffectDaoSpy = jest.spyOn(InvoiceAffectDao, 'getInvoicesByDateAndEmployee')
+                    .mockImplementation(() => new Promise((resolve, reject) => {
+                        resolve(fakeInvoiceAffectListWithEmptyClientList)
+                    }));
+
+                // act
+                const response = await InvoiceService.getBilled(startDateStr, endDateStr, yearMonthList, []);
+
+                // assert
+                expect(response).toEqual(expectedList);
             });
         });
     });

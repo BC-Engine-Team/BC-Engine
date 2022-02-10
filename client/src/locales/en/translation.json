@@ -159,7 +159,13 @@
             "EndDate":"End Date",
             "LoadButton":"Load",
             "CreateButton": "Create"
+        },
+        "delete":{
+            "NotAuthorized":"You are not authorized to perform this action.",
+            "Title":"Are you sure you want to delete ",
+            "Confirmation": "Report deleted successfully"
         }
+
     },
     "form":{
         "Password":"Password",
@@ -172,6 +178,7 @@
         "Empty":"This field cannot be empty!",
         "Incorrect":"Incorrect email or password.",
         "NotFound":"Could not reach B&C Engine...",
+        "Malfunction": "Malfunction in the B&C Engine",
         "PasswordMatch":"Passwords must match!"
     }
 }

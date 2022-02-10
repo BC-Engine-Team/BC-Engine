@@ -133,18 +133,38 @@ describe("Test User DAL", () => {
             expect(resp.email).toBe(returnedUser.email);
         });
 
-        // still needs to test if the User Model resolves with false
-
-        it("UD2.2 - should catch error thrown by the User Model", async () => {
+        it("UD2.2 - should catch error thrown by the User Model with custom message", async () => {
             // arrange
-            UserMock.$queryInterface.$useHandler(function (query, queryOptions, done) {
-                return Promise.reject(new Error("Error with the User Model."));
-            });
+            let mock = {create: () => {return Promise.reject({message: "Error with the User Model."})}}
 
-            // act
-            await UserDAO.createUser(returnedUser, UserMock).catch(err => {
-                // assert
-                expect(err.message).toBe("Error with the User Model.");
+            // act and assert
+            await expect(UserDAO.createUser(returnedUser, mock)).rejects
+                .toEqual({
+                    data: {}, 
+                    message: "Error with the User Model.", 
+                    status: 500
+                });
+        });
+
+        it("UD2.3 - should resolves false", async () => {
+            // arrange
+            let mock = {create: () => {return Promise.resolve(false)}}
+
+            // act and assert
+            await expect(UserDAO.createUser(returnedUser, mock)).resolves
+                .toEqual(false);
+        });
+
+        it("UD2.4 - should catch error thrown by the User Model with default message", async () => {
+            // arrange
+            let mock = {create: () => {return Promise.reject({})}}
+
+            // act and assert
+            await expect(UserDAO.createUser(returnedUser, mock)).rejects
+            .toEqual({
+                data: {}, 
+                message: "some error occured", 
+                status: 500
             });
         });
     });
@@ -188,6 +208,19 @@ describe("Test User DAL", () => {
                 expect(err.message).toBe("Error with the User Model.");
             });
         });
+
+        it("UD3.4 - should catch error thrown by the User Model with default message", async () => {
+            // arrange
+            UserMock.$queryInterface.$useHandler(function (query, queryOptions, done) {
+                return Promise.reject(new Error());
+            });
+
+            // act
+            await UserDAO.getAllUsers(UserMock).catch(err => {
+                // assert
+                expect(err.message).toBe("some error occured");
+            });
+        });
     });
 
     describe("UD4 - updateUser", () => {
@@ -227,6 +260,19 @@ describe("Test User DAL", () => {
             await UserDAO.updateUser(returnedUser, UserMock).catch(err => {
                 // assert
                 expect(err.message).toBe("Error with the User Model.");
+            });
+        });
+
+        it("UD3.4 - should catch error thrown by the User Model with default message", async () => {
+            // arrange
+            UserMock.$queryInterface.$useHandler(function (query, queryOptions, done) {
+                return Promise.reject(new Error());
+            });
+
+            // act
+            await UserDAO.updateUser(returnedUser, UserMock).catch(err => {
+                // assert
+                expect(err.message).toBe("some error occured");
             });
         });
     });

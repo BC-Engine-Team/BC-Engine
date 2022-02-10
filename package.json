@@ -5,7 +5,7 @@
   "main": "index.js",
   "engines": {
     "node": "16.13.2",
-    "npm" : "8.1.2"
+    "npm": "8.1.2"
   },
   "scripts": {
     "test": "jest --coverage",
@@ -23,6 +23,7 @@
     "body-parser": "^1.19.0",
     "concurrently": "^6.4.0",
     "cors": "^2.8.5",
+    "crypto": "^1.0.1",
     "dotenv": "^10.0.0",
     "express": "^4.17.1",
     "faker": "^5.5.3",
@@ -31,7 +32,9 @@
     "mock-express-response": "^0.3.0",
     "morgan": "^1.10.0",
     "mysql2": "^2.3.3",
+    "path": "^0.12.7",
     "pg": "^8.7.1",
+    "querystring": "^0.2.1",
     "react-i18next": "^11.15.3",
     "react-router-bootstrap": "^0.26.0",
     "sequelize": "^6.13.0",

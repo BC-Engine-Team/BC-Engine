@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
-import { Form, Table, InputGroup, FormControl, FormLabel, Button, ButtonGroup, OverlayTrigger, DropdownButton, Dropdown, Tooltip as ToolTipBootstrap, FormCheck } from 'react-bootstrap';
+import { Form, Table, InputGroup, FormControl, FormLabel, Button, ButtonGroup, OverlayTrigger, DropdownButton, Dropdown, Tooltip as ToolTipBootstrap, FormCheck, Col, Row } from 'react-bootstrap';
 import ConfirmationPopup from '../components/ConfirmationPopup';
 import { useTranslation } from 'react-i18next';
 import Axios from 'axios';
@@ -142,24 +142,23 @@ const Dashboard = () => {
 
                 for (let i = 0; i < res.data.length; i++) {
                     listEmployee.push({
-                        name: res.data[i].firstName + " " + res.data[i].lastName,
+                        name: res.data[i].name,
                         id: res.data[i].nameID
                     });
                 }
-
                 setEmployeeSelect(listEmployee);
             })
             .catch((error) => {
                 if (error.response) {
                     if (error.response.status === 403 || error.response.status === 401) {
-                        console.log(error.response.body);
+                        alert(error.response.body);
                     }
                     else {
-                        console.log("Malfunction in the B&C Engine...");
+                        alert("Malfunction in the B&C Engine...");
                     }
                 }
                 else if (error.request) {
-                    console.log("Could not reach b&C Engine...");
+                    alert("Could not reach b&C Engine...");
                 }
             });
     }
@@ -167,7 +166,6 @@ const Dashboard = () => {
     const chart = async (employeeId = -1, compare = false) => {
         setChartLoading(true);
         setChartData(fallbackChartData);
-        console.log(criteria)
         localStorage.setItem("dash_previous_criteria", JSON.stringify(criteria));
         let compareData = [];
 
@@ -195,7 +193,6 @@ const Dashboard = () => {
 
             await Axios.get(`${process.env.REACT_APP_API}/invoice/defaultChartAndTable/${startDate}/${endDate}`, { params: param, headers: header })
                 .then((res) => {
-                    console.log(res.data[0].table.length)
                     if (res.status === 403 && res.status === 401) {
                         setAuthorized(false);
                         return;
@@ -228,7 +225,7 @@ const Dashboard = () => {
                         let colorBG = colors[colorCounter];
 
                         if (compare && c === 0) {
-                            datasetLabel = groupedChartData[Object.keys(groupedChartData)[i]][0]['group'].toString().concat(" - employee");
+                            datasetLabel = groupedChartData[Object.keys(groupedChartData)[i]][0]['group'].toString().concat(" - emp");
                             colorBG = compareColors[colorCounter]
                         }
 
@@ -496,8 +493,8 @@ const Dashboard = () => {
 
                             <Form.Group className="my-2" controlId="floatingModifyStartMonth">
                                 <Form.Label>{t('dashboard.criteria.StartDateLabel')}</Form.Label>
-                                <div className='row'>
-                                    <div className='col-md-6 col-sm-6'>
+                                <Row>
+                                    <Col sm={6} md={6}>
                                         <Form.Select required
                                             id='startYearSelect'
                                             size="sm"
@@ -517,8 +514,8 @@ const Dashboard = () => {
                                         <Form.Control.Feedback type="invalid">
                                             {errors.startYear}
                                         </Form.Control.Feedback>
-                                    </div>
-                                    <div className='col-md-6 col-sm-6'>
+                                    </Col>
+                                    <Col sm={6} md={6}>
                                         <Form.Select required
                                             id='startMonthSelect'
                                             size="sm"
@@ -536,14 +533,14 @@ const Dashboard = () => {
                                         <Form.Control.Feedback type="invalid">
                                             {errors.startMonth}
                                         </Form.Control.Feedback>
-                                    </div>
-                                </div>
+                                    </Col>
+                                </Row>
                             </Form.Group>
 
                             <Form.Group className="my-2" controlId="floatingModifyEndMonth">
                                 <Form.Label>{t('dashboard.criteria.EndDateLabel')}</Form.Label>
-                                <div className='row'>
-                                    <div className='col-md-6 col-sm-6'>
+                                <Row>
+                                    <Col sm={6} md={6}>
                                         <Form.Select required
                                             id='endYearSelect'
                                             size="sm"
@@ -562,8 +559,8 @@ const Dashboard = () => {
                                         <Form.Control.Feedback type="invalid">
                                             {errors.endYear}
                                         </Form.Control.Feedback>
-                                    </div>
-                                    <div className='col-md-6 col-sm-6'>
+                                    </Col>
+                                    <Col sm={6} md={6}>
                                         <Form.Select required
                                             id='endMonthSelect'
                                             size="sm"
@@ -580,68 +577,69 @@ const Dashboard = () => {
                                         <Form.Control.Feedback type="invalid">
                                             {errors.endMonth}
                                         </Form.Control.Feedback>
-                                    </div>
-                                </div>
+                                    </Col>
+                                </Row>
                             </Form.Group>
 
-                            <FormLabel htmlFor="employeeCriteriaDashboard" className="mt-2">{t('dashboard.criteria.labels.Employee')}</FormLabel>
-                            <InputGroup className="mb-2">
+                            <Row>
+                                <FormLabel htmlFor="employeeCriteriaDashboard" className="mt-2">{t('dashboard.criteria.labels.Employee')}</FormLabel>
+                                <InputGroup className="mb-2">
 
-                                <OverlayTrigger
-                                    placement="top"
-                                    overlay={criteria.employee1.name !== "All" ?
-                                        <ToolTipBootstrap id="compareBTN-tooltip" className="transparent">
-                                            {criteria.employee1.name}
-                                        </ToolTipBootstrap> : <></>
-                                    } >
+                                    <OverlayTrigger
+                                        placement="top"
+                                        overlay={criteria.employee1.name !== "All" ?
+                                            <ToolTipBootstrap id="compareBTN-tooltip" className="transparent">
+                                                {criteria.employee1.name}
+                                            </ToolTipBootstrap> : <></>
+                                        } >
 
-                                    <FormControl id="employeeCriteriaDashboard" as="select" onChange={(e) => {
-                                        setField('employee1', {
-                                            id: e.target.value,
-                                            name: e.target.options[e.target.selectedIndex].text
-                                        });
-                                    }}>
+                                        <Form.Select id="employeeCriteriaDashboard" onChange={(e) => {
+                                            setField('employee1', {
+                                                id: e.target.value,
+                                                name: e.target.options[e.target.selectedIndex].text
+                                            });
+                                        }}>
 
-                                        <option key={-1} value={-1}>{t('dashboard.criteria.All')}</option>
-                                        {employeeSelect.map(e => {
-                                            return (
-                                                <option key={e.id} value={e.id}>{e.name}</option>
-                                            )
-                                        })}
-                                    </FormControl>
-                                </OverlayTrigger>
+                                            <option key={-1} value={-1}>{t('dashboard.criteria.All')}</option>
+                                            {employeeSelect.map(e => {
+                                                return (
+                                                    <option key={e.id} value={e.id}>{e.name}</option>
+                                                )
+                                            })}
+                                        </Form.Select>
+                                    </OverlayTrigger>
 
-                                <OverlayTrigger
-                                    placement="top"
-                                    overlay={
-                                        <ToolTipBootstrap id="compareBTN-tooltip">
-                                            {t('dashboard.criteria.Compare')}
-                                        </ToolTipBootstrap>
-                                    } >
+                                    <OverlayTrigger
+                                        placement="top"
+                                        overlay={
+                                            <ToolTipBootstrap id="compareBTN-tooltip">
+                                                {t('dashboard.criteria.Compare')}
+                                            </ToolTipBootstrap>
+                                        } >
 
-                                    <Button
-                                        id="compareToAllBTN"
-                                        variant="light"
-                                        disabled={parseInt(criteria.employee1.id) === -1}
-                                        onClick={() => setField('employee2', {
-                                            id: compareEmployeeChecked ? null : -1,
-                                            name: compareEmployeeChecked ? null : "All"
-                                        })}
-                                        className="btn btn-light shadow-sm border inputSelect ms-1">
-
-                                        <FormCheck
-                                            type="switch"
-                                            label={t('dashboard.criteria.CompareBTN')}
+                                        <Button
+                                            id="compareToAllBTN"
+                                            variant="light"
                                             disabled={parseInt(criteria.employee1.id) === -1}
-                                            checked={compareEmployeeChecked}
-                                        />
-                                    </Button>
-                                </OverlayTrigger>
+                                            onClick={() => setField('employee2', {
+                                                id: compareEmployeeChecked ? null : -1,
+                                                name: compareEmployeeChecked ? null : "All"
+                                            })}
+                                            className="btn btn-light shadow-sm border inputSelect ms-1">
 
-                            </InputGroup>
+                                            <FormCheck
+                                                type="switch"
+                                                label={t('dashboard.criteria.CompareBTN')}
+                                                disabled={parseInt(criteria.employee1.id) === -1}
+                                                checked={compareEmployeeChecked}
+                                            />
+                                        </Button>
+                                    </OverlayTrigger>
+                                </InputGroup>
+                            </Row>
 
-                            <div className='row'>
-                                <div className='col-md-6 col-sm-6'>
+                            <Row className='mt-2'>
+                                <Col sm={6} md={6} className="pe-1">
                                     <Button
                                         id='loadChartButton'
                                         onClick={loadChartData}
@@ -661,8 +659,8 @@ const Dashboard = () => {
                                             <></>}
                                         {loadChartButtonText}
                                     </Button>
-                                </div>
-                                <div className='col-md-6 col-sm-6'>
+                                </Col>
+                                <Col sm={6} md={6} className="ps-1">
                                     <Button
                                         id='saveChartButton'
                                         onClick={handleSaveChartReport}
@@ -671,8 +669,8 @@ const Dashboard = () => {
                                         variant='primary'>
                                         {saveChartButtonText}
                                     </Button>
-                                </div>
-                            </div>
+                                </Col>
+                            </Row>
                         </div>
                     </div>
                     <div className="container-chart">

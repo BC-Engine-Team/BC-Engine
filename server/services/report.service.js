@@ -61,7 +61,7 @@ exports.createChartReportData = async (createdChartReport, data) => {
         let preparedData = [];
 
         for (let i = 0; i < data.length; i++) {
-            let isEmpFiltered = data[i].label.toString().split(" - ").at(-1) === "employee";
+            let isEmpFiltered = data[i].label.toString().split(" - ").at(-1) === "emp";
             let year = parseInt(data[i].label.toString().split(" - ")[0]);
             let set = {
                 chart_report_id: createdChartReport.chartReportId,
@@ -167,10 +167,22 @@ exports.getReportTypesWithRecipients = async () => {
                 }
                 resolve(false);
             })
-            .then(async data => {
-                if (data[0]) {
+            .catch(err => {
+                const response = {
+                    status: err.status || 500,
+                    message: err.message || "Malfunction in the B&C Engine."
+                };
+                reject(response);
+            });
+    });
+}
 
-                }
+exports.deleteChartReportById = async (chartReportId) => {
+    return new Promise((resolve, reject) => {
+
+        ChartReportDao.deleteChartReportById(chartReportId)
+            .then(async data => {
+                if (data) resolve(data);
                 resolve(false);
             })
             .catch(err => {
@@ -220,3 +232,4 @@ exports.getRecipients = async () => {
             });
     });
 }
+
