@@ -133,13 +133,30 @@ exports.verifyChartReport = (criteria) => {
     return verified;
 }
 
+exports.deleteChartReportById = async (chartReportId) => {
+    return new Promise((resolve, reject) => {
+
+        ChartReportDao.deleteChartReportById(chartReportId)
+            .then(async data => {
+                if (data) resolve(data);
+                resolve(false);
+            })
+            .catch(err => {
+                const response = {
+                    status: err.status || 500,
+                    message: err.message || "Malfunction in the B&C Engine."
+                };
+                reject(response);
+            });
+    });
+}
+
 
 // Reports Types related functions
 exports.getReportTypesWithRecipients = async () => {
     return new Promise(async (resolve, reject) => {
         this.getReportTypes()
             .then(async reportTypes => {
-
                 if (reportTypes) {
                     let returnData = {
                         reportTypes: reportTypes
@@ -159,30 +176,15 @@ exports.getReportTypesWithRecipients = async () => {
                                 data.reportTypes[i].recipients[recipientId].isRecipient = true;
                             }
                             else {
-                                data.reportTypes[i].recipients[recipientId] = data.recipients[j].name;
+                                data.reportTypes[i].recipients[recipientId] = {
+                                    name: data.recipients[j].name,
+                                    isRecipient: false
+                                };
                             }
                         }
                     }
                     resolve(data.reportTypes);
                 }
-                resolve(false);
-            })
-            .catch(err => {
-                const response = {
-                    status: err.status || 500,
-                    message: err.message || "Malfunction in the B&C Engine."
-                };
-                reject(response);
-            });
-    });
-}
-
-exports.deleteChartReportById = async (chartReportId) => {
-    return new Promise((resolve, reject) => {
-
-        ChartReportDao.deleteChartReportById(chartReportId)
-            .then(async data => {
-                if (data) resolve(data);
                 resolve(false);
             })
             .catch(err => {
@@ -207,7 +209,7 @@ exports.getReportTypes = async () => {
             .catch(err => {
                 const response = {
                     status: err.status || 500,
-                    message: err.message || "Could not create Chart Report."
+                    message: err.message || "Could not fetch Report Types."
                 }
                 reject(response);
             });
@@ -226,7 +228,7 @@ exports.getRecipients = async () => {
             .catch(err => {
                 const response = {
                     status: err.status || 500,
-                    message: err.message || "Could not create Chart Report."
+                    message: err.message || "Could not fetch Recipients."
                 }
                 reject(response);
             });
