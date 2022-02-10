@@ -62,8 +62,6 @@ exports.createChartReportPDFByReportId = async (reportId) => {
         format: "letter"
     };
 
-    console.log(__dirname.replace("services", "") + "docs\\template_img\\")
-
     return new Promise(async (resolve, reject) => {
         ChartReportDao.getChartReportById(reportId)
             .then(async data => {

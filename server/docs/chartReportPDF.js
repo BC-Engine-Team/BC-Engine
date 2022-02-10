@@ -1,15 +1,6 @@
 module.exports = (data) => {
     const today = new Date();
 
-    const formatTimes = (time) => {
-        if(time < 10) time = "0" + time;
-        return time;
-    }
-
-    let logoUrl = './template_img/logo.png'
-
-    console.log(logoUrl)
-
     const months = [ 
         "January", 
         "February", 
@@ -24,6 +15,32 @@ module.exports = (data) => {
         "November", 
         "December" 
     ];
+    
+    const formatTimes = (time) => {
+        if(time < 10) time = "0" + time;
+        return time;
+    }
+
+    const getDateOrdinal = (date) => {
+        switch(date) {
+            case 1: return "st";
+            case 2: return "nd";
+            case 3: return "rd";
+            default: return "th";
+        }
+    }
+
+    const getFullDateFormatted = (date) => {
+        let str = "";
+        str = str.concat(months[date.getMonth()], " ");
+        str = str.concat(formatTimes(date.getDate()));
+        str = str.concat(`<small>${getDateOrdinal(date.getDate())}</small>, `)
+        str = str.concat(date.getFullYear(), " - ");
+        str = str.concat(formatTimes(date.getHours()), ":");
+        str = str.concat(formatTimes(date.getMinutes()), ":");
+        str = str.concat(formatTimes(date.getSeconds()));
+        return str;
+    }
 
     let html =  /*html*/`
     <!DOCTYPE html>
@@ -140,9 +157,9 @@ module.exports = (data) => {
           <h1>Chart Report - ${data.name}</h1>
           <div id="ReportInfo" class="clearfix">
             <h2 class="title">Report Information</h2>
-            <div><span>Date Created</span> ${months[data.createdAt.getMonth()]} ${data.createdAt.getDate()}<small>th</small>, ${data.createdAt.getFullYear()} - ${data.createdAt.getTime()} - ${formatTimes(data.createdAt.getHours())}:${formatTimes(data.createdAt.getMinutes())}:${formatTimes(data.createdAt.getSeconds())}</div>
-            <div><span>Date Last Updated</span> ${months[data.updatedAt.getMonth()]} ${data.updatedAt.getDate()}<small>th</small>, ${data.updatedAt.getFullYear()} - ${formatTimes(data.updatedAt.getHours())}:${formatTimes(data.updatedAt.getMinutes())}:${formatTimes(data.updatedAt.getSeconds())}</div>
-            <div><span>Date Report Exported</span> ${months[today.getMonth()]} ${today.getDate()}<small>th</small>, ${today.getFullYear()} - ${formatTimes(today.getHours())}:${formatTimes(today.getMinutes())}:${formatTimes(today.getSeconds())}</div>
+            <div><span>Date Created</span> ${getFullDateFormatted(data.createdAt)}</div>
+            <div><span>Date Last Updated</span> ${getFullDateFormatted(data.updatedAt)}</div>
+            <div><span>Date Report Exported</span> ${getFullDateFormatted(today)}</div>
           </div>
           <div id="chartCriteria">
             <h2 class="title" >Chart Criteria</h2>
