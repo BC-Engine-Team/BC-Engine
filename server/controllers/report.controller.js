@@ -46,7 +46,6 @@ exports.getReportTypesWithRecipients = async (req, res) => {
     if (req.user.role !== "admin")
         return res.status(403).send({ message: "You are not authorized to fetch from this resource." });
 
-
     await reportService.getReportTypesWithRecipients()
         .then(async response => {
             if (response) {
