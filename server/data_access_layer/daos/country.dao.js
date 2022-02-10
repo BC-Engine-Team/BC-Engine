@@ -27,6 +27,7 @@ exports.getAllCountries = async (db=database) => {
                 let returnData = [];
                 data.forEach(c => {
                     returnData.push({
+                        countryCode: c["COUNTRY_CODE"],
                         countryLabel: c["COUNTRY_LABEL"]
                     });
                 });

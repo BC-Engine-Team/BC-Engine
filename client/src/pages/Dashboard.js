@@ -92,7 +92,7 @@ const Dashboard = () => {
     const earliestYear = 2009;
     const [authorized, setAuthorized] = useState(false);
     const [clientNameCountry, setClientNameCountry] = useState([{ name: "", country: "", clientgrading: "" }]);
-    const [countries, setCountries] = useState([{ countryLabel: "" }]);
+    const [countries, setCountries] = useState([{ countryCode: "", countryLabel: "" }]);
     const [filteredCountry, setFilteredCountry] = useState({country: ""});
     const [errors, setErrors] = useState({});
 
@@ -184,6 +184,7 @@ const Dashboard = () => {
                 for(let i = 0; i < res.data.length; i++)
                 {
                     countryList.push({
+                        countryCode: res.data[i].countryCode,
                         countryLabel: res.data[i].countryLabel
                     });
                 }
@@ -211,6 +212,7 @@ const Dashboard = () => {
             let endDate = new Date(criteria.endYear, criteria.endMonth, 1).toISOString().split("T")[0];
 
             let param = {};
+
             if (employeeId !== -1 && countryCode === undefined) {
                 param = {
                     employeeId: employeeId
@@ -414,7 +416,7 @@ const Dashboard = () => {
                 }
             }
 
-            await chart(parseInt(criteria.employee1.id), compareEmployeeChecked);
+            await chart(parseInt(criteria.employee1.id), criteria.country, compareEmployeeChecked);
         }
     };
 
@@ -444,6 +446,9 @@ const Dashboard = () => {
                 [field]: null
             });
         }
+
+        console.log(value);
+        
         setChartSaved(false);
     };
 
@@ -634,6 +639,23 @@ const Dashboard = () => {
                                     </Col>
                                 </Row>
                             </Form.Group>
+
+
+                            <Row>
+                                <FormLabel htmlFor="countryCriteriaDashboard" className="mt-2">{t('dashboard.criteria.labels.Country')}</FormLabel>
+                                <InputGroup className="mb-2">
+
+                                        <Form.Select id="countryCriteriaDashboard" 
+                                                    onChange={(e) => setField('country', e.target.value)}>
+                                            <option value="All">{t('dashboard.criteria.All')}</option>
+                                            {countries.map(c => {
+                                                return (
+                                                    <option key={c.countryCode} value={c.countryLabel}>{c.countryLabel}</option>
+                                                )
+                                            })}
+                                        </Form.Select>
+                                </InputGroup>
+                            </Row>
 
                             <Row>
                                 <FormLabel htmlFor="employeeCriteriaDashboard" className="mt-2">{t('dashboard.criteria.labels.Employee')}</FormLabel>

@@ -59,7 +59,7 @@ exports.getAverages = async (startDateStr, endDateStr,  employeeId = undefined, 
             });
         }
 
-        if(countryCode === "all"){
+        if(countryCode === "All"){
             countryCode = undefined;
         }
 
@@ -279,18 +279,20 @@ exports.getBilled = async (startDateStr, endDateStr, yearMonthList, clientsList 
             }).catch(err => {
                 reject(err);
             })
-            if(clientsList.length === 0) {
-                getBilled_(yearMonthList, [{invoiceDate: null, billed: null, actorId: null}])
-            }
-            else {
-                await InvoiceAffectDao.getInvoicesByDateAndEmployee(startDateStr, endDateStr, clientsList).then(async data => {
-                    if (data) getBilled_(yearMonthList, data);
-                    else resolve(false);
-                }).catch(err => {
-                    reject(err);
-                });
-            }
         }
+
+        // if(clientsList.length === 0) {
+        //     getBilled_(yearMonthList, [{invoiceDate: null, billed: null, actorId: null}])
+        // }
+        // else {
+        //     await InvoiceAffectDao.getInvoicesByDateAndEmployee(startDateStr, endDateStr, clientsList).then(async data => {
+        //         if (data) getBilled_(yearMonthList, data);
+        //         else resolve(false);
+        //     }).catch(err => {
+        //         reject(err);
+        //     });
+        // }
+        
     });
 }
 
@@ -406,6 +408,7 @@ exports.getCountriesName = async () => {
             if(data){
                 data.forEach(country => {
                     countryList.push({
+                        countryCode: country.countryCode,
                         countryLabel: country.countryLabel
                     });
                 });

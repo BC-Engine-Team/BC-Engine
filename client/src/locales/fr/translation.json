@@ -57,6 +57,7 @@
           "CompareBTN":"Comparer",
           "All":"Tous",
           "labels": {
+             "Country":"Pays",
              "Employee":"Employé"
           },
          "NamePlaceHolder": "Entrez le nom de votre Rapport Graphique",
