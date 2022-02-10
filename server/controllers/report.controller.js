@@ -36,3 +36,21 @@ exports.createChartReport = async (req, res) => {
             return res.status(err.status || 500).send({ message: err.message || "Malfunction in the B&C Engine." });
         });
 }
+
+exports.createChartReportPDF = async (req, res) => {
+    if (!req.query.reportid)
+    return res.status(400).send({ message: "Content cannot be empty." });
+
+    await reportService.createChartReportPDFByReportId(req.query.reportid)
+        .then(response => {
+            console.log(response)
+            if(response) {
+                return res.status(200).send(response);
+            }
+            return res.status(500).send({ message: "The data could not be fetched." });
+        })
+        .catch(err => {
+            return res.status(err.status || 500)
+                .send({ message: !!err.message ? err.message : "Malfunction in the B&C Engine." });
+        });
+}

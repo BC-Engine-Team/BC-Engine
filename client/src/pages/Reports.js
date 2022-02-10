@@ -8,7 +8,7 @@ import { Button, Table } from 'react-bootstrap'
 
 import NavB from '../components/NavB'
 import DeleteButton from '../components/DeleteButton'
-import EditButton from '../components/EditButton'
+import ExportButton from '../components/ExportButton'
 
 const Reports = () => {
     const { t } = useTranslation();
@@ -27,6 +27,32 @@ const Reports = () => {
         ageOfAccount: "",
         accountType: ""
     }]);
+
+    const createAndDownloadPDF = (ReportId) => {
+        let header = {
+            'authorization': "Bearer " + cookies.get("accessToken"),
+        }
+
+        Axios.defaults.withCredentials = true;
+
+        Axios.post(`${process.env.REACT_APP_API}/reports/create-pdf/${ReportId}`, { headers: header })
+            .then((response) => {
+                console.log(response);
+            })
+            .catch((error) => {
+                if (error.response) {
+                    if (error.response.status === 403 || error.response.status === 401) {
+                        alert("You are not authorized to perform this action.");
+                    }
+                    else {
+                        alert("Could not reach b&C Engine...");
+                    }
+                }
+                else if (error.request) {
+                    alert("Could not reach b&C Engine...");
+                }
+            });
+    }
 
     const handleRefresh = () => {
         let header = {
@@ -107,8 +133,7 @@ const Reports = () => {
                                             <td>{r.endDate.toString()}</td>
                                             <td className="py-1">
                                                 <div className="d-flex justify-content-center">
-                                                    <EditButton />
-
+                                                    <ExportButton onExport={() => createAndDownloadPDF(r.chartReportId)} />
                                                     <DeleteButton />
                                                 </div>
                                             </td>

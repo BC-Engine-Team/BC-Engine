@@ -80,3 +80,26 @@ exports.createDataForChartReport = async (chartReportId, data, chartReportDataMo
             })
     });
 }
+
+exports.getChartReportById = async (chartReportId, chartReportModel = ChartReportModel) => {
+    return new Promise((resolve, reject) => {
+        chartReportModel.findOne({
+            where: {
+                chart_report_id: chartReportId
+            }
+        }).then(async data => {
+            if (data) {
+                console.log(data)
+                resolve(data)
+            }
+            resolve(false);
+        })
+            .catch(async err => {
+                const response = {
+                    status: err.status || 500,
+                    message: err.message || "Could not fetch data."
+                };
+                reject(response);
+            });
+    });
+}

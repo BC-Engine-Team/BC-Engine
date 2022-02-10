@@ -1,5 +1,7 @@
 const ChartReportDao = require("../data_access_layer/daos/chart_report.dao");
 
+const pdf = require('html-pdf');
+const pdfTemplate = require("../docs/chartReportPDF");
 
 exports.getChartReportsByUserId = async (userId) => {
     return new Promise(async (resolve, reject) => {
@@ -50,6 +52,36 @@ exports.createChartReportForUser = async (criteria, data, userId) => {
                     status: err.status || 500,
                     message: err.message || "Malfunction in the B&C Engine."
                 };
+                reject(response);
+            });
+    });
+}
+
+exports.createChartReportPDFByReportId = async (reportId) => {
+    const pdfOptions = {
+        format: "A4",
+        type: "pdf",
+        quality: 75
+    };
+
+    return new Promise(async (resolve, reject) => {
+        ChartReportDao.getChartReportById(reportId)
+            .then(async data => {
+                if (data)
+                    pdf.create(pdfTemplate(data), pdfOptions).toFile(`./docs/pdf_files/chartReport-${reportId}.pdf`, (err) => {
+                        if(err) {
+                            reject(err);
+                        }
+                        resolve(true);
+                    });
+                else
+                    resolve(false);
+            })
+            .catch(err => {
+                const response = {
+                    status: err.status || 500,
+                    message: err.message || "Malfunction in the B&C Engine."
+                }
                 reject(response);
             });
     });

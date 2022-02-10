@@ -1,16 +1,16 @@
 import Icon from '@mdi/react'
-import { mdiPencil, mdiPencilOutline } from '@mdi/js';
+import { mdiFileExport, mdiFileExportOutline } from '@mdi/js';
 
-const EditButton = ({ onEdit }) => {
+const EditButton = ({ onExport }) => {
     return (
-        <button className="btnEdit btn-edit" onClick={onEdit}>
-        <Icon path={mdiPencil} 
+        <button className="btnEdit btn-edit" onClick={onExport}>
+        <Icon path={mdiFileExport} 
             className="mdi mdi-edit" 
             title="edit Button"
             size={1}
             horizontal/>
 
-        <Icon path={mdiPencilOutline}
+        <Icon path={mdiFileExportOutline}
             className="mdi mdi-edit-empty" 
             title="edit Button empty"
             size={1}
