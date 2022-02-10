@@ -25,7 +25,7 @@ module.exports = (data) => {
         "December" 
     ];
 
-    let html =  `
+    let html =  /*html*/`
     <!DOCTYPE html>
     <html lang="en">
       <head>
@@ -45,8 +45,8 @@ module.exports = (data) => {
 
             body {
                 position: relative;
-                width: 21cm;  
-                height: 29.7cm; 
+                width: 8.5in;  
+                height: 11in; 
                 margin: 0 auto; 
                 color: #001028;
                 background: #FFFFFF; 
@@ -135,11 +135,7 @@ module.exports = (data) => {
       <body>
         <header class="clearfix">
           <div id="logo">
-            <picture>
-                <source srcset="brandingLogo">
-                <img src="brandingLogo" width="90" height="90">
-            </picture>
-            <img src="brandingLogo" width="90" height="90">
+            <img src="https://i.postimg.cc/rwsyKZ34/logo.png" width="90px" height="90px">
           </div>
           <h1>Chart Report - ${data.name}</h1>
           <div id="ReportInfo" class="clearfix">
@@ -170,11 +166,5 @@ module.exports = (data) => {
       </body>
     </html>
     `
-
-    let html1 = html.replaceAll('brandingLogo','file:\\\\\\' + 
-    require.resolve('./template_img/logo.png').replace(/\//g,"\\\\"));
-
-    console.log(html1)
-
-    return html1
+    return html
 }

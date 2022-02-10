@@ -59,16 +59,17 @@ exports.createChartReportForUser = async (criteria, data, userId) => {
 
 exports.createChartReportPDFByReportId = async (reportId) => {
     const pdfOptions = {
-        format: "A4",
-        type: "pdf",
-        quality: 75
+        format: "letter"
     };
+
+    console.log(__dirname.replace("services", "") + "docs\\template_img\\")
 
     return new Promise(async (resolve, reject) => {
         ChartReportDao.getChartReportById(reportId)
             .then(async data => {
                 if (data)
-                    pdf.create(pdfTemplate(data), pdfOptions).toFile(`./docs/pdf_files/chartReport-${reportId}.pdf`, (err) => {
+                    pdf.create(pdfTemplate(data), pdfOptions)
+                    .toFile(`./docs/pdf_files/chartReport-${reportId}.pdf`, (err) => {
                         if(err) {
                             reject(err);
                         }
