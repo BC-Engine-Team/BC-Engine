@@ -118,6 +118,12 @@ module.exports = (localdb, Sequelize) => {
         { underscored: true });
 
     const ChartReportData = localdb.define("chart_reports_data", {
+        chart_report_id: {
+            field: 'chart_report_id',
+            type: Sequelize.UUID,
+            defaultValue: Sequelize.UUIDV4,
+            primaryKey: true
+        },
         year: {
             field: 'year',
             type: Sequelize.INTEGER

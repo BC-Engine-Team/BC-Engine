@@ -45,143 +45,183 @@ module.exports = (data, averagesList) => {
     let html =  /*html*/`
     <!DOCTYPE html>
     <html lang="en">
-      <head>
-        <meta charset="utf-8">
-        <title>Chart Report - ${data.name}</title>
-        <style>
-            .clearfix:after {
-                content: "";
-                display: table;
-                clear: both;
-            }
+        <head>
+            <meta charset="utf-8">
+            <title>Chart Report - ${data.name}</title>
+            <style>
+                .clearfix:after {
+                    content: "";
+                    display: table;
+                    clear: both;
+                }
 
-            a {
-            color: #5D6975;
-                text-decoration: underline;
-            }
-
-            body {
-                position: relative;
-                width: 8.5in;  
-                height: 11in; 
-                margin: 0 auto; 
-                color: #001028;
-                background: #FFFFFF; 
-                font-family: Arial, sans-serif; 
-                font-size: 12px; 
-                font-family: Arial;
-            }
-
-            header {
-                padding: 10px 0;
-                margin-bottom: 30px;
-            }
-
-            #logo {
-                text-align: center;
-                margin-bottom: 10px;
-            }
-
-            #logo picture {
-                width: 90px;
-            }
-
-            h1 {
-                border-top: 1px solid  #5D6975;
-                border-bottom: 1px solid  #5D6975;
+                a {
                 color: #5D6975;
-                font-size: 2.4em;
-                line-height: 1.4em;
-                font-weight: normal;
-                text-align: center;
-                margin: 0 0 20px 0;
-            }
+                    text-decoration: underline;
+                }
 
-            #chartCriteria {
-                float: left;
-            }
+                body {
+                    position: relative;
+                    width: 8.5in;  
+                    height: 11in; 
+                    margin: 0 auto; 
+                    color: #001028;
+                    background: #FFFFFF; 
+                    font-family: Arial, sans-serif; 
+                    font-size: 12px; 
+                    font-family: Arial;
+                }
 
-            #chartCriteria span {
-                color: #5D6975;
-                width: 80px;
-                margin-right: 10px;
-                display: inline-block;
-                font-size: 1em;
-            }
+                header {
+                    padding: 10px 0;
+                    margin-bottom: 30px;
+                }
 
-            #ReportInfo span {
-                color: #5D6975;
-                width: 120px;
-                display: inline-block;
-                font-size: 1em;
-            }
+                #logo {
+                    text-align: center;
+                    margin-bottom: 10px;
+                }
 
-            #ReportInfo {
-                float: right;
-                text-align: right;
-            }
+                #logo picture {
+                    width: 90px;
+                }
 
-            #chartCriteria div,
-                #ReportInfo div {
-                white-space: nowrap;
-                margin-top: 0.2rem;    
-            }
+                h1 {
+                    border-top: 1px solid  #5D6975;
+                    border-bottom: 1px solid  #5D6975;
+                    color: #5D6975;
+                    font-size: 2.4em;
+                    line-height: 1.4em;
+                    font-weight: normal;
+                    text-align: center;
+                    margin: 0 0 20px 0;
+                }
 
-            #notices .notice {
-                color: #5D6975;
-                font-size: 1.2em;
-            }
+                #chartCriteria {
+                    float: left;
+                }
 
-            footer {
-                color: #5D6975;
-                width: 100%;
-                height: 30px;
-                position: absolute;
-                bottom: 0;
-                border-top: 1px solid #C1CED9;
-                padding: 8px 0;
-                text-align: center;
-            }
+                #chartCriteria span {
+                    color: #5D6975;
+                    width: 80px;
+                    margin-right: 10px;
+                    display: inline-block;
+                    font-size: 1em;
+                }
 
-            .title {
-                margin-top: 0;
-                margin-bottom: 0.7rem;
-            }
-        </style>
-      </head>
-      <body>
-        <header class="clearfix">
-          <div id="logo">
-            <img src="https://i.postimg.cc/rwsyKZ34/logo.png" width="90px" height="90px">
-          </div>
-          <h1>Chart Report - ${data.name}</h1>
-          <div id="ReportInfo" class="clearfix">
-            <h2 class="title">Report Information</h2>
-            <div><span>Date Created</span> ${getFullDateFormatted(data.createdAt)}</div>
-            <div><span>Date Last Updated</span> ${getFullDateFormatted(data.updatedAt)}</div>
-            <div><span>Date Report Exported</span> ${getFullDateFormatted(today)}</div>
-          </div>
-          <div id="chartCriteria">
-            <h2 class="title" >Chart Criteria</h2>
-            <div><span>Name</span> ${data.name}</div>
-            <div><span>Start Date</span> ${months[parseInt(data.endDate.substring(5, 7)) - 1]} ${data.endDate.substring(0, 4)}</div>
-            <div><span>End Date</span> ${months[parseInt(data.startDate.substring(5, 7)) - 1]} ${data.startDate.substring(0, 4)}</div>
-            <div><span>Employee</span> ${data.employee1Name}</div>
-            ${ data.employee2Name !== null ?  `<div><span>Compared With</span> ${data.employee2Name}</div>` : ""}
-            <div><span>Age of Account</span> ${data.ageOfAccount}</div>
-            <div><span>Account Type</span> ${data.accountType}</div>
-            <div><span>Country</span> ${data.country}</div>
-            <div><span>Client Type</span> ${data.clientType === "Corr" ? "Correspondant" : data.clientType === "All" ? "All" : "Direct"}</div>
-          </div>
-        </header>
-        <main>
-            <p>Chart will go here</p>
-        </main>
-        <footer>
-          Invoice was created on a computer and is valid without the signature and seal.
-        </footer>
-      </body>
+                #ReportInfo span {
+                    color: #5D6975;
+                    width: 120px;
+                    display: inline-block;
+                    font-size: 1em;
+                }
+
+                #ReportInfo {
+                    float: right;
+                    text-align: right;
+                }
+
+                #chartCriteria div,
+                    #ReportInfo div {
+                    white-space: nowrap;
+                    margin-top: 0.2rem;    
+                }
+
+                #notices .notice {
+                    color: #5D6975;
+                    font-size: 1.2em;
+                }
+
+                footer {
+                    color: #5D6975;
+                    width: 100%;
+                    height: 30px;
+                    position: absolute;
+                    bottom: 0;
+                    border-top: 1px solid #C1CED9;
+                    padding: 8px 0;
+                    text-align: center;
+                }
+
+                .title {
+                    margin-top: 0;
+                    margin-bottom: 0.7rem;
+                }
+            </style>
+        </head>
+        <body>
+            <header class="clearfix">
+            <div id="logo">
+                <img src="https://i.postimg.cc/rwsyKZ34/logo.png" width="90px" height="90px">
+            </div>
+            <h1>Chart Report - ${data.name}</h1>
+            <div id="ReportInfo" class="clearfix">
+                <h2 class="title">Report Information</h2>
+                <div><span>Date Created</span> ${getFullDateFormatted(data.createdAt)}</div>
+                <div><span>Date Last Updated</span> ${getFullDateFormatted(data.updatedAt)}</div>
+                <div><span>Date Report Exported</span> ${getFullDateFormatted(today)}</div>
+            </div>
+            <div id="chartCriteria">
+                <h2 class="title" >Chart Criteria</h2>
+                <div><span>Name</span> ${data.name}</div>
+                <div><span>Start Date</span> ${months[parseInt(data.endDate.substring(5, 7)) - 1]} ${data.endDate.substring(0, 4)}</div>
+                <div><span>End Date</span> ${months[parseInt(data.startDate.substring(5, 7)) - 1]} ${data.startDate.substring(0, 4)}</div>
+                <div><span>Employee</span> ${data.employee1Name}</div>
+                ${ data.employee2Name !== null ?  `<div><span>Compared With</span> ${data.employee2Name}</div>` : ""}
+                <div><span>Age of Account</span> ${data.ageOfAccount}</div>
+                <div><span>Account Type</span> ${data.accountType}</div>
+                <div><span>Country</span> ${data.country}</div>
+                <div><span>Client Type</span> ${data.clientType === "Corr" ? "Correspondant" : data.clientType === "All" ? "All" : "Direct"}</div>
+            </div>
+            </header>
+            <main>
+                <canvas id="myChart" width="auto" height="auto"></canvas>
+            </main>
+            <footer>
+                Invoice was created on a computer and is valid without the signature and seal.
+            </footer>
+        </body>
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
+        <script>
+            const ctx = document.getElementById('myChart');
+            const myChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
+                    datasets: [{
+                        label: '# of Votes',
+                        data: [12, 19, 3, 5, 2, 3],
+                        backgroundColor: [
+                            'rgba(255, 99, 132, 0.2)',
+                            'rgba(54, 162, 235, 0.2)',
+                            'rgba(255, 206, 86, 0.2)',
+                            'rgba(75, 192, 192, 0.2)',
+                            'rgba(153, 102, 255, 0.2)',
+                            'rgba(255, 159, 64, 0.2)'
+                        ],
+                        borderColor: [
+                            'rgba(255, 99, 132, 1)',
+                            'rgba(54, 162, 235, 1)',
+                            'rgba(255, 206, 86, 1)',
+                            'rgba(75, 192, 192, 1)',
+                            'rgba(153, 102, 255, 1)',
+                            'rgba(255, 159, 64, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        </script>
     </html>
     `
+
     return html
 }

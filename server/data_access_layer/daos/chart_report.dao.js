@@ -77,7 +77,7 @@ exports.createDataForChartReport = async (chartReportId, data, chartReportDataMo
                     message: err.message || "Could not create data."
                 }
                 reject(response);
-            })
+            });
     });
 }
 
@@ -87,19 +87,47 @@ exports.getChartReportById = async (chartReportId, chartReportModel = ChartRepor
             where: {
                 chart_report_id: chartReportId
             }
-        }).then(async data => {
+        })
+        .then(async data => {
             if (data) {
                 console.log(data)
                 resolve(data)
             }
             resolve(false);
         })
-            .catch(async err => {
-                const response = {
-                    status: err.status || 500,
-                    message: err.message || "Could not fetch data."
-                };
-                reject(response);
-            });
+        .catch(async err => {
+            const response = {
+                status: err.status || 500,
+                message: err.message || "Could not fetch data."
+            };
+            reject(response);
+        });
+    });
+}
+
+exports.getDataForChartReport = async (chartReportId, chartReportDataModel = ChartReportDataModel) => {
+    return new Promise((resolve, reject) => {
+        chartReportDataModel.findAll({
+            where: {
+                chart_report_id: chartReportId
+            }
+        })
+        .then(async data => {
+            if (data) {
+                let returnData = [];
+                for (let i = 0; i < data.length; i++) {
+                    returnData.push(data[i].dataValues);
+                }
+                resolve(returnData)
+            }
+            resolve(false);
+        })
+        .catch(async err => {
+            const response = {
+                status: err.status || 500,
+                message: err.message || "Could not create data."
+            }
+            reject(response);
+        });
     });
 }

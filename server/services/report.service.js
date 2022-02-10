@@ -1,5 +1,4 @@
 const ChartReportDao = require("../data_access_layer/daos/chart_report.dao");
-const invoiceService = require('./invoice.service');
 
 const pdf = require('html-pdf');
 const pdfTemplate = require("../docs/chartReportPDF");
@@ -69,13 +68,21 @@ exports.createChartReportPDFByReportId = async (reportId) => {
                 if (data) {
                     let averagesList = [];
 
-                    await this.getChartReportPDFAverages(data).then(async dataAvg => {
-                        averagesList = dataAvg;
+                    await this.getChartReportPDFAverages(reportId).then(async dataAvg => {
+                        for(let i = 0; i < dataAvg.length; i++) {
+                            delete dataAvg[i].createdAt;
+                            delete dataAvg[i].updatedAt;
+                            delete dataAvg[i].chart_report_id;
+                            delete dataAvg[i].employee;
+                            averagesList.push(dataAvg[i]);
+                        }
                     }).catch(err => {
                         reject(err);
                     });
 
-                    pdf.create(pdfTemplate(data, averagesList[0].chart), pdfOptions)
+                    console.log(averagesList)
+
+                    pdf.create(pdfTemplate(data, averagesList), pdfOptions)
                     .toFile(`./docs/pdf_files/chartReport-${reportId}.pdf`, (err) => {
                         if(err) {
                             reject(err);
@@ -96,9 +103,9 @@ exports.createChartReportPDFByReportId = async (reportId) => {
     });
 }
 
-exports.getChartReportPDFAverages = async (data) => {
+exports.getChartReportPDFAverages = async (reportId) => {
     return new Promise(async (resolve, reject) => {
-        await invoiceService.getAverages(data.startDate, data.endDate, data.employeeId === "All" ? undefined : data.employeeId)
+        ChartReportDao.getDataForChartReport(reportId)
         .then(data => {
             if (data) resolve(data);
             resolve(false);
