@@ -70,11 +70,26 @@ exports.createChartReportPDFByReportId = async (reportId) => {
 
                     await this.getChartReportPDFAverages(reportId).then(async dataAvg => {
                         for(let i = 0; i < dataAvg.length; i++) {
-                            delete dataAvg[i].createdAt;
-                            delete dataAvg[i].updatedAt;
-                            delete dataAvg[i].chart_report_id;
-                            delete dataAvg[i].employee;
-                            averagesList.push(dataAvg[i]);
+                            console.log(dataAvg[i])
+                            let avgObject = {
+                                year: dataAvg[i].year,
+                                employee: dataAvg[i].employee,
+                                data: [
+                                    dataAvg[i].january,
+                                    dataAvg[i].february,
+                                    dataAvg[i].march,
+                                    dataAvg[i].april,
+                                    dataAvg[i].may,
+                                    dataAvg[i].june,
+                                    dataAvg[i].july,
+                                    dataAvg[i].august,
+                                    dataAvg[i].september,
+                                    dataAvg[i].october,
+                                    dataAvg[i].november,
+                                    dataAvg[i].december,
+                                ]
+                            }
+                            averagesList.push(avgObject);
                         }
                     }).catch(err => {
                         reject(err);

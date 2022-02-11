@@ -1,3 +1,5 @@
+// const Chart = require('chart.js');
+
 module.exports = (data, averagesList) => {
     const today = new Date();
 
@@ -16,6 +18,30 @@ module.exports = (data, averagesList) => {
         "December" 
     ];
 
+    const compareColors = [
+        'rgb(255, 192, 159)',
+        'rgb(191, 175, 192)',
+        'rgb(255, 238, 147)',
+        'rgb(160, 206, 217)',
+        'rgb(173, 247, 182)'
+    ];
+
+    const colors = [
+        'rgba(255, 192, 159, 0.6)',
+        'rgba(191, 175, 192, 0.6)',
+        'rgba(255, 238, 147, 0.6)',
+        'rgba(160, 206, 217, 0.6)',
+        'rgba(173, 247, 182, 0.6)'
+    ]
+
+    const colorBorders = [
+        'rgb(255, 139, 77)',
+        'rgb(127, 101, 129)',
+        'rgb(255, 224, 51)',
+        'rgb(65, 144, 164)',
+        'rgb(46, 234, 68)'
+    ]
+
     const formatTimes = (time) => {
         if(time < 10) time = "0" + time;
         return time;
@@ -32,6 +58,7 @@ module.exports = (data, averagesList) => {
 
     const getFullDateFormatted = (date) => {
         let str = "";
+
         str = str.concat(months[date.getMonth()], " ");
         str = str.concat(formatTimes(date.getDate()));
         str = str.concat(`<small>${getDateOrdinal(date.getDate())}</small>, `)
@@ -39,10 +66,80 @@ module.exports = (data, averagesList) => {
         str = str.concat(formatTimes(date.getHours()), ":");
         str = str.concat(formatTimes(date.getMinutes()), ":");
         str = str.concat(formatTimes(date.getSeconds()));
+
         return str;
     }
 
-    let html =  /*html*/`
+    const buildChartDatasets = () => {
+        let str = "";
+        let counter = 0;
+        let counterCompare = 0;
+        let labelCompare = "";
+
+        for(let i = 0; i < averagesList.length; i++) {
+            
+            if(counter === 5) 
+                counter = 0; 
+
+            if(averagesList[i].employee !== -1) {
+                labelCompare = " - emp";
+            }
+
+            str = str.concat("{label: '", averagesList[i].year, labelCompare, "',");
+
+            str = str.concat("data: [");
+            for(let j = 0; j < averagesList[i].data.length; j++) {
+                str = str.concat(averagesList[i].data[j]);
+
+                if(j + 1 !== averagesList[i].data.length) 
+                    str = str.concat(",");
+                else
+                    str = str.concat("],");
+            }
+
+            if(averagesList[i].employee !== -1) {
+                str = str.concat("backgroundColor: '", compareColors[counterCompare], "'}");
+                counterCompare++
+            } 
+            else {
+                str = str.concat("backgroundColor: '", colors[counter], "',");
+                str = str.concat("borderColor: '", colorBorders[counter], "',");
+                str = str.concat("borderWidth: ", 1, "}")
+                counter++
+            }
+
+            if(i + 1 !== averagesList.length) 
+                str = str.concat(",");
+        }
+
+        console.log(str)
+        return str;
+    }
+
+//   <tr>
+        //     <td class="service">SEO</td>
+        //     <td class="desc">Optimize the site for search engines (SEO)</td>
+        //     <td class="unit">$40.00</td>
+        //     <td class="qty">20</td>
+        //     <td class="total">$800.00</td>
+        //   </tr>
+
+    const buildTable = () => {
+        let str = "";
+
+        // for(let i = 0; i < averagesList.length; i++) {
+        //     for(let j = 0; i < averagesList[i].data.length; j++) {
+                
+        //     }
+        // }
+        
+        //str = str.concat("<tr>");
+        return str;
+    }
+
+    let html =  
+    /*html*/
+    `
     <!DOCTYPE html>
     <html lang="en">
         <head>
@@ -62,7 +159,7 @@ module.exports = (data, averagesList) => {
 
                 body {
                     position: relative;
-                    width: 8.5in;  
+                    width: 8in;  
                     height: 11in; 
                     margin: 0 auto; 
                     color: #001028;
@@ -118,7 +215,7 @@ module.exports = (data, averagesList) => {
 
                 #ReportInfo {
                     float: right;
-                    text-align: right;
+                    text-align: left;
                 }
 
                 #chartCriteria div,
@@ -135,16 +232,17 @@ module.exports = (data, averagesList) => {
                 footer {
                     color: #5D6975;
                     width: 100%;
-                    height: 30px;
                     position: absolute;
                     bottom: 0;
                     border-top: 1px solid #C1CED9;
                     padding: 8px 0;
                     text-align: center;
+                    line-height: 0.5em;
                 }
 
                 .title {
                     margin-top: 0;
+                    text-align: center;
                     margin-bottom: 0.7rem;
                 }
             </style>
@@ -176,52 +274,75 @@ module.exports = (data, averagesList) => {
             </header>
             <main>
                 <canvas id="myChart" width="auto" height="auto"></canvas>
-            </main>
-            <footer>
-                Invoice was created on a computer and is valid without the signature and seal.
-            </footer>
-        </body>
 
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
+                <table>
+        <thead>
+            <tr>
+                <th></th>
+                ${averagesList.map((ym) => {return `<th>${ym.year}</th>`})}
+                <th>AVERAGE DIFFERENCE</th>
+            </tr>
+        </thead>
+        <tbody>
+            ${buildTable()}
+        </tbody>
+      </table>
+            </main>
+        </body>
+        <footer>
+            <p>@Copyright 2021-${today.getFullYear()}.</p>
+            <p>All rights reserved. Powered by B&C Engine.</p>
+        </footer>
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.min.js"></script>
         <script>
             const ctx = document.getElementById('myChart');
             const myChart = new Chart(ctx, {
                 type: 'bar',
                 data: {
-                    labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
-                    datasets: [{
-                        label: '# of Votes',
-                        data: [12, 19, 3, 5, 2, 3],
-                        backgroundColor: [
-                            'rgba(255, 99, 132, 0.2)',
-                            'rgba(54, 162, 235, 0.2)',
-                            'rgba(255, 206, 86, 0.2)',
-                            'rgba(75, 192, 192, 0.2)',
-                            'rgba(153, 102, 255, 0.2)',
-                            'rgba(255, 159, 64, 0.2)'
-                        ],
-                        borderColor: [
-                            'rgba(255, 99, 132, 1)',
-                            'rgba(54, 162, 235, 1)',
-                            'rgba(255, 206, 86, 1)',
-                            'rgba(75, 192, 192, 1)',
-                            'rgba(153, 102, 255, 1)',
-                            'rgba(255, 159, 64, 1)'
-                        ],
-                        borderWidth: 1
-                    }]
+                    labels: [${months.map((m) => {return "'"+m+"'"})}],
+                    datasets: [${buildChartDatasets()}]
                 },
                 options: {
+                    devicePixelRatio: 2,
+                    title: {
+                        display: true,
+                        text: 'Average Collection Days over Time',
+                        fontSize: 25,
+                        fontFamily: "'Arial', 'sans-serif'",
+                        fontColor: 'black',
+                        fontStyle: '400'
+                    },
+                    legend: {
+                        display: true,
+                        position: 'right'
+                    },
                     scales: {
-                        y: {
-                            beginAtZero: true
-                        }
+                        yAxes: [{
+                            ticks: {
+                                beginAtZero: true
+                            },
+                            scaleLabel: {
+                                display: true,
+                                labelString: "Days",
+                                fontSize: 15
+                            }
+                        }],
+                        xAxes: [{
+                            scaleLabel: {
+                                display: true,
+                                labelString: 'Months',
+                                fontSize: 15
+                            }
+                        }]
                     }
                 }
             });
         </script>
     </html>
     `
+
+    console.log(html)
 
     return html
 }
