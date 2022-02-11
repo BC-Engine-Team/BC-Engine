@@ -20,6 +20,8 @@ const Reports = () => {
     const malfunctionError = t('error.Malfunction');
     const notFoundError = t('error.NotFound')
 
+    let role = cookies.get("role");
+
     const [chartReportId, setChartReportId] = useState("");
     const [chartReportName, setChartReportName] = useState("");
     const [deleteButtonActivated, setDeleteButtonActivated] = useState(false);
@@ -177,59 +179,64 @@ const Reports = () => {
                         </Table>
                     </div>
                 </div>
-                <div className='container-reportsManagement'>
-                    <div className='card shadow my-3 mx-3 px-3 py-2'>
-                        <h3 className='text-center'>{t('reports.reportsManagement.Title')}</h3>
-                        <Form.Group className="my-2" controlId="floatingModifyReportType">
-                            <Form.Label>{t('reports.reportsManagement.reportType.Title')}</Form.Label>
-                            <Form.Select required
-                                id='reportTypeSelect'
-                                size="sm"
-                                aria-label="Default select example">
-                                {reportTypes.map((t) => {
-                                    return (
-                                        <option key={t.id} value={t.id}>
-                                            {t.name}
-                                        </option>)
-                                })}
-                            </Form.Select>
-                        </Form.Group>
-                        <Form.Group className="my-2" controlId="floatingModifyFrequency">
-                            <Form.Label>{t('reports.reportsManagement.frequency.Title')}</Form.Label>
-                            <Form.Select required
-                                id='reportFreqSelect'
-                                size="sm"
-                                aria-label="Default select example"
-                                disabled={true}>
-                                <option key={selectedReportType.frequency} value={selectedReportType.frequency}>
-                                    {selectedReportType.frequency === -2 ? t('reports.reportsManagement.frequency.Week') :
-                                        selectedReportType.frequency === -1 ? t('reports.reportsManagement.frequency.BiWeek') :
-                                            selectedReportType.frequency === 0 ? t('reports.reportsManagement.frequency.Month') :
-                                                selectedReportType.frequency === 1 ? t('reports.reportsManagement.frequency.BiMonth') :
-                                                    selectedReportType.frequency === 2 ? t('reports.reportsManagement.frequency.Yearly') :
-                                                        t('reports.reportsManagement.frequency.Month')}
-                                </option>
-                            </Form.Select>
-                        </Form.Group>
+                {role === "admin" ?
+                    <div className='container-reportsManagement'>
+                        <div className='card shadow my-3 mx-3 px-3 py-2'>
+                            <h3 className='text-center'>{t('reports.reportsManagement.Title')}</h3>
+                            <Form.Group className="my-2" controlId="floatingModifyReportType">
+                                <Form.Label>{t('reports.reportsManagement.reportType.Title')}</Form.Label>
+                                <Form.Select required
+                                    id='reportTypeSelect'
+                                    size="sm"
+                                    aria-label="Default select example">
+                                    {reportTypes.map((t) => {
+                                        return (
+                                            <option key={t.id} value={t.id}>
+                                                {t.name}
+                                            </option>)
+                                    })}
+                                </Form.Select>
+                            </Form.Group>
+                            <Form.Group className="my-2" controlId="floatingModifyFrequency">
+                                <Form.Label>{t('reports.reportsManagement.frequency.Title')}</Form.Label>
+                                <Form.Select required
+                                    id='reportFreqSelect'
+                                    size="sm"
+                                    aria-label="Default select example"
+                                    disabled={true}>
+                                    <option key={selectedReportType.frequency} value={selectedReportType.frequency}>
+                                        {selectedReportType.frequency === -2 ? t('reports.reportsManagement.frequency.Week') :
+                                            selectedReportType.frequency === -1 ? t('reports.reportsManagement.frequency.BiWeek') :
+                                                selectedReportType.frequency === 0 ? t('reports.reportsManagement.frequency.Month') :
+                                                    selectedReportType.frequency === 1 ? t('reports.reportsManagement.frequency.BiMonth') :
+                                                        selectedReportType.frequency === 2 ? t('reports.reportsManagement.frequency.Yearly') :
+                                                            t('reports.reportsManagement.frequency.Month')}
+                                    </option>
+                                </Form.Select>
+                            </Form.Group>
 
-                        <Form.Group className="my-2" controlId="floatingModifyFrequency">
-                            <Form.Label>{t('reports.reportsManagement.recipients.Title')}</Form.Label>
-                            <ListGroup id='reportRecipientList'>
-                                {selectedReportType.recipients ? Object.keys(selectedReportType.recipients).map((rId, i) => {
-                                    return (
-                                        <ListGroupItem
-                                            key={i}
-                                            value={rId}
-                                            id={rId}>
-                                            <Form.Check label={selectedReportType.recipients[rId].name}
-                                                defaultChecked={selectedReportType.recipients[rId].isRecipient} />
-                                        </ListGroupItem>
-                                    );
-                                }) : <></>}
-                            </ListGroup>
-                        </Form.Group>
+                            <Form.Group className="my-2" controlId="floatingModifyFrequency">
+                                <Form.Label>{t('reports.reportsManagement.recipients.Title')}</Form.Label>
+                                <ListGroup id='reportRecipientList'>
+                                    {selectedReportType.recipients ? Object.keys(selectedReportType.recipients).map((rId, i) => {
+                                        return (
+                                            <ListGroupItem
+                                                key={i}
+                                                value={rId}
+                                                id={rId}>
+                                                <Form.Check label={selectedReportType.recipients[rId].name}
+                                                    defaultChecked={selectedReportType.recipients[rId].isRecipient} />
+                                            </ListGroupItem>
+                                        );
+                                    }) : <></>}
+                                </ListGroup>
+                            </Form.Group>
+                        </div>
                     </div>
-                </div>
+                    :
+                    <></>
+                }
+
                 <div className='container-chartReports'>
                     <div className='card shadow my-3 mx-3'>
                         <h4 className="text-center bg-light">Chart Reports</h4>

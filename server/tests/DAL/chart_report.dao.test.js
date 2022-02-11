@@ -1,8 +1,7 @@
 const { sequelize,
     dataTypes,
     checkModelName,
-    checkPropertyExists,
-    checkHookDefined
+    checkPropertyExists
 } = require('sequelize-test-helpers');
 
 const [UserModel, ChartReportModel] = require('../../data_access_layer/models/localdb/localdb.model')(sequelize, dataTypes);
@@ -328,7 +327,7 @@ describe("Test Chart Report DAO", () => {
             it("CRD4.1.1 - when model resolves false, should resolve with an error message", async () => {
                 // arrange
                 let expectedResponse = false;
-        
+
                 fakeChartReportModel = {
                     destroy: () => {
                         return Promise.resolve(false);

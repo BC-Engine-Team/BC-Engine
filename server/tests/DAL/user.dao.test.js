@@ -135,20 +135,20 @@ describe("Test User DAL", () => {
 
         it("UD2.2 - should catch error thrown by the User Model with custom message", async () => {
             // arrange
-            let mock = {create: () => {return Promise.reject({message: "Error with the User Model."})}}
+            let mock = { create: () => { return Promise.reject({ message: "Error with the User Model." }) } }
 
             // act and assert
             await expect(UserDAO.createUser(returnedUser, mock)).rejects
                 .toEqual({
-                    data: {}, 
-                    message: "Error with the User Model.", 
+                    data: {},
+                    message: "Error with the User Model.",
                     status: 500
                 });
         });
 
         it("UD2.3 - should resolves false", async () => {
             // arrange
-            let mock = {create: () => {return Promise.resolve(false)}}
+            let mock = { create: () => { return Promise.resolve(false) } }
 
             // act and assert
             await expect(UserDAO.createUser(returnedUser, mock)).resolves
@@ -157,15 +157,15 @@ describe("Test User DAL", () => {
 
         it("UD2.4 - should catch error thrown by the User Model with default message", async () => {
             // arrange
-            let mock = {create: () => {return Promise.reject({})}}
+            let mock = { create: () => { return Promise.reject({}) } }
 
             // act and assert
             await expect(UserDAO.createUser(returnedUser, mock)).rejects
-            .toEqual({
-                data: {}, 
-                message: "some error occured", 
-                status: 500
-            });
+                .toEqual({
+                    data: {},
+                    message: "some error occured",
+                    status: 500
+                });
         });
     });
 
