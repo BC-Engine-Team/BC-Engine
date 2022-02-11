@@ -61,7 +61,7 @@ exports.getAverages = async (startDateStr, endDateStr,  employeeId = undefined, 
                 reject(err);
             });
         }
-
+        
 
         // prepare startDate to get billed amount for each month
         startDate.setMonth(startDate.getMonth() - 12);
@@ -345,6 +345,14 @@ exports.getNamesAndCountries = async (clientsID, employeeId = undefined, country
 
         if (countryCode !== undefined && employeeId === undefined){
             await ClientDao.getClientByIDAndCountry(clientsID, countryCode).then(async data => {
+                if (data) getNamesAndCountries_(formattedClientList, data);
+                else resolve(false);
+            }).catch(err => {
+                reject(err);
+            })
+        }
+        else if (countryCode === undefined && employeeId !== undefined){
+            await ClientDao.getClientByIDAndEmployee(clientsID, employeeId).then(async data => {
                 if (data) getNamesAndCountries_(formattedClientList, data);
                 else resolve(false);
             }).catch(err => {

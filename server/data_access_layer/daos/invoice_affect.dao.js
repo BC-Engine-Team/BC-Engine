@@ -145,6 +145,5 @@ exports.getInvoicesByDateAndEmployeeAndCountry = async (startDate, endDate, clie
         catch (err) {
             reject(err);
         }
-
     });
 }
