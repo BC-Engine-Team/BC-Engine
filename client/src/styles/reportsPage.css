@@ -45,7 +45,7 @@ h4 {
       flex-direction: column;
     }
     .container-reportsManagement, 
-    .container-reportTable,
+    .container-reportsTable,
     .container-chartReports{
       width: 100%;
     }
