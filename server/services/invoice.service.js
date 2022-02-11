@@ -6,7 +6,7 @@ const CountryDao = require("../data_access_layer/daos/country.dao")
 const NameQualityDao = require("../data_access_layer/daos/name_quality.dao");
 
 
-let clientIDList = [];
+
 
 exports.getAverages = async (startDateStr, endDateStr,  employeeId = undefined, countryCode = undefined) => {
 
@@ -32,6 +32,7 @@ exports.getAverages = async (startDateStr, endDateStr,  employeeId = undefined, 
         let averagesList = [];
         let totalDuesList = [];
         let billedList = [];
+        let clientIDList = [];
         let clientList = [];
         let clientsList;
         let nameIdList = [];
@@ -79,7 +80,8 @@ exports.getAverages = async (startDateStr, endDateStr,  employeeId = undefined, 
 
         // Get list of amount billed for each month (previous 12 months)
         await this.getBilled(startDateStr, endDateStr, yearMonthList, clientsList, countryCode).then(async data => {
-            billedList = data;
+            billedList = data.billedList;
+            clientIDList = data.clientIDList;
         }).catch(err => {
             reject(err);
         });
@@ -204,13 +206,11 @@ exports.getDues = async (yearMonthList, employeeId = undefined, countryCode = un
 }
 
 
-
-
-
-
 //method to get the bill amount
 exports.getBilled = async (startDateStr, endDateStr, yearMonthList, clientsList = undefined, countryCode = undefined) => {
+    let returnData = {};
     let billedList = [];
+    let clientIDList = [];
     let startDate = new Date(parseInt(startDateStr.substring(5, 7)) + " " + parseInt(startDateStr.substring(8)) + " " + parseInt(startDateStr.substring(0, 4)));
     let endDate = new Date(parseInt(endDateStr.substring(5, 7)) + " " + parseInt(endDateStr.substring(8)) + " " + parseInt(endDateStr.substring(0, 4)));
     endDate.setMonth(endDate.getMonth() - (yearMonthList.length - 1));
@@ -240,7 +240,8 @@ exports.getBilled = async (startDateStr, endDateStr, yearMonthList, clientsList 
                 endDate.setUTCMonth(endDate.getUTCMonth() + 1);
             });
             clientIDList = [...new Set(clientIDList)];
-            resolve(billedList);
+            returnData = {billedList: billedList, clientIDList: clientIDList}
+            resolve(returnData);
         }
 
         if (clientsList !== undefined && countryCode === undefined) {
@@ -282,43 +283,6 @@ exports.getBilled = async (startDateStr, endDateStr, yearMonthList, clientsList 
 }
 
 
-
-exports.getClientsByEmployee = async (employeeId) => {
-    return new Promise(async (resolve, reject) => {
-        await NameQualityDao.getClientsByEmployee(employeeId).then(async data => {
-            if (data) resolve(data)
-            resolve(false);
-        }).catch(err => {
-            reject(err);
-        });
-    });
-}
-
-
-
-
-exports.getYearMonth = (startDateStr, endDateStr) => {
-    let yearMonthList = [];
-
-    const startYear = parseInt(startDateStr.split('-')[0]);
-    let startMonth = parseInt(startDateStr.split('-')[1]);
-    const endYear = parseInt(endDateStr.split('-')[0]);
-    const endMonth = parseInt(endDateStr.split('-')[1]);
-
-    // make list of yearMonth [201911,202001,202002,...] to select dues
-    for (let y = startYear; y <= endYear; y++) {
-        if (y != startYear) startMonth = 1;
-        for (let m = startMonth; m <= 12; m++) {
-            if (y == endYear && m > endMonth) break;
-            let yearMonthStr = y.toString();
-            if (m < 10) yearMonthStr += '0';
-            yearMonthStr += m.toString();
-            yearMonthList.push(parseInt(yearMonthStr));
-        }
-    }
-
-    return yearMonthList;
-}
 
 
 // method to get the names and countries based by clients id
@@ -401,6 +365,42 @@ exports.getClientGrading = async (idList) => {
             reject(err);
         })
     });
+}
+
+
+exports.getClientsByEmployee = async (employeeId) => {
+    return new Promise(async (resolve, reject) => {
+        await NameQualityDao.getClientsByEmployee(employeeId).then(async data => {
+            if (data) resolve(data)
+            resolve(false);
+        }).catch(err => {
+            reject(err);
+        });
+    });
+}
+
+
+exports.getYearMonth = (startDateStr, endDateStr) => {
+    let yearMonthList = [];
+
+    const startYear = parseInt(startDateStr.split('-')[0]);
+    let startMonth = parseInt(startDateStr.split('-')[1]);
+    const endYear = parseInt(endDateStr.split('-')[0]);
+    const endMonth = parseInt(endDateStr.split('-')[1]);
+
+    // make list of yearMonth [201911,202001,202002,...] to select dues
+    for (let y = startYear; y <= endYear; y++) {
+        if (y != startYear) startMonth = 1;
+        for (let m = startMonth; m <= 12; m++) {
+            if (y == endYear && m > endMonth) break;
+            let yearMonthStr = y.toString();
+            if (m < 10) yearMonthStr += '0';
+            yearMonthStr += m.toString();
+            yearMonthList.push(parseInt(yearMonthStr));
+        }
+    }
+
+    return yearMonthList;
 }
 
 

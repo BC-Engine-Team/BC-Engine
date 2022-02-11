@@ -7,8 +7,6 @@ exports.getAverages = async (req, res) => {
     let regexDateStr = /^\d{4}-\d{2}-\d{2}$/;
     let regexDate = new RegExp(regexDateStr);
 
-    console.log(req.query.country);
-
     if (!req.params.startDate || !req.params.endDate)
         return res.status(400).send({ message: "Content cannot be empty." });
 
