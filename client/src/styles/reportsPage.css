@@ -14,13 +14,18 @@
     display: flex;
     width: 100%;
     justify-self: center;
+    max-width: 2100px;
 }
 
 .container-reportsManagement {
     width: 40%;
 }
 
-.container-reportTable {
+.container-reportsTable-employee {
+    width: 100%;
+}
+
+.container-reportsTable {
     width: 60%;
     float: left;
 }

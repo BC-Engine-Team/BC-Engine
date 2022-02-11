@@ -41,10 +41,22 @@ const Reports = () => {
 
     const [reportTypes, setReportTypes] = useState([]);
     const [selectedReportType, setSelectedReportType] = useState({});
+    const [showReportsManagement, setShowReportsManagement] = useState({
+        isAdmin: false,
+        employee: "container-reportsTable-employee",
+        admin: "container-reportsTable"
+    });
 
     const handleRefresh = async () => {
         await getChartReports();
-        await getReportTypesAndRecipients();
+        if (cookies.get("role") === 'admin') {
+            setShowReportsManagement({
+                ...showReportsManagement,
+                isAdmin: true
+            });
+            await getReportTypesAndRecipients();
+        }
+
     }
 
     const getReportTypesAndRecipients = async () => {
@@ -159,134 +171,138 @@ const Reports = () => {
     return (
         <div>
             <NavB />
-            <div className='justify-content-center mainContainer container-reportsPage'>
-                <div className='container-reportTable' >
-                    <div className='card shadow my-3 mx-3' >
-                        <h4 className="text-center bg-light">{t('reports.reports.Title')}</h4>
-                        <Table responsive hover id='reportTypesTable'>
-                            <thead className='bg-light'>
-                                <tr key="0">
-                                    <th>{t('reports.reports.NameLabel')}</th>
-                                    <th>{t('reports.reports.EmployeeLabel')}</th>
-                                    <th>{t('reports.reports.DateLabel')}</th>
-                                    <th className='text-center'>Actions</th>
-                                </tr>
-                            </thead>
+            <div className=' mainContainer mainDiv'>
+                <div className='justify-content-center main'>
+                    <div className={showReportsManagement.isAdmin ?
+                        showReportsManagement.admin :
+                        showReportsManagement.employee} >
+                        <div className='card shadow my-3 mx-3' >
+                            <h4 className="text-center bg-light">{t('reports.reports.Title')}</h4>
+                            <Table responsive hover id='reportTypesTable'>
+                                <thead className='bg-light'>
+                                    <tr key="0">
+                                        <th>{t('reports.reports.NameLabel')}</th>
+                                        <th>{t('reports.reports.EmployeeLabel')}</th>
+                                        <th>{t('reports.reports.DateLabel')}</th>
+                                        <th className='text-center'>Actions</th>
+                                    </tr>
+                                </thead>
 
-                            <tbody>
+                                <tbody>
 
-                            </tbody>
-                        </Table>
-                    </div>
-                </div>
-                {role === "admin" ?
-                    <div className='container-reportsManagement'>
-                        <div className='card shadow my-3 mx-3 px-3 py-2'>
-                            <h3 className='text-center'>{t('reports.reportsManagement.Title')}</h3>
-                            <Form.Group className="my-2" controlId="floatingModifyReportType">
-                                <Form.Label>{t('reports.reportsManagement.reportType.Title')}</Form.Label>
-                                <Form.Select required
-                                    id='reportTypeSelect'
-                                    size="sm"
-                                    aria-label="Default select example">
-                                    {reportTypes.map((t) => {
-                                        return (
-                                            <option key={t.id} value={t.id}>
-                                                {t.name}
-                                            </option>)
-                                    })}
-                                </Form.Select>
-                            </Form.Group>
-                            <Form.Group className="my-2" controlId="floatingModifyFrequency">
-                                <Form.Label>{t('reports.reportsManagement.frequency.Title')}</Form.Label>
-                                <Form.Select required
-                                    id='reportFreqSelect'
-                                    size="sm"
-                                    aria-label="Default select example"
-                                    disabled={true}>
-                                    <option key={selectedReportType.frequency} value={selectedReportType.frequency}>
-                                        {selectedReportType.frequency === -2 ? t('reports.reportsManagement.frequency.Week') :
-                                            selectedReportType.frequency === -1 ? t('reports.reportsManagement.frequency.BiWeek') :
-                                                selectedReportType.frequency === 0 ? t('reports.reportsManagement.frequency.Month') :
-                                                    selectedReportType.frequency === 1 ? t('reports.reportsManagement.frequency.BiMonth') :
-                                                        selectedReportType.frequency === 2 ? t('reports.reportsManagement.frequency.Yearly') :
-                                                            t('reports.reportsManagement.frequency.Month')}
-                                    </option>
-                                </Form.Select>
-                            </Form.Group>
-
-                            <Form.Group className="my-2" controlId="floatingModifyFrequency">
-                                <Form.Label>{t('reports.reportsManagement.recipients.Title')}</Form.Label>
-                                <ListGroup id='reportRecipientList'>
-                                    {selectedReportType.recipients ? Object.keys(selectedReportType.recipients).map((rId, i) => {
-                                        return (
-                                            <ListGroupItem
-                                                key={i}
-                                                value={rId}
-                                                id={rId}>
-                                                <Form.Check label={selectedReportType.recipients[rId].name}
-                                                    defaultChecked={selectedReportType.recipients[rId].isRecipient} />
-                                            </ListGroupItem>
-                                        );
-                                    }) : <></>}
-                                </ListGroup>
-                            </Form.Group>
+                                </tbody>
+                            </Table>
                         </div>
                     </div>
-                    :
-                    <></>
-                }
+                    {role === "admin" ?
+                        <div className='container-reportsManagement'>
+                            <div className='card shadow my-3 mx-3 px-3 py-2'>
+                                <h3 className='text-center'>{t('reports.reportsManagement.Title')}</h3>
+                                <Form.Group className="my-2" controlId="floatingModifyReportType">
+                                    <Form.Label>{t('reports.reportsManagement.reportType.Title')}</Form.Label>
+                                    <Form.Select required
+                                        id='reportTypeSelect'
+                                        size="sm"
+                                        aria-label="Default select example">
+                                        {reportTypes.map((t) => {
+                                            return (
+                                                <option key={t.id} value={t.id}>
+                                                    {t.name}
+                                                </option>)
+                                        })}
+                                    </Form.Select>
+                                </Form.Group>
+                                <Form.Group className="my-2" controlId="floatingModifyFrequency">
+                                    <Form.Label>{t('reports.reportsManagement.frequency.Title')}</Form.Label>
+                                    <Form.Select required
+                                        id='reportFreqSelect'
+                                        size="sm"
+                                        aria-label="Default select example"
+                                        disabled={true}>
+                                        <option key={selectedReportType.frequency} value={selectedReportType.frequency}>
+                                            {selectedReportType.frequency === -2 ? t('reports.reportsManagement.frequency.Week') :
+                                                selectedReportType.frequency === -1 ? t('reports.reportsManagement.frequency.BiWeek') :
+                                                    selectedReportType.frequency === 0 ? t('reports.reportsManagement.frequency.Month') :
+                                                        selectedReportType.frequency === 1 ? t('reports.reportsManagement.frequency.BiMonth') :
+                                                            selectedReportType.frequency === 2 ? t('reports.reportsManagement.frequency.Yearly') :
+                                                                t('reports.reportsManagement.frequency.Month')}
+                                        </option>
+                                    </Form.Select>
+                                </Form.Group>
 
-                <div className='container-chartReports'>
-                    <div className='card shadow my-3 mx-3'>
-                        <h4 className="text-center bg-light">Chart Reports</h4>
-                        <Table responsive hover id='chartReportsTable'>
-                            <thead className='bg-light'>
-                                <tr key="0">
-                                    <th>{t('reports.chartReports.Name')}</th>
-                                    <th>{t('reports.chartReports.Employee')}</th>
-                                    <th>{t('reports.chartReports.ClientType')}</th>
-                                    <th>{t('reports.chartReports.Country')}</th>
-                                    <th>{t('reports.chartReports.AgeOfAccount')}</th>
-                                    <th>{t('reports.chartReports.AccountType')}</th>
-                                    <th>{t('reports.chartReports.StartDate')}</th>
-                                    <th>{t('reports.chartReports.EndDate')}</th>
-                                    <th>
-                                        <div className="d-flex justify-content-center">
-                                            <Button
-                                                className="btn py-0 shadow-sm border">
-                                                {t('reports.chartReports.CreateButton')}
-                                            </Button>
-                                        </div>
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {chartReports.map(r => {
-                                    return (
-                                        <tr key={r.chartReportId} id={r.chartReportId}>
-                                            <td>{r.name}</td>
-                                            <td>{r.employee1Name}{r.employee2Name === null ? "" : ", " + r.employee2Name}</td>
-                                            <td>{r.clientType}</td>
-                                            <td>{r.country}</td>
-                                            <td>{r.ageOfAccount}</td>
-                                            <td>{r.accountType}</td>
-                                            <td>{r.startDate.toString()}</td>
-                                            <td>{r.endDate.toString()}</td>
-                                            <td className="py-1">
-                                                <div className="d-flex justify-content-center">
+                                <Form.Group className="my-2" controlId="floatingModifyFrequency">
+                                    <Form.Label>{t('reports.reportsManagement.recipients.Title')}</Form.Label>
+                                    <ListGroup id='reportRecipientList'>
+                                        {selectedReportType.recipients ? Object.keys(selectedReportType.recipients).map((rId, i) => {
+                                            return (
+                                                <ListGroupItem
+                                                    key={i}
+                                                    value={rId}
+                                                    id={rId}>
+                                                    <Form.Check label={selectedReportType.recipients[rId].name}
+                                                        defaultChecked={selectedReportType.recipients[rId].isRecipient} />
+                                                </ListGroupItem>
+                                            );
+                                        }) : <></>}
+                                    </ListGroup>
+                                </Form.Group>
+                            </div>
+                        </div>
+                        :
+                        <></>
+                    }
 
-                                                    <BiExport size={"1.7rem"} className="pt-1" />
-                                                    <DeleteButton onDelete={() => handleDeleteChartReport(r.chartReportId, r.name)} />
-                                                </div >
-                                            </td >
-                                        </tr >
-                                    );
-                                })}
-                            </tbody >
-                        </Table >
+                    <div className='container-chartReports'>
+                        <div className='card shadow my-3 mx-3'>
+                            <h4 className="text-center bg-light">Chart Reports</h4>
+                            <Table responsive hover id='chartReportsTable'>
+                                <thead className='bg-light'>
+                                    <tr key="0">
+                                        <th>{t('reports.chartReports.Name')}</th>
+                                        <th>{t('reports.chartReports.Employee')}</th>
+                                        <th>{t('reports.chartReports.ClientType')}</th>
+                                        <th>{t('reports.chartReports.Country')}</th>
+                                        <th>{t('reports.chartReports.AgeOfAccount')}</th>
+                                        <th>{t('reports.chartReports.AccountType')}</th>
+                                        <th>{t('reports.chartReports.StartDate')}</th>
+                                        <th>{t('reports.chartReports.EndDate')}</th>
+                                        <th>
+                                            <div className="d-flex justify-content-center">
+                                                <Button
+                                                    className="btn py-0 shadow-sm border">
+                                                    {t('reports.chartReports.CreateButton')}
+                                                </Button>
+                                            </div>
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {chartReports.map(r => {
+                                        return (
+                                            <tr key={r.chartReportId} id={r.chartReportId}>
+                                                <td>{r.name}</td>
+                                                <td>{r.employee1Name}{r.employee2Name === null ? "" : ", " + r.employee2Name}</td>
+                                                <td>{r.clientType}</td>
+                                                <td>{r.country}</td>
+                                                <td>{r.ageOfAccount}</td>
+                                                <td>{r.accountType}</td>
+                                                <td>{r.startDate.toString()}</td>
+                                                <td>{r.endDate.toString()}</td>
+                                                <td className="py-1">
+                                                    <div className="d-flex justify-content-center">
+
+                                                        <BiExport size={"1.7rem"} className="pt-1" />
+                                                        <DeleteButton onDelete={() => handleDeleteChartReport(r.chartReportId, r.name)} />
+                                                    </div >
+                                                </td >
+                                            </tr >
+                                        );
+                                    })}
+                                </tbody >
+                            </Table >
+                        </div >
                     </div >
-                </div >
+                </div>
             </div >
             <ConfirmationPopup
                 open={deleteButtonActivated}
