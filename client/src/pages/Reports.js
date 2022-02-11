@@ -254,7 +254,7 @@ const Reports = () => {
 
                     <div className='container-chartReports'>
                         <div className='card shadow my-3 mx-3'>
-                            <h4 className="text-center bg-light">Chart Reports</h4>
+                            <h4 className="text-center bg-light">{t('reports.chartReports.Title')}</h4>
                             <Table responsive hover id='chartReportsTable'>
                                 <thead className='bg-light'>
                                     <tr key="0">

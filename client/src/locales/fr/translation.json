@@ -149,14 +149,15 @@
           }
        },
        "chartReports": {
-          "Name": "NOM DU RAPPORT",
-          "Employee": "EMPLOYÉ",
-          "ClientType": "TYPE DE CLIENT",
-          "Country": "PAYS",
-          "AgeOfAccount": "AGE DU COMPTE",
-          "AccountType": "TYPE DU COMPTE",
-          "StartDate": "DATE DE DÉBUT",
-          "EndDate": "DATE DE FIN",
+         "Title": "Rapports Graphiques",
+          "Name": "Nom du Rapport",
+          "Employee": "Employé",
+          "ClientType": "Type de Client",
+          "Country": "Pays",
+          "AgeOfAccount": "Âge du Compte",
+          "AccountType": "Type du Compte",
+          "StartDate": "Date de Début",
+          "EndDate": "Date de Fin",
           "LoadButton": "Charger",
           "CreateButton": "Ajouter"
        },

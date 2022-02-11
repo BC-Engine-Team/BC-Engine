@@ -149,6 +149,7 @@
             }
         },
         "chartReports":{
+            "Title": "Chart Reports",
             "Name":"Name of Report",
             "Employee":"Employee Criteria",
             "ClientType":"Client Type",
