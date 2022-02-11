@@ -93,7 +93,6 @@ const Dashboard = () => {
     const [authorized, setAuthorized] = useState(false);
     const [clientNameCountry, setClientNameCountry] = useState([{ name: "", country: "", clientgrading: "" }]);
     const [countries, setCountries] = useState([{ countryCode: "", countryLabel: "" }]);
-    const [filteredCountry, setFilteredCountry] = useState({country: ""});
     const [errors, setErrors] = useState({});
 
     // Criteria
@@ -500,14 +499,6 @@ const Dashboard = () => {
     }
 
 
-    
-    // assign the country selected inside the filteredCountry field
-    const countryFiltering = (country) => {
-        setFilteredCountry(country)
-    }
-
-    
-    
     useEffect(() => {
         if (cookies.get("accessToken") === undefined) {
             navigate("/login");

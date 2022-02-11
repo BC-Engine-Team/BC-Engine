@@ -23,7 +23,7 @@ exports.getAllCountries = async (db=database) => {
                     type: QueryTypes.SELECT
                 }
             );
-            if(data){
+            if (data) {
                 let returnData = [];
                 data.forEach(c => {
                     returnData.push({
@@ -35,8 +35,44 @@ exports.getAllCountries = async (db=database) => {
             }
             resolve(false);
         }
-        catch(err){
-            reject(err);
+        catch (err) {
+            const response = {
+                status: err.status || 500,
+                message: err.message || "some error occured"
+            }
+            reject(response);
         }
     });
 }
+
+
+// exports.getCountryCode = async (countryCode, db = database) => {
+//     return new Promise(async (resolve, reject) => {
+//         try{
+//             const data = await db.query(
+//                 "SELECT DISTINCT COUNTRY_CODE, COUNTRY_LABEL \
+//                 FROM [Bosco reduction].[dbo].[COUNTRY] \
+//                 WHERE COUNTRY_LABEL = ?",
+//                 {
+//                     replacements: [countryCode],
+//                     type: QueryTypes.SELECT
+//                 }
+//             );
+//             if (data) {
+//                 let returnData = [];
+//                 data.forEach(c => {
+//                     returnData.push(c['COUNTRY_CODE'])
+//                 });
+//                 resolve(returnData);
+//             }
+//             resolve(false);
+//         }
+//         catch (err) {
+//             const response = {
+//                 status: err.status || 500,
+//                 message: err.message || "some error occured"
+//             }
+//             reject(response);
+//         }
+//     })
+// }

@@ -38,6 +38,9 @@ exports.getAverages = async (startDateStr, endDateStr,  employeeId = undefined, 
         let clientGradingList = [];
         let returnData = [];
 
+        // let countrySymbol;
+
+
         let startDate = new Date(`${startDateStr} 00:00:00`);
         let endDate = new Date(`${endDateStr} 00:00:00`);
         if (startDate > endDate) {
@@ -50,6 +53,17 @@ exports.getAverages = async (startDateStr, endDateStr,  employeeId = undefined, 
 
         let yearMonthList = this.getYearMonth(startDateStr, endDateStr);
 
+
+        // if(countryCode !== undefined) {
+        //     await this.getCountryCode(countryCode).then(async data => {
+        //         countrySymbol = data;
+        //     }).catch(err => {
+        //         reject(err);
+        //     });
+        // }
+
+
+        // prepare the clientsList from the specified employee if there is a country or not
         if(employeeId !== undefined) {
             clientsList = [];
             await this.getClientsByEmployee(employeeId).then(async data => {
@@ -60,18 +74,18 @@ exports.getAverages = async (startDateStr, endDateStr,  employeeId = undefined, 
         }
 
 
+        // prepare startDate to get billed amount for each month
+        startDate.setMonth(startDate.getMonth() - 12);
+        let theMonth = startDate.getMonth() + 1;
+        startDateStr = startDate.getFullYear() + "-" + theMonth + "-01";
+
+
         // Get the list of total dues for each month
         await this.getDues(yearMonthList, employeeId, countryCode).then(async data => {
             totalDuesList = data;
         }).catch(err => {
             reject(err);
         });
-
-
-        // prepare startDate to get billed amount for each month
-        startDate.setMonth(startDate.getMonth() - 12);
-        let theMonth = startDate.getMonth() + 1;
-        startDateStr = startDate.getFullYear() + "-" + theMonth + "-01";
 
 
         // Get list of amount billed for each month (previous 12 months)
@@ -81,9 +95,6 @@ exports.getAverages = async (startDateStr, endDateStr,  employeeId = undefined, 
             reject(err);
         });
 
-
-
-        
         //Get list of client based by actor id
         await this.getNamesAndCountries(clientIDList, countryCode).then(async data => {
             clientList = data;
@@ -145,6 +156,7 @@ exports.getAverages = async (startDateStr, endDateStr,  employeeId = undefined, 
         resolve(returnData);
     });
 }
+
 
 exports.getDues = async (yearMonthList, employeeId = undefined, countryCode = undefined) => {
     let totalDuesList = [];
@@ -276,22 +288,13 @@ exports.getBilled = async (startDateStr, endDateStr, yearMonthList, clientsList 
             }).catch(err => {
                 reject(err);
             })
-        }
-
-        // if(clientsList.length === 0) {
-        //     getBilled_(yearMonthList, [{invoiceDate: null, billed: null, actorId: null}])
-        // }
-        // else {
-        //     await InvoiceAffectDao.getInvoicesByDateAndEmployee(startDateStr, endDateStr, clientsList).then(async data => {
-        //         if (data) getBilled_(yearMonthList, data);
-        //         else resolve(false);
-        //     }).catch(err => {
-        //         reject(err);
-        //     });
-        // }
-        
+        } 
     });
 }
+
+
+
+
 
 exports.getClientsByEmployee = async (employeeId) => {
     return new Promise(async (resolve, reject) => {
@@ -303,6 +306,31 @@ exports.getClientsByEmployee = async (employeeId) => {
         });
     });
 }
+
+
+// exports.getCountryCode = async (countryCode) => {
+//     return new Promise(async (resolve, reject) => {
+//         await CountryDao.getCountryCode(countryCode).then(async data => {
+//             if (data) resolve(data)
+//             resolve(false);
+//         }).catch(err => {
+//             reject(err);
+//         })
+//     });
+// }
+
+
+// exports.getClientsByEmployeeAndCountry = async (employeeId, countrySymbol) => {
+//     return new Promise(async (resolve, reject) => {
+//         await NameQualityDao.getClientsByEmployeeAndCountry(employeeId, countrySymbol).then(async data => {
+//             if (data) resolve(data)
+//             resolve(false);
+//         }).catch(err => {
+//             reject(err);
+//         });
+//     });
+// }
+
 
 
 exports.getYearMonth = (startDateStr, endDateStr) => {
