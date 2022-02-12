@@ -296,4 +296,84 @@ describe("Test Chart Report DAO", () => {
             });
         });
     });
+
+    describe("CRD4 - deleteChartReportById", () => {
+        let fakeDeleteChartIdModelResponse = {
+            chartReportId: "any"
+        }
+
+        let fakeChartReportModel = {
+            destroy: () => {
+                return Promise.resolve(fakeDeleteChartIdModelResponse);
+            }
+        };
+        describe("CRD4.1 - given valid chartReportId", () => {
+            it("UD4.1.1 - should return successful delete message", async () => {
+                // arrange
+                let expectedResponse = "Chart report deleted successfully."
+
+                fakeChartReportModel = {
+                    destroy: () => {
+                        return Promise.resolve(expectedResponse);
+                    }
+                };
+
+                // act and assert
+                await expect(ChartReportDAO.deleteChartReportById("fakeUUID", fakeChartReportModel))
+                    .resolves.toEqual(expectedResponse)
+            });
+        });
+
+        describe("CRD4.1 - given invalid chartReportId", () => {
+            it("CRD4.1.1 - when model resolves false, should resolve with an error message", async () => {
+                // arrange
+                let expectedResponse = false;
+        
+                fakeChartReportModel = {
+                    destroy: () => {
+                        return Promise.resolve(false);
+                    }
+                };
+
+                // act and assert
+                expect(ChartReportDAO.deleteChartReportById("fakeUUID", fakeChartReportModel))
+                    .resolves.toEqual(expectedResponse);
+            });
+            it("CRD4.1.2 - when model throws error with specified status and message, should reject specified status and message", async () => {
+                // arrange
+                let expectedResponse = {
+                    status: 600,
+                    message: "Error."
+                };
+
+                fakeChartReportModel = {
+                    destroy: () => {
+                        return Promise.reject(expectedResponse);
+                    }
+                };
+
+                // act and assert
+                expect(ChartReportDAO.deleteChartReportById("fakeUUID", fakeChartReportModel))
+                    .rejects.toEqual(expectedResponse);
+            });
+
+            it("CRD4.1.3 - when model throws error with unspecified status and message, should reject default status and message", async () => {
+                // arrange
+                let expectedResponse = {
+                    status: 500,
+                    message: "Could not delete data."
+                };
+
+                fakeChartReportModel = {
+                    destroy: () => {
+                        return Promise.reject({});
+                    }
+                };
+
+                // act and assert
+                expect(ChartReportDAO.deleteChartReportById("fakeUUID", fakeChartReportModel))
+                    .rejects.toEqual(expectedResponse);
+            });
+        });
+    });
 });

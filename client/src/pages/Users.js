@@ -22,7 +22,7 @@ const Users = () => {
     let navigate = useNavigate();
     let counter = 0;
 
-    const notFoundError = t('error.NotFound');
+    const malfunctionError = t('error.Malfunction');
     const cookies = new Cookies();
     const displayNone = "d-none";
 
@@ -125,11 +125,11 @@ const Users = () => {
                         setInvalidInput(t('user.delete'));
                     }
                     else {
-                        setInvalidInput(notFoundError);
+                        setInvalidInput(malfunctionError);
                     }
                 }
                 else if (error.request) {
-                    setInvalidInput(notFoundError);
+                    setInvalidInput(malfunctionError);
                 }
             });
 

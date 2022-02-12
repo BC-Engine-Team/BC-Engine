@@ -7,13 +7,21 @@ import Axios from 'axios';
 import { Button, Table } from 'react-bootstrap'
 
 import NavB from '../components/NavB'
+import ConfirmationPopup from '../components/ConfirmationPopup'
 import DeleteButton from '../components/DeleteButton'
 import EditButton from '../components/EditButton'
 
 const Reports = () => {
     const { t } = useTranslation();
     let navigate = useNavigate();
+
     const cookies = new Cookies();
+    const malfunctionError = t('error.Malfunction');
+    const notFoundError = t('error.NotFound')
+    
+    const [chartReportId, setChartReportId] = useState("");
+    const [chartReportName, setChartReportName] = useState("");
+    const [deleteButtonActivated, setDeleteButtonActivated] = useState(false);
 
     const [chartReports, setChartReports] = useState([{
         chartReportId: "",
@@ -54,6 +62,45 @@ const Reports = () => {
             });
     }
 
+    const handleDeleteChartReport = (id, chartReportName) => {
+        setChartReportId(id);
+        setChartReportName(chartReportName);
+        setDeleteButtonActivated(true);
+    }
+
+    const onDeleteClick = () => {
+        let header = {
+            'authorization': "Bearer " + cookies.get("accessToken")
+        }
+
+        let data = {
+            chartReportId: chartReportId
+        }
+
+        Axios.defaults.withCredentials = true;
+
+        Axios.delete(`${process.env.REACT_APP_API}/reports/delete/${chartReportId}`, { headers: header, data: data })
+            .then((response) => {
+                if (response.status === 200 || response.status === 204) {
+                    handleRefresh(); 
+                    alert(t('reports.delete.Confirmation')); 
+                }    
+            })
+            .catch((error) => {
+                if (error.response) {
+                    if (error.response.status === 401 || error.response.status === 403) {
+                        alert(t('reports.delete.NotAuthorized'));
+                    }
+                    else{
+                        alert(malfunctionError)
+                    }
+                }
+                else if (error.request) {
+                    alert(notFoundError);
+                }
+            });
+            setDeleteButtonActivated(false);
+    };
 
     useEffect(() => {
         if (cookies.get("accessToken") === undefined) {
@@ -92,7 +139,6 @@ const Reports = () => {
                                     </th>
                                 </tr>
                             </thead>
-
                             <tbody>
                                 {chartReports.map(r => {
                                     return (
@@ -108,8 +154,7 @@ const Reports = () => {
                                             <td className="py-1">
                                                 <div className="d-flex justify-content-center">
                                                     <EditButton />
-
-                                                    <DeleteButton />
+                                                    <DeleteButton onDelete={() => handleDeleteChartReport(r.chartReportId, r.name)}/>
                                                 </div>
                                             </td>
                                         </tr>
@@ -120,6 +165,12 @@ const Reports = () => {
                     </div>
                 </div>
             </div>
+            <ConfirmationPopup 
+                open={deleteButtonActivated}
+                prompt={t('reports.delete.Title')}
+                title={chartReportName}
+                onAccept={() => { onDeleteClick() }}
+                onClose={() => { setDeleteButtonActivated(false) }}/>
         </div>
     )
 }

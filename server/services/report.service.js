@@ -131,3 +131,22 @@ exports.verifyChartReport = (criteria) => {
 
     return verified;
 }
+
+
+exports.deleteChartReportById = async (chartReportId) => {
+    return new Promise((resolve, reject) => {
+
+        ChartReportDao.deleteChartReportById(chartReportId)
+            .then(async data => {
+                if(data) resolve(data);
+                resolve(false);
+            })
+            .catch(err => {
+                const response = {
+                    status: err.status || 500,
+                    message: err.message || "Malfunction in the B&C Engine."
+                }
+                reject(response);
+            });
+    });
+}

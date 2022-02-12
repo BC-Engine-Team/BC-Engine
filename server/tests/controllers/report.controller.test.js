@@ -450,5 +450,93 @@ describe("Test Report Controller", () => {
             });
         });
     });
-});
 
+    describe("RC3 - deleteChartReport", () => {
+        let chartReportIdObject = {
+            chartReportId: "0ba47970-d667-4328-9711-84c4a8968c0d"
+        };
+
+        let invalidChartReportId = {
+            chartReportId: null
+        }
+        describe("RC3.1 - given a valid request", () => {
+            it("RC3.1.1 - should return valid response from report service", async () => {
+                // arrange
+                reportServiceSpy = jest.spyOn(ReportService, 'deleteChartReportById')
+                    .mockImplementation(() => new Promise((resolve) => {
+                        resolve(chartReportIdObject);
+                    }));
+
+                // act
+                const response = await request.delete(`/api/reports/delete/${chartReportIdObject.chartReportId}`);
+
+                // assert
+                expect(response.status).toBe(200);
+                expect(reportServiceSpy).toHaveBeenCalledTimes(1);
+            });
+            
+            it("RC3.1.2 - when service resolves false, should return 500 and message", async () => {
+                // arrange
+                let expectedResponse = { message: "The data could not be deleted." };
+
+                reportServiceSpy = jest.spyOn(ReportService, 'deleteChartReportById')
+                    .mockImplementation(() => new Promise((resolve) => {
+                        resolve(false);
+                    }));
+
+                // act
+                const response = await request.delete(`/api/reports/delete/${chartReportIdObject.chartReportId}`);
+
+                // assert
+                expect(response.status).toBe(500);
+                expect(response.body).toEqual(expectedResponse);
+                expect(reportServiceSpy).toHaveBeenCalledTimes(1);
+                expect(authSpy).toHaveBeenCalledTimes(1);
+            });
+
+            it("RC3.1.3 - when service throws error with specified status and message, should respond with specified status and message", async () => {
+                // arrange
+                let expectedResponse = {
+                    status: 600,
+                    message: "Random error"
+                };
+
+                reportServiceSpy = jest.spyOn(ReportService, 'deleteChartReportById')
+                    .mockImplementation(async () => {
+                        await Promise.reject(expectedResponse);
+                    });
+
+                // act
+                const response = await request.delete(`/api/reports/delete/${chartReportIdObject.chartReportId}`);
+
+                // assert
+                expect(response.status).toBe(expectedResponse.status);
+                expect(response.body.message).toEqual(expectedResponse.message);
+                expect(reportServiceSpy).toHaveBeenCalledTimes(1);
+                expect(authSpy).toHaveBeenCalledTimes(1);
+            });
+
+
+            it("RC3.1.4 - when service throws error with unspecified status and message, should respond with 500 and default message", async () => {
+                // arrange
+                let expectedResponse = {
+                    status: 500,
+                    message: "Malfunction in the B&C Engine."
+                };
+                reportServiceSpy = jest.spyOn(ReportService, 'deleteChartReportById')
+                    .mockImplementation(async () => {
+                        await Promise.reject(expectedResponse);
+                    });
+
+                // act
+                const response = await request.delete(`/api/reports/delete/${chartReportIdObject.chartReportId}`);
+
+                // assert
+                expect(response.status).toBe(expectedResponse.status);
+                expect(response.body.message).toEqual(expectedResponse.message);
+                expect(reportServiceSpy).toHaveBeenCalledTimes(1);
+                expect(authSpy).toHaveBeenCalledTimes(1);
+            });
+        });
+    });
+});
