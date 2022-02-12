@@ -1,11 +1,11 @@
 const database = require('../databases')['mssql_bosco'];
 const { QueryTypes } = require('sequelize');
 
-exports.getClientByID = async (clientIDList, db=database) => {
+exports.getClientByID = async (clientIDList, db = database) => {
 
     return new Promise(async (resolve, reject) => {
 
-        try{
+        try {
             const data = await db.query(
                 "SELECT DISTINCT N.NAME_ID, ISNULL(N.NAME_1,'')+ISNULL(' '+N.NAME_2,'')+ISNULL(' '+N.NAME_3,'') as NAME, C.COUNTRY_LABEL \
                 FROM [Bosco reduction].[dbo].[NAME] N, [Bosco reduction].[dbo].[NAME_CONNECTION] NC, [Bosco reduction].[dbo].[COUNTRY] C \
@@ -17,7 +17,7 @@ exports.getClientByID = async (clientIDList, db=database) => {
                     type: QueryTypes.SELECT
                 }
             );
-            if(data) {
+            if (data) {
                 let returnData = [];
                 data.forEach(c => {
                     returnData.push({
@@ -30,7 +30,7 @@ exports.getClientByID = async (clientIDList, db=database) => {
             }
             resolve(false);
         }
-        catch(err){
+        catch (err) {
             reject(err);
         }
     });
@@ -40,7 +40,7 @@ exports.getAllEmployeeNames = async (db = database) => {
 
     return new Promise(async (resolve, reject) => {
 
-        try{
+        try {
             const data = await db.query(
                 "SELECT ISNULL(NAME_1,'') + ISNULL(' '+NAME_2,'') + ISNULL(' '+NAME_3,'') AS FULLNAME, NAME_ID \
                 FROM NAME \
@@ -52,7 +52,7 @@ exports.getAllEmployeeNames = async (db = database) => {
                     type: QueryTypes.SELECT
                 }
             );
-            if(data) {
+            if (data) {
                 let returnData = [];
                 data.forEach(c => {
                     returnData.push({
@@ -64,7 +64,7 @@ exports.getAllEmployeeNames = async (db = database) => {
             }
             resolve(false);
         }
-        catch(err){
+        catch (err) {
             reject(err);
         }
     });

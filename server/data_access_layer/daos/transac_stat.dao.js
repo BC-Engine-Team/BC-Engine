@@ -3,36 +3,11 @@ const databases = require('../databases');
 const { QueryTypes } = require('sequelize');
 const TransacStatModel = databases['mssql_bosco'].transactions_stat;
 
-exports.getTransactionsStatByYearMonth = async (yearMonthList, clientType = undefined, db = database) => {
+exports.getTransactionsStatByYearMonth = async (query, db = database) => {
     return new Promise(async (resolve, reject) => {
-
         try {
-            let queryStringSelect = "select ACS.DUE_CURRENT, ACS.DUE_1_MONTH, ACS.DUE_2_MONTH, ACS.DUE_3_MONTH, ACS.YEAR_MONTH";
-
-            let queryStringFrom = " from ACCOUNTING_CLIENT_STAT ACS ";
-
-            let queryStringWhere = " where ACS.YEAR_MONTH in (?) \
-            and ACS.CONNECTION_ID = 3 \
-            and ACS.STAT_TYPE = 1 ";
-
-            let replacements = [yearMonthList];
-
-            if (clientType !== undefined) {
-                queryStringFrom += ", NAME_CONNECTION NC, NAME_QUALITY NQ ";
-
-                queryStringWhere += " and NC.CONNECTION_ID = 3\
-                and NC.CONNECTION_NAME_ID = CONVERT(NVARCHAR, ACS.ACC_NAME_ID)\
-                and NC.NAME_ID = NQ.NAME_ID\
-                and NQ.QUALITY_TYPE_ID = 3\
-                and NQ.DROPDOWN_CODE = ?";
-
-                replacements.push(clientType.toUpperCase());
-            }
-
-            let queryString = queryStringSelect + queryStringFrom + queryStringWhere;
-
-            const data = await db.query(queryString, {
-                replacements: replacements,
+            const data = await db.query(query.queryString, {
+                replacements: query.replacements,
                 type: QueryTypes.SELECT
             });
 

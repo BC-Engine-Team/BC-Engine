@@ -1,19 +1,12 @@
 const database = require('../databases')['mssql_pat']
 const { QueryTypes } = require('sequelize');
 
-exports.getInvoicesByDate = async (startDate, endDate, db = database) => {
+exports.getInvoicesByDate = async (query, db = database) => {
     return new Promise(async (resolve, reject) => {
         try {
-            const data = await db.query(
-                "Select IH.INVOCIE_DATE, IH.ACTOR_ID, BIA.AFFECT_AMOUNT \
-                from INVOICE_HEADER IH, BOSCO_INVOICE_AFFECT BIA \
-                Where IH.INVOICE_PREVIEW=0 \
-                AND IH.INVOICE_TYPE in (1,4) \
-                AND IH.INVOCIE_DATE between ? AND ? \
-                AND BIA.INVOICE_ID=IH.INVOICE_ID \
-                AND BIA.AFFECT_ACCOUNT like '%1200%'",
+            const data = await db.query(query.queryString,
                 {
-                    replacements: [startDate, endDate],
+                    replacements: query.replacements,
                     type: QueryTypes.SELECT
                 }
             );

@@ -16,7 +16,6 @@ exports.getClientGrading = async (clientIDList, db = database) => {
                     type: QueryTypes.SELECT
                 }
             );
-            console.log(data)
             if (data) {
                 let returnData = [];
                 data.forEach(c => {
