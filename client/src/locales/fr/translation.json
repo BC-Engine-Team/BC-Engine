@@ -157,7 +157,7 @@
        "chartReports": {
          "Title": "Rapports Graphiques",
           "Name": "Nom du Rapport",
-          "Employee": "Employé",
+          "Employee": "Employé(e)",
           "ClientType": "Type de Client",
           "Country": "Pays",
           "AgeOfAccount": "Âge du Compte",

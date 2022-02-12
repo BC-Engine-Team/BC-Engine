@@ -240,9 +240,7 @@ module.exports = (localdb, Sequelize) => {
         }
     })
 
-    const ReportTypeRecipients = localdb.define("report_type_recipients", {
-
-    });
+    const ReportTypeRecipients = localdb.define("report_type_recipients", {});
 
     ReportTypeRecipients.belongsTo(ReportType, {
         foreignKey: {
@@ -259,7 +257,6 @@ module.exports = (localdb, Sequelize) => {
         },
         onDelete: 'CASCADE'
     });
-
 
     return [User, ChartReport, ChartReportData, ReportType, Recipients, ReportTypeRecipients];
 };
