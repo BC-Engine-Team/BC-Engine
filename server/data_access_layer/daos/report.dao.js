@@ -30,7 +30,8 @@ exports.getReportTypesWithRecipientIds = async (reportTypesModel = ReportTypeMod
                     for (let i = 0; i < data.reportTypes.length; i++) {
                         data.reportTypes[i].recipients = {};
                         for (let j = 0; j < data.recipients.length; j++) {
-                            if (data.reportTypes[i].reportTypeId === data.recipients[j].dataValues.report_type_id) {
+                            if (data.reportTypes[i].reportTypeId === data.recipients[j].dataValues.report_type_id &&
+                                !(data.recipients[j].dataValues.recipient_id in data.reportTypes[i].recipients)) {
                                 data.reportTypes[i].recipients[data.recipients[j].dataValues.recipient_id] = { name: "" };
                             }
                         }
