@@ -73,7 +73,7 @@ exports.getTransactionsStatByYearMonthAndEmployee = async (yearMonthList, employ
     });
 }
 
-exports.getTransactionsStatByYearMonthAndCountry = async (yearMonthList, countryCode, db = database) => {
+exports.getTransactionsStatByYearMonthAndCountry = async (yearMonthList, countryLabel, db = database) => {
     return new Promise(async (resolve, reject) => {
 
         try{
@@ -84,7 +84,7 @@ exports.getTransactionsStatByYearMonthAndCountry = async (yearMonthList, country
                 AND CONNECTION_ID = 3 \
                 AND YEAR_MONTH IN (?)",
                 {
-                    replacements: [countryCode, yearMonthList], 
+                    replacements: [countryLabel, yearMonthList], 
                     type: QueryTypes.SELECT 
                 }
             );
@@ -111,7 +111,7 @@ exports.getTransactionsStatByYearMonthAndCountry = async (yearMonthList, country
 }
 
 
-exports.getTransactionsStatByYearMonthAndEmployeeAndCountry = async (yearMonthList, employeeId, countryCode, db = database) => {
+exports.getTransactionsStatByYearMonthAndEmployeeAndCountry = async (yearMonthList, employeeId, countryLabel, db = database) => {
     return new Promise(async (resolve, reject) => {
 
         try{
@@ -129,7 +129,7 @@ exports.getTransactionsStatByYearMonthAndEmployeeAndCountry = async (yearMonthLi
                 AND CONVERT(nvarchar,RESP.NAME_ID)=NQ.DROPDOWN_CODE \
                 AND NQ.DROPDOWN_CODE=?",
                 {
-                    replacements: [countryCode, yearMonthList, employeeId], 
+                    replacements: [countryLabel, yearMonthList, employeeId], 
                     type: QueryTypes.SELECT 
                 }
             );
