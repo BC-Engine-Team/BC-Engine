@@ -6,10 +6,8 @@ router.get("/chartReport", authService.authenticateToken, reportController.getCh
 
 router.post("/chartReport", authService.authenticateToken, reportController.createChartReport);
 
-router.get("/create-pdf", (req,res) => {
-    res.sendFile(`${__dirname}/docs/pdf_files/chartReport-${req.query.reportId}`);
-});
+router.get("/fetchPdf", authService.authenticateToken, reportController.fetchChartReportPDF);
 
-router.post("/create-pdf", authService.authenticateToken, reportController.createChartReportPDF);
+router.post("/createPdf", authService.authenticateToken, reportController.createChartReportPDF);
 
 module.exports = router;

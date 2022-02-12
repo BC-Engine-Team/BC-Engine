@@ -33,11 +33,44 @@ const Reports = () => {
             'authorization': "Bearer " + cookies.get("accessToken"),
         }
 
+        let param = {
+            reportid: ReportId
+        }
+
         Axios.defaults.withCredentials = true;
 
-        Axios.post(`${process.env.REACT_APP_API}/reports/create-pdf/${ReportId}`, { headers: header })
+        Axios.post(`${process.env.REACT_APP_API}/reports/createPdf`, param, { headers: header })
             .then((response) => {
-                console.log(response);
+                if(response.data === true) {
+                    Axios.get(`${process.env.REACT_APP_API}/reports/fetchdf`, { params: param, headers: header, responseType: 'blob' })
+                    .then((response) => {
+                        const pdfBlob = new Blob([response.data], { type: 'application/pdf' });
+
+                        var element = document.createElement('a');
+
+                        element.setAttribute('href', 'data:application/pdf,'.toString('base64'));
+                        element.setAttribute('download', {pdfBlob});
+                        document.body.appendChild(element);
+                        element.click();
+                        document.body.removeChild(element)
+
+                        //saveAs(pdfBlob, 'newPdf.pdf');
+                    })
+                    .catch((error) => {
+                        if (error.response) {
+                            if (error.response.status === 403 || error.response.status === 401) {
+                                alert("You are not authorized to perform this action.");
+                            }
+                            else {
+                                alert("Could not reach b&C Engine...");
+                            }
+                        }
+                        else if (error.request) {
+                            alert("Could not reach b&C Engine...");
+                        }
+                    });
+                }
+                else{console.log("hey")}
             })
             .catch((error) => {
                 if (error.response) {

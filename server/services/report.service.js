@@ -57,7 +57,7 @@ exports.createChartReportForUser = async (criteria, data, userId) => {
     });
 }
 
-exports.createChartReportPDFByReportId = async (reportId) => {
+exports.createChartReportPDFById = async (reportId) => {
     const pdfOptions = {
         format: "letter"
     };
