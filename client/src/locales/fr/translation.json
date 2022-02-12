@@ -119,13 +119,13 @@
        }
     },
     "reports": {
+      "ExportButtonLabel": "Exporter",
        "reports": {
           "Title": "Rapports",
           "NameLabel": "Nom du Rapport",
           "DateLabel": "Date du Rapport",
           "EmployeeLabel": "Employé(es) concerné(es)",
-          "EmailButtonLabel": "Address Courriel",
-          "ExportButtonLabel": "Exporter"
+          "EmailButtonLabel": "Addresse Courriel"
        },
        "reportsManagement": {
           "Title": "Gestion des Rapports",
@@ -144,19 +144,20 @@
              "Bimonth": "Bimensuel",
              "Year": "Annuel"
           },
-          "employees": {
-             "Title": "Selectionnez les Employé(es)"
+          "recipients": {
+             "Title": "Selectionnez les Destinataires"
           }
        },
        "chartReports": {
-          "Name": "NOM DU RAPPORT",
-          "Employee": "EMPLOYÉ",
-          "ClientType": "TYPE DE CLIENT",
-          "Country": "PAYS",
-          "AgeOfAccount": "AGE DU COMPTE",
-          "AccountType": "TYPE DU COMPTE",
-          "StartDate": "DATE DE DÉBUT",
-          "EndDate": "DATE DE FIN",
+         "Title": "Rapports Graphiques",
+          "Name": "Nom du Rapport",
+          "Employee": "Employé(e)",
+          "ClientType": "Type de Client",
+          "Country": "Pays",
+          "AgeOfAccount": "Âge du Compte",
+          "AccountType": "Type du Compte",
+          "StartDate": "Date de Début",
+          "EndDate": "Date de Fin",
           "LoadButton": "Charger",
           "CreateButton": "Ajouter"
        },
