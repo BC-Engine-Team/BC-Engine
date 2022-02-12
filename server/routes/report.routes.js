@@ -2,13 +2,14 @@ const reportController = require("../controllers/report.controller.js");
 let router = require("express").Router();
 const authService = require("../services/auth.service");
 
-//Fetch all chart reports
+// Chart Reports routes
 router.get("/chartReport", authService.authenticateToken, reportController.getChartReportsByUserId);
 
-// Create chart report
 router.post("/chartReport", authService.authenticateToken, reportController.createChartReport);
 
-// Delete chart report selected
 router.delete("/delete/:chartReportId", authService.authenticateToken, reportController.deleteChartReport);
+
+// Report Types routes
+router.get("/reportTypes", authService.authenticateToken, reportController.getReportTypesWithRecipients);
 
 module.exports = router;

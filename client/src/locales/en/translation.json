@@ -120,13 +120,13 @@
         }
     },
     "reports":{
+        "ExportButtonLabel": "Export",
         "reports":{
             "Title":"Reports",
             "NameLabel":"Report Name",
             "DateLabel":"Report Date",
             "EmployeeLabel":"Concerned Employee(s)",
-            "EmailButtonLabel":"Email",
-            "ExportButtonLabel":"Export"
+            "EmailButtonLabel":"Email"
         },
         "reportsManagement":{
             "Title":"Reports Management",
@@ -145,19 +145,20 @@
                 "Bimonth":"Bimonthly",
                 "Year":"Yearly"
             },
-            "employees":{
-                "Title":"Select Employee(s)"
+            "recipients":{
+                "Title":"Select Recipients"
             }
         },
         "chartReports":{
-            "Name":"NAME OF REPORT",
-            "Employee":"EMPLOYEE CRITERIA",
-            "ClientType":"CLIENT TYPE",
-            "Country":"COUNTRY",
-            "AgeOfAccount":"AGE OF ACCOUNT",
-            "AccountType":"ACCOUNT TYPE",
-            "StartDate":"START DATE",
-            "EndDate":"END DATE",
+            "Title": "Chart Reports",
+            "Name":"Name of Report",
+            "Employee":"Employee Criteria",
+            "ClientType":"Client Type",
+            "Country":"Country",
+            "AgeOfAccount":"Age of Account",
+            "AccountType":"Account Type",
+            "StartDate":"Start Date",
+            "EndDate":"End Date",
             "LoadButton":"Load",
             "CreateButton": "Create"
         },

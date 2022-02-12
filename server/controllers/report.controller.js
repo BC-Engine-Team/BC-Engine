@@ -37,6 +37,26 @@ exports.createChartReport = async (req, res) => {
         });
 }
 
+exports.getReportTypesWithRecipients = async (req, res) => {
+    if (!req.user || !req.user.userId || req.userId === "" ||
+        req.user.userId === undefined) {
+        return res.status(400).send({ message: "Content cannot be empty." });
+    }
+
+    if (req.user.role !== "admin")
+        return res.status(403).send({ message: "You are not authorized to fetch from this resource." });
+
+    await reportService.getReportTypesWithRecipients()
+        .then(async response => {
+            if (response) {
+                return res.send(response);
+            }
+            return res.status(500).send({ message: "The data could not be fetched." });
+        })
+        .catch(err => {
+            return res.status(err.status || 500).send({ message: err.message || "Malfunction in the B&C Engine." });
+        });
+}
 
 exports.deleteChartReport = async (req, res) => {
 
