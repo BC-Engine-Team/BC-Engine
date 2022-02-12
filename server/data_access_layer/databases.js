@@ -171,7 +171,7 @@ db.sync = async (database, options) => {
         },
         {
           name: "Sabrina Lavoie",
-          email: "sabrina@benoit-cote.com"
+          email: "slavoie@benoit-cote.com"
         },
         {
           name: "Suzanne Antal",

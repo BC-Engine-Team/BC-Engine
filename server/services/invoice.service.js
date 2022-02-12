@@ -4,18 +4,25 @@ const NameQualityDao = require("../data_access_layer/daos/name_quality.dao");
 const ClientDao = require("../data_access_layer/daos/name.dao");
 const ClientGradingDao = require("../data_access_layer/daos/client_grading.dao")
 
-let clientIDList = [];
 
-exports.getAverages = async (startDateStr, endDateStr,  employeeId = undefined) => {
+
+exports.getAverages = async (startDateStr, endDateStr, employeeId = undefined, clientType = undefined) => {
     return new Promise(async (resolve, reject) => {
+        // List to hold the final response
+        let returnData = [];
+
+        // Lists used for main calculation
         let averagesList = [];
         let totalDuesList = [];
         let billedList = [];
-        let clientList = [];
-        let clientsList;
-        let nameIdList = [];
+
+        // List used to filter Bills by employee
+        let clientsByEmployee;
+
+        // Lists used for the Clients Table
+        let clientIDList = [];
         let clientGradingList = [];
-        let returnData = [];
+        let clientList = [];
 
         let startDate = new Date(`${startDateStr} 00:00:00`);
         let endDate = new Date(`${endDateStr} 00:00:00`);
@@ -29,17 +36,17 @@ exports.getAverages = async (startDateStr, endDateStr,  employeeId = undefined) 
 
         let yearMonthList = this.getYearMonth(startDateStr, endDateStr);
 
-        if(employeeId !== undefined) {
-            clientsList = [];
+        if (employeeId !== undefined) {
+            clientsByEmployee = [];
             await this.getClientsByEmployee(employeeId).then(async data => {
-                clientsList = data;
+                clientsByEmployee = data;
             }).catch(err => {
                 reject(err);
             });
         }
 
         // Get the list of total dues for each month
-        await this.getDues(yearMonthList, employeeId).then(async data => {
+        await this.getDues(yearMonthList, employeeId, clientType).then(async data => {
             totalDuesList = data;
         }).catch(err => {
             reject(err);
@@ -51,18 +58,41 @@ exports.getAverages = async (startDateStr, endDateStr,  employeeId = undefined) 
         startDateStr = startDate.getFullYear() + "-" + theMonth + "-01";
 
         // Get list of amount billed for each month (previous 12 months)
-        await this.getBilled(startDateStr, endDateStr, yearMonthList, clientsList).then(async data => {
-            billedList = data;
+        await this.getBilled(startDateStr, endDateStr, yearMonthList, clientsByEmployee, clientType).then(async data => {
+            billedList = data.billedList;
+            clientIDList = data.clientIDList;
         }).catch(err => {
             reject(err);
         });
 
-        //Get list of client based by actor id
+        // Get List of Client Id, Name and Country
         await this.getNamesAndCountries(clientIDList).then(async data => {
             clientList = data;
         }).catch(err => {
             reject(err);
         });
+
+        // Get List of Client Id and Client Grading
+        await this.getClientGrading(clientIDList).then(async data => {
+            clientGradingList = data;
+        }).catch(err => {
+            reject(err);
+        });
+
+        console.log(clientGradingList)
+        console.log(clientList);
+        // Associate clients with the appropriate grading
+        for (const c of clientList) {
+            for (const g of clientGradingList) {
+                if (c.nameId === g.nameId) {
+                    c.grading = g.grading;
+                    break;
+                }
+                else if (c.nameId !== g.nameId) {
+                    c.grading = "N/A"
+                }
+            }
+        }
 
         // Populate average list with average for each month
         if (totalDuesList.length === 0 || billedList.length === 0) return;
@@ -78,34 +108,11 @@ exports.getAverages = async (startDateStr, endDateStr,  employeeId = undefined) 
             counter++;
         });
 
+        // Group averages List by year
         const groupedAverages = averagesList.reduce((groups, item) => ({
             ...groups,
             [item.group]: [...(groups[item.group] || []), item]
         }), {});
-
-        clientList.forEach(c => {
-            nameIdList.push(c.nameId);
-        });
-
-        if(nameIdList.length !== 0) {
-            await this.getClientGrading(nameIdList).then(async data => {
-                clientGradingList = data;
-            }).catch(err => {
-                reject(err);
-            });
-        }
-        
-        for (const c of clientList) {
-            for (const g of clientGradingList) {
-                if (c.nameId === g.nameId) {
-                    c.grading = g.grading;
-                    break;
-                }
-                else if (c.nameId !== g.nameId) {
-                    c.grading = "N/A"
-                }
-            }
-        }
 
         returnData.push({
             chart: groupedAverages,
@@ -116,7 +123,7 @@ exports.getAverages = async (startDateStr, endDateStr,  employeeId = undefined) 
     });
 }
 
-exports.getDues = async (yearMonthList, employeeId = undefined) => {
+exports.getDues = async (yearMonthList, employeeId = undefined, clientType = undefined) => {
     let totalDuesList = [];
 
     return new Promise(async (resolve, reject) => {
@@ -137,8 +144,8 @@ exports.getDues = async (yearMonthList, employeeId = undefined) => {
             resolve(totalDuesList);
         }
 
-        if(employeeId === undefined) {
-            await TransacStatDao.getTransactionsStatByYearMonth(yearMonthList).then(async data => {
+        if (employeeId === undefined) {
+            await TransacStatDao.getTransactionsStatByYearMonth(yearMonthList, clientType).then(async data => {
                 if (data) getDues_(yearMonthList, data);
                 else resolve(false);
             }).catch(err => {
@@ -158,8 +165,8 @@ exports.getDues = async (yearMonthList, employeeId = undefined) => {
 
 
 
-exports.getBilled = async (startDateStr, endDateStr, yearMonthList, clientsList = undefined) => {
-    let billedList = [];
+exports.getBilled = async (startDateStr, endDateStr, yearMonthList, clientsList = undefined, clientType = undefined) => {
+
     let startDate = new Date(parseInt(startDateStr.substring(5, 7)) + " " + parseInt(startDateStr.substring(8)) + " " + parseInt(startDateStr.substring(0, 4)));
     let endDate = new Date(parseInt(endDateStr.substring(5, 7)) + " " + parseInt(endDateStr.substring(8)) + " " + parseInt(endDateStr.substring(0, 4)));
     endDate.setMonth(endDate.getMonth() - (yearMonthList.length - 1));
@@ -170,6 +177,10 @@ exports.getBilled = async (startDateStr, endDateStr, yearMonthList, clientsList 
     return new Promise(async (resolve, reject) => {
 
         const getBilled_ = (yearMonthLists, data) => {
+            let billedList = [];
+            let clientIDList = [];
+            let returnData = {};
+
             yearMonthLists.forEach(ym => {
                 let billed = 0;
 
@@ -189,10 +200,16 @@ exports.getBilled = async (startDateStr, endDateStr, yearMonthList, clientsList 
                 endDate.setUTCMonth(endDate.getUTCMonth() + 1);
             });
             clientIDList = [...new Set(clientIDList)];
-            resolve(billedList);
+
+            returnData = {
+                billedList: billedList,
+                clientIDList: clientIDList
+            };
+
+            resolve(returnData);
         }
 
-        if(clientsList === undefined) {
+        if (clientsList === undefined) {
             await InvoiceAffectDao.getInvoicesByDate(startDateStr, endDateStr).then(async data => {
                 if (data) getBilled_(yearMonthList, data);
                 else resolve(false);
@@ -201,8 +218,8 @@ exports.getBilled = async (startDateStr, endDateStr, yearMonthList, clientsList 
             })
         }
         else {
-            if(clientsList.length === 0) {
-                getBilled_(yearMonthList, [{invoiceDate: null, billed: null, actorId: null}])
+            if (clientsList.length === 0) {
+                getBilled_(yearMonthList, [{ invoiceDate: null, billed: null, actorId: null }])
             }
             else {
                 await InvoiceAffectDao.getInvoicesByDateAndEmployee(startDateStr, endDateStr, clientsList).then(async data => {
@@ -287,6 +304,7 @@ exports.getClientGrading = async (idList) => {
     return new Promise(async (resolve, reject) => {
         await ClientGradingDao.getClientGrading(idList).then(async data => {
             if (data) {
+                console.log(data)
                 data.forEach(g => {
                     gradingList.push({
                         nameId: g.nameId,

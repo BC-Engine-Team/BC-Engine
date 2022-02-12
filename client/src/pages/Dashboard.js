@@ -181,14 +181,15 @@ const Dashboard = () => {
             let startDate = new Date(criteria.startYear, criteria.startMonth, 1).toISOString().split("T")[0];
             let endDate = new Date(criteria.endYear, criteria.endMonth, 1).toISOString().split("T")[0];
 
-            let param = {};
-            if (employeeId !== -1) {
-                param = {
-                    employeeId: employeeId
-                }
-            }
+            let param = {
+                employeeId: employeeId === -1 ? undefined : employeeId,
+                clientType: criteria.clientType === "Any" ? undefined : criteria.clientType
+            };
+
             if (c === 1) {
-                param = {};
+                param = {
+                    clientType: criteria.clientType === "Any" ? undefined : criteria.clientType
+                };
             }
 
             await Axios.get(`${process.env.REACT_APP_API}/invoice/defaultChartAndTable/${startDate}/${endDate}`, { params: param, headers: header })
@@ -635,6 +636,20 @@ const Dashboard = () => {
                                             />
                                         </Button>
                                     </OverlayTrigger>
+                                </InputGroup>
+                            </Row>
+
+                            <Row>
+                                <FormLabel htmlFor="clientTypeCriteriaDashboard" className="mt-2">{t('dashboard.criteria.labels.ClientType')}</FormLabel>
+                                <InputGroup className="mb-2">
+                                    <Form.Select id="clientTypeCriteriaDashboard" onChange={(e) => {
+                                        setField('clientType', e.target.value);
+                                    }}>
+                                        <option key={0} value={"Any"}>{t('dashboard.criteria.clientType.Any')}</option>
+                                        <option key={1} value={"CORRES"}>{t('dashboard.criteria.clientType.Corr')}</option>
+                                        <option key={2} value={"DIRECT"}>{t('dashboard.criteria.clientType.Direct')}</option>
+
+                                    </Form.Select>
                                 </InputGroup>
                             </Row>
 

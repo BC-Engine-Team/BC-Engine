@@ -2,11 +2,11 @@ const database = require('../databases')['mssql_bosco'];
 const { QueryTypes } = require('sequelize');
 
 
-exports.getClientGrading = async (clientIDList, db=database) => {
+exports.getClientGrading = async (clientIDList, db = database) => {
 
     return new Promise(async (resolve, reject) => {
 
-        try{
+        try {
             const data = await db.query(
                 "SELECT DISTINCT [NAME_ID], [DROPDOWN_CODE] \
                 FROM [Bosco reduction].[dbo].[NAME_QUALITY] WHERE QUALITY_TYPE_ID = 15 \
@@ -16,7 +16,8 @@ exports.getClientGrading = async (clientIDList, db=database) => {
                     type: QueryTypes.SELECT
                 }
             );
-            if(data){
+            console.log(data)
+            if (data) {
                 let returnData = [];
                 data.forEach(c => {
                     returnData.push({
@@ -28,7 +29,7 @@ exports.getClientGrading = async (clientIDList, db=database) => {
             }
             resolve(false);
         }
-        catch(err){
+        catch (err) {
             reject(err);
         }
     });
