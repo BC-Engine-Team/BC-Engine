@@ -19,11 +19,11 @@ module.exports = (data, averagesList) => {
     ];
 
     const compareColors = [
-        'rgb(255, 192, 159)',
-        'rgb(191, 175, 192)',
-        'rgb(255, 238, 147)',
-        'rgb(160, 206, 217)',
-        'rgb(173, 247, 182)'
+        'rgb(255, 139, 77)',
+        'rgb(127, 101, 129)',
+        'rgb(255, 224, 51)',
+        'rgb(65, 144, 164)',
+        'rgb(46, 234, 68)'
     ];
 
     const colors = [
@@ -81,6 +81,9 @@ module.exports = (data, averagesList) => {
             if(counter === 5) 
                 counter = 0; 
 
+            if(counterCompare === 5)
+                counterCompare = 0;
+
             if(averagesList[i].employee !== -1) {
                 labelCompare = " - emp";
             }
@@ -112,28 +115,76 @@ module.exports = (data, averagesList) => {
                 str = str.concat(",");
         }
 
-        console.log(str)
         return str;
     }
-
-//   <tr>
-        //     <td class="service">SEO</td>
-        //     <td class="desc">Optimize the site for search engines (SEO)</td>
-        //     <td class="unit">$40.00</td>
-        //     <td class="qty">20</td>
-        //     <td class="total">$800.00</td>
-        //   </tr>
 
     const buildTable = () => {
         let str = "";
 
-        // for(let i = 0; i < averagesList.length; i++) {
-        //     for(let j = 0; i < averagesList[i].data.length; j++) {
-                
-        //     }
-        // }
+        for(let i = 0; i < 12; i++) {
+            let averageNormal = 0;
+            let averageCounter = 0;
+
+            let compareAverage = 0;
+            let compareAverageCounter = 0;
+
+            let counter = 0;
+            let compareCounter = 0;
+            str = str.concat("<tr>", "<th class='monthColumn'>", months[i], "</th>")
+
+            for(let j = 0; j < averagesList.length; j++) {
+                if(counter === 5) 
+                counter = 0; 
+
+                if(compareCounter === 5) 
+                compareCounter = 0; 
+
+                if(averagesList[j].employee !== -1) {
+                    str = str.concat("<td style='background-color:", compareColors[counter], "'>", averagesList[j].data[i] !== 0 ? averagesList[j].data[i] : "N/A", "</td>")
+                    counter++
+
+                    if(averagesList[j].data[i] !== 0) {
+                        averageNormal += averagesList[j].data[i];
+                        averageCounter++
+                    }
+
+                    if((j + 1) === averagesList.length) {
+                        averageNormal /= averageCounter;
+                        str = str.concat("<td style='border:1px solid #333; border-top: none; border-bottom: none;'>", averageNormal.toFixed(2), "</td>")
+                    }
+                }
+                else {
+                    str = str.concat("<td style='background-color:", colors[compareCounter], "'>", averagesList[j].data[i] !== 0 ? averagesList[j].data[i] : "N/A", "</td>")
+                    compareCounter++
+
+                    if(averagesList[j].data[i] !== 0) {
+                        compareAverage += averagesList[j].data[i];
+                        compareAverageCounter++
+                    }
+
+                    if((j + 1) === averagesList.length / 2) {
+                        compareAverage /= compareAverageCounter;
+                        str = str.concat("<td style='border: 1px solid #333; border-top: none; border-bottom: none;'>", compareAverage.toFixed(2), "</td>")
+                    }
+                }
+            }
+            str = str.concat("</tr>")
+        }
+
+        return str;
+    }
+
+    const buildTableHead = () => {
+        let str = "";
+
+        for(let i = 0; i < averagesList.length; i++) {
+            str = str.concat("<th>", averagesList[i].year, "</th>")
+
+            if(averagesList[i].employee === -1 && i + 1 === averagesList.length / 2) {
+                str = str.concat("<th>AVERAGE</th>")
+            }
+        }
         
-        //str = str.concat("<tr>");
         return str;
     }
 
@@ -233,17 +284,73 @@ module.exports = (data, averagesList) => {
                     color: #5D6975;
                     width: 100%;
                     position: absolute;
-                    bottom: 0;
+                    bottom: 14px;
                     border-top: 1px solid #C1CED9;
                     padding: 8px 0;
                     text-align: center;
-                    line-height: 0.5em;
+                    line-height: 0.8em;
+                }
+                
+                .secondPageFooter {
+                    color: #5D6975;
+                    width: 100%;
+                    border-top: 1px solid #C1CED9;
+                    padding: 8px 0;
+                    text-align: center;
+                    line-height: 0.8em;
+                    margin-top: 314px;
                 }
 
                 .title {
                     margin-top: 0;
                     text-align: center;
                     margin-bottom: 0.7rem;
+                }
+
+                .table {
+                    width: 100%;
+                    background: #fff;
+                    box-shadow: 0px 5px 12px -12px rgb(0 0 0 / 29%);
+                    text-align: center;
+                    color: #212529;
+                    border-collapse: collapse;
+                    border: 1px solid #333 !important;
+                }
+
+                .table thead {
+                    background: #333;
+                    color: #fff;
+                }
+
+                .table thead th {
+                    border: none;
+                    padding: 7px 0;
+                    font-size: 12px;
+                    color: #fff;
+                }
+
+                .monthColumn {
+                    width: 100px;
+                }
+
+                .table tbody th {
+                    background: #e8ebf8;
+                    border-bottom: 2px solid #333 !important;
+                    border-right: 1px solid #333 !important;
+                    border: none;
+                    padding: 7px;
+                    font-size: 12px;
+                    vertical-align: middle;
+                }
+
+                .table tbody td {
+                    border-bottom: 1px solid #333 !important;
+                }
+
+                .tableTitle {
+                    font-size: 25;
+                    text-align: center;
+                    margin-top: 0.7in;
                 }
             </style>
         </head>
@@ -273,26 +380,41 @@ module.exports = (data, averagesList) => {
             </div>
             </header>
             <main>
-                <canvas id="myChart" width="auto" height="auto"></canvas>
-
-                <table>
-        <thead>
-            <tr>
-                <th></th>
-                ${averagesList.map((ym) => {return `<th>${ym.year}</th>`})}
-                <th>AVERAGE DIFFERENCE</th>
-            </tr>
-        </thead>
-        <tbody>
-            ${buildTable()}
-        </tbody>
-      </table>
+                <canvas id="myChart" width="auto" height="200px"></canvas>
             </main>
         </body>
         <footer>
             <p>@Copyright 2021-${today.getFullYear()}.</p>
             <p>All rights reserved. Powered by B&C Engine.</p>
         </footer>
+        <div style="page-break-after:always;"></div>
+        <body>
+            <header class="clearfix">
+            <div id="logo">
+                <img src="https://i.postimg.cc/rwsyKZ34/logo.png" width="90px" height="90px">
+            </div>
+            <h1>Chart Report - ${data.name}</h1>
+            <main>
+                <h2 class="tableTitle">Chart Raw Data (Days)</h2>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th></th>
+                            ${buildTableHead()}
+                            ${averagesList.length !== 1 ? `<th>AVERAGE</th>` : ""}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${buildTable()}
+                    </tbody>
+                </table>
+            </main>
+            <div class="secondPageFooter">
+                <p>@Copyright 2021-${today.getFullYear()}.</p>
+                <p>All rights reserved. Powered by B&C Engine.</p>
+            </div>
+        </body>
+        
 
         <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.min.js"></script>
         <script>

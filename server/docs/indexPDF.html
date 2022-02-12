@@ -108,6 +108,41 @@
                 margin-top: 0;
                 margin-bottom: 0.7rem;
             }
+
+            table {
+              width: 100%;
+              background: #fff;
+              box-shadow: 0px 5px 12px -12px rgb(0 0 0 / 29%);
+              text-align: center;
+              color: #212529;
+              border-collapse: collapse;
+            }
+
+            thead {
+              background: #333;
+              color: #fff;
+            }
+
+            table thead th {
+              border: none;
+              padding: 7px 0;
+              font-size: 12px;
+              color: #fff;
+            }
+
+            .monthColumn {
+              width: 100px;
+            }
+
+            table tbody th {
+              background: #e8ebf8;
+              border-bottom: 2px solid #e0e5f6;
+              border: none;
+              padding: 7px;
+              font-size: 12px;
+              vertical-align: middle;
+            }
+
         </style>
       </head>
       <body>
@@ -136,6 +171,37 @@
         </header>
         <main>
           <canvas id="myChart" width="auto" height="auto"></canvas>
+
+          <table>
+            <thead>
+              <tr>
+                <th class="monthColumn"></th>
+                <th>2018</th>
+                <th>2019</th>
+                <th>2020</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <th>January</th>
+                <td>100</td>
+                <td>100</td>
+                <td>100</td>
+              </tr>
+              <tr>
+                <th>January</th>
+                <td>100</td>
+                <td>100</td>
+                <td>100</td>
+              </tr>
+              <tr>
+                <th>September</th>
+                <td>100</td>
+                <td>100</td>
+                <td>100</td>
+              </tr>
+            </tbody>
+          </table>
         </main>
         <footer>
           Invoice was created on a computer and is valid without the signature and seal.

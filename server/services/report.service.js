@@ -135,6 +135,8 @@ exports.createChartReportData = async (createdChartReport, data) => {
     return new Promise(async (resolve, reject) => {
         let preparedData = [];
 
+        console.log(data)
+
         for (let i = 0; i < data.length; i++) {
             let isEmpFiltered = data[i].label.toString().split(" - ").at(-1) === "emp";
             let year = parseInt(data[i].label.toString().split(" - ")[0]);
@@ -158,6 +160,8 @@ exports.createChartReportData = async (createdChartReport, data) => {
             preparedData.push(set);
         }
 
+        console.log(preparedData)
+
         await ChartReportDao.createDataForChartReport(createdChartReport.chartReportId, preparedData)
             .then(async data => {
                 if (data)
@@ -166,6 +170,7 @@ exports.createChartReportData = async (createdChartReport, data) => {
                     resolve(false);
             })
             .catch(err => {
+                console.log(err)
                 const response = {
                     status: err.status || 500,
                     message: err.message || "Malfunction in the B&C Engine."
