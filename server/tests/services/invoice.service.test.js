@@ -13,20 +13,23 @@ let yearMonthList = [202011, 202012, 202101];
 let nameIdList = [32590, 36052, 37960];
 
 
-let fakeBilledList = [
-    {
-        month: 202011,
-        billed: 100
-    },
-    {
-        month: 202012,
-        billed: 150
-    },
-    {
-        month: 202101,
-        billed: 125
-    }
-];
+let fakeBilledList = {
+    billedList: [
+        {
+            month: 202011,
+            billed: 100
+        },
+        {
+            month: 202012,
+            billed: 150
+        },
+        {
+            month: 202101,
+            billed: 125
+        }
+    ],
+    clientIDList: [54998, 63379, 54332]
+};
 
 let fakeDuesList = [
     {
@@ -70,14 +73,17 @@ let fakeTransacStatList = [
 let fakeInvoiceAffectList = [
     {
         invoiceDate: new Date(2020, 9, 15),
+        actorId: 22222,
         amount: 50
     },
     {
         invoiceDate: new Date(2020, 10, 15),
+        actorId: 33333,
         amount: 50
     },
     {
         invoiceDate: new Date(2020, 11, 15),
+        actorId: 44444,
         amount: 50
     }
 ];
@@ -103,19 +109,19 @@ let fakeExpectedGetAverageResponse = [
             2020: [
                 {
                     month: 202011,
-                    average: (fakeDuesList[0].totalDues / fakeBilledList[0].billed * 365).toFixed(2),
+                    average: (fakeDuesList[0].totalDues / fakeBilledList.billedList[0].billed * 365).toFixed(2),
                     group: 2020
                 },
                 {
                     month: 202012,
-                    average: (fakeDuesList[1].totalDues / fakeBilledList[1].billed * 365).toFixed(2),
+                    average: (fakeDuesList[1].totalDues / fakeBilledList.billedList[1].billed * 365).toFixed(2),
                     group: 2020
                 }
             ],
             2021: [
                 {
                     month: 202101,
-                    average: (fakeDuesList[2].totalDues / fakeBilledList[2].billed * 365).toFixed(2),
+                    average: (fakeDuesList[2].totalDues / fakeBilledList.billedList[2].billed * 365).toFixed(2),
                     group: 2021
                 }
             ]
@@ -349,7 +355,6 @@ describe("Test Invoice Service", () => {
         process.exit;
     });
 
-    //to fix
     describe("IS1 - getAverages", () => {
         describe("IS1.1 - given two dates", () => {
             it("IS1.1.1 - should respond with the list of averages per month with group key", async () => {
@@ -421,7 +426,6 @@ describe("Test Invoice Service", () => {
             });
 
             it("IS1.1.6 - should respond with error thrown by getNamesAndCountries", async () => {
-
                 // arrange
                 getDuesSpy = jest.spyOn(InvoiceService, 'getDues')
                     .mockImplementation(() => new Promise((resolve) => {
@@ -445,8 +449,6 @@ describe("Test Invoice Service", () => {
             });
 
             it("IS1.1.7 - should respond with error thrown by getClientGrading", async () => {
-
-
                 // arrange
                 getDuesSpy = jest.spyOn(InvoiceService, 'getDues')
                     .mockImplementation(() => new Promise((resolve) => {
@@ -471,7 +473,6 @@ describe("Test Invoice Service", () => {
                     .toEqual({ message: "getClientGrading failed" });
             });
         });
-
 
 
         describe("IS1.2 - given two dates and employeeId", () => {
@@ -545,7 +546,6 @@ describe("Test Invoice Service", () => {
             });
 
             it("IS1.2.5 - should respond with error thrown by getNamesAndCountries", async () => {
-
                 // arrange
                 getDuesSpy = jest.spyOn(InvoiceService, 'getDues')
                     .mockImplementation(() => new Promise((resolve) => {
@@ -640,7 +640,6 @@ describe("Test Invoice Service", () => {
             });
 
             it("IS1.3.2 - should respond with the list of averages per month with group key if option all country is selected", async () => {
-
                 //arrange
                 getClientSpy = jest.spyOn(InvoiceService, 'getNamesAndCountries')
                     .mockImplementation(() => new Promise((resolve) => {
@@ -654,12 +653,12 @@ describe("Test Invoice Service", () => {
                     }));
 
                 // act
-                const response = await InvoiceService.getAverages("2020-11-01", "2021-01-01", undefined, "all");
+                const response = await InvoiceService.getAverages("2020-11-01", "2021-01-01", undefined, "All");
 
                 // assert
                 expect(response).toEqual(fakeExpectedGetAverageResponse);
                 expect(getDuesSpy).toBeCalledTimes(1);
-                expect(getDuesSpy).toBeCalledWith(yearMonthList, undefined, undefined);
+                expect(getDuesSpy).toBeCalledWith(yearMonthList, undefined, "All");
 
                 expect(getClientSpy).toBeCalledTimes(1);
                 expect(getClientGradingSpy).toBeCalledTimes(1);
@@ -697,7 +696,6 @@ describe("Test Invoice Service", () => {
 
             
             it("IS1.3.5 - should respond with error thrown by getNamesAndCountries", async () => {
-
                 // arrange
                 getDuesSpy = jest.spyOn(InvoiceService, 'getDues')
                     .mockImplementation(() => new Promise((resolve) => {
@@ -777,11 +775,15 @@ describe("Test Invoice Service", () => {
             });
         });
 
+
+
+
+
         // describe("IS1.4 - given two dates, an employeeId and a country value", () => {
         //     let countryName = "Canada";
         //     let employeeId = 22769;
 
-        //     it("IS1.4.1 - should respond with the list of averages per month with group key for a specific country and employeeId", async () => {
+        //     it("IS1.4.1 - should respond with the list of averages per month with group key for a specific employee and country", async () => {
         //         //arrange
         //         getClientSpy = jest.spyOn(InvoiceService, 'getNamesAndCountries')
         //             .mockImplementation(() => new Promise((resolve) => {
@@ -929,16 +931,9 @@ describe("Test Invoice Service", () => {
         //         await expect(InvoiceService.getAverages(startDate, endDate, employeeId, countryName)).rejects
         //             .toEqual(expectedError);
         //     });
-
         // });
     });
     
-
-
-
-
-
-
     describe("IS2 - getDues", () => {
         describe("IS2.1 - given a valid yearMonthList", () => {
             it("IS2.1.1 - should return totalDuesList", async () => {
@@ -1193,26 +1188,29 @@ describe("Test Invoice Service", () => {
             it("IS3.1.1 - should return billed", async () => {
                 // arrange
                 getBilledSpy.mockRestore();
-                let expectedList = [
-                    {
-                        month: 202011,
-                        billed: 50
-                    },
-                    {
-                        month: 202012,
-                        billed: 100
-                    },
-                    {
-                        month: 202101,
-                        billed: 150
-                    }
-                ];
+                let expectedResponse = {
+                   billedList: [
+                        {
+                            month: 202011,
+                            billed: 50
+                        },
+                        {
+                            month: 202012,
+                            billed: 100
+                        },
+                        {
+                            month: 202101,
+                            billed: 150
+                        }
+                    ],
+                    clientIDList: [22222,33333,44444]
+                };
 
                 // act
                 const response = await InvoiceService.getBilled(startDateStr, endDateStr, yearMonthList);
 
                 // assert
-                expect(response).toEqual(expectedList);
+                expect(response).toEqual(expectedResponse);
                 expect(invoiceAffectDaoSpy).toHaveBeenCalledTimes(1);
                 expect(invoiceAffectDaoSpy).toHaveBeenCalledWith(startDateStr, endDateStr);
             });
@@ -1249,20 +1247,23 @@ describe("Test Invoice Service", () => {
             it("IS3.2.1 - should return billed", async () => {
                 // arrange
                 
-                let expectedList = [
-                    {
-                        month: 202011,
-                        billed: 50
-                    },
-                    {
-                        month: 202012,
-                        billed: 100
-                    },
-                    {
-                        month: 202101,
-                        billed: 150
-                    }
-                ];
+                let expectedResponse = {
+                    billedList: [
+                        {
+                            month: 202011,
+                            billed: 50
+                        },
+                        {
+                            month: 202012,
+                            billed: 100
+                        },
+                        {
+                            month: 202101,
+                            billed: 150
+                        }
+                    ],
+                    clientIDList: [22222,33333,44444]
+                 };
 
                 invoiceAffectDaoSpy = jest.spyOn(InvoiceAffectDao, 'getInvoicesByDateAndEmployee')
                     .mockImplementation(() => new Promise((resolve, reject) => {
@@ -1273,7 +1274,7 @@ describe("Test Invoice Service", () => {
                 const response = await InvoiceService.getBilled(startDateStr, endDateStr, yearMonthList, nameIdList);
 
                 // assert
-                expect(response).toEqual(expectedList);
+                expect(response).toEqual(expectedResponse);
                 expect(invoiceAffectDaoSpy).toHaveBeenCalledTimes(1);
                 expect(invoiceAffectDaoSpy).toHaveBeenCalledWith(startDateStr, endDateStr, nameIdList);
             });
@@ -1312,20 +1313,23 @@ describe("Test Invoice Service", () => {
             it("IS3.3.1 - should return billed", async () => {
 
                 // arrange
-                let expectedList = [
-                    {
-                        month: 202011,
-                        billed: 50
-                    },
-                    {
-                        month: 202012,
-                        billed: 100
-                    },
-                    {
-                        month: 202101,
-                        billed: 150
-                    }
-                ];
+                let expectedResponse = {
+                    billedList: [
+                        {
+                            month: 202011,
+                            billed: 50
+                        },
+                        {
+                            month: 202012,
+                            billed: 100
+                        },
+                        {
+                            month: 202101,
+                            billed: 150
+                        }
+                     ],
+                     clientIDList: [22222,33333,44444]
+                 };
 
                 invoiceAffectDaoSpy = jest.spyOn(InvoiceAffectDao, 'getInvoicesByDateAndCountry')
                     .mockImplementation(() => new Promise((resolve, reject) => {
@@ -1336,7 +1340,7 @@ describe("Test Invoice Service", () => {
                 const response = await InvoiceService.getBilled(startDateStr, endDateStr, yearMonthList, undefined, countryName);
 
                 // assert
-                expect(response).toEqual(expectedList);
+                expect(response).toEqual(expectedResponse);
                 expect(invoiceAffectDaoSpy).toHaveBeenCalledTimes(1);
                 expect(invoiceAffectDaoSpy).toHaveBeenCalledWith(startDateStr, endDateStr, countryName);
             });
@@ -1375,20 +1379,23 @@ describe("Test Invoice Service", () => {
             it("IS3.4.1 - should return billed", async () => {
 
                 // arrange
-                let expectedList = [
-                    {
-                        month: 202011,
-                        billed: 50
-                    },
-                    {
-                        month: 202012,
-                        billed: 100
-                    },
-                    {
-                        month: 202101,
-                        billed: 150
-                    }
-                ];
+                let expectedResponse = {
+                    billedList: [
+                        {
+                            month: 202011,
+                            billed: 50
+                        },
+                        {
+                            month: 202012,
+                            billed: 100
+                        },
+                        {
+                            month: 202101,
+                            billed: 150
+                        }
+                    ],
+                    clientIDList: [22222,33333,44444]
+                 };
 
                 invoiceAffectDaoSpy = jest.spyOn(InvoiceAffectDao, 'getInvoicesByDateAndEmployeeAndCountry')
                     .mockImplementation(() => new Promise((resolve, reject) => {
@@ -1399,7 +1406,7 @@ describe("Test Invoice Service", () => {
                 const response = await InvoiceService.getBilled(startDateStr, endDateStr, yearMonthList, nameIdList, countryName);
 
                 // assert
-                expect(response).toEqual(expectedList);
+                expect(response).toEqual(expectedResponse);
                 expect(invoiceAffectDaoSpy).toHaveBeenCalledTimes(1);
                 expect(invoiceAffectDaoSpy).toHaveBeenCalledWith(startDateStr, endDateStr, nameIdList, countryName);
             });
@@ -1435,21 +1442,23 @@ describe("Test Invoice Service", () => {
             
             it("IS3.5.1 - should return billed", async () => {
                 // arrange
-                
-                let expectedList = [
-                    {
-                        month: 202011,
-                        billed: 0
-                    },
-                    {
-                        month: 202012,
-                        billed: 0
-                    },
-                    {
-                        month: 202101,
-                        billed: 0
-                    }
-                ];
+                let expectedResponse = {
+                    billedList: [
+                        {
+                            month: 202011,
+                            billed: 0
+                        },
+                        {
+                            month: 202012,
+                            billed: 0
+                        },
+                        {
+                            month: 202101,
+                            billed: 0
+                        }
+                     ],
+                    clientIDList: [undefined]
+                 };
 
                 invoiceAffectDaoSpy = jest.spyOn(InvoiceAffectDao, 'getInvoicesByDateAndEmployee')
                     .mockImplementation(() => new Promise((resolve, reject) => {
@@ -1460,14 +1469,10 @@ describe("Test Invoice Service", () => {
                 const response = await InvoiceService.getBilled(startDateStr, endDateStr, yearMonthList, []);
 
                 // assert
-                expect(response).toEqual(expectedList);
+                expect(response).toEqual(expectedResponse);
             });
         });
     });
-
-
-
-
 
 
     describe("IS4 - getNamesAndCountries", () => {
@@ -1515,78 +1520,234 @@ describe("Test Invoice Service", () => {
             });
         });
 
+        describe("IS4.2 - given a valid list of nameId and country", () => {
+            let fakeClientIdList = [1, 2, 3, 4, 5, 6, 7, 8];
+            let countryName = "Canada";
+            it("IS4.2.1 - should return a list of nameId, names and country label", async () => {
 
-        // describe("IS4.2 - given a valid list of nameId with country", () => {
+                //arrange 
+                getClientSpy.mockRestore()
 
-        //     let fakeClientIdList = [1, 2, 7, 8];
-        //     let countryName = "Canada";
-        //     it("IS4.2.1 - should return a list of nameId, names and country label", async () => {
+                let fakeClientListFilteredResponse = [
+                    {
+                        nameId: 1,
+                        name: "Banque Royale",
+                        country: "Canada",
+                        grading: ""
+                    },
+                    {
+                        nameId: 2,
+                        name: "Benoit Cote",
+                        country: "Canada",
+                        grading: ""
+                    },
+                    {
+                        nameId: 7,
+                        name: "Plank Productions Inc.",
+                        country: "Canada",
+                        grading: ""
+                    },
+                    {
+                        nameId: 8,
+                        name: "Unknown user",
+                        country: "Canada",
+                        grading: ""
+                    }
+                ];
 
-        //         //arrange 
-        //         getClientSpy.mockRestore()
+                clientDaoSpy = jest.spyOn(ClientDao, 'getClientByIDAndCountry')
+                    .mockImplementation(() => new Promise((resolve) => {
+                        resolve(fakeClientListFilteredResponse);
+                    }));
 
-        //         let fakeClientListFiltered = [
-        //             {
-        //                 nameId: 1,
-        //                 name: "Banque Royale",
-        //                 country: "Canada",
-        //                 grading: ""
-        //             },
-        //             {
-        //                 nameId: 2,
-        //                 name: "Benoit Cote",
-        //                 country: "Canada",
-        //                 grading: ""
-        //             },
-        //             {
-        //                 nameId: 7,
-        //                 name: "Plank Productions Inc.",
-        //                 country: "Canada",
-        //                 grading: ""
-        //             },
-        //             {
-        //                 nameId: 8,
-        //                 name: "Unknown user",
-        //                 country: "Canada",
-        //                 grading: ""
-        //             }
-        //         ];
+                // act
+                const response = await InvoiceService.getNamesAndCountries(fakeClientIdList, undefined, countryName);
 
-        //         // act
-        //         const response = await InvoiceService.getNamesAndCountries(fakeClientIdList, countryName);
+                // assert
+                expect(response).toEqual(fakeClientListFilteredResponse);
+                expect(clientDaoSpy).toHaveBeenCalledTimes(1);
+                expect(clientDaoSpy).toHaveBeenCalledWith(fakeClientIdList, countryName);
+            });
 
-        //         // assert
-        //         expect(response).toEqual(fakeClientListFiltered);
-        //         expect(clientDaoSpy).toHaveBeenCalledTimes(1);
-        //         expect(clientDaoSpy).toHaveBeenCalledWith(fakeClientIdList);
-        //     });
+            it("IS4.2.2 - should resolve with false when dao resolves with false", async () => {
+
+                //arrange
+                clientDaoSpy = jest.spyOn(ClientDao, 'getClientByIDAndCountry')
+                    .mockImplementation(() => new Promise((resolve) => {
+                        resolve(false);
+                    }));
+
+                // act and assert
+                expect(InvoiceService.getNamesAndCountries(nameIdList, undefined, countryName)).resolves
+                    .toEqual(false);
+            });
+
+            it("IS4.2.3 - should reject with error when dao throws error", async () => {
+                //arrange
+                clientDaoSpy = jest.spyOn(ClientDao, 'getClientByIDAndCountry')
+                    .mockImplementation(() => new Promise((resolve, reject) => {
+                        reject({ message: "dao failed" });
+                    }));
+
+                // act and assert
+                expect(InvoiceService.getNamesAndCountries(nameIdList, undefined, countryName)).rejects
+                    .toEqual({ message: "dao failed" });
+            });
+        });
 
 
-        //     it("IS4.2.2 - should reject with error when dao throws error", async () => {
-        //         //arrange
-        //         clientDaoSpy = jest.spyOn(ClientDao, 'getClientByIDAndCountry')
-        //             .mockImplementation(() => new Promise((resolve, reject) => {
-        //                 reject({ message: "dao failed" });
-        //             }));
+        describe("IS4.3 - given a valid list of nameId and employeeId", () => {
+            let fakeClientIdList = [1, 2, 3, 4, 5, 6, 7, 8];
+            let employeeId = 20044;
+            it("IS4.3.1 - should return a list of nameId, names and country label", async () => {
 
-        //         // act and assert
-        //         await expect(InvoiceService.getNamesAndCountries(nameIdList, countryName)).rejects
-        //             .toEqual({ message: "dao failed" });
-        //     });
+                //arrange 
+                getClientSpy.mockRestore()
 
-        //     it("IS4.2.3 - should resolve with false when dao resolves with false", async () => {
+                let fakeClientListFilteredResponse = [
+                    {
+                        nameId: 1,
+                        name: "Banque Royale",
+                        country: "Canada",
+                        grading: ""
+                    },
+                    {
+                        nameId: 2,
+                        name: "Benoit Cote",
+                        country: "Canada",
+                        grading: ""
+                    },
+                    {
+                        nameId: 7,
+                        name: "Plank Productions Inc.",
+                        country: "Canada",
+                        grading: ""
+                    },
+                    {
+                        nameId: 8,
+                        name: "Unknown user",
+                        country: "Canada",
+                        grading: ""
+                    }
+                ];
 
-        //         //arrange
-        //         clientDaoSpy = jest.spyOn(ClientDao, 'getClientByIDAndCountry')
-        //             .mockImplementation(() => new Promise((resolve) => {
-        //                 resolve(false);
-        //             }));
+                clientDaoSpy = jest.spyOn(ClientDao, 'getClientByIDAndEmployee')
+                    .mockImplementation(() => new Promise((resolve) => {
+                        resolve(fakeClientListFilteredResponse);
+                    }));
 
-        //         // act and assert
-        //         await expect(InvoiceService.getNamesAndCountries(nameIdList, countryName)).resolves
-        //             .toEqual(false);
-        //     });
-        // });
+                // act
+                const response = await InvoiceService.getNamesAndCountries(fakeClientIdList, employeeId, undefined);
+
+                // assert
+                expect(response).toEqual(fakeClientListFilteredResponse);
+                expect(clientDaoSpy).toHaveBeenCalledTimes(1);
+                expect(clientDaoSpy).toHaveBeenCalledWith(fakeClientIdList, employeeId);
+            });
+
+            it("IS4.3.2 - should resolve with false when dao resolves with false", async () => {
+
+                //arrange
+                clientDaoSpy = jest.spyOn(ClientDao, 'getClientByIDAndEmployee')
+                    .mockImplementation(() => new Promise((resolve) => {
+                        resolve(false);
+                    }));
+
+                // act and assert
+                expect(InvoiceService.getNamesAndCountries(nameIdList, employeeId, undefined)).resolves
+                    .toEqual(false);
+            });
+
+            it("IS4.3.3 - should reject with error when dao throws error", async () => {
+                //arrange
+                clientDaoSpy = jest.spyOn(ClientDao, 'getClientByIDAndEmployee')
+                    .mockImplementation(() => new Promise((resolve, reject) => {
+                        reject({ message: "dao failed" });
+                    }));
+
+                // act and assert
+                expect(InvoiceService.getNamesAndCountries(nameIdList, employeeId, undefined)).rejects
+                    .toEqual({ message: "dao failed" });
+            });
+        });
+
+
+        describe("IS4.4 - given a valid list of nameId, employeeId and country", () => {
+            let fakeClientIdList = [1, 2, 3, 4, 5, 6, 7, 8];
+            let countryName = "Canada";
+            let employeeId = 20044;
+            it("IS4.4.1 - should return a list of nameId, names and country label", async () => {
+
+                //arrange 
+                getClientSpy.mockRestore()
+
+                let fakeClientListFilteredResponse = [
+                    {
+                        nameId: 1,
+                        name: "Banque Royale",
+                        country: "Canada",
+                        grading: ""
+                    },
+                    {
+                        nameId: 2,
+                        name: "Benoit Cote",
+                        country: "Canada",
+                        grading: ""
+                    },
+                    {
+                        nameId: 7,
+                        name: "Plank Productions Inc.",
+                        country: "Canada",
+                        grading: ""
+                    },
+                    {
+                        nameId: 8,
+                        name: "Unknown user",
+                        country: "Canada",
+                        grading: ""
+                    }
+                ];
+
+                clientDaoSpy = jest.spyOn(ClientDao, 'getClientByIDAndEmployeeAndCountry')
+                    .mockImplementation(() => new Promise((resolve) => {
+                        resolve(fakeClientListFilteredResponse);
+                    }));
+
+                // act
+                const response = await InvoiceService.getNamesAndCountries(fakeClientIdList, employeeId, countryName);
+
+                // assert
+                expect(response).toEqual(fakeClientListFilteredResponse);
+                expect(clientDaoSpy).toHaveBeenCalledTimes(1);
+                expect(clientDaoSpy).toHaveBeenCalledWith(fakeClientIdList, employeeId, countryName);
+            });
+
+            it("IS4.3.2 - should resolve with false when dao resolves with false", async () => {
+
+                //arrange
+                clientDaoSpy = jest.spyOn(ClientDao, 'getClientByIDAndEmployeeAndCountry')
+                    .mockImplementation(() => new Promise((resolve) => {
+                        resolve(false);
+                    }));
+
+                // act and assert
+                expect(InvoiceService.getNamesAndCountries(nameIdList, employeeId, countryName)).resolves
+                    .toEqual(false);
+            });
+
+            it("IS4.3.3 - should reject with error when dao throws error", async () => {
+                //arrange
+                clientDaoSpy = jest.spyOn(ClientDao, 'getClientByIDAndEmployeeAndCountry')
+                    .mockImplementation(() => new Promise((resolve, reject) => {
+                        reject({ message: "dao failed" });
+                    }));
+
+                // act and assert
+                expect(InvoiceService.getNamesAndCountries(nameIdList, employeeId, countryName)).rejects
+                    .toEqual({ message: "dao failed" });
+            });
+        });
+
 
     });
 
@@ -1704,8 +1865,6 @@ describe("Test Invoice Service", () => {
             });
         });
     });
-
-
 
     describe("IS7 - getCountriesName", () => {
         describe("IS7.1 - given I enter the application to get the list of countries", () => {

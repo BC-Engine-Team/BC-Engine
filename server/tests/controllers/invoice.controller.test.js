@@ -438,9 +438,6 @@ describe("Test Invoice Controller", () => {
                 expect(response.status).toBe(200);
                 expect(JSON.stringify(response.body)).toEqual(JSON.stringify(expectedCountryResponse));
                 expect(invoiceServiceSpy).toHaveBeenCalledTimes(1);
-                expect(authStub.called).toBeTruthy();
-
-                authStub.resetHistory();
             });
 
 

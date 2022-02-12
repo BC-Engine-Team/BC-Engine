@@ -57,17 +57,42 @@ describe("Test Country DAO", () => {
                 .toEqual(false);
         });
 
-        it("CD1.3 - should catch error when db throws error", async () => {
+        it("CD1.3 - should return a specific error message when it is of 500", async () => {
             // arrange
+
+            let expectedError = {
+                message: "Error with the db.",
+                status: 500
+            }
+
             let dbStub = {
                 query: () => {
-                    throw new Error("Error with the db.");
+                    return Promise.reject(expectedError);
                 }
             };
 
             // act and assert
             await expect(CountryDao.getAllCountries(dbStub)).rejects
-                .toEqual(new Error("Error with the db."));
+                .toEqual(expectedError);
+        });
+
+        it("CD1.4 - should return an unspecific error message", async () => {
+            // arrange
+
+            let expectedError = {
+                message: "Some error",
+                status: 400
+            }
+
+            let dbStub = {
+                query: () => {
+                    return Promise.reject(expectedError);
+                }
+            };
+
+            // act and assert
+            await expect(CountryDao.getAllCountries(dbStub)).rejects
+                .toEqual(expectedError);
         })
     });
 });

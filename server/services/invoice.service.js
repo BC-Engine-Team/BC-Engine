@@ -52,6 +52,7 @@ exports.getAverages = async (startDateStr, endDateStr,  employeeId = undefined, 
 
         let yearMonthList = this.getYearMonth(startDateStr, endDateStr);
 
+        //if(employeeId !== undefined && countryCode !== undefined || countryCode === undefined) {
 
         // prepare the clientsList from the specified employee if there is a country or not
         if(employeeId !== undefined) {
@@ -283,17 +284,12 @@ exports.getBilled = async (startDateStr, endDateStr, yearMonthList, clientsList 
 }
 
 
-
-
 // method to get the names and countries based by clients id
 exports.getNamesAndCountries = async (clientsID, employeeId = undefined, countryCode = undefined) => {
-
     let formattedClientList = [];
     return new Promise(async (resolve, reject) => {
         
-
         const getNamesAndCountries_ = (formattedClientList, data) => {
-           
             data.forEach(i => {
                 formattedClientList.push({
                     nameId: i.nameId,
@@ -306,7 +302,6 @@ exports.getNamesAndCountries = async (clientsID, employeeId = undefined, country
             resolve(formattedClientList);
         }
 
-
         if (countryCode !== undefined && employeeId === undefined){
             await ClientDao.getClientByIDAndCountry(clientsID, countryCode).then(async data => {
                 if (data) getNamesAndCountries_(formattedClientList, data);
@@ -315,6 +310,7 @@ exports.getNamesAndCountries = async (clientsID, employeeId = undefined, country
                 reject(err);
             })
         }
+
         else if (countryCode === undefined && employeeId !== undefined){
             await ClientDao.getClientByIDAndEmployee(clientsID, employeeId).then(async data => {
                 if (data) getNamesAndCountries_(formattedClientList, data);
@@ -323,6 +319,7 @@ exports.getNamesAndCountries = async (clientsID, employeeId = undefined, country
                 reject(err);
             })
         }
+
         else if (countryCode !== undefined && employeeId !== undefined){
             await ClientDao.getClientByIDAndEmployeeAndCountry(clientsID, employeeId, countryCode).then(async data => {
                 if (data) getNamesAndCountries_(formattedClientList, data);
@@ -331,6 +328,7 @@ exports.getNamesAndCountries = async (clientsID, employeeId = undefined, country
                 reject(err);
             })
         }
+
         else{
             await ClientDao.getClientByID(clientsID).then(async data => {
                 if (data) getNamesAndCountries_(formattedClientList, data);

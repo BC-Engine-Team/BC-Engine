@@ -184,7 +184,7 @@ describe("Test Name DAO", () => {
     });
 
     describe("ND3 - getClientByIDAndCountry", () => {
-        it("ND3.1 - Should return employees corresponding to the name input", async () => {
+        it("ND3.1 - Should return clients corresponding to the country", async () => {
             
             // arrange
             let testId = [20100, 20234];
@@ -247,6 +247,160 @@ describe("Test Name DAO", () => {
 
             // act and assert
             await expect(ClientDao.getClientByIDAndCountry(testId, countryName, dbStub)).rejects
+                .toEqual(new Error("Error with the db."));
+        });
+    });
+
+
+
+
+
+
+
+    describe("ND4 - getClientByIDAndEmployee", () => {
+        it("ND4.1 - Should return client corresponding to the employeeId", async () => {
+            
+            // arrange
+            let testId = [20100, 20234];
+            let employeeId = 22211;
+
+            let dbStub = {
+                query: () => {
+                    return fakeClientListFiltered;
+                }
+            };
+
+            let expectedResponse = [
+                {
+                    nameId: fakeClientList[0].NAME_ID,
+                    name: fakeClientList[0].NAME,
+                    country: fakeClientList[0].COUNTRY_LABEL
+                },
+                {
+                    nameId: fakeClientList[1].NAME_ID,
+                    name: fakeClientList[1].NAME,
+                    country: fakeClientList[1].COUNTRY_LABEL
+                }
+            ];
+
+            // act
+            const response = await ClientDao.getClientByIDAndEmployee(testId, employeeId, dbStub);
+
+            // assert
+            expect(response).toEqual(expectedResponse);
+            
+        });
+
+        it("ND4.2 - should resolve false when Model cant fetch data", async () => {
+             // arrange
+            let dbStub = {
+                query: () => {
+                    return false;
+                }
+            };
+
+            let testId = [0];
+            let employeeId = 0;
+
+            // act and assert
+            await expect(ClientDao.getClientByIDAndEmployee(testId, employeeId, dbStub)).resolves
+                .toEqual(false);
+            
+        });
+
+        it("ND4.3 - should catch error when db throws error", async () => {
+            // arrange
+            let dbStub = {
+                query: () => {
+                    throw new Error("Error with the db.");
+                }
+            };
+
+            let testId = [0];
+            let employeeId = 0;
+
+            // act and assert
+            await expect(ClientDao.getClientByIDAndEmployee(testId, employeeId, dbStub)).rejects
+                .toEqual(new Error("Error with the db."));
+        });
+    });
+
+
+
+
+
+
+
+
+
+
+    describe("ND5 - getClientByIDAndEmployee", () => {
+        it("ND5.1 - Should return client corresponding to the employeeId and country", async () => {
+            
+            // arrange
+            let testId = [20100, 20234];
+            let employeeId = 22211;
+            let countryName = "Canada";
+
+            let dbStub = {
+                query: () => {
+                    return fakeClientListFiltered;
+                }
+            };
+
+            let expectedResponse = [
+                {
+                    nameId: fakeClientList[0].NAME_ID,
+                    name: fakeClientList[0].NAME,
+                    country: fakeClientList[0].COUNTRY_LABEL
+                },
+                {
+                    nameId: fakeClientList[1].NAME_ID,
+                    name: fakeClientList[1].NAME,
+                    country: fakeClientList[1].COUNTRY_LABEL
+                }
+            ];
+
+            // act
+            const response = await ClientDao.getClientByIDAndEmployeeAndCountry(testId, employeeId, countryName, dbStub);
+
+            // assert
+            expect(response).toEqual(expectedResponse);
+            
+        });
+
+        it("ND4.2 - should resolve false when Model cant fetch data", async () => {
+             // arrange
+            let dbStub = {
+                query: () => {
+                    return false;
+                }
+            };
+
+            let testId = [0];
+            let employeeId = 0;
+            let countryName = 0;
+
+            // act and assert
+            await expect(ClientDao.getClientByIDAndEmployeeAndCountry(testId, employeeId, countryName, dbStub)).resolves
+                .toEqual(false);
+            
+        });
+
+        it("ND4.3 - should catch error when db throws error", async () => {
+            // arrange
+            let dbStub = {
+                query: () => {
+                    throw new Error("Error with the db.");
+                }
+            };
+
+            let testId = [0];
+            let employeeId = 0;
+            let countryName = 0;
+
+            // act and assert
+            await expect(ClientDao.getClientByIDAndEmployeeAndCountry(testId, employeeId, countryName, dbStub)).rejects
                 .toEqual(new Error("Error with the db."));
         });
     });
