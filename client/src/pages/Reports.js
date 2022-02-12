@@ -68,7 +68,6 @@ const Reports = () => {
 
         await Axios.get(`${process.env.REACT_APP_API}/reports/reportTypes`, { headers: header })
             .then((response) => {
-                console.log(response)
                 if (response.data) {
                     console.log(response.data)
                     setReportTypes(response.data);
