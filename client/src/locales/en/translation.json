@@ -59,6 +59,7 @@
             "CompareBTN":"Compare",
             "All":"All",
             "labels": {
+                "Country":"Country",
                 "Employee":"Employee"
             },
             "StartDateLabel": "Start Month",
