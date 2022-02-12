@@ -426,7 +426,7 @@ module.exports = (data, averagesList) => {
                     datasets: [${buildChartDatasets()}]
                 },
                 options: {
-                    devicePixelRatio: 2,
+                    devicePixelRatio: 4,
                     title: {
                         display: true,
                         text: 'Average Collection Days over Time',
@@ -463,8 +463,6 @@ module.exports = (data, averagesList) => {
         </script>
     </html>
     `
-
-    console.log(html)
 
     return html
 }

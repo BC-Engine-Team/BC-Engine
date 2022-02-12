@@ -70,7 +70,6 @@ exports.createChartReportPDFByReportId = async (reportId) => {
 
                     await this.getChartReportPDFAverages(reportId).then(async dataAvg => {
                         for(let i = 0; i < dataAvg.length; i++) {
-                            console.log(dataAvg[i])
                             let avgObject = {
                                 year: dataAvg[i].year,
                                 employee: dataAvg[i].employee,
@@ -94,8 +93,6 @@ exports.createChartReportPDFByReportId = async (reportId) => {
                     }).catch(err => {
                         reject(err);
                     });
-
-                    console.log(averagesList)
 
                     pdf.create(pdfTemplate(data, averagesList), pdfOptions)
                     .toFile(`./docs/pdf_files/chartReport-${reportId}.pdf`, (err) => {
@@ -135,8 +132,6 @@ exports.createChartReportData = async (createdChartReport, data) => {
     return new Promise(async (resolve, reject) => {
         let preparedData = [];
 
-        console.log(data)
-
         for (let i = 0; i < data.length; i++) {
             let isEmpFiltered = data[i].label.toString().split(" - ").at(-1) === "emp";
             let year = parseInt(data[i].label.toString().split(" - ")[0]);
@@ -160,8 +155,6 @@ exports.createChartReportData = async (createdChartReport, data) => {
             preparedData.push(set);
         }
 
-        console.log(preparedData)
-
         await ChartReportDao.createDataForChartReport(createdChartReport.chartReportId, preparedData)
             .then(async data => {
                 if (data)
@@ -170,7 +163,6 @@ exports.createChartReportData = async (createdChartReport, data) => {
                     resolve(false);
             })
             .catch(err => {
-                console.log(err)
                 const response = {
                     status: err.status || 500,
                     message: err.message || "Malfunction in the B&C Engine."

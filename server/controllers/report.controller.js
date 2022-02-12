@@ -43,7 +43,6 @@ exports.createChartReportPDF = async (req, res) => {
 
     await reportService.createChartReportPDFByReportId(req.query.reportid)
         .then(response => {
-            console.log(response)
             if(response) {
                 return res.status(200).send(response);
             }

@@ -72,7 +72,6 @@ exports.createDataForChartReport = async (chartReportId, data, chartReportDataMo
                 resolve(false);
             })
             .catch(async err => {
-                console.log(err)
                 const response = {
                     status: err.status || 500,
                     message: err.message || "Could not create data."
@@ -91,7 +90,6 @@ exports.getChartReportById = async (chartReportId, chartReportModel = ChartRepor
         })
         .then(async data => {
             if (data) {
-                console.log(data)
                 resolve(data)
             }
             resolve(false);
