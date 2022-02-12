@@ -2,9 +2,7 @@ const database = require('../databases')['mssql_bosco'];
 const { QueryTypes } = require('sequelize');
 
 exports.getClientByID = async (clientIDList, db=database) => {
-
     return new Promise(async (resolve, reject) => {
-
         try{
             const data = await db.query(
                 "SELECT DISTINCT N.NAME_ID, ISNULL(N.NAME_1,'')+ISNULL(' '+N.NAME_2,'')+ISNULL(' '+N.NAME_3,'') as NAME, C.COUNTRY_LABEL \
@@ -38,7 +36,7 @@ exports.getClientByID = async (clientIDList, db=database) => {
 }
 
 
-exports.getClientByIDAndCountry = async (clientIDList, countryCode, db=database) => {
+exports.getClientByIDAndCountry = async (clientIDList, countryLabel, db=database) => {
     return new Promise(async (resolve, reject) => {
         try{
             const data = await db.query(
@@ -50,7 +48,7 @@ exports.getClientByIDAndCountry = async (clientIDList, countryCode, db=database)
                 AND C.COUNTRY_LABEL = ? \
                 ORDER BY NAME",
                 {
-                    replacements: [clientIDList, countryCode],
+                    replacements: [clientIDList, countryLabel],
                     type: QueryTypes.SELECT
                 }
             );
@@ -71,6 +69,7 @@ exports.getClientByIDAndCountry = async (clientIDList, countryCode, db=database)
         }
     });
 }
+
 
 exports.getClientByIDAndEmployee = async (clientIDList, employeeId, db=database) => {
     return new Promise(async (resolve, reject) => {
@@ -108,7 +107,7 @@ exports.getClientByIDAndEmployee = async (clientIDList, employeeId, db=database)
 }
 
 
-exports.getClientByIDAndEmployeeAndCountry = async (clientIDList, employeeId, countryCode, db=database) => {
+exports.getClientByIDAndEmployeeAndCountry = async (clientIDList, employeeId, countryLabel, db=database) => {
     return new Promise(async (resolve, reject) => {
         try{
             const data = await db.query(
@@ -120,7 +119,7 @@ exports.getClientByIDAndEmployeeAndCountry = async (clientIDList, employeeId, co
                 AND C.COUNTRY_LABEL = ? \
                 AND NQ.DROPDOWN_CODE = ?",
                 {
-                    replacements: [clientIDList, countryCode, employeeId],
+                    replacements: [clientIDList, countryLabel, employeeId],
                     type: QueryTypes.SELECT
                 }
             );
@@ -144,9 +143,7 @@ exports.getClientByIDAndEmployeeAndCountry = async (clientIDList, employeeId, co
 
     
 exports.getAllEmployeeNames = async (db = database) => {
-
     return new Promise(async (resolve, reject) => {
-
         try{
             const data = await db.query(
                 "SELECT ISNULL(NAME_1,'') + ISNULL(' '+NAME_2,'') + ISNULL(' '+NAME_3,'') AS FULLNAME, NAME_ID \

@@ -498,7 +498,4 @@ describe("Test Invoice Controller", () => {
             });
         });
     });
-
-
-
 });

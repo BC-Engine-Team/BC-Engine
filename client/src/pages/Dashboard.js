@@ -188,6 +188,19 @@ const Dashboard = () => {
                     });
                 }
                 setCountries(countryList);
+            })
+            .catch((error) => {
+                if (error.response) {
+                    if (error.response.status === 403 || error.response.status === 401) {
+                        alert(error.response.body);
+                    }
+                    else {
+                        alert("Malfunction in the B&C Engine...");
+                    }
+                }
+                else if (error.request) {
+                    alert("Could not reach b&C Engine...");
+                }
             });
     }
 
@@ -197,9 +210,6 @@ const Dashboard = () => {
         setChartData(fallbackChartData);
         localStorage.setItem("dash_previous_criteria", JSON.stringify(criteria));
         let compareData = [];
-
-        console.log(countryCode);
-
         let arrayLength = 1;
         if (compare) arrayLength = 2;
         for (let c = 0; c < arrayLength; c++) {
