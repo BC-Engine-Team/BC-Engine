@@ -1,12 +1,19 @@
 const TransacStatDao = require("../data_access_layer/daos/transac_stat.dao");
 const InvoiceAffectDao = require("../data_access_layer/daos/invoice_affect.dao");
-const NameQualityDao = require("../data_access_layer/daos/name_quality.dao");
 const ClientDao = require("../data_access_layer/daos/name.dao");
 const ClientGradingDao = require("../data_access_layer/daos/client_grading.dao")
+const CountryDao = require("../data_access_layer/daos/country.dao")
+const NameQualityDao = require("../data_access_layer/daos/name_quality.dao");
 
 
 
-exports.getAverages = async (startDateStr, endDateStr, employeeId = undefined, clientType = undefined) => {
+
+
+
+exports.getAverages = async (startDateStr, endDateStr, employeeId = undefined, clientType = undefined, countryLabel = undefined) => {
+    // make list of yearMonth [201911,202001,202002,...] to select dues
+    let yearMonthList = [];
+
     return new Promise(async (resolve, reject) => {
         // List to hold the final response
         let returnData = [];
@@ -24,6 +31,7 @@ exports.getAverages = async (startDateStr, endDateStr, employeeId = undefined, c
         let clientGradingList = [];
         let clientList = [];
 
+
         let startDate = new Date(`${startDateStr} 00:00:00`);
         let endDate = new Date(`${endDateStr} 00:00:00`);
         if (startDate > endDate) {
@@ -34,7 +42,7 @@ exports.getAverages = async (startDateStr, endDateStr, employeeId = undefined, c
             reject(response);
         }
 
-        let yearMonthList = this.getYearMonth(startDateStr, endDateStr);
+        yearMonthList = this.getYearMonth(startDateStr, endDateStr);
 
         if (employeeId !== undefined) {
             clientsByEmployee = [];
@@ -45,20 +53,23 @@ exports.getAverages = async (startDateStr, endDateStr, employeeId = undefined, c
             });
         }
 
-        // Get the list of total dues for each month
-        await this.getDues(yearMonthList, employeeId, clientType).then(async data => {
-            totalDuesList = data;
-        }).catch(err => {
-            reject(err);
-        });
 
         // prepare startDate to get billed amount for each month
         startDate.setMonth(startDate.getMonth() - 12);
         let theMonth = startDate.getMonth() + 1;
         startDateStr = startDate.getFullYear() + "-" + theMonth + "-01";
 
+
+        // Get the list of total dues for each month
+        await this.getDues(yearMonthList, employeeId, clientType, countryCode).then(async data => {
+            totalDuesList = data;
+        }).catch(err => {
+            reject(err);
+        });
+
+
         // Get list of amount billed for each month (previous 12 months)
-        await this.getBilled(startDateStr, endDateStr, yearMonthList, employeeId, clientType).then(async data => {
+        await this.getBilled(startDateStr, endDateStr, yearMonthList, employeeId, clientType, countryCode).then(async data => {
             billedList = data.billedList;
             clientIDList = data.clientIDList;
         }).catch(err => {
@@ -166,7 +177,7 @@ exports.prepareDuesQuery = (yearMonthList, employeeId, clientType) => {
 
 
 
-exports.getDues = async (yearMonthList, employeeId = undefined, clientType = undefined) => {
+exports.getDues = async (yearMonthList, employeeId = undefined, clientType = undefined, countryCode = undefined) => {
     return new Promise(async (resolve, reject) => {
         let totalDuesList = [];
 
@@ -195,39 +206,6 @@ exports.getDues = async (yearMonthList, employeeId = undefined, clientType = und
                 };
                 reject(response);
             })
-
-        // const getDues_ = (ymList, data) => {
-        //     ymList.forEach(ym => {
-        //         let totalDues = 0;
-        //         data.forEach(e => {
-        //             if (e.yearMonth === ym) {
-        //                 totalDues += (e.dueCurrent + e.due1Month + e.due2Month + e.due3Month);
-        //             }
-        //         });
-        //         totalDuesList.push({
-        //             month: ym.toString(),
-        //             totalDues: totalDues.toFixed(2)
-        //         });
-        //     });
-        //     resolve(totalDuesList);
-        // }
-
-        // if (employeeId === undefined) {
-        //     await TransacStatDao.getTransactionsStatByYearMonth(yearMonthList, clientType).then(async data => {
-        //         if (data) getDues_(yearMonthList, data);
-        //         else resolve(false);
-        //     }).catch(err => {
-        //         reject(err);
-        //     });
-        // }
-        // else {
-        //     await TransacStatDao.getTransactionsStatByYearMonthAndEmployee(yearMonthList, employeeId).then(async data => {
-        //         if (data) getDues_(yearMonthList, data);
-        //         else resolve(false);
-        //     }).catch(err => {
-        //         reject(err);
-        //     });
-        // }
     });
 }
 
@@ -268,7 +246,7 @@ exports.prepareBilledQuery = (startDate, endDate, employeeId, clientType) => {
     return query;
 }
 
-exports.getBilled = async (startDateStr, endDateStr, yearMonthList, employeeId = undefined, clientType = undefined) => {
+exports.getBilled = async (startDateStr, endDateStr, yearMonthList, employeeId = undefined, clientType = undefined, countryCode = undefined) => {
 
     let startDate = new Date(parseInt(startDateStr.substring(5, 7)) + " " + parseInt(startDateStr.substring(8)) + " " + parseInt(startDateStr.substring(0, 4)));
     let endDate = new Date(parseInt(endDateStr.substring(5, 7)) + " " + parseInt(endDateStr.substring(8)) + " " + parseInt(endDateStr.substring(0, 4)));
@@ -290,7 +268,6 @@ exports.getBilled = async (startDateStr, endDateStr, yearMonthList, employeeId =
 
                     yearMonthList.forEach(ym => {
                         let billed = 0;
-
                         data.forEach(i => {
                             if (i.invoiceDate >= startDate && i.invoiceDate < endDate) {
                                 billed += i.amount;
@@ -325,63 +302,87 @@ exports.getBilled = async (startDateStr, endDateStr, yearMonthList, employeeId =
                 }
                 reject(response);
             });
-
-        // const getBilled_ = (yearMonthLists, data) => {
-        //     let billedList = [];
-        //     let clientIDList = [];
-        //     let returnData = {};
-
-        //     yearMonthLists.forEach(ym => {
-        //         let billed = 0;
-
-        //         data.forEach(i => {
-        //             if (i.invoiceDate >= startDate && i.invoiceDate < endDate) {
-        //                 billed += i.amount;
-        //                 clientIDList.push(i.actorId);
-        //             }
-        //         });
-
-        //         billedList.push({
-        //             month: ym,
-        //             billed: billed
-        //         });
-
-        //         startDate.setUTCMonth(startDate.getUTCMonth() + 1);
-        //         endDate.setUTCMonth(endDate.getUTCMonth() + 1);
-        //     });
-        //     clientIDList = [...new Set(clientIDList)];
-
-        //     returnData = {
-        //         billedList: billedList,
-        //         clientIDList: clientIDList
-        //     };
-
-        //     resolve(returnData);
-        // }
-
-        // if (clientsList === undefined) {
-        //     await InvoiceAffectDao.getInvoicesByDate(startDateStr, endDateStr).then(async data => {
-        //         if (data) getBilled_(yearMonthList, data);
-        //         else resolve(false);
-        //     }).catch(err => {
-        //         reject(err);
-        //     })
-        // }
-        // else {
-        //     if (clientsList.length === 0) {
-        //         getBilled_(yearMonthList, [{ invoiceDate: null, billed: null, actorId: null }])
-        //     }
-        //     else {
-        //         await InvoiceAffectDao.getInvoicesByDateAndEmployee(startDateStr, endDateStr, clientsList).then(async data => {
-        //             if (data) getBilled_(yearMonthList, data);
-        //             else resolve(false);
-        //         }).catch(err => {
-        //             reject(err);
-        //         });
-        //     }
-        // }
     });
 }
+
+// method to get the names and countries based by clients id
+exports.getNamesAndCountries = async (clientsID, employeeId = undefined, countryLabel = undefined) => {
+    let formattedClientList = [];
+    return new Promise(async (resolve, reject) => {
+
+        const getNamesAndCountries_ = (formattedClientList, data) => {
+            data.forEach(i => {
+                formattedClientList.push({
+                    nameId: i.nameId,
+                    name: i.name,
+                    country: i.country,
+                    grading: ""
+                });
+            });
+
+            resolve(formattedClientList);
+        }
+
+        if (countryLabel !== undefined && employeeId === undefined) {
+            await ClientDao.getClientByIDAndCountry(clientsID, countryLabel).then(async data => {
+                if (data) getNamesAndCountries_(formattedClientList, data);
+                else resolve(false);
+            }).catch(err => {
+                reject(err);
+            })
+        }
+
+        else if (countryLabel === undefined && employeeId !== undefined) {
+            await ClientDao.getClientByIDAndEmployee(clientsID, employeeId).then(async data => {
+                if (data) getNamesAndCountries_(formattedClientList, data);
+                else resolve(false);
+            }).catch(err => {
+                reject(err);
+            })
+        }
+
+        else if (countryLabel !== undefined && employeeId !== undefined) {
+            await ClientDao.getClientByIDAndEmployeeAndCountry(clientsID, employeeId, countryLabel).then(async data => {
+                if (data) getNamesAndCountries_(formattedClientList, data);
+                else resolve(false);
+            }).catch(err => {
+                reject(err);
+            })
+        }
+
+        else {
+            await ClientDao.getClientByID(clientsID).then(async data => {
+                if (data) getNamesAndCountries_(formattedClientList, data);
+                else resolve(false);
+            }).catch(err => {
+                reject(err);
+            })
+        }
+    });
+}
+
+//method to get the client grading
+exports.getClientGrading = async (idList) => {
+    let gradingList = [];
+
+    return new Promise(async (resolve, reject) => {
+        await ClientGradingDao.getClientGrading(idList).then(async data => {
+            if (data) {
+                data.forEach(g => {
+                    gradingList.push({
+                        nameId: g.nameId,
+                        grading: g.grading
+                    });
+                });
+                resolve(gradingList);
+            }
+            resolve(false);
+        }).catch(err => {
+            reject(err);
+        })
+    });
+}
+
 
 exports.getClientsByEmployee = async (employeeId) => {
     return new Promise(async (resolve, reject) => {
@@ -393,6 +394,7 @@ exports.getClientsByEmployee = async (employeeId) => {
         });
     });
 }
+
 
 exports.getYearMonth = (startDateStr, endDateStr) => {
     let yearMonthList = [];
@@ -415,55 +417,4 @@ exports.getYearMonth = (startDateStr, endDateStr) => {
     }
 
     return yearMonthList;
-}
-
-// method to get the names and countries based by clients id
-exports.getNamesAndCountries = async (clientsID) => {
-
-    let formattedClientList = [];
-    return new Promise(async (resolve, reject) => {
-        await ClientDao.getClientByID(clientsID.length === 0 ? [-1000] : clientsID).then(async data => {
-
-            if (data) {
-                data.forEach(i => {
-
-                    formattedClientList.push({
-                        nameId: i.nameId,
-                        name: i.name,
-                        country: i.country,
-                        grading: ""
-                    });
-                });
-
-                resolve(formattedClientList);
-            }
-            resolve(false);
-        }).catch(err => {
-            reject(err);
-        })
-    });
-}
-
-
-//method to get the client grading
-exports.getClientGrading = async (idList) => {
-
-    let gradingList = [];
-
-    return new Promise(async (resolve, reject) => {
-        await ClientGradingDao.getClientGrading(idList).then(async data => {
-            if (data) {
-                data.forEach(g => {
-                    gradingList.push({
-                        nameId: g.nameId,
-                        grading: g.grading
-                    });
-                });
-                resolve(gradingList);
-            }
-            resolve(false);
-        }).catch(err => {
-            reject(err);
-        })
-    });
 }
