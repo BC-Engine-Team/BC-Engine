@@ -1,0 +1,7 @@
+.loadingChartReport {
+    height: 36px;
+    align-items: center;
+    display: flex;
+    margin: 0 4px;
+    padding: 0 6px;
+}

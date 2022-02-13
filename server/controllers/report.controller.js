@@ -38,7 +38,6 @@ exports.createChartReport = async (req, res) => {
 }
 
 exports.createChartReportPDF = async (req, res) => {
-    console.log(req.body)
     if (!req.body.reportid)
     return res.status(400).send({ message: "Content cannot be empty." });
 
@@ -59,15 +58,12 @@ exports.fetchChartReportPDF = async (req, res) => {
     if (!req.query.reportid)
     return res.status(400).send({ message: "Content cannot be empty." });
 
-    await res.sendFile(`./docs/pdf_files/chartReport-${req.query.reportid}.pdf`)
-        .then(response => {
-            if(response) {
-                return res.status(200).send(response);
-            }
-            return res.status(500).send({ message: "The data could not be fetched." });
-        })
-        .catch(err => {
-            return res.status(err.status || 500)
-                .send({ message: !!err.message ? err.message : "Malfunction in the B&C Engine." });
-        });
+    await res.sendFile(`${__dirname.replace("controllers", "")}docs\\pdf_files\\chartReport-${req.query.reportid}.pdf`, {}, (err) => {
+        if(err) {
+            return res.status(err.status).end();
+        }
+        else {
+            return res.status(200)
+        }
+    });
 }
