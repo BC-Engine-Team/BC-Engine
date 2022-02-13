@@ -111,8 +111,10 @@ const Dashboard = () => {
             id: compareEmployeeChecked ? -1 : null,
             name: compareEmployeeChecked ? "All" : null
         },
-        countryId: '-1',
-        country: "-1",
+        country: {
+            id: -1,
+            name: "All"
+        },
         clientType: "Any",
         ageOfAccount: "All",
         accountType: 'Receivable',
@@ -204,7 +206,7 @@ const Dashboard = () => {
     }
 
 
-    const chart = async (employeeId = -1, countryCode = -1, compare = false) => {
+    const chart = async (compare = false) => {
         setChartLoading(true);
         setChartData(fallbackChartData);
         localStorage.setItem("dash_previous_criteria", JSON.stringify(criteria));
@@ -222,9 +224,10 @@ const Dashboard = () => {
             let endDate = new Date(criteria.endYear, criteria.endMonth, 1).toISOString().split("T")[0];
 
             let param = {
-                employeeId: employeeId === -1 ? undefined : employeeId,
+                employeeId: parseInt(criteria.employee1.id) === -1 ? undefined : criteria.employee1.id,
                 clientType: criteria.clientType === "Any" ? undefined : criteria.clientType,
-                country: criteria.countryId === -1 ? undefined : criteria.countryId
+                countryCode: parseInt(criteria.country.id) === -1 ? undefined : criteria.country.id,
+                countryLabel: parseInt(criteria.country.id) === -1 ? undefined : criteria.country.name
             };
 
             if (c === 1) {
@@ -367,8 +370,8 @@ const Dashboard = () => {
                     employee1Name: criteria.employee1.name,
                     employee2Id: compareEmployeeChecked ? -1 : null,
                     employee2Name: compareEmployeeChecked ? "All" : null,
-                    countryId: criteria.countryId,
-                    country: criteria.country,
+                    countryId: criteria.country.id,
+                    country: criteria.country.name,
                     clientType: criteria.clientType,
                     ageOfAccount: criteria.ageOfAccount,
                     accountType: criteria.accountType,
@@ -416,7 +419,7 @@ const Dashboard = () => {
                 }
             }
 
-            await chart(parseInt(criteria.employee1.id), criteria.country, compareEmployeeChecked);
+            await chart(compareEmployeeChecked);
         }
     };
 
@@ -636,11 +639,16 @@ const Dashboard = () => {
                                 <InputGroup className="mb-2">
 
                                     <Form.Select id="countryCriteriaDashboard"
-                                        onChange={(e) => setField('country', e.target.value)}>
+                                        onChange={(e) => {
+                                            setField('country', {
+                                                id: e.target.value,
+                                                name: e.target.options[e.target.selectedIndex].text
+                                            });
+                                        }}>
                                         <option key={-1} value={-1}>{t('dashboard.criteria.All')}</option>
                                         {countries.map(c => {
                                             return (
-                                                <option key={c.countryCode} value={c.countryLabel}>{c.countryLabel}</option>
+                                                <option key={c.countryCode} value={c.countryCode}>{c.countryLabel}</option>
                                             )
                                         })}
                                     </Form.Select>

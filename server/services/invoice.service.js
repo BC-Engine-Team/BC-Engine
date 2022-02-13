@@ -2,18 +2,10 @@ const TransacStatDao = require("../data_access_layer/daos/transac_stat.dao");
 const InvoiceAffectDao = require("../data_access_layer/daos/invoice_affect.dao");
 const ClientDao = require("../data_access_layer/daos/name.dao");
 const ClientGradingDao = require("../data_access_layer/daos/client_grading.dao")
-const CountryDao = require("../data_access_layer/daos/country.dao")
 const NameQualityDao = require("../data_access_layer/daos/name_quality.dao");
+const CountryDao = require("../data_access_layer/daos/country.dao");
 
-
-
-
-
-
-exports.getAverages = async (startDateStr, endDateStr, employeeId = undefined, clientType = undefined, countryLabel = undefined) => {
-    // make list of yearMonth [201911,202001,202002,...] to select dues
-    let yearMonthList = [];
-
+exports.getAverages = async (startDateStr, endDateStr, employeeId = undefined, clientType = undefined, countryLabel = undefined, countryCode = undefined) => {
     return new Promise(async (resolve, reject) => {
         // List to hold the final response
         let returnData = [];
@@ -22,9 +14,6 @@ exports.getAverages = async (startDateStr, endDateStr, employeeId = undefined, c
         let averagesList = [];
         let totalDuesList = [];
         let billedList = [];
-
-        // List used to filter Bills by employee
-        let clientsByEmployee;
 
         // Lists used for the Clients Table
         let clientIDList = [];
@@ -42,26 +31,16 @@ exports.getAverages = async (startDateStr, endDateStr, employeeId = undefined, c
             reject(response);
         }
 
-        yearMonthList = this.getYearMonth(startDateStr, endDateStr);
-
-        if (employeeId !== undefined) {
-            clientsByEmployee = [];
-            await this.getClientsByEmployee(employeeId).then(async data => {
-                clientsByEmployee = data;
-            }).catch(err => {
-                reject(err);
-            });
-        }
-
+        // make list of yearMonth [201911,202001,202002,...] to select dues
+        let yearMonthList = this.getYearMonth(startDateStr, endDateStr);
 
         // prepare startDate to get billed amount for each month
         startDate.setMonth(startDate.getMonth() - 12);
         let theMonth = startDate.getMonth() + 1;
         startDateStr = startDate.getFullYear() + "-" + theMonth + "-01";
 
-
         // Get the list of total dues for each month
-        await this.getDues(yearMonthList, employeeId, clientType, countryCode).then(async data => {
+        await this.getDues(yearMonthList, employeeId, clientType, countryLabel).then(async data => {
             totalDuesList = data;
         }).catch(err => {
             reject(err);
@@ -77,7 +56,7 @@ exports.getAverages = async (startDateStr, endDateStr, employeeId = undefined, c
         });
 
         // Get List of Client Id, Name and Country
-        await this.getNamesAndCountries(clientIDList).then(async data => {
+        await this.getNamesAndCountries(clientIDList.length === 0 ? [-1000] : clientIDList).then(async data => {
             clientList = data;
         }).catch(err => {
             reject(err);
@@ -137,7 +116,7 @@ exports.getAverages = async (startDateStr, endDateStr, employeeId = undefined, c
     });
 }
 
-exports.prepareDuesQuery = (yearMonthList, employeeId, clientType) => {
+exports.prepareDuesQuery = (yearMonthList, employeeId, clientType, countryLabel) => {
     let query = {
         queryString: "SELECT ACS.DUE_CURRENT, ACS.DUE_1_MONTH, ACS.DUE_2_MONTH, ACS.DUE_3_MONTH, ACS.YEAR_MONTH ",
         replacements: [yearMonthList]
@@ -167,7 +146,14 @@ exports.prepareDuesQuery = (yearMonthList, employeeId, clientType) => {
         whereString = whereString.concat("AND NC.NAME_ID=NQ2.NAME_ID\
                                             AND NQ2.QUALITY_TYPE_ID=3\
                                             AND NQ2.DROPDOWN_CODE=?");
+
         query.replacements.push(clientType.toUpperCase());
+    }
+
+    if (countryLabel !== undefined) {
+        fromString = fromString.concat(", ACCOUNTING_NAME AN ");
+        whereString = whereString.concat(" AND ACS.ACC_NAME_ID=AN.ACC_NAME_ID AND AN.ACC_NAME_COUNTRY=?");
+        query.replacements.push(countryLabel);
     }
 
     query.queryString = query.queryString.concat(fromString, whereString);
@@ -177,11 +163,11 @@ exports.prepareDuesQuery = (yearMonthList, employeeId, clientType) => {
 
 
 
-exports.getDues = async (yearMonthList, employeeId = undefined, clientType = undefined, countryCode = undefined) => {
+exports.getDues = async (yearMonthList, employeeId = undefined, clientType = undefined, countryLabel = undefined) => {
     return new Promise(async (resolve, reject) => {
         let totalDuesList = [];
 
-        let preparedQuery = this.prepareDuesQuery(yearMonthList, employeeId, clientType);
+        let preparedQuery = this.prepareDuesQuery(yearMonthList, employeeId, clientType, countryLabel);
 
         await TransacStatDao.getTransactionsStatByYearMonth(preparedQuery)
             .then(async data => {
@@ -209,7 +195,7 @@ exports.getDues = async (yearMonthList, employeeId = undefined, clientType = und
     });
 }
 
-exports.prepareBilledQuery = (startDate, endDate, employeeId, clientType) => {
+exports.prepareBilledQuery = (startDate, endDate, employeeId, clientType, countryCode) => {
     let query = {
         queryString: "SELECT IH.INVOCIE_DATE, IH.ACTOR_ID, BIA.AFFECT_AMOUNT ",
         replacements: [startDate, endDate]
@@ -241,6 +227,14 @@ exports.prepareBilledQuery = (startDate, endDate, employeeId, clientType) => {
         query.replacements.push(clientType.toUpperCase());
     }
 
+    if (countryCode !== undefined) {
+        fromString = fromString.includes("LEFT OUTER JOIN [Bosco reduction].[dbo].NAME_CONNECTION NC ON NC.CONNECTION_ID=1 AND NC.CONNECTION_NAME_ID=CONVERT(nvarchar, IH.ACTOR_ID)") ?
+            fromString : fromString.concat(" LEFT OUTER JOIN [Bosco reduction].[dbo].NAME_CONNECTION NC ON NC.CONNECTION_ID=1 AND NC.CONNECTION_NAME_ID=CONVERT(nvarchar, IH.ACTOR_ID) ");
+        fromString = fromString.concat(", [Bosco reduction].[dbo].NAME N ");
+        whereString = whereString.concat(" AND N.NAME_ID=NC.NAME_ID AND N.LEGAL_COUNTRY_CODE=? ");
+        query.replacements.push(countryCode);
+    }
+
     query.queryString = query.queryString.concat(fromString, whereString);
 
     return query;
@@ -257,7 +251,7 @@ exports.getBilled = async (startDateStr, endDateStr, yearMonthList, employeeId =
 
     return new Promise(async (resolve, reject) => {
 
-        let preparedQuery = this.prepareBilledQuery(startDateStr, endDateStr, employeeId, clientType);
+        let preparedQuery = this.prepareBilledQuery(startDateStr, endDateStr, employeeId, clientType, countryCode);
 
         await InvoiceAffectDao.getInvoicesByDate(preparedQuery)
             .then(async data => {
@@ -417,4 +411,26 @@ exports.getYearMonth = (startDateStr, endDateStr) => {
     }
 
     return yearMonthList;
+}
+
+
+exports.getCountriesName = async () => {
+    let countryList = [];
+
+    return new Promise(async (resolve, reject) => {
+        await CountryDao.getAllCountries().then(async data => {
+            if (data) {
+                data.forEach(country => {
+                    countryList.push({
+                        countryCode: country.countryCode,
+                        countryLabel: country.countryLabel
+                    });
+                });
+                resolve(countryList);
+            }
+            resolve(false);
+        }).catch(err => {
+            reject(err);
+        });
+    });
 }
