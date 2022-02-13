@@ -161,29 +161,32 @@ exports.prepareDuesQuery = (yearMonthList, employeeId, clientType, countryLabel)
     return query;
 }
 
-
-
 exports.getDues = async (yearMonthList, employeeId = undefined, clientType = undefined, countryLabel = undefined) => {
     return new Promise(async (resolve, reject) => {
+        console.log("bro what the fuck")
         let totalDuesList = [];
 
         let preparedQuery = this.prepareDuesQuery(yearMonthList, employeeId, clientType, countryLabel);
 
+        console.log(preparedQuery)
         await TransacStatDao.getTransactionsStatByYearMonth(preparedQuery)
             .then(async data => {
-                yearMonthList.forEach(ym => {
-                    let totalDues = 0;
-                    data.forEach(e => {
-                        if (e.yearMonth === ym) {
-                            totalDues += (e.dueCurrent + e.due1Month + e.due2Month + e.due3Month);
-                        }
+                if (data) {
+                    yearMonthList.forEach(ym => {
+                        let totalDues = 0;
+                        data.forEach(e => {
+                            if (e.yearMonth === ym) {
+                                totalDues += (e.dueCurrent + e.due1Month + e.due2Month + e.due3Month);
+                            }
+                        });
+                        totalDuesList.push({
+                            month: ym.toString(),
+                            totalDues: totalDues.toFixed(2)
+                        });
                     });
-                    totalDuesList.push({
-                        month: ym.toString(),
-                        totalDues: totalDues.toFixed(2)
-                    });
-                });
-                resolve(totalDuesList);
+                    resolve(totalDuesList);
+                }
+                resolve(false);
             })
             .catch(err => {
                 const response = {
@@ -289,7 +292,6 @@ exports.getBilled = async (startDateStr, endDateStr, yearMonthList, employeeId =
                 resolve(false);
             })
             .catch(err => {
-                console.log(err)
                 const response = {
                     status: err.status || 500,
                     message: err.message || "Could not fetch bills."
@@ -377,17 +379,6 @@ exports.getClientGrading = async (idList) => {
     });
 }
 
-
-exports.getClientsByEmployee = async (employeeId) => {
-    return new Promise(async (resolve, reject) => {
-        await NameQualityDao.getClientsByEmployee(employeeId).then(async data => {
-            if (data) resolve(data)
-            resolve(false);
-        }).catch(err => {
-            reject(err);
-        });
-    });
-}
 
 
 exports.getYearMonth = (startDateStr, endDateStr) => {

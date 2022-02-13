@@ -19,43 +19,20 @@ let returnedAccountStat = {
 
 let fakeStatsList = [
     {
-        dataValues: {
-            yearMonth: 202011,
-            dueCurrent: 100,
-            due1Month: 200,
-            due2Month: 50,
-            due3Month: 20
-        }
-    },
-    {
-        dataValues: {
-            yearMonth: 202012,
-            dueCurrent: 100,
-            due1Month: 200,
-            due2Month: 50,
-            due3Month: 20
-        }
-    }
-];
-
-let fakeStatsListWithColumnName = [
-    {
         YEAR_MONTH: 202011,
-        DUE_CURRENT: 100,
-        DUE_1_MONTH: 200,
-        DUE_2_MONTH: 50,
-        DUE_3_MONTH: 20
+        DUE_1_MONTH: 100,
+        DUE_2_MONTH: 200,
+        DUE_3_MONTH: 50,
+        DUE_CURRENT: 20
     },
     {
         YEAR_MONTH: 202012,
-        DUE_CURRENT: 100,
-        DUE_1_MONTH: 200,
-        DUE_2_MONTH: 50,
-        DUE_3_MONTH: 20
+        DUE_1_MONTH: 100,
+        DUE_2_MONTH: 200,
+        DUE_3_MONTH: 50,
+        DUE_CURRENT: 20
     }
 ];
-
-let yearMonthList = [202011, 202012];
 
 let SequelizeMock = require('sequelize-mock');
 const dbMock = new SequelizeMock();
@@ -78,267 +55,71 @@ describe("Test Transac Stat DAO", () => {
     ['yearMonth', 'dueCurrent', 'due1Month', 'due2Month', 'due3Month', 'amount', 'transactionDate', 'transactionRef', 'connectionId']
         .forEach(checkPropertyExists(instance));
 
+
+    let dbStub = {
+        query: () => {
+            return Promise.resolve(fakeStatsList);
+        }
+    };
+
+    let fakeQuery = {
+        queryString: "fakeQuery",
+        replacements: ["fakeReplace"]
+    };
+
     describe("TD1 - getTransactionsStatByYearMonth", () => {
         it("TD1.1 - should return list of stats in correct format", async () => {
             // arrange
-            let expectedResponse = [fakeStatsList[0].dataValues, fakeStatsList[1].dataValues];
-            AccountingClientStatMock.$queryInterface.$useHandler(function (query, queryOptions, done) {
-                return Promise.resolve(fakeStatsList);
-            });
+            let expectedResponse = [
+                {
+                    yearMonth: fakeStatsList[0].YEAR_MONTH,
+                    dueCurrent: fakeStatsList[0].DUE_CURRENT,
+                    due1Month: fakeStatsList[0].DUE_1_MONTH,
+                    due2Month: fakeStatsList[0].DUE_2_MONTH,
+                    due3Month: fakeStatsList[0].DUE_3_MONTH
+                },
+                {
+                    yearMonth: fakeStatsList[1].YEAR_MONTH,
+                    dueCurrent: fakeStatsList[1].DUE_CURRENT,
+                    due1Month: fakeStatsList[1].DUE_1_MONTH,
+                    due2Month: fakeStatsList[1].DUE_2_MONTH,
+                    due3Month: fakeStatsList[1].DUE_3_MONTH
+                }
+            ];
 
             // act and assert
-            await expect(TransacStatDao.getTransactionsStatByYearMonth(yearMonthList, AccountingClientStatMock)).resolves
+            await expect(TransacStatDao.getTransactionsStatByYearMonth(fakeQuery, dbStub)).resolves
                 .toEqual(expectedResponse);
         });
 
         it("TD1.2 - should return false when model cant fetch data", async () => {
             // arrange
-            AccountingClientStatMock.$queryInterface.$useHandler(function (query, queryOptions, done) {
-                return Promise.resolve(false);
-            });
+            dbStub = {
+                query: () => {
+                    return Promise.resolve(false);
+                }
+            };
 
             // act and assert
-            await expect(TransacStatDao.getTransactionsStatByYearMonth(yearMonthList, AccountingClientStatMock)).resolves
+            await expect(TransacStatDao.getTransactionsStatByYearMonth(fakeQuery, dbStub)).resolves
                 .toEqual(false);
         });
 
         it("TD1.3 - should return error when model throws error", async () => {
             // arrange
-            AccountingClientStatMock.$queryInterface.$useHandler(function (query, queryOptions, done) {
-                return Promise.reject({ message: "Error with the model." });
-            });
-
-            // act and assert
-            await expect(TransacStatDao.getTransactionsStatByYearMonth(yearMonthList, AccountingClientStatMock)).rejects
-                .toEqual({ message: "Error with the model." });
-        });
-    });
-
-    describe("TD2 - getTransactionsStatByYearMonthAndEmployee", () => {
-        it("TD2.1 - Should return list of clients", async () => {
-            // arrange
-            let employeeId = [22769];
-            let expectedResponse = [fakeStatsList[0].dataValues, fakeStatsList[1].dataValues];
-
-            let dbStub = {
-                query: () => {
-                    return fakeStatsListWithColumnName;
-                }
-            };
-
-            // act and assert
-            await expect(TransacStatDao.getTransactionsStatByYearMonthAndEmployee(yearMonthList, employeeId, dbStub)).resolves
-                .toEqual(expectedResponse);
-
-        });
-
-        it("TD2.2 - Should resolve false when Model cant fetch data", async () => {
-            // arrange
-            let employeeId = [22769];
-
-            let dbStub = {
-                query: () => {
-                    return false;
-                }
-            };
-
-            await expect(TransacStatDao.getTransactionsStatByYearMonthAndEmployee(yearMonthList, employeeId, dbStub)).resolves
-                .toEqual(false);
-        });
-
-        it("TD2.3 - Should reject error with 500 status and predefined message when model does not define them", async () => {
-            // arrange
-            let employeeId = [22769];
-
-            let expectedError = {
+            let expectedResponse = {
                 status: 500,
-                message: "some error occured"
+                message: "Could not fetch transactions."
             };
-
-            let dbStub = {
+            dbStub = {
                 query: () => {
-                    return Promise.reject(expectedError);
+                    return Promise.reject({})
                 }
             };
 
             // act and assert
-            await expect(TransacStatDao.getTransactionsStatByYearMonthAndEmployee(yearMonthList, employeeId, dbStub)).rejects
-                .toEqual(expectedError);
-        });
-
-        it("TD2.4 - Should reject error when Model throws error with defined status and message", async () => {
-            // arrange
-            let employeeId = [22769];
-
-            let expectedError = {
-                status: 404,
-                message: "Error."
-            };
-
-            let dbStub = {
-                query: () => {
-                    return Promise.reject(expectedError);
-                }
-            };
-
-            // act and assert
-            await expect(TransacStatDao.getTransactionsStatByYearMonthAndEmployee(yearMonthList, employeeId, dbStub)).rejects
-                .toEqual(expectedError);
-        });
-    });
-
-
-    describe("TD3 - getTransactionsStatByYearMonthAndCountry", () => {
-        it("TD3.1 - Should return list of stats based by country", async () => {
-            // arrange
-            let countryName = "Canada";
-            let expectedResponse = [fakeStatsList[0].dataValues, fakeStatsList[1].dataValues];
-
-            let dbStub = {
-                query: () => {
-                    return fakeStatsListWithColumnName;
-                }
-            };
-
-            // act and assert
-            await expect(TransacStatDao.getTransactionsStatByYearMonthAndCountry(yearMonthList, countryName, dbStub)).resolves
+            await expect(TransacStatDao.getTransactionsStatByYearMonth(fakeQuery, dbStub)).rejects
                 .toEqual(expectedResponse);
-
-        });
-
-        it("TD3.2 - Should resolve false when Model cant fetch data", async () => {
-            // arrange
-            let countryName = "Canada";
-
-            let dbStub = {
-                query: () => {
-                    return false;
-                }
-            };
-
-            await expect(TransacStatDao.getTransactionsStatByYearMonthAndCountry(yearMonthList, countryName, dbStub)).resolves
-                .toEqual(false);
-        });
-
-        it("TD3.3 - Should reject error with 500 status and predefined message when model does not define them", async () => {
-            // arrange
-            let countryName = "Canada";
-
-            let expectedError = {
-                status: 500,
-                message: "some error occured"
-            };
-
-            let dbStub = {
-                query: () => {
-                    return Promise.reject(expectedError);
-                }
-            };
-
-            // act and assert
-            await expect(TransacStatDao.getTransactionsStatByYearMonthAndCountry(yearMonthList, countryName, dbStub)).rejects
-                .toEqual(expectedError);
-        });
-
-        it("TD3.4 - Should reject error when Model throws error with defined status and message", async () => {
-            // arrange
-            let countryName = "Canada";
-
-            let expectedError = {
-                status: 404,
-                message: "Error."
-            };
-
-            let dbStub = {
-                query: () => {
-                    return Promise.reject(expectedError);
-                }
-            };
-
-            // act and assert
-            await expect(TransacStatDao.getTransactionsStatByYearMonthAndCountry(yearMonthList, countryName, dbStub)).rejects
-                .toEqual(expectedError);
         });
     });
-
-    describe("TD4 - getTransactionsStatByYearMonthAndEmployeeAndCountry", () => {
-        it("TD4.1 - Should return list of stats based by employee and country", async () => {
-            // arrange
-            let employeeId = [22769];
-            let countryName = "Canada";
-            let expectedResponse = [fakeStatsList[0].dataValues, fakeStatsList[1].dataValues];
-
-            let dbStub = {
-                query: () => {
-                    return fakeStatsListWithColumnName;
-                }
-            };
-
-            // act and assert
-            await expect(TransacStatDao.getTransactionsStatByYearMonthAndEmployeeAndCountry(yearMonthList, employeeId, countryName, dbStub)).resolves
-                .toEqual(expectedResponse);
-
-        });
-
-        it("TD4.2 - Should resolve false when Model cant fetch data", async () => {
-            // arrange
-            let employeeId = [22769];
-            let countryName = "Canada";
-
-            let dbStub = {
-                query: () => {
-                    return false;
-                }
-            };
-
-            await expect(TransacStatDao.getTransactionsStatByYearMonthAndEmployeeAndCountry(yearMonthList, employeeId, countryName, dbStub)).resolves
-                .toEqual(false);
-        });
-
-        it("TD4.3 - Should reject error with 500 status and predefined message when model does not define them", async () => {
-            // arrange
-            let employeeId = [22769];
-            let countryName = "Canada";
-
-            let expectedError = {
-                status: 500,
-                message: "some error occured"
-            };
-
-            let dbStub = {
-                query: () => {
-                    return Promise.reject(expectedError);
-                }
-            };
-
-            // act and assert
-            await expect(TransacStatDao.getTransactionsStatByYearMonthAndEmployeeAndCountry(yearMonthList, employeeId, countryName, dbStub)).rejects
-                .toEqual(expectedError);
-        });
-
-        it("TD4.4 - Should reject error when Model throws error with defined status and message", async () => {
-
-            // arrange
-            let employeeId = [22769];
-            let countryName = "Canada";
-
-            let expectedError = {
-                status: 404,
-                message: "Error."
-            };
-
-            let dbStub = {
-                query: () => {
-                    return Promise.reject(expectedError);
-                }
-            };
-
-            // act and assert
-            await expect(TransacStatDao.getTransactionsStatByYearMonthAndEmployeeAndCountry(yearMonthList, employeeId, countryName, dbStub)).rejects
-                .toEqual(expectedError);
-        });
-    });
-
-
-
 });
