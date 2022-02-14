@@ -1,41 +1,25 @@
-const { sequelize,
-    dataTypes,
-    checkModelName,
-    checkPropertyExists,
-    checkHookDefined
-} = require('sequelize-test-helpers');
-const ClientDao = require("../../data_access_layer/daos/name.dao");
-const NameModel = require('../../data_access_layer/models/mssql_bosco/name.model')(sequelize, dataTypes);
+var { expect, jest } = require('@jest/globals');
 
+const NameDao = require("../../data_access_layer/daos/name.dao");
 
-let fakeClientList = [
+let fakeGetClientDbQueryResponse = [
     {
         NAME_ID: 20100,
         NAME: "National Research Council of Canada",
-        COUNTRY_LABEL: "Canada"
+        COUNTRY_LABEL: "Canada",
+        GRADING: "C"
     },
     {
         NAME_ID: 20234,
         NAME: "Groupe Patrick Ménard Assurances Inc. Groupe Jetté",
-        COUNTRY_LABEL: "Canada"
+        COUNTRY_LABEL: "Canada",
+        GRADING: "B"
     },
     {
         NAME_ID: 20330,
         NAME: "Martin Aubé",
-        COUNTRY_LABEL: "Japan"
-    }
-];
-
-let fakeClientListFiltered = [
-    {
-        NAME_ID: 20100,
-        NAME: "National Research Council of Canada",
-        COUNTRY_LABEL: "Canada"
-    },
-    {
-        NAME_ID: 20234,
-        NAME: "Groupe Patrick Ménard Assurances Inc. Groupe Jetté",
-        COUNTRY_LABEL: "Canada"
+        COUNTRY_LABEL: "Japan",
+        GRADING: null
     }
 ];
 
@@ -48,84 +32,82 @@ let returnedEmployeeList = [
         NAME_ID: 29569,
         FULLNAME: 'France Cote'
     }
-]
+];
 
-let SequelizeMock = require('sequelize-mock');
-const dbMock = new SequelizeMock();
+let fakeClientIdList = [12345, 12346, 12347];
+
+
 
 describe("Test Name DAO", () => {
-    const instance = new NameModel();
 
-    // testing the chart report model properties
-    checkModelName(NameModel)('NAME');
-    ['nameID', 'firstName', 'lastName']
-        .forEach(checkPropertyExists(instance));
+    describe("ND1 - getClientInformation", () => {
 
-    describe("ND1 - getClientByID", () => {
-        it("ND1.1 - Should return list of clients", async () => {
-            
-            // arrange
-            let testId = [20100, 20234, 20330];
+        describe("ND1.1 - given valid response from db query", () => {
+            it("ND1.1.1 - Should return list of clients", async () => {
+                // arrange
+                let expectedResponse = [
+                    {
+                        nameId: fakeGetClientDbQueryResponse[0].NAME_ID,
+                        name: fakeGetClientDbQueryResponse[0].NAME,
+                        country: fakeGetClientDbQueryResponse[0].COUNTRY_LABEL,
+                        grading: fakeGetClientDbQueryResponse[0].GRADING
+                    },
+                    {
+                        nameId: fakeGetClientDbQueryResponse[1].NAME_ID,
+                        name: fakeGetClientDbQueryResponse[1].NAME,
+                        country: fakeGetClientDbQueryResponse[1].COUNTRY_LABEL,
+                        grading: fakeGetClientDbQueryResponse[1].GRADING
+                    },
+                    {
+                        nameId: fakeGetClientDbQueryResponse[2].NAME_ID,
+                        name: fakeGetClientDbQueryResponse[2].NAME,
+                        country: fakeGetClientDbQueryResponse[2].COUNTRY_LABEL,
+                        grading: "N/A"
+                    }
+                ];
+                let dbStub = {
+                    query: () => {
+                        return Promise.resolve(fakeGetClientDbQueryResponse);
+                    }
+                };
 
-            let dbStub = {
-                query: () => {
-                    return fakeClientList;
-                }
-            };
-
-            let expectedResponse = [
-                {
-                    nameId: fakeClientList[0].NAME_ID,
-                    name: fakeClientList[0].NAME,
-                    country: fakeClientList[0].COUNTRY_LABEL
-                },
-                {
-                    nameId: fakeClientList[1].NAME_ID,
-                    name: fakeClientList[1].NAME,
-                    country: fakeClientList[1].COUNTRY_LABEL
-                },
-                {
-                    nameId: fakeClientList[2].NAME_ID,
-                    name: fakeClientList[2].NAME,
-                    country: fakeClientList[2].COUNTRY_LABEL
-                }
-            ];
-
-            // act
-            const response = await ClientDao.getClientByID(testId, dbStub);
-
-            // assert
-            expect(response).toEqual(expectedResponse);
+                // act and assert
+                await expect(NameDao.getClientsInClientIdList(fakeClientIdList, dbStub))
+                    .resolves.toEqual(expectedResponse)
+            });
         });
+
 
         it("ND1.2 - should return false when db cant fetch data", async () => {
             // arrange
             let dbStub = {
                 query: () => {
-                    return false;
+                    return Promise.resolve(false);
                 }
             };
 
             let testId = [0];
 
             // act and assert
-            await expect(ClientDao.getClientByID(testId, dbStub)).resolves
+            await expect(NameDao.getClientsInClientIdList(fakeClientIdList, dbStub)).resolves
                 .toEqual(false);
         });
 
         it("ND1.3 - should catch error when db throws error", async () => {
             // arrange
+            let expectedResponse = {
+                status: 500,
+                message: "Could not get clients."
+            };
             let dbStub = {
                 query: () => {
-                    throw new Error("Error with the db.");
+                    return Promise.reject({});
                 }
             };
 
-            let testId = [0];
-
             // act and assert
-            await expect(ClientDao.getClientByID(testId, dbStub)).rejects
-                .toEqual(new Error("Error with the db."));
+            await expect(NameDao.getClientsInClientIdList(fakeClientIdList, dbStub)).rejects
+                .toEqual(expectedResponse);
         })
     });
 
@@ -150,7 +132,7 @@ describe("Test Name DAO", () => {
             ]
 
             // act
-            const response = await ClientDao.getAllEmployeeNames(dbStub);
+            const response = await NameDao.getAllEmployeeNames(dbStub);
 
             // assert
             expect(response).toEqual(expectedEmployeeList);
@@ -165,7 +147,7 @@ describe("Test Name DAO", () => {
             };
 
             // act and assert
-            await expect(ClientDao.getAllEmployeeNames(dbStub)).resolves
+            await expect(NameDao.getAllEmployeeNames(dbStub)).resolves
                 .toEqual(false);
         });
 
@@ -178,229 +160,7 @@ describe("Test Name DAO", () => {
             };
 
             // act and assert
-            await expect(ClientDao.getAllEmployeeNames(dbStub)).rejects
-                .toEqual(new Error("Error with the db."));
-        });
-    });
-
-    describe("ND3 - getClientByIDAndCountry", () => {
-        it("ND3.1 - Should return clients corresponding to the country", async () => {
-            
-            // arrange
-            let testId = [20100, 20234];
-            let countryName = "Canada";
-
-            let dbStub = {
-                query: () => {
-                    return fakeClientListFiltered;
-                }
-            };
-
-            let expectedResponse = [
-                {
-                    nameId: fakeClientList[0].NAME_ID,
-                    name: fakeClientList[0].NAME,
-                    country: fakeClientList[0].COUNTRY_LABEL
-                },
-                {
-                    nameId: fakeClientList[1].NAME_ID,
-                    name: fakeClientList[1].NAME,
-                    country: fakeClientList[1].COUNTRY_LABEL
-                }
-            ];
-
-            // act
-            const response = await ClientDao.getClientByIDAndCountry(testId, countryName, dbStub);
-
-            // assert
-            expect(response).toEqual(expectedResponse);
-            
-        });
-
-        it("ND3.2 - should resolve false when Model cant fetch data", async () => {
-             // arrange
-            let dbStub = {
-                query: () => {
-                    return false;
-                }
-            };
-
-            let testId = [0];
-            let countryName = 0;
-
-            // act and assert
-            await expect(ClientDao.getClientByIDAndCountry(testId, countryName, dbStub)).resolves
-                .toEqual(false);
-            
-        });
-
-        it("ND3.3 - should catch error when db throws error", async () => {
-            // arrange
-            let dbStub = {
-                query: () => {
-                    throw new Error("Error with the db.");
-                }
-            };
-
-            let testId = [0];
-            let countryName = 0;
-
-            // act and assert
-            await expect(ClientDao.getClientByIDAndCountry(testId, countryName, dbStub)).rejects
-                .toEqual(new Error("Error with the db."));
-        });
-    });
-
-
-
-
-
-
-
-    describe("ND4 - getClientByIDAndEmployee", () => {
-        it("ND4.1 - Should return client corresponding to the employeeId", async () => {
-            
-            // arrange
-            let testId = [20100, 20234];
-            let employeeId = 22211;
-
-            let dbStub = {
-                query: () => {
-                    return fakeClientListFiltered;
-                }
-            };
-
-            let expectedResponse = [
-                {
-                    nameId: fakeClientList[0].NAME_ID,
-                    name: fakeClientList[0].NAME,
-                    country: fakeClientList[0].COUNTRY_LABEL
-                },
-                {
-                    nameId: fakeClientList[1].NAME_ID,
-                    name: fakeClientList[1].NAME,
-                    country: fakeClientList[1].COUNTRY_LABEL
-                }
-            ];
-
-            // act
-            const response = await ClientDao.getClientByIDAndEmployee(testId, employeeId, dbStub);
-
-            // assert
-            expect(response).toEqual(expectedResponse);
-            
-        });
-
-        it("ND4.2 - should resolve false when Model cant fetch data", async () => {
-             // arrange
-            let dbStub = {
-                query: () => {
-                    return false;
-                }
-            };
-
-            let testId = [0];
-            let employeeId = 0;
-
-            // act and assert
-            await expect(ClientDao.getClientByIDAndEmployee(testId, employeeId, dbStub)).resolves
-                .toEqual(false);
-            
-        });
-
-        it("ND4.3 - should catch error when db throws error", async () => {
-            // arrange
-            let dbStub = {
-                query: () => {
-                    throw new Error("Error with the db.");
-                }
-            };
-
-            let testId = [0];
-            let employeeId = 0;
-
-            // act and assert
-            await expect(ClientDao.getClientByIDAndEmployee(testId, employeeId, dbStub)).rejects
-                .toEqual(new Error("Error with the db."));
-        });
-    });
-
-
-
-
-
-
-
-
-
-
-    describe("ND5 - getClientByIDAndEmployee", () => {
-        it("ND5.1 - Should return client corresponding to the employeeId and country", async () => {
-            
-            // arrange
-            let testId = [20100, 20234];
-            let employeeId = 22211;
-            let countryName = "Canada";
-
-            let dbStub = {
-                query: () => {
-                    return fakeClientListFiltered;
-                }
-            };
-
-            let expectedResponse = [
-                {
-                    nameId: fakeClientList[0].NAME_ID,
-                    name: fakeClientList[0].NAME,
-                    country: fakeClientList[0].COUNTRY_LABEL
-                },
-                {
-                    nameId: fakeClientList[1].NAME_ID,
-                    name: fakeClientList[1].NAME,
-                    country: fakeClientList[1].COUNTRY_LABEL
-                }
-            ];
-
-            // act
-            const response = await ClientDao.getClientByIDAndEmployeeAndCountry(testId, employeeId, countryName, dbStub);
-
-            // assert
-            expect(response).toEqual(expectedResponse);
-            
-        });
-
-        it("ND4.2 - should resolve false when Model cant fetch data", async () => {
-             // arrange
-            let dbStub = {
-                query: () => {
-                    return false;
-                }
-            };
-
-            let testId = [0];
-            let employeeId = 0;
-            let countryName = 0;
-
-            // act and assert
-            await expect(ClientDao.getClientByIDAndEmployeeAndCountry(testId, employeeId, countryName, dbStub)).resolves
-                .toEqual(false);
-            
-        });
-
-        it("ND4.3 - should catch error when db throws error", async () => {
-            // arrange
-            let dbStub = {
-                query: () => {
-                    throw new Error("Error with the db.");
-                }
-            };
-
-            let testId = [0];
-            let employeeId = 0;
-            let countryName = 0;
-
-            // act and assert
-            await expect(ClientDao.getClientByIDAndEmployeeAndCountry(testId, employeeId, countryName, dbStub)).rejects
+            await expect(NameDao.getAllEmployeeNames(dbStub)).rejects
                 .toEqual(new Error("Error with the db."));
         });
     });
