@@ -1,10 +1,10 @@
 const database = require('../databases')['mssql_pat']
 const { QueryTypes } = require('sequelize');
 
-exports.getInvoicesByDate = async (startDate, endDate, employeeId = undefined, clientType = undefined, countryCode = undefined, db = database) => {
+exports.getInvoicesByDate = async (startDate, endDate, employeeId = undefined, clientType = undefined, countryCode = undefined, ageOfAccount = undefined, db = database) => {
     return new Promise(async (resolve, reject) => {
         try {
-            let query = this.prepareBilledQuery(startDate, endDate, employeeId, clientType, countryCode);
+            let query = this.prepareBilledQuery(startDate, endDate, employeeId, clientType, countryCode, ageOfAccount);
 
             const data = await db.query(query.queryString,
                 {
@@ -36,7 +36,7 @@ exports.getInvoicesByDate = async (startDate, endDate, employeeId = undefined, c
     });
 }
 
-exports.prepareBilledQuery = (startDate, endDate, employeeId, clientType, countryCode) => {
+exports.prepareBilledQuery = (startDate, endDate, employeeId, clientType, countryCode, ageOfAccount) => {
     let query = {
         queryString: "SELECT IH.INVOCIE_DATE, IH.ACTOR_ID, BIA.AFFECT_AMOUNT ",
         replacements: [startDate, endDate]
@@ -71,6 +71,29 @@ exports.prepareBilledQuery = (startDate, endDate, employeeId, clientType, countr
         fromString = fromString.concat(", [Bosco reduction].[dbo].NAME N ");
         whereString = whereString.concat(" AND N.NAME_ID=NC.NAME_ID AND N.LEGAL_COUNTRY_CODE=? ");
         query.replacements.push(countryCode);
+    }
+
+    if (ageOfAccount !== undefined) {
+        fromString = fromString.includes("LEFT OUTER JOIN [Bosco reduction].[dbo].NAME_CONNECTION NC ON NC.CONNECTION_ID=1 AND NC.CONNECTION_NAME_ID=CONVERT(nvarchar, IH.ACTOR_ID)") ?
+            fromString : fromString.concat(" LEFT OUTER JOIN [Bosco reduction].[dbo].NAME_CONNECTION NC ON NC.CONNECTION_ID=1 AND NC.CONNECTION_NAME_ID=CONVERT(nvarchar, IH.ACTOR_ID) ");
+        fromString = fromString.concat(" LEFT OUTER JOIN [Bosco reduction].[dbo].ACCOUNTING_CLIENT AC ON AC.TRANSACTION_REF=CONVERT(NVARCHAR,IH.INVOICE_ID) ");
+
+        switch (ageOfAccount) {
+            case "<30":
+                whereString = whereString.concat(" AND DATEDIFF(day, IH.INVOCIE_DATE, AC.CLEARING_LAST_TRANSACTION)<30 ");
+                break;
+            case "30-60":
+                whereString = whereString.concat(" AND DATEDIFF(day, IH.INVOCIE_DATE, AC.CLEARING_LAST_TRANSACTION)>=30 ",
+                    "AND DATEDIFF(day, IH.INVOCIE_DATE, AC.CLEARING_LAST_TRANSACTION)<60");
+                break;
+            case "60-90":
+                whereString = whereString.concat(" AND DATEDIFF(day, IH.INVOCIE_DATE, AC.CLEARING_LAST_TRANSACTION)>=60 ",
+                    "AND DATEDIFF(day, IH.INVOCIE_DATE, AC.CLEARING_LAST_TRANSACTION)<=90");
+                break;
+            case ">90":
+                whereString = whereString.concat(" AND DATEDIFF(day, IH.INVOCIE_DATE, AC.CLEARING_LAST_TRANSACTION)>90 ");
+                break;
+        }
     }
 
     query.queryString = query.queryString.concat(fromString, whereString);
