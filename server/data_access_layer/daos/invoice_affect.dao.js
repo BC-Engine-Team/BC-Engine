@@ -96,7 +96,7 @@ exports.prepareBilledQuery = (startDate, endDate, employeeId, clientType, countr
         query.replacements.push(countryCode);
     }
 
-    
+
 
     query.queryString = query.queryString.concat(fromString, whereString);
 

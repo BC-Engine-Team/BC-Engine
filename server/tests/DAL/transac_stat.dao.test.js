@@ -28,6 +28,7 @@ let fakeStatsList = [
     }
 ];
 
+
 describe("Test Transac Stat DAO", () => {
     let dbStub = {
         query: () => {

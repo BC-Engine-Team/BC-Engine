@@ -108,8 +108,6 @@ describe("Test Name DAO", () => {
                     .toEqual(expectedResponse);
             });
         });
-
-
     });
 
     describe("ND2 - getAllEmployeeNames", () => {

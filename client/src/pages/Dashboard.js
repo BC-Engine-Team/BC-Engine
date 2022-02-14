@@ -86,6 +86,7 @@ const Dashboard = () => {
     const [confirmSaveActivated, setConfirmSaveActivated] = useState(false);
     const [chartSaved, setChartSaved] = useState(true);
     const [navClicked, setNavClicked] = useState(false);
+    const [pageToNavigateTo, setPageToNavigateTo] = useState("/reports");
 
     const currentYear = new Date().getFullYear();
     const currentMonth = new Date().getMonth();
@@ -494,7 +495,6 @@ const Dashboard = () => {
 
 
     // handle clicks to other pages when unsaved work on Chart Report
-    const [pageToNavigateTo, setPageToNavigateTo] = useState("/reports");
     const handleNavClick = async (whereTo) => {
         setPageToNavigateTo("/" + whereTo.split("/").at(-1));
         if (chartSaved) {
@@ -773,8 +773,8 @@ const Dashboard = () => {
                                     </Button>
                                 </Col>
                             </Row>
-                        </div>
-                    </div>
+                        </div >
+                    </div >
                     <div className="container-chart">
                         <div className="card shadow my-3 mx-3 p-2 pt-3">
                             {chartData &&
@@ -877,8 +877,8 @@ const Dashboard = () => {
                             </ButtonGroup>
                         </div>
                     </div>
-                </div>
-            </div>
+                </div >
+            </div >
             <ConfirmationPopup
                 open={confirmSaveActivated}
                 prompt={t('dashboard.criteria.SaveConfirmPrompt')}
