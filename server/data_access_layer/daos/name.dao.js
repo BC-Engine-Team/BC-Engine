@@ -8,8 +8,6 @@ exports.getClientsInClientIdList = async (clientIDList, db = database) => {
                 " FROM NAME N LEFT OUTER JOIN NAME_QUALITY NQ ON NQ.NAME_ID=N.NAME_ID AND NQ.QUALITY_TYPE_ID=15, COUNTRY C, NAME_CONNECTION NC",
                 " WHERE C.COUNTRY_CODE=N.LEGAL_COUNTRY_CODE AND NC.CONNECTION_NAME_ID IN (?) AND NC.NAME_ID=N.NAME_ID ORDER BY NAME");
 
-            console.log(queryString)
-
             const data = await db.query(queryString,
                 {
                     replacements: [clientIDList],

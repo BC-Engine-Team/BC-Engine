@@ -8,7 +8,7 @@ exports.getEmployeeByEmail = async (email, empModel = EmployeeModel) => {
                 email: email
             }
         }).then(async data => {
-            if(data){
+            if (data) {
                 let emp = {};
                 emp.email = data.dataValues.email;
                 emp.name = data.dataValues.firstName + " " + data.dataValues.lastName;
@@ -17,8 +17,7 @@ exports.getEmployeeByEmail = async (email, empModel = EmployeeModel) => {
             resolve(false);
         }).catch(err => {
             const response = {
-                status: 500,
-                data: {},
+                status: err.status || 500,
                 message: err.message || "some error occured"
             }
             reject(response);

@@ -1,4 +1,4 @@
-const {sequelize,
+const { sequelize,
     dataTypes,
     checkModelName,
     checkPropertyExists,
@@ -70,7 +70,7 @@ describe("Test Employee DAL", () => {
     describe("ED1 - getEmployeeByEmail", () => {
         it("ED1.1 - should return employee when it exists", async () => {
             // arrange
-            EmpMock.$queryInterface.$useHandler(function(query, queryOptions, done){
+            EmpMock.$queryInterface.$useHandler(function (query, queryOptions, done) {
                 return Promise.resolve(returnedEmp);
             });
 
@@ -84,7 +84,7 @@ describe("Test Employee DAL", () => {
 
         it("ED1.2 - should return false when Employee model can't find employee", async () => {
             // arrange
-            EmpMock.$queryInterface.$useHandler(function(query,queryOptions, done){
+            EmpMock.$queryInterface.$useHandler(function (query, queryOptions, done) {
                 return Promise.resolve(false);
             });
 
@@ -95,17 +95,34 @@ describe("Test Employee DAL", () => {
             expect(resp).toBeFalsy();
         });
 
-        it("ED1.3 - should catch error thrown by the Employee Model", async () => {
+        it("ED1.3 - should catch specified error thrown by the Employee Model", async () => {
             // arrange
-            EmpMock.$queryInterface.$useHandler(function(query, queryOptions, done){
-                return Promise.reject(new Error("Error with the Employee Model."));
+            let expectedResponse = {
+                status: 600,
+                message: "Error."
+            };
+            EmpMock.$queryInterface.$useHandler(function (query, queryOptions, done) {
+                return Promise.reject(expectedResponse);
             });
 
             // act
-            await EmpDAO.getEmployeeByEmail("", EmpMock).catch(err => {
-                // assert
-                expect(err.message).toBe("Error with the Employee Model.");
+            await expect(EmpDAO.getEmployeeByEmail("someEmail", EmpMock))
+                .rejects.toEqual(expectedResponse);
+        });
+
+        it("ED1.4 - should catch unspecified error thrown by the Employee Model", async () => {
+            // arrange
+            let expectedResponse = {
+                status: 500,
+                message: "some error occured"
+            };
+            EmpMock.$queryInterface.$useHandler(function (query, queryOptions, done) {
+                return Promise.reject({});
             });
+
+            // act
+            await expect(EmpDAO.getEmployeeByEmail("someEmail", EmpMock))
+                .rejects.toEqual(expectedResponse);
         });
     });
 });

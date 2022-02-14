@@ -31,11 +31,6 @@ exports.getAverages = async (startDateStr, endDateStr, employeeId = undefined, c
         // make list of yearMonth [201911,202001,202002,...] to select dues
         let yearMonthList = this.getYearMonth(startDateStr, endDateStr);
 
-        // prepare startDate to get billed amount for each month
-        startDate.setMonth(startDate.getMonth() - 12);
-        let theMonth = startDate.getMonth() + 1;
-        startDateStr = startDate.getFullYear() + "-" + theMonth + "-01";
-
         // Get the list of total dues for each month
         await this.getDues(yearMonthList, employeeId, clientType, countryLabel).then(async data => {
             totalDuesList = data;
@@ -43,6 +38,10 @@ exports.getAverages = async (startDateStr, endDateStr, employeeId = undefined, c
             reject(err);
         });
 
+        // prepare startDate to get billed amount for each month
+        startDate.setMonth(startDate.getMonth() - 12);
+        let theMonth = startDate.getMonth() + 1;
+        startDateStr = startDate.getFullYear() + "-" + theMonth + "-01";
 
         // Get list of amount billed for each month (previous 12 months)
         await this.getBilled(startDateStr, endDateStr, yearMonthList, employeeId, clientType, countryCode).then(async data => {
@@ -52,7 +51,7 @@ exports.getAverages = async (startDateStr, endDateStr, employeeId = undefined, c
             reject(err);
         });
 
-        // Get List of Client Id, Name and Country
+        // Get List of Client Id, Name, Country, and grading
         await this.getClientInformation(clientIDList.length === 0 ? [-1000] : clientIDList)
             .then(async data => {
                 clientList = data;
@@ -198,86 +197,6 @@ exports.getBilled = async (startDateStr, endDateStr, yearMonthList, employeeId =
             });
     });
 }
-
-// method to get the names and countries based by clients id
-// exports.getNamesAndCountries = async (clientsID, employeeId = undefined, countryLabel = undefined) => {
-//     let formattedClientList = [];
-//     return new Promise(async (resolve, reject) => {
-
-//         const getNamesAndCountries_ = (formattedClientList, data) => {
-//             data.forEach(i => {
-//                 formattedClientList.push({
-//                     nameId: i.nameId,
-//                     name: i.name,
-//                     country: i.country,
-//                     grading: ""
-//                 });
-//             });
-
-//             resolve(formattedClientList);
-//         }
-
-//         if (countryLabel !== undefined && employeeId === undefined) {
-//             await ClientDao.getClientByIDAndCountry(clientsID, countryLabel).then(async data => {
-//                 if (data) getNamesAndCountries_(formattedClientList, data);
-//                 else resolve(false);
-//             }).catch(err => {
-//                 reject(err);
-//             })
-//         }
-
-//         else if (countryLabel === undefined && employeeId !== undefined) {
-//             await ClientDao.getClientByIDAndEmployee(clientsID, employeeId).then(async data => {
-//                 if (data) getNamesAndCountries_(formattedClientList, data);
-//                 else resolve(false);
-//             }).catch(err => {
-//                 reject(err);
-//             })
-//         }
-
-//         else if (countryLabel !== undefined && employeeId !== undefined) {
-//             await ClientDao.getClientByIDAndEmployeeAndCountry(clientsID, employeeId, countryLabel).then(async data => {
-//                 if (data) getNamesAndCountries_(formattedClientList, data);
-//                 else resolve(false);
-//             }).catch(err => {
-//                 reject(err);
-//             })
-//         }
-
-//         else {
-//             await ClientDao.getClientByID(clientsID).then(async data => {
-//                 if (data) getNamesAndCountries_(formattedClientList, data);
-//                 else resolve(false);
-//             }).catch(err => {
-//                 reject(err);
-//             })
-//         }
-//     });
-// }
-
-// //method to get the client grading
-// exports.getClientGrading = async (idList) => {
-//     let gradingList = [];
-
-//     return new Promise(async (resolve, reject) => {
-//         await ClientGradingDao.getClientGrading(idList).then(async data => {
-//             if (data) {
-//                 data.forEach(g => {
-//                     gradingList.push({
-//                         nameId: g.nameId,
-//                         grading: g.grading
-//                     });
-//                 });
-//                 resolve(gradingList);
-//             }
-//             resolve(false);
-//         }).catch(err => {
-//             reject(err);
-//         })
-//     });
-// }
-
-
 
 exports.getYearMonth = (startDateStr, endDateStr) => {
     let yearMonthList = [];

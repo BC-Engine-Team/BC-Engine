@@ -92,11 +92,12 @@ const Dashboard = () => {
     const earliestYear = 2009;
     const [authorized, setAuthorized] = useState(false);
     const [clientNameCountry, setClientNameCountry] = useState([{ name: "", country: "", clientgrading: "" }]);
-    const [countries, setCountries] = useState([{ countryCode: "", countryLabel: "" }]);
-    const [errors, setErrors] = useState({});
+
 
     // Criteria
+    const [employeeSelect, setEmployeeSelect] = useState([]);
     const [compareEmployeeChecked, setCompareEmployeeChecked] = useState(false);
+
     const [criteria, setCriteria] = useState({
         name: "",
         startYear: currentYear - 2,
@@ -119,13 +120,42 @@ const Dashboard = () => {
         ageOfAccount: "All",
         accountType: 'Receivable',
     });
+    const [errors, setErrors] = useState({});
 
-    const [startYearList, setStartYearList] = useState([]);
-    const [endYearList, setEndYearList] = useState([]);
-    const [startMonthList, setStartMonthList] = useState([]);
-    const [endMonthList, setEndMonthList] = useState([]);
+    const [yearList, setYearList] = useState([]);
+    const [monthList, setMonthList] = useState([]);
 
-    const [employeeSelect, setEmployeeSelect] = useState([]);
+    const [countries, setCountries] = useState([{ countryCode: "", countryLabel: "" }]);
+
+    const setField = (field, value) => {
+        if (field === 'employee1' && parseInt(value.id) === -1) {
+            setCompareEmployeeChecked(false);
+            setCriteria({
+                ...criteria,
+                [field]: value,
+                'employee2': { id: null, name: null }
+            });
+        }
+        else {
+            if (field === 'employee2') {
+                setCompareEmployeeChecked(!compareEmployeeChecked);
+            }
+
+            setCriteria({
+                ...criteria,
+                [field]: value
+            });
+        }
+
+        if (!!errors[field]) {
+            setErrors({
+                ...errors,
+                [field]: null
+            });
+        }
+
+        setChartSaved(false);
+    };
 
     const createEmployeeCriteria = async () => {
         let listEmployee = [];
@@ -165,7 +195,6 @@ const Dashboard = () => {
             });
     }
 
-
     //to display the list of all countries in the select box
     const countrySelectBox = async () => {
         let countryList = [];
@@ -204,7 +233,6 @@ const Dashboard = () => {
                 }
             });
     }
-
 
     const chart = async (compare = false) => {
         setChartLoading(true);
@@ -332,6 +360,46 @@ const Dashboard = () => {
         }
     }
 
+    const initCriteria = async () => {
+        // init time frame selections
+        let yearList = [];
+        for (let i = earliestYear; i <= currentYear; i++) {
+            yearList.push(i);
+        }
+        setYearList(yearList);
+        setMonthList(months);
+
+        countrySelectBox();
+
+        createEmployeeCriteria();
+    };
+
+    const findCriteriaErrors = () => {
+        const { name, startYear, startMonth, endYear, endMonth } = criteria;
+        let newErrors = {};
+
+        // name errors
+        if (name.length === 0)
+            newErrors.name = t("error.Empty");
+
+        // endYear errors
+        if (parseInt(endYear) < parseInt(startYear))
+            newErrors.endYear = t("dashboard.criteria.EndYearExceedError");
+
+        // endMonth errors
+        if (parseInt(endMonth) < parseInt(startMonth) && parseInt(startYear) === parseInt(endYear))
+            newErrors.endMonth = t("dashboard.criteria.EndMonthExceedError");
+
+        if (parseInt(endMonth) > parseInt(currentMonth) && parseInt(endYear) === parseInt(currentYear.toString()))
+            newErrors.endMonth = t("dashboard.criteria.EndMonthExceedCurrentError");
+
+        // startMonth errors
+        if (startMonth > currentMonth && startYear === currentYear.toString())
+            newErrors.startMonth = t("dashboard.criteria.StartMonthExceedCurrentError");
+
+        return newErrors;
+    };
+
     const handleSaveChartReport = async (event) => {
         event.preventDefault();
         event.stopPropagation();
@@ -423,74 +491,8 @@ const Dashboard = () => {
         }
     };
 
-    const setField = (field, value) => {
-        if (field === 'employee1' && parseInt(value.id) === -1) {
-            setCompareEmployeeChecked(false);
-            setCriteria({
-                ...criteria,
-                [field]: value,
-                'employee2': { id: null, name: null }
-            });
-        }
-        else {
-            if (field === 'employee2') {
-                setCompareEmployeeChecked(!compareEmployeeChecked);
-            }
 
-            setCriteria({
-                ...criteria,
-                [field]: value
-            });
-        }
-
-        if (!!errors[field]) {
-            setErrors({
-                ...errors,
-                [field]: null
-            });
-        }
-
-        setChartSaved(false);
-    };
-
-    const findCriteriaErrors = () => {
-        const { name, startYear, startMonth, endYear, endMonth } = criteria;
-        let newErrors = {};
-
-        // name errors
-        if (name.length === 0)
-            newErrors.name = t("error.Empty");
-
-        // endYear errors
-        if (parseInt(endYear) < parseInt(startYear))
-            newErrors.endYear = t("dashboard.criteria.EndYearExceedError");
-
-        // endMonth errors
-        if (parseInt(endMonth) < parseInt(startMonth) && parseInt(startYear) === parseInt(endYear))
-            newErrors.endMonth = t("dashboard.criteria.EndMonthExceedError");
-
-        if (parseInt(endMonth) > parseInt(currentMonth) && parseInt(endYear) === parseInt(currentYear.toString()))
-            newErrors.endMonth = t("dashboard.criteria.EndMonthExceedCurrentError");
-
-        // startMonth errors
-        if (startMonth > currentMonth && startYear === currentYear.toString())
-            newErrors.startMonth = t("dashboard.criteria.StartMonthExceedCurrentError");
-
-        return newErrors;
-    };
-
-    const initCriteria = async () => {
-        let yearList = [];
-        for (let i = earliestYear; i <= currentYear; i++) {
-            yearList.push(i);
-        }
-        setStartYearList(yearList);
-        setEndYearList(yearList);
-
-        setStartMonthList(months);
-        setEndMonthList(months);
-    };
-
+    // handle clicks to other pages when unsaved work on Chart Report
     const [pageToNavigateTo, setPageToNavigateTo] = useState("/reports");
     const handleNavClick = async (whereTo) => {
         setPageToNavigateTo("/" + whereTo.split("/").at(-1));
@@ -500,21 +502,16 @@ const Dashboard = () => {
         setNavClicked(true)
     }
 
-
     useEffect(() => {
         if (cookies.get("accessToken") === undefined) {
             navigate("/login");
         }
 
-        chart();
-        countrySelectBox();
-        createEmployeeCriteria();
         initCriteria();
         chart();
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
-
 
 
     return (
@@ -555,7 +552,7 @@ const Dashboard = () => {
                                             value={criteria.startYear}
                                             isInvalid={!!errors.startYear}>
 
-                                            {startYearList.map((y, i) => {
+                                            {yearList.map((y, i) => {
                                                 return (
                                                     <option key={i} value={y}>{y}</option>
                                                 );
@@ -576,7 +573,7 @@ const Dashboard = () => {
                                             value={criteria.startMonth}
                                             isInvalid={!!errors.startMonth}>
 
-                                            {startMonthList.map((m, i) => {
+                                            {monthList.map((m, i) => {
                                                 return (<option key={i} value={i}>{m}</option>);
                                             })}
 
@@ -601,7 +598,7 @@ const Dashboard = () => {
                                             value={criteria.endYear}
                                             isInvalid={!!errors.endYear}>
 
-                                            {endYearList.map((y, i) => {
+                                            {yearList.map((y, i) => {
                                                 return (
                                                     <option key={i} value={y}>{y}</option>
                                                 );
@@ -621,7 +618,7 @@ const Dashboard = () => {
                                             value={criteria.endMonth}
                                             isInvalid={!!errors.endMonth}>
 
-                                            {endMonthList.map((m, i) => {
+                                            {monthList.map((m, i) => {
                                                 return (<option key={i} value={i}>{m}</option>);
                                             })}
                                         </Form.Select>

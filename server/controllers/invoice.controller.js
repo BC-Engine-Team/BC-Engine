@@ -2,7 +2,6 @@ const invoiceService = require('../services/invoice.service');
 const empService = require('../services/emp.service');
 
 
-
 exports.getAverages = async (req, res) => {
     let regexDateStr = /^\d{4}-\d{2}-\d{2}$/;
     let regexDate = new RegExp(regexDateStr);

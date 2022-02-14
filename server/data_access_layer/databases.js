@@ -42,7 +42,6 @@ db['localdb'].reportTypeRecipients] = require("./models/localdb/localdb.model")(
 db['mssql_pat'].employees = require("./models/mssql_pat/employee.model")(db['mssql_pat'], Sequelize);
 
 // Bosco database tables
-db['mssql_bosco'].nameEmployee = require("./models/mssql_bosco/name.model")(db['mssql_bosco'], Sequelize);
 
 
 
