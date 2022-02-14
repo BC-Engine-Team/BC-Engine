@@ -319,8 +319,30 @@ describe("Test Invoice Affect DAO", () => {
             });
         });
 
-        describe("IAD2.6 - given startDate, endDate and client Type but no employeeId", () => {
-            it("IAD2.6.1 - should respond with query filtered by date and client type", () => {
+        describe("IAD2.6 - given startDate, endDate, ageOfAccount, but no employeeId", () => {
+            it("IAD2.6.1 - should respond with query only filtering by date and age of account", async () => {
+                // arrange
+                let expectedQuery = {
+                    queryString: "".concat("SELECT IH.INVOCIE_DATE, IH.ACTOR_ID, BIA.AFFECT_AMOUNT ",
+                        "FROM  BOSCO_INVOICE_AFFECT BIA, INVOICE_HEADER IH  ",
+                        "LEFT OUTER JOIN [Bosco reduction].[dbo].NAME_CONNECTION NC ON NC.CONNECTION_ID=1 AND NC.CONNECTION_NAME_ID=CONVERT(nvarchar, IH.ACTOR_ID) ",
+                        " LEFT OUTER JOIN [Bosco reduction].[dbo].ACCOUNTING_CLIENT AC ON AC.TRANSACTION_REF=CONVERT(NVARCHAR,IH.INVOICE_ID) ",
+                        "WHERE IH.INVOICE_TYPE in (1,4) AND IH.INVOICE_PREVIEW=0 AND IH.INVOCIE_DATE BETWEEN ? AND ? ",
+                        "AND BIA.INVOICE_ID=IH.INVOICE_ID AND BIA.AFFECT_ACCOUNT LIKE '%1200%' ",
+                        " AND DATEDIFF(day, IH.INVOCIE_DATE, AC.CLEARING_LAST_TRANSACTION)<30 "),
+                    replacements: [startDate, endDate]
+                };
+
+                // act
+                const response = InvoiceAffectDao.prepareBilledQuery(startDate, endDate, undefined, undefined, undefined, ageOfAccount);
+
+                // assert
+                expect(response).toEqual(expectedQuery);
+            });
+        });
+
+        describe("IAD2.7 - given startDate, endDate and client Type but no employeeId", () => {
+            it("IAD2.7.1 - should respond with query filtered by date and client type", () => {
                 // arrange
                 let expectedQuery = {
                     queryString: "".concat("SELECT IH.INVOCIE_DATE, IH.ACTOR_ID, BIA.AFFECT_AMOUNT ",
@@ -340,8 +362,8 @@ describe("Test Invoice Affect DAO", () => {
             });
         });
 
-        describe("IAD2.7 - given startDate, endDate and countryCode but no employeeId or clientType", () => {
-            it("IAD2.7.1 - should respond with query filtered by date and country", () => {
+        describe("IAD2.8 - given startDate, endDate and countryCode but no employeeId or clientType", () => {
+            it("IAD2.8.1 - should respond with query filtered by date and country", () => {
                 // arrange
                 let expectedQuery = {
                     queryString: "".concat("SELECT IH.INVOCIE_DATE, IH.ACTOR_ID, BIA.AFFECT_AMOUNT ",
