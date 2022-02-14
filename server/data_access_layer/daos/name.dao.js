@@ -31,7 +31,7 @@ exports.getClientsInClientIdList = async (clientIDList, db = database) => {
         catch (err) {
             const response = {
                 status: err.status || 500,
-                message: err.message || "Could not get clients."
+                message: err.message || "Could not fetch clients."
             };
             reject(response);
         }

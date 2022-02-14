@@ -86,6 +86,7 @@ const Dashboard = () => {
     const [confirmSaveActivated, setConfirmSaveActivated] = useState(false);
     const [chartSaved, setChartSaved] = useState(true);
     const [navClicked, setNavClicked] = useState(false);
+    const [pageToNavigateTo, setPageToNavigateTo] = useState("/reports");
 
     const currentYear = new Date().getFullYear();
     const currentMonth = new Date().getMonth();
@@ -493,7 +494,6 @@ const Dashboard = () => {
 
 
     // handle clicks to other pages when unsaved work on Chart Report
-    const [pageToNavigateTo, setPageToNavigateTo] = useState("/reports");
     const handleNavClick = async (whereTo) => {
         setPageToNavigateTo("/" + whereTo.split("/").at(-1));
         if (chartSaved) {
