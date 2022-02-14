@@ -140,7 +140,7 @@ describe("Test Report Controller", () => {
                 };
                 reportServiceSpy = jest.spyOn(ReportService, 'getChartReportsByUserId')
                     .mockImplementation(async () => {
-                        await Promise.reject(expectedResponse);
+                        await Promise.reject({});
                     });
 
                 // act
@@ -522,7 +522,7 @@ describe("Test Report Controller", () => {
                 };
                 reportServiceSpy = jest.spyOn(ReportService, 'deleteChartReportById')
                     .mockImplementation(async () => {
-                        await Promise.reject(expectedResponse);
+                        await Promise.reject({});
                     });
 
                 // act

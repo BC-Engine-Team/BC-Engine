@@ -1,56 +1,17 @@
 const database = require('../databases')['mssql_bosco']
 const databases = require('../databases');
-const { QueryTypes, AccessDeniedError } = require('sequelize');
-const TransacStatModel = databases['mssql_bosco'].transactions_stat;
+const { QueryTypes } = require('sequelize');
 
-exports.getTransactionsStatByYearMonth = async (yearMonthList, transacStatModel = TransacStatModel) => {
-    return new Promise((resolve, reject) => {
-        transacStatModel.findAll({
-            where: {
-                yearMonth: yearMonthList,
-                connectionId: 3
-            }
-        }).then(async data => {
-            if (data) {
-                let returnData = [];
-                for (let i = 0; i < data.length; i++) {
-                    returnData.push(data[i].dataValues);
-                }
-                resolve(returnData);
-            }
-            resolve(false);
-        }).catch(err => {
-            reject(err);
-        })
-    })
-}
-
-exports.getTransactionsStatByYearMonthAndEmployee = async (yearMonthList, employeeId, db = database) => {
+exports.getTransactionsStatByYearMonth = async (yearMonthList, employeeId = undefined, clientType = undefined, countryLabel = undefined, db = database) => {
     return new Promise(async (resolve, reject) => {
         try {
-            /* NQ.QUALITY_TYPE_ID -> 5 = Client responsible*/
-            const data = await db.query(
-                "SELECT \
-                ACS.DUE_CURRENT, ACS.DUE_1_MONTH, ACS.DUE_2_MONTH, ACS.DUE_3_MONTH, ACS.YEAR_MONTH \
-                FROM \
-                ACCOUNTING_CLIENT_STAT ACS, \
-                NAME_CONNECTION NCS, \
-                NAME_QUALITY NQ, \
-                NAME RESP \
-                WHERE \
-                ACS.CONNECTION_ID=3 AND \
-                ACS.YEAR_MONTH IN (?) AND \
-                NCS.CONNECTION_ID=3 AND \
-                NCS.CONNECTION_NAME_ID=CONVERT(nvarchar,ACS.ACC_NAME_ID) AND \
-                NQ.NAME_ID=NCS.NAME_ID AND \
-                NQ.QUALITY_TYPE_ID=5 AND \
-                CONVERT(nvarchar,RESP.NAME_ID)=NQ.DROPDOWN_CODE \
-                AND NQ.DROPDOWN_CODE = ?",
-                {
-                    replacements: [yearMonthList, employeeId], 
-                    type: QueryTypes.SELECT 
-                }
-            );
+            let query = this.prepareDuesQuery(yearMonthList, employeeId, clientType, countryLabel);
+
+            const data = await db.query(query.queryString, {
+                replacements: query.replacements,
+                type: QueryTypes.SELECT
+            });
+
             if (data) {
                 let returnData = [];
 
@@ -68,95 +29,57 @@ exports.getTransactionsStatByYearMonthAndEmployee = async (yearMonthList, employ
             resolve(false);
         }
         catch (err) {
-            reject(err);
+            const response = {
+                status: err.status || 500,
+                message: err.message || "Could not fetch transactions."
+            };
+            reject(response);
         }
-    });
+    })
 }
 
-exports.getTransactionsStatByYearMonthAndCountry = async (yearMonthList, countryLabel, db = database) => {
-    return new Promise(async (resolve, reject) => {
+exports.prepareDuesQuery = (yearMonthList, employeeId, clientType, countryLabel) => {
+    let query = {
+        queryString: "SELECT ACS.DUE_CURRENT, ACS.DUE_1_MONTH, ACS.DUE_2_MONTH, ACS.DUE_3_MONTH, ACS.YEAR_MONTH ",
+        replacements: [yearMonthList]
+    };
 
-        try{
-            const data = await db.query(
-                "SELECT DUE_CURRENT, DUE_1_MONTH, DUE_2_MONTH, DUE_3_MONTH, YEAR_MONTH \
-                FROM ACCOUNTING_CLIENT_STAT \
-                WHERE ACC_NAME_ID IN (SELECT ACC_NAME_ID FROM ACCOUNTING_NAME WHERE ACC_NAME_COUNTRY = ?) \
-                AND CONNECTION_ID = 3 \
-                AND YEAR_MONTH IN (?)",
-                {
-                    replacements: [countryLabel, yearMonthList], 
-                    type: QueryTypes.SELECT 
-                }
-            );
-            if (data) {
-                let returnData = [];
+    let fromString = "FROM ACCOUNTING_CLIENT_STAT ACS ";
+    let whereString = "WHERE ACS.YEAR_MONTH in (?) AND ACS.CONNECTION_ID=3 AND ACS.STAT_TYPE=1";
 
-                data.forEach(e => {
-                    returnData.push({
-                        dueCurrent: e['DUE_CURRENT'],
-                        due1Month: e['DUE_1_MONTH'],
-                        due2Month: e['DUE_2_MONTH'],
-                        due3Month: e['DUE_3_MONTH'],
-                        yearMonth: e['YEAR_MONTH']
-                    });
-                });
-                resolve(returnData);
-            }
-            resolve(false);
-        }
-        catch(err){
-            reject(err);
-        }
-    });
+    if (employeeId !== undefined) {
+        fromString = fromString.concat(", NAME_CONNECTION NC, NAME_QUALITY NQ1, NAME RESP ");
+        whereString = whereString.concat(" AND NC.CONNECTION_ID=3 AND NC.CONNECTION_NAME_ID=CONVERT(NVARCHAR, ACS.ACC_NAME_ID)",
+            " AND NQ1.NAME_ID=NC.NAME_ID AND NQ1.QUALITY_TYPE_ID=5",
+            " AND CONVERT(NVARCHAR,RESP.NAME_ID)=NQ1.DROPDOWN_CODE",
+            " AND NQ1.DROPDOWN_CODE=? ");
+        query.replacements.push(employeeId);
+    }
+
+    if (clientType !== undefined) {
+        fromString = fromString.includes("NAME_CONNECTION NC") ?
+            fromString : fromString.concat(", NAME_CONNECTION NC ");
+        fromString = fromString.concat(", NAME_QUALITY NQ2 ");
+
+        whereString = whereString.includes("NC.CONNECTION_ID=3") ?
+            whereString : whereString.concat(" AND NC.CONNECTION_ID=3 ");
+        whereString = whereString.includes("NC.CONNECTION_NAME_ID=CONVERT(NVARCHAR, ACS.ACC_NAME_ID)") ?
+            whereString : whereString.concat(" AND NC.CONNECTION_NAME_ID=CONVERT(NVARCHAR, ACS.ACC_NAME_ID) ");
+        whereString = whereString.concat(" AND NC.NAME_ID=NQ2.NAME_ID",
+            " AND NQ2.QUALITY_TYPE_ID=3",
+            " AND NQ2.DROPDOWN_CODE=? ");
+
+        query.replacements.push(clientType.toUpperCase());
+    }
+
+    if (countryLabel !== undefined) {
+        fromString = fromString.concat(", ACCOUNTING_NAME AN ");
+        whereString = whereString.concat(" AND ACS.ACC_NAME_ID=AN.ACC_NAME_ID AND AN.ACC_NAME_COUNTRY=? ");
+        query.replacements.push(countryLabel);
+    }
+
+    query.queryString = query.queryString.concat(fromString, whereString);
+
+    return query;
 }
 
-
-exports.getTransactionsStatByYearMonthAndEmployeeAndCountry = async (yearMonthList, employeeId, countryLabel, db = database) => {
-    return new Promise(async (resolve, reject) => {
-
-        try{
-            const data = await db.query(
-                "SELECT ACS.DUE_CURRENT, ACS.DUE_1_MONTH, ACS.DUE_2_MONTH, ACS.DUE_3_MONTH, ACS.YEAR_MONTH \
-                FROM ACCOUNTING_CLIENT_STAT ACS, NAME_CONNECTION NCS, \
-                NAME_QUALITY NQ, NAME RESP \
-                WHERE ACC_NAME_ID IN (SELECT ACC_NAME_ID FROM ACCOUNTING_NAME WHERE ACC_NAME_COUNTRY = ?) \
-                AND ACS.CONNECTION_ID=3 \
-                AND ACS.YEAR_MONTH IN (?) \
-                AND NCS.CONNECTION_ID=3 \
-                AND NCS.CONNECTION_NAME_ID=CONVERT(nvarchar,ACS.ACC_NAME_ID) \
-                AND NQ.NAME_ID=NCS.NAME_ID \
-                AND NQ.QUALITY_TYPE_ID=5 \
-                AND CONVERT(nvarchar,RESP.NAME_ID)=NQ.DROPDOWN_CODE \
-                AND NQ.DROPDOWN_CODE=?",
-                {
-                    replacements: [countryLabel, yearMonthList, employeeId], 
-                    type: QueryTypes.SELECT 
-                }
-            );
-            if (data) {
-                let returnData = [];
-
-                data.forEach(e => {
-                    returnData.push({
-                        dueCurrent: e['DUE_CURRENT'],
-                        due1Month: e['DUE_1_MONTH'],
-                        due2Month: e['DUE_2_MONTH'],
-                        due3Month: e['DUE_3_MONTH'],
-                        yearMonth: e['YEAR_MONTH']
-                    });
-                });
-                resolve(returnData);
-            }
-            resolve(false);
-        }
-        catch(err){
-            reject(err);
-        }
-    });
-}
-
-
-
-
-
-                

@@ -1,150 +1,46 @@
 const database = require('../databases')['mssql_bosco'];
 const { QueryTypes } = require('sequelize');
 
-exports.getClientByID = async (clientIDList, db=database) => {
+exports.getClientsInClientIdList = async (clientIDList, db = database) => {
     return new Promise(async (resolve, reject) => {
-        try{
-            const data = await db.query(
-                "SELECT DISTINCT N.NAME_ID, ISNULL(N.NAME_1,'')+ISNULL(' '+N.NAME_2,'')+ISNULL(' '+N.NAME_3,'') as NAME, C.COUNTRY_LABEL \
-                FROM NAME N, NAME_CONNECTION NC, COUNTRY C \
-                WHERE NC.CONNECTION_NAME_ID in (?) \
-                AND NC.NAME_ID = N.NAME_ID \
-                AND N.LEGAL_COUNTRY_CODE = C.COUNTRY_CODE \
-                ORDER BY NAME",
+        try {
+            let queryString = "".concat("SELECT DISTINCT N.NAME_ID, ISNULL(N.NAME_1,'')+ISNULL(' '+N.NAME_2,'')+ISNULL(' '+N.NAME_3,'') as NAME, C.COUNTRY_LABEL, NQ.DROPDOWN_CODE as 'GRADING'",
+                " FROM NAME N LEFT OUTER JOIN NAME_QUALITY NQ ON NQ.NAME_ID=N.NAME_ID AND NQ.QUALITY_TYPE_ID=15, COUNTRY C, NAME_CONNECTION NC",
+                " WHERE C.COUNTRY_CODE=N.LEGAL_COUNTRY_CODE AND NC.CONNECTION_NAME_ID IN (?) AND NC.NAME_ID=N.NAME_ID ORDER BY NAME");
+
+            const data = await db.query(queryString,
                 {
                     replacements: [clientIDList],
                     type: QueryTypes.SELECT
                 }
             );
-            if(data) {
+            if (data) {
                 let returnData = [];
                 data.forEach(c => {
                     returnData.push({
                         nameId: c["NAME_ID"],
                         name: c["NAME"],
-                        country: c["COUNTRY_LABEL"]
+                        country: c["COUNTRY_LABEL"],
+                        grading: c["GRADING"] === null ? "N/A" : c["GRADING"]
                     });
                 });
                 resolve(returnData);
             }
             resolve(false);
         }
-        catch(err){
-            reject(err);
-        }
-    });
-}
-
-
-exports.getClientByIDAndCountry = async (clientIDList, countryLabel, db=database) => {
-    return new Promise(async (resolve, reject) => {
-        try{
-            const data = await db.query(
-                "SELECT DISTINCT N.NAME_ID, ISNULL(N.NAME_1,'')+ISNULL(' '+N.NAME_2,'')+ISNULL(' '+N.NAME_3,'') as NAME, C.COUNTRY_LABEL, C.COUNTRY_CODE \
-                FROM NAME N, NAME_CONNECTION NC, COUNTRY C \
-                WHERE NC.CONNECTION_NAME_ID in (?) \
-                AND NC.NAME_ID = N.NAME_ID \
-                AND N.LEGAL_COUNTRY_CODE = C.COUNTRY_CODE \
-                AND C.COUNTRY_LABEL = ? \
-                ORDER BY NAME",
-                {
-                    replacements: [clientIDList, countryLabel],
-                    type: QueryTypes.SELECT
-                }
-            );
-            if(data){
-                let returnData = [];
-                data.forEach(c => {
-                    returnData.push({
-                        nameId: c["NAME_ID"],
-                        name: c["NAME"],
-                        country: c["COUNTRY_LABEL"]});
-                    });
-                    resolve(returnData);
-                }
-                resolve(false);
-            }
-        catch(err){
-            reject(err);
-        }
-    });
-}
-
-
-exports.getClientByIDAndEmployee = async (clientIDList, employeeId, db=database) => {
-    return new Promise(async (resolve, reject) => {
-        try{
-            const data = await db.query(
-                "SELECT DISTINCT N.NAME_ID, ISNULL(N.NAME_1,'')+ISNULL(' '+N.NAME_2,'')+ISNULL(' '+N.NAME_3,'') as NAME, C.COUNTRY_LABEL, NQ.DROPDOWN_CODE \
-                FROM [Bosco reduction].[dbo].[NAME] N, [Bosco reduction].[dbo].[NAME_CONNECTION] NC, [Bosco reduction].[dbo].[COUNTRY] C, [Bosco reduction].[dbo].[NAME_QUALITY] NQ  \
-                WHERE NC.CONNECTION_NAME_ID in (?) \
-                AND NC.NAME_ID = N.NAME_ID \
-                AND N.LEGAL_COUNTRY_CODE = C.COUNTRY_CODE \
-				AND NQ.DROPDOWN_CODE = ? \
-                ORDER BY NAME",
-                {
-                    replacements: [clientIDList, employeeId],
-                    type: QueryTypes.SELECT
-                }
-            );
-            if(data){
-                let returnData = [];
-                data.forEach(c => {
-                    returnData.push({
-                        nameId: c["NAME_ID"],
-                        name: c["NAME"],
-                        country: c["COUNTRY_LABEL"]});
-                    });
-                    resolve(returnData);
-                }
-            resolve(false);
-        }
-        
         catch (err) {
-            reject(err);
+            const response = {
+                status: err.status || 500,
+                message: err.message || "Could not fetch clients."
+            };
+            reject(response);
         }
     });
 }
 
-
-exports.getClientByIDAndEmployeeAndCountry = async (clientIDList, employeeId, countryLabel, db=database) => {
-    return new Promise(async (resolve, reject) => {
-        try{
-            const data = await db.query(
-                "SELECT DISTINCT N.NAME_ID, ISNULL(N.NAME_1,'')+ISNULL(' '+N.NAME_2,'')+ISNULL(' '+N.NAME_3,'') as NAME, C.COUNTRY_LABEL, C.COUNTRY_CODE \
-                FROM NAME N, NAME_CONNECTION NC, COUNTRY C, NAME_QUALITY NQ \
-                WHERE NC.CONNECTION_NAME_ID in (?) \
-                AND NC.NAME_ID = N.NAME_ID \
-                AND N.LEGAL_COUNTRY_CODE = C.COUNTRY_CODE \
-                AND C.COUNTRY_LABEL = ? \
-                AND NQ.DROPDOWN_CODE = ?",
-                {
-                    replacements: [clientIDList, countryLabel, employeeId],
-                    type: QueryTypes.SELECT
-                }
-            );
-            if(data){
-                let returnData = [];
-                data.forEach(c => {
-                    returnData.push({
-                        nameId: c["NAME_ID"],
-                        name: c["NAME"],
-                        country: c["COUNTRY_LABEL"]});
-                    });
-                    resolve(returnData);
-                }
-            resolve(false);
-        }
-        catch(err){
-            reject(err);
-        }
-    });
-}
-
-    
 exports.getAllEmployeeNames = async (db = database) => {
     return new Promise(async (resolve, reject) => {
-        try{
+        try {
             const data = await db.query(
                 "SELECT ISNULL(NAME_1,'') + ISNULL(' '+NAME_2,'') + ISNULL(' '+NAME_3,'') AS FULLNAME, NAME_ID \
                 FROM NAME \
@@ -156,7 +52,7 @@ exports.getAllEmployeeNames = async (db = database) => {
                     type: QueryTypes.SELECT
                 }
             );
-            if(data) {
+            if (data) {
                 let returnData = [];
                 data.forEach(c => {
                     returnData.push({
@@ -168,7 +64,7 @@ exports.getAllEmployeeNames = async (db = database) => {
             }
             resolve(false);
         }
-        catch(err){
+        catch (err) {
             reject(err);
         }
     });

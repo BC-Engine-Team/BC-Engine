@@ -57,8 +57,9 @@
           "CompareBTN":"Comparer",
           "All":"Tous",
           "labels": {
+             "Employee":"Employé(e)",
              "Country":"Pays",
-             "Employee":"Employé"
+             "ClientType": "Type de Client"
           },
          "NamePlaceHolder": "Entrez le nom de votre Rapport Graphique",
          "LoadChartButton": "Mettre à jour le Graphique",
@@ -68,7 +69,12 @@
          "EndMonthExceedError": "Mois de fin ne peut pas être avant le Mois de début.",
          "EndMonthExceedCurrentError": "Mois de fin ne peut pas être après le mois actuel.",
          "EndYearExceedError": "Année de fin ne peut pas être avant l'Année de début.",
-         "SaveConfirmPrompt": "Êtes-vous certain de vouloir sauvegarder "
+         "SaveConfirmPrompt": "Êtes-vous certain de vouloir sauvegarder ",
+         "clientType": {
+            "Corr": "Correspondent",
+            "Direct": "Direct",
+            "Any": "Tous"
+        }
        },
        "chart": {
           "Title": "Moyenne de Jour de Collection par Mois",

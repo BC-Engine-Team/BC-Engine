@@ -17,7 +17,7 @@ let fakeCountriesList = [
 describe("Test Country DAO", () => {
     describe("CD1 - getAllCountries", () => {
         it("CD1.1 - Should return list of countries", async () => {
-            
+
             // arrange
             let dbStub = {
                 query: () => {
@@ -80,13 +80,13 @@ describe("Test Country DAO", () => {
             // arrange
 
             let expectedError = {
-                message: "Some error",
-                status: 400
+                message: "some error occured",
+                status: 500
             }
 
             let dbStub = {
                 query: () => {
-                    return Promise.reject(expectedError);
+                    return Promise.reject({});
                 }
             };
 

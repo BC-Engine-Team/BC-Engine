@@ -59,8 +59,9 @@
             "CompareBTN":"Compare",
             "All":"All",
             "labels": {
+                "Employee":"Employee",
                 "Country":"Country",
-                "Employee":"Employee"
+                "ClientType": "Client Type"                
             },
             "StartDateLabel": "Start Month",
             "EndDateLabel": "End Month",
@@ -68,7 +69,12 @@
             "EndMonthExceedError": "End Month cannot be before Start Month.",
             "EndMonthExceedCurrentError": "End Month cannot exceed current month.",
             "EndYearExceedError": "End Year cannot be before Start Year.",
-            "SaveConfirmPrompt": "Are you sure you want to save "
+            "SaveConfirmPrompt": "Are you sure you want to save ",
+            "clientType": {
+                "Corr": "Correspondent",
+                "Direct": "Direct",
+                "Any": "Any"
+            }
         },
         "chart":{
             "Title":"Average Collection Days over Time",

@@ -258,6 +258,5 @@ module.exports = (localdb, Sequelize) => {
         onDelete: 'CASCADE'
     });
 
-
     return [User, ChartReport, ChartReportData, ReportType, Recipients, ReportTypeRecipients];
 };

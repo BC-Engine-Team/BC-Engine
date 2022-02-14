@@ -40,12 +40,8 @@ db['localdb'].reportTypeRecipients] = require("./models/localdb/localdb.model")(
 
 // patricia database tables
 db['mssql_pat'].employees = require("./models/mssql_pat/employee.model")(db['mssql_pat'], Sequelize);
-db['mssql_pat'].invoice_affect = require("./models/mssql_pat/invoice_affect.model")(db['mssql_pat'], Sequelize);
 
 // Bosco database tables
-db['mssql_bosco'].transactions = require("./models/mssql_bosco/accounting_client.model")(db['mssql_bosco'], Sequelize);
-db['mssql_bosco'].transactions_stat = require("./models/mssql_bosco/accounting_client_stat.model")(db['mssql_bosco'], Sequelize);
-db['mssql_bosco'].nameEmployee = require("./models/mssql_bosco/name.model")(db['mssql_bosco'], Sequelize);
 
 
 
@@ -171,7 +167,7 @@ db.sync = async (database, options) => {
         },
         {
           name: "Sabrina Lavoie",
-          email: "sabrina@benoit-cote.com"
+          email: "slavoie@benoit-cote.com"
         },
         {
           name: "Suzanne Antal",
