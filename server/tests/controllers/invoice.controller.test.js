@@ -407,4 +407,95 @@ describe("Test Invoice Controller", () => {
             });
         });
     });
+
+
+    describe("IC3 - Get All Countries for Dropdown ", () => {
+        
+        describe("IC3.1 - given any user", () => {
+
+            it("IC3.1.1 - Should respond with 200 and a list of countries", async () => {
+                // arrange
+                let expectedCountryResponse = [
+                    {
+                        countryLabel: "Canada"
+                    },
+                    {
+                        countryLabel: "France"
+                    },
+                    {
+                        countryLabel: "Japan"
+                    }
+                ];
+
+                invoiceServiceSpy = jest.spyOn(InvoiceService, 'getCountriesName')
+                    .mockImplementation(() => new Promise((resolve) => {
+                        resolve(expectedCountryResponse);
+                    }));
+
+                const response = await request.get("/api/invoice/getCountries");
+
+                // assert
+                expect(response.status).toBe(200);
+                expect(JSON.stringify(response.body)).toEqual(JSON.stringify(expectedCountryResponse));
+                expect(invoiceServiceSpy).toHaveBeenCalledTimes(1);
+            });
+
+
+            it("IC3.1.2 -  should respond with 500 and message", async () => {
+                // arrange
+                let expectedResponse = "The data could not be fetched.";
+                invoiceServiceSpy = jest.spyOn(InvoiceService, 'getCountriesName')
+                    .mockImplementation(() => new Promise((resolve) => {
+                        resolve(false);
+                    }));
+
+                // act
+                const response = await request.get("/api/invoice/getCountries");
+
+                // assert
+                expect(response.status).toBe(500);
+                expect(response.body.message).toBe(expectedResponse);
+            });
+        
+
+            it("IC3.1.3 - should respond with 500 status code and message when not specified", async () => {
+                // arrange
+                let expectedError = {
+                    message: "Malfunction in the B&C Engine."
+                };
+
+                invoiceServiceSpy = jest.spyOn(InvoiceService, 'getCountriesName')
+                    .mockImplementation(async () => {
+                        await Promise.reject({});
+                    });
+
+                // act
+                const response = await request.get("/api/invoice/getCountries");
+
+                // assert
+                expect(response.status).toBe(500);
+                expect(response.body).toEqual(expectedError);
+            });
+
+
+            it("IC3.1.4 - should respond with caught error's status and message", async () => {
+                // arrange
+                let expectedError = {
+                    status: 400,
+                    message: "Custom message."
+                };
+                invoiceServiceSpy = jest.spyOn(InvoiceService, 'getCountriesName')
+                    .mockImplementation(async () => {
+                        await Promise.reject(expectedError);
+                    });
+
+                // act
+                const response = await request.get("/api/invoice/getCountries");
+
+                // assert
+                expect(response.status).toBe(400);
+                expect(response.body.message).toBe(expectedError.message);
+            });
+        });
+    });
 });

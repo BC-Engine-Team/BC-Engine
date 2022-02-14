@@ -86,6 +86,7 @@ const Dashboard = () => {
     const [confirmSaveActivated, setConfirmSaveActivated] = useState(false);
     const [chartSaved, setChartSaved] = useState(true);
     const [navClicked, setNavClicked] = useState(false);
+    const [pageToNavigateTo, setPageToNavigateTo] = useState("/reports");
 
     const currentYear = new Date().getFullYear();
     const currentMonth = new Date().getMonth();
@@ -93,10 +94,11 @@ const Dashboard = () => {
     const [authorized, setAuthorized] = useState(false);
     const [clientNameCountry, setClientNameCountry] = useState([{ name: "", country: "", clientgrading: "" }]);
 
-    const [errors, setErrors] = useState({});
 
     // Criteria
+    const [employeeSelect, setEmployeeSelect] = useState([]);
     const [compareEmployeeChecked, setCompareEmployeeChecked] = useState(false);
+
     const [criteria, setCriteria] = useState({
         name: "",
         startYear: currentYear - 2,
@@ -111,19 +113,50 @@ const Dashboard = () => {
             id: compareEmployeeChecked ? -1 : null,
             name: compareEmployeeChecked ? "All" : null
         },
-        countryId: '-1',
-        country: "All",
+        country: {
+            id: -1,
+            name: "All"
+        },
         clientType: "Any",
         ageOfAccount: "All",
         accountType: 'Receivable',
     });
+    const [errors, setErrors] = useState({});
 
-    const [startYearList, setStartYearList] = useState([]);
-    const [endYearList, setEndYearList] = useState([]);
-    const [startMonthList, setStartMonthList] = useState([]);
-    const [endMonthList, setEndMonthList] = useState([]);
+    const [yearList, setYearList] = useState([]);
+    const [monthList, setMonthList] = useState([]);
 
-    const [employeeSelect, setEmployeeSelect] = useState([]);
+    const [countries, setCountries] = useState([{ countryCode: "", countryLabel: "" }]);
+
+    const setField = (field, value) => {
+        if (field === 'employee1' && parseInt(value.id) === -1) {
+            setCompareEmployeeChecked(false);
+            setCriteria({
+                ...criteria,
+                [field]: value,
+                'employee2': { id: null, name: null }
+            });
+        }
+        else {
+            if (field === 'employee2') {
+                setCompareEmployeeChecked(!compareEmployeeChecked);
+            }
+
+            setCriteria({
+                ...criteria,
+                [field]: value
+            });
+        }
+
+        if (!!errors[field]) {
+            setErrors({
+                ...errors,
+                [field]: null
+            });
+        }
+
+        setChartSaved(false);
+    };
 
     const createEmployeeCriteria = async () => {
         let listEmployee = [];
@@ -163,12 +196,50 @@ const Dashboard = () => {
             });
     }
 
-    const chart = async (employeeId = -1, compare = false) => {
+    //to display the list of all countries in the select box
+    const countrySelectBox = async () => {
+        let countryList = [];
+
+        let header = {
+            'authorization': "Bearer " + cookies.get("accessToken"),
+        }
+
+        await Axios.get(`${process.env.REACT_APP_API}/invoice/getCountries`, { headers: header })
+            .then(async (res) => {
+                if (res.status === 403 && res.status === 401) {
+                    setAuthorized(false);
+                    return;
+                }
+                setAuthorized(true);
+
+                for (let i = 0; i < res.data.length; i++) {
+                    countryList.push({
+                        countryCode: res.data[i].countryCode,
+                        countryLabel: res.data[i].countryLabel
+                    });
+                }
+                setCountries(countryList);
+            })
+            .catch((error) => {
+                if (error.response) {
+                    if (error.response.status === 403 || error.response.status === 401) {
+                        alert(error.response.body);
+                    }
+                    else {
+                        alert("Malfunction in the B&C Engine...");
+                    }
+                }
+                else if (error.request) {
+                    alert("Could not reach b&C Engine...");
+                }
+            });
+    }
+
+    const chart = async (compare = false) => {
         setChartLoading(true);
         setChartData(fallbackChartData);
         localStorage.setItem("dash_previous_criteria", JSON.stringify(criteria));
         let compareData = [];
-
         let arrayLength = 1;
         if (compare) arrayLength = 2;
         for (let c = 0; c < arrayLength; c++) {
@@ -181,14 +252,18 @@ const Dashboard = () => {
             let startDate = new Date(criteria.startYear, criteria.startMonth, 1).toISOString().split("T")[0];
             let endDate = new Date(criteria.endYear, criteria.endMonth, 1).toISOString().split("T")[0];
 
-            let param = {};
-            if (employeeId !== -1) {
-                param = {
-                    employeeId: employeeId
-                }
-            }
+            let param = {
+                employeeId: parseInt(criteria.employee1.id) === -1 ? undefined : criteria.employee1.id,
+                clientType: criteria.clientType === "Any" ? undefined : criteria.clientType,
+                countryCode: parseInt(criteria.country.id) === -1 ? undefined : criteria.country.id,
+                countryLabel: parseInt(criteria.country.id) === -1 ? undefined : criteria.country.name
+            };
+
             if (c === 1) {
-                param = {};
+                param = {
+                    ...param,
+                    employeeId: undefined
+                };
             }
 
             await Axios.get(`${process.env.REACT_APP_API}/invoice/defaultChartAndTable/${startDate}/${endDate}`, { params: param, headers: header })
@@ -286,6 +361,46 @@ const Dashboard = () => {
         }
     }
 
+    const initCriteria = async () => {
+        // init time frame selections
+        let yearList = [];
+        for (let i = earliestYear; i <= currentYear; i++) {
+            yearList.push(i);
+        }
+        setYearList(yearList);
+        setMonthList(months);
+
+        countrySelectBox();
+
+        createEmployeeCriteria();
+    };
+
+    const findCriteriaErrors = () => {
+        const { name, startYear, startMonth, endYear, endMonth } = criteria;
+        let newErrors = {};
+
+        // name errors
+        if (name.length === 0)
+            newErrors.name = t("error.Empty");
+
+        // endYear errors
+        if (parseInt(endYear) < parseInt(startYear))
+            newErrors.endYear = t("dashboard.criteria.EndYearExceedError");
+
+        // endMonth errors
+        if (parseInt(endMonth) < parseInt(startMonth) && parseInt(startYear) === parseInt(endYear))
+            newErrors.endMonth = t("dashboard.criteria.EndMonthExceedError");
+
+        if (parseInt(endMonth) > parseInt(currentMonth) && parseInt(endYear) === parseInt(currentYear.toString()))
+            newErrors.endMonth = t("dashboard.criteria.EndMonthExceedCurrentError");
+
+        // startMonth errors
+        if (startMonth > currentMonth && startYear === currentYear.toString())
+            newErrors.startMonth = t("dashboard.criteria.StartMonthExceedCurrentError");
+
+        return newErrors;
+    };
+
     const handleSaveChartReport = async (event) => {
         event.preventDefault();
         event.stopPropagation();
@@ -324,8 +439,8 @@ const Dashboard = () => {
                     employee1Name: criteria.employee1.name,
                     employee2Id: compareEmployeeChecked ? -1 : null,
                     employee2Name: compareEmployeeChecked ? "All" : null,
-                    countryId: criteria.countryId,
-                    country: criteria.country,
+                    countryId: criteria.country.id,
+                    country: criteria.country.name,
                     clientType: criteria.clientType,
                     ageOfAccount: criteria.ageOfAccount,
                     accountType: criteria.accountType,
@@ -373,78 +488,12 @@ const Dashboard = () => {
                 }
             }
 
-            await chart(parseInt(criteria.employee1.id), compareEmployeeChecked);
+            await chart(compareEmployeeChecked);
         }
     };
 
-    const setField = (field, value) => {
-        if (field === 'employee1' && parseInt(value.id) === -1) {
-            setCompareEmployeeChecked(false);
-            setCriteria({
-                ...criteria,
-                [field]: value,
-                'employee2': { id: null, name: null }
-            });
-        }
-        else {
-            if (field === 'employee2') {
-                setCompareEmployeeChecked(!compareEmployeeChecked);
-            }
 
-            setCriteria({
-                ...criteria,
-                [field]: value
-            });
-        }
-
-        if (!!errors[field]) {
-            setErrors({
-                ...errors,
-                [field]: null
-            });
-        }
-        setChartSaved(false);
-    };
-
-    const findCriteriaErrors = () => {
-        const { name, startYear, startMonth, endYear, endMonth } = criteria;
-        let newErrors = {};
-
-        // name errors
-        if (name.length === 0)
-            newErrors.name = t("error.Empty");
-
-        // endYear errors
-        if (parseInt(endYear) < parseInt(startYear))
-            newErrors.endYear = t("dashboard.criteria.EndYearExceedError");
-
-        // endMonth errors
-        if (parseInt(endMonth) < parseInt(startMonth) && parseInt(startYear) === parseInt(endYear))
-            newErrors.endMonth = t("dashboard.criteria.EndMonthExceedError");
-
-        if (parseInt(endMonth) > parseInt(currentMonth) && parseInt(endYear) === parseInt(currentYear.toString()))
-            newErrors.endMonth = t("dashboard.criteria.EndMonthExceedCurrentError");
-
-        // startMonth errors
-        if (startMonth > currentMonth && startYear === currentYear.toString())
-            newErrors.startMonth = t("dashboard.criteria.StartMonthExceedCurrentError");
-
-        return newErrors;
-    };
-
-    const initCriteria = async () => {
-        let yearList = [];
-        for (let i = earliestYear; i <= currentYear; i++) {
-            yearList.push(i);
-        }
-        setStartYearList(yearList);
-        setEndYearList(yearList);
-
-        setStartMonthList(months);
-        setEndMonthList(months);
-    };
-
-    const [pageToNavigateTo, setPageToNavigateTo] = useState("/reports");
+    // handle clicks to other pages when unsaved work on Chart Report
     const handleNavClick = async (whereTo) => {
         setPageToNavigateTo("/" + whereTo.split("/").at(-1));
         if (chartSaved) {
@@ -458,12 +507,12 @@ const Dashboard = () => {
             navigate("/login");
         }
 
-        createEmployeeCriteria();
         initCriteria();
         chart();
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
+
 
     return (
         <div>
@@ -503,7 +552,7 @@ const Dashboard = () => {
                                             value={criteria.startYear}
                                             isInvalid={!!errors.startYear}>
 
-                                            {startYearList.map((y, i) => {
+                                            {yearList.map((y, i) => {
                                                 return (
                                                     <option key={i} value={y}>{y}</option>
                                                 );
@@ -524,7 +573,7 @@ const Dashboard = () => {
                                             value={criteria.startMonth}
                                             isInvalid={!!errors.startMonth}>
 
-                                            {startMonthList.map((m, i) => {
+                                            {monthList.map((m, i) => {
                                                 return (<option key={i} value={i}>{m}</option>);
                                             })}
 
@@ -549,7 +598,7 @@ const Dashboard = () => {
                                             value={criteria.endYear}
                                             isInvalid={!!errors.endYear}>
 
-                                            {endYearList.map((y, i) => {
+                                            {yearList.map((y, i) => {
                                                 return (
                                                     <option key={i} value={y}>{y}</option>
                                                 );
@@ -569,7 +618,7 @@ const Dashboard = () => {
                                             value={criteria.endMonth}
                                             isInvalid={!!errors.endMonth}>
 
-                                            {endMonthList.map((m, i) => {
+                                            {monthList.map((m, i) => {
                                                 return (<option key={i} value={i}>{m}</option>);
                                             })}
                                         </Form.Select>
@@ -580,6 +629,28 @@ const Dashboard = () => {
                                     </Col>
                                 </Row>
                             </Form.Group>
+
+
+                            <Row>
+                                <FormLabel htmlFor="countryCriteriaDashboard" className="mt-2">{t('dashboard.criteria.labels.Country')}</FormLabel>
+                                <InputGroup className="mb-2">
+
+                                    <Form.Select id="countryCriteriaDashboard"
+                                        onChange={(e) => {
+                                            setField('country', {
+                                                id: e.target.value,
+                                                name: e.target.options[e.target.selectedIndex].text
+                                            });
+                                        }}>
+                                        <option key={-1} value={-1}>{t('dashboard.criteria.All')}</option>
+                                        {countries.map(c => {
+                                            return (
+                                                <option key={c.countryCode} value={c.countryCode}>{c.countryLabel}</option>
+                                            )
+                                        })}
+                                    </Form.Select>
+                                </InputGroup>
+                            </Row>
 
                             <Row>
                                 <FormLabel htmlFor="employeeCriteriaDashboard" className="mt-2">{t('dashboard.criteria.labels.Employee')}</FormLabel>
@@ -635,6 +706,20 @@ const Dashboard = () => {
                                             />
                                         </Button>
                                     </OverlayTrigger>
+                                </InputGroup>
+                            </Row>
+
+                            <Row>
+                                <FormLabel htmlFor="clientTypeCriteriaDashboard" className="mt-2">{t('dashboard.criteria.labels.ClientType')}</FormLabel>
+                                <InputGroup className="mb-2">
+                                    <Form.Select id="clientTypeCriteriaDashboard" onChange={(e) => {
+                                        setField('clientType', e.target.value);
+                                    }}>
+                                        <option key={0} value={"Any"}>{t('dashboard.criteria.clientType.Any')}</option>
+                                        <option key={1} value={"CORRES"}>{t('dashboard.criteria.clientType.Corr')}</option>
+                                        <option key={2} value={"DIRECT"}>{t('dashboard.criteria.clientType.Direct')}</option>
+
+                                    </Form.Select>
                                 </InputGroup>
                             </Row>
 
@@ -773,8 +858,6 @@ const Dashboard = () => {
                                 <button className='left-button'>&#60;</button>
                                 <button className='right-button'>&#62;</button>
                             </ButtonGroup>
-
-
                         </div>
                     </div>
                 </div>
