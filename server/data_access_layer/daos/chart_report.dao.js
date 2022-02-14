@@ -112,19 +112,19 @@ exports.getDataForChartReport = async (chartReportId, chartReportDataModel = Cha
             }
         })
         .then(async data => {
-            if (data) {
+            if (data.length !== 0) {
                 let returnData = [];
                 for (let i = 0; i < data.length; i++) {
                     returnData.push(data[i].dataValues);
                 }
                 resolve(returnData)
             }
-            resolve(false);
+            reject({status: 500, message: "Fetched data doesn't exist."})
         })
         .catch(async err => {
             const response = {
                 status: err.status || 500,
-                message: err.message || "Could not create data."
+                message: err.message || "Could not fetch data."
             }
             reject(response);
         });

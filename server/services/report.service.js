@@ -250,7 +250,7 @@ exports.createChartReportPDFById = async (reportId) => {
                 if (data) {
                     let averagesList = [];
 
-                    await this.getChartReportPDFAverages(reportId).then(async dataAvg => {
+                    await this.getChartReportPDFAverages(reportId).then(async (dataAvg) => {
                         for(let i = 0; i < dataAvg.length; i++) {
                             let avgObject = {
                                 year: dataAvg[i].year,
@@ -301,7 +301,9 @@ exports.getChartReportPDFAverages = async (reportId) => {
     return new Promise(async (resolve, reject) => {
         ChartReportDao.getDataForChartReport(reportId)
         .then(data => {
-            if (data) resolve(data);
+            if (data) {
+                resolve(data);
+            }
             resolve(false);
         })
         .catch(err => {
