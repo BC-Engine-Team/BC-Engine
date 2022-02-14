@@ -272,16 +272,20 @@ exports.createChartReportPDFById = async (reportId) => {
                             }
                             averagesList.push(avgObject);
                         }
-                    }).catch(err => {
-                        reject(err);
-                    });
+                        console.log(averagesList)
 
-                    pdf.create(pdfTemplate(data, averagesList), pdfOptions)
-                    .toFile(`./docs/pdf_files/chartReport-${reportId}.pdf`, (err) => {
-                        if(err) {
-                            reject(err);
-                        }
-                        resolve(true);
+                    }).then(() => {
+                        console.log(averagesList)
+                        pdf.create(pdfTemplate(data, averagesList), pdfOptions)
+                        .toFile(`./docs/pdf_files/chartReport-${reportId}.pdf`, (err) => {
+                            if(err) {
+                                reject(err);
+                            }
+                            resolve(true);
+                        });
+                    }).catch(err => {
+                        console.log(err)
+                        reject(err);
                     });
                 }
                 else
