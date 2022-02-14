@@ -15,8 +15,14 @@ const Reports = () => {
     let navigate = useNavigate();
     const cookies = new Cookies();
 
+    let role = cookies.get("role");
+
     const [pdfLoading, setPdfLoading] = useState(false);
     const [currentPdfLoading, setCurrentPdfLoading] = useState();
+    
+    const [chartReportId, setChartReportId] = useState("");
+    const [chartReportName, setChartReportName] = useState("");
+    const [deleteButtonActivated, setDeleteButtonActivated] = useState(false);
 
     const [chartReports, setChartReports] = useState([{
         chartReportId: "",
@@ -30,6 +36,14 @@ const Reports = () => {
         ageOfAccount: "",
         accountType: ""
     }]);
+
+    const [reportTypes, setReportTypes] = useState([]);
+    const [selectedReportType, setSelectedReportType] = useState({});
+    const [showReportsManagement, setShowReportsManagement] = useState({
+        isAdmin: false,
+        employee: "container-reportsTable-employee",
+        admin: "container-reportsTable"
+    });
 
     const createAndDownloadPDF = (ReportId) => {
         setPdfLoading(true);
@@ -98,14 +112,57 @@ const Reports = () => {
             });
     }
 
-    const handleRefresh = () => {
+    const handleRefresh = async () => {
+        await getChartReports();
+        if (cookies.get("role") === 'admin') {
+            setShowReportsManagement({
+                ...showReportsManagement,
+                isAdmin: true
+            });
+            await getReportTypesAndRecipients();
+        }
+
+    }
+
+    const getReportTypesAndRecipients = async () => {
         let header = {
             'authorization': "Bearer " + cookies.get("accessToken"),
         }
 
         Axios.defaults.withCredentials = true;
 
-        Axios.get(`${process.env.REACT_APP_API}/reports/chartReport`, { headers: header })
+        await Axios.get(`${process.env.REACT_APP_API}/reports/reportTypes`, { headers: header })
+            .then((response) => {
+                if (response.data) {
+                    console.log(response.data)
+                    setReportTypes(response.data);
+                    setSelectedReportType(response.data[0]);
+                    return;
+                }
+                alert("The response from the B&C Engine was invalid.");
+            })
+            .catch((error) => {
+                if (error.response) {
+                    if (error.response.status === 403 || error.response.status === 401) {
+                        alert("You are not authorized to perform this action.");
+                    }
+                    else {
+                        alert("Malfunction in the B&C Engine.");
+                    }
+                }
+                else if (error.request) {
+                    alert("Could not reach b&C Engine...");
+                }
+            });
+    }
+
+    const getChartReports = async () => {
+        let header = {
+            'authorization': "Bearer " + cookies.get("accessToken")
+        }
+
+        Axios.defaults.withCredentials = true;
+        await Axios.get(`${process.env.REACT_APP_API}/reports/chartReport`, { headers: header })
             .then((response) => {
                 setChartReports(response.data);
             })
@@ -115,14 +172,55 @@ const Reports = () => {
                         alert("You are not authorized to perform this action.");
                     }
                     else {
-                        alert("Could not reach b&C Engine...");
+                        alert("Malfunction in the B&C Engine.");
                     }
                 }
                 else if (error.request) {
                     alert("Could not reach b&C Engine...");
                 }
             });
+    };
+
+    const handleDeleteChartReport = (id, chartReportName) => {
+        setChartReportId(id);
+        setChartReportName(chartReportName);
+        setDeleteButtonActivated(true);
     }
+
+    const onDeleteClick = () => {
+        let header = {
+            'authorization': "Bearer " + cookies.get("accessToken")
+        }
+
+        let data = {
+            chartReportId: chartReportId
+        }
+
+        Axios.defaults.withCredentials = true;
+
+
+        Axios.delete(`${process.env.REACT_APP_API}/reports/delete/${chartReportId}`, { headers: header, data: data })
+            .then((response) => {
+                if (response.status === 200 || response.status === 204) {
+                    handleRefresh();
+                    alert(t('reports.delete.Confirmation'));
+                }
+            })
+            .catch((error) => {
+                if (error.response) {
+                    if (error.response.status === 401 || error.response.status === 403) {
+                        alert(t('reports.delete.NotAuthorized'));
+                    }
+                    else {
+                        alert(malfunctionError)
+                    }
+                }
+                else if (error.request) {
+                    alert(notFoundError);
+                }
+            });
+        setDeleteButtonActivated(false);
+    };
 
 
     useEffect(() => {

@@ -42,11 +42,6 @@ input, select, button{
   background-color: rgb(228, 228, 228);
 }
 
-@media (max-width: 768px) {
-  .navBarGreeting {
-    display: none;
-  } 
-}
 .navLogin {
   text-align: center;
 }
@@ -61,4 +56,51 @@ input, select, button{
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%)
+}
+
+.passwordValidationField.form-control.is-invalid, 
+.passwordValidationField.was-validated,
+.passwordValidationField.form-control:invalid {
+  padding-right: 4.125rem!important;
+  background-position: center right 2.25rem!important;
+}
+
+@media (max-width: 768px) {
+  .navBarGreeting {
+    display: none;
+  } 
+
+  #loginForm {
+    margin-top: 2rem !important;
+    margin-right: 2rem !important;
+    margin-left: 2rem !important;
+  }
+
+  #login-card {
+    margin: 2rem!important;
+  }
+}
+
+@media (max-width: 576px) {
+  #loginForm {
+    margin-top: 1.5rem !important;
+    margin-right: 1rem !important;
+    margin-left: 1rem !important;
+  }
+
+  #login-card {
+    margin: 1rem!important;
+  }
+}
+
+@media (max-width: 482px) {
+  #loginForm {
+    margin-top: 1rem !important;
+    margin-right: 0 !important;
+    margin-left: 0 !important;
+  }
+
+  #login-card {
+    margin: 0!important;
+  }
 }

@@ -33,7 +33,10 @@ db.Sequelize = Sequelize;
 // Add any tables to the local database here
 [db['localdb'].users,
 db['localdb'].chartReports,
-db['localdb'].chartReportsData] = require("./models/localdb/localdb.model")(db['localdb'], Sequelize);
+db['localdb'].chartReportsData,
+db['localdb'].reportTypes,
+db['localdb'].recipients,
+db['localdb'].reportTypeRecipients] = require("./models/localdb/localdb.model")(db['localdb'], Sequelize);
 
 // patricia database tables
 db['mssql_pat'].employees = require("./models/mssql_pat/employee.model")(db['mssql_pat'], Sequelize);
@@ -112,8 +115,90 @@ db.sync = async (database, options) => {
         }
       ]);
     })
+    .then(async () => {
+      let recipients = await db['localdb'].recipients.bulkCreate([
+        {
+          name: "Charles-André Caron",
+          email: "charles-andre@benoit-cote.com"
+        },
+        {
+          name: "France Coté",
+          email: "france@benoit-cote.com"
+        },
+        {
+          name: "Hilal El Ayoubi",
+          email: "hilal@benoit-cote.com"
+        },
+        {
+          name: "Ibrahim Tamer",
+          email: "ibrahim@benoit-cote.com"
+        },
+        {
+          name: "Irina Kostko",
+          email: "irina@benoit-cote.com"
+        },
+        {
+          name: "Ismaël Coulibaly",
+          email: "ismael@benoit-cote.com"
+        },
+        {
+          name: "Marc Benoît",
+          email: "marc@benoit-cote.com"
+        },
+        {
+          name: "Mailyne Séïde",
+          email: "marilyne@benoit-cote.com"
+        },
+        {
+          name: "Martin Roy",
+          email: "martin@benoit-cote.com"
+        },
+        {
+          name: "Mathieu Audet",
+          email: "ma@benoit-cote.com"
+        },
+        {
+          name: "Mathieu Miron",
+          email: "mathieu@benoit-cote.com"
+        },
+        {
+          name: "Michel Sofia",
+          email: "michel@benoit-cote.com"
+        },
+        {
+          name: "Philip Conrad",
+          email: "phil@benoit-cote.com"
+        },
+        {
+          name: "Sabrina Lavoie",
+          email: "sabrina@benoit-cote.com"
+        },
+        {
+          name: "Suzanne Antal",
+          email: "suzanne@benoit-cote.com"
+        }
+      ]);
+      return recipients;
+    })
+    .then(async (recipients) => {
+      let reportTypes = await db['localdb'].reportTypes.create({
+        reportTypeName: 'Monthly Employee Performance Report',
+        frequency: 0
+      });
+      return { reportTypes: reportTypes, recipients: recipients };
+    })
+    .then(async data => {
+      let reportTypeRecipients = [];
+      for (let i = 0; i < data.recipients.length; i++) {
+        reportTypeRecipients.push({
+          report_type_id: data.reportTypes.reportTypeId,
+          recipient_id: data.recipients[i].recipientId
+        });
+      }
+      await db['localdb'].reportTypeRecipients.bulkCreate(reportTypeRecipients);
+    })
     .catch((err) => {
-      console.log(err);
+      console.log(err.message);
     });
 }
 

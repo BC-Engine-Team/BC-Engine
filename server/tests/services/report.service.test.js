@@ -2,6 +2,7 @@ var { expect, jest } = require('@jest/globals');
 
 const ReportService = require("../../services/report.service");
 const ChartReportDao = require("../../data_access_layer/daos/chart_report.dao");
+const ReportDao = require("../../data_access_layer/daos/report.dao");
 
 
 
@@ -193,8 +194,6 @@ describe("Test Report Service", () => {
         });
 
     describe("RS2 - createChartReportForUser", () => {
-
-
         describe("RS2.1 - given valid criteria", () => {
             it("RS2.1.1 - when valid response from functions, should call functions with prepared data and respond with functions response", async () => {
                 // arrange
@@ -690,4 +689,491 @@ describe("Test Report Service", () => {
             });
         });
     });
+
+    describe("RS6 - deleteChartReportById", () => {
+        let fakeChartIdObject = {
+            chartReportId: "fakeUUID"
+        };
+        describe("RS6.1 - given valid chart report id", () => {
+            it("RS6.1.1 - should return an empty promise", () => {
+
+                //arrange
+                chartReportDaoSpy = jest.spyOn(ChartReportDao, 'deleteChartReportById')
+                    .mockImplementation(() => new Promise((resolve, reject) => {
+                        resolve({});
+                    }));
+
+                let expectedResponse = Promise.resolve({})
+
+                // act
+                const response = ReportService.deleteChartReportById(fakeChartIdObject.chartReportId);
+
+                // assert
+                expect(response).toEqual(expectedResponse);
+            });
+        });
+
+        describe("RS6.2 - given invalid chart report id", () => {
+            it("RS6.2.1 - should return Dao error", () => {
+                // arrange
+                chartReportDaoSpy = jest.spyOn(ChartReportDao, 'deleteChartReportById')
+                    .mockImplementation(() => new Promise((resolve, reject) => {
+                        reject(expectedData);
+                    }));
+
+                let expectedData = {
+                    status: 500,
+                    message: "Some error occured"
+                }
+
+                //act and assert
+                expect(ReportService.deleteChartReportById(fakeChartIdObject.chartReportId)).rejects
+                    .toEqual(expectedData);
+
+            });
+
+            it("RS6.2.2 - should return false", () => {
+                // arrange
+                chartReportDaoSpy = jest.spyOn(ChartReportDao, 'deleteChartReportById')
+                    .mockImplementation(() => new Promise((resolve, reject) => {
+                        resolve(false);
+                    }));
+
+                //act and assert
+                expect(ReportService.deleteChartReportById(fakeChartIdObject.chartReportId)).resolves
+                    .toEqual(false);
+            });
+
+            it("RS6.2.3 - when dao rejects with specified status and message, should reject with specified status and message", async () => {
+                // arrange
+                let expectedResponse = {
+                    status: 600,
+                    message: "Error."
+                };
+                chartReportDaoSpy = jest.spyOn(ChartReportDao, 'deleteChartReportById')
+                    .mockImplementation(() => new Promise((resolve, reject) => {
+                        reject(expectedResponse);
+                    }));
+
+                // act and assert
+                await expect(ReportService.deleteChartReportById(fakeChartIdObject.chartReportId))
+                    .rejects.toEqual(expectedResponse);
+                expect(chartReportDaoSpy).toHaveBeenCalledWith(fakeChartIdObject.chartReportId);
+            });
+
+            it("RS6.2.4 - when dao rejects with unspecified status and message, should reject with default status and message", async () => {
+                // arrange
+                let expectedResponse = {
+                    status: 500,
+                    message: "Malfunction in the B&C Engine."
+                };
+                chartReportDaoSpy = jest.spyOn(ChartReportDao, 'deleteChartReportById')
+                    .mockImplementation(() => new Promise((resolve, reject) => {
+                        reject({});
+                    }));
+
+                // act and assert
+                await expect(ReportService.deleteChartReportById(fakeChartIdObject.chartReportId))
+                    .rejects.toEqual(expectedResponse);
+                expect(chartReportDaoSpy).toHaveBeenCalledWith(fakeChartIdObject.chartReportId);
+            });
+        });
+    });
+
+
+    let reportServiceGetReportTypesSpy;
+    let reportServiceGetRecipientsSpy;
+    describe("RS7 - getReportTypesWithRecipients", () => {
+        let fakeGetReportTypesResponse = [
+            {
+                reportTypeId: "someUUID",
+                name: "someName1",
+                frequency: 0,
+                recipients: {
+                    "uuid1": { name: "" },
+                    "uuid2": { name: "" },
+                    "uuid3": { name: "" }
+                }
+            },
+            {
+                reportTypeId: "someUUID1",
+                name: "someName2",
+                frequency: 1,
+                recipients: {
+                    "uuid3": { name: "" },
+                    "uuid2": { name: "" },
+                    "uuid5": { name: "" }
+                }
+            }
+        ];
+        let fakeGetRecipientsResponse = [
+            {
+                recipientId: "uuid1",
+                name: "myName1",
+                email: "email1"
+            },
+            {
+                recipientId: "uuid2",
+                name: "myName2",
+                email: "email2"
+            },
+            {
+                recipientId: "uuid3",
+                name: "myName3",
+                email: "email3"
+            },
+            {
+                recipientId: "uuid4",
+                name: "myName4",
+                email: "email4"
+            },
+            {
+                recipientId: "uuid5",
+                name: "myName5",
+                email: "email5"
+            },
+        ];
+
+        reportServiceGetReportTypesSpy = jest.spyOn(ReportService, 'getReportTypes')
+            .mockImplementation(() => new Promise((resolve) => {
+                resolve(fakeGetReportTypesResponse);
+            }));
+        reportServiceGetRecipientsSpy = jest.spyOn(ReportService, 'getRecipients')
+            .mockImplementation(() => new Promise((resolve) => {
+                resolve(fakeGetRecipientsResponse);
+            }));
+
+        describe("RS7.1 - given valid response from getReportTypes and getRecipients", () => {
+            it("RS7.1.1 - should respond with list of reportTypes with the recipients", async () => {
+                // arrange
+                let expectedResponse = [
+                    {
+                        reportTypeId: fakeGetReportTypesResponse[0].reportTypeId,
+                        name: fakeGetReportTypesResponse[0].name,
+                        frequency: fakeGetReportTypesResponse[0].frequency,
+                        recipients: {
+                            "uuid1": { name: "myName1", isRecipient: true },
+                            "uuid2": { name: "myName2", isRecipient: true },
+                            "uuid3": { name: "myName3", isRecipient: true },
+                            "uuid4": { name: "myName4", isRecipient: false },
+                            "uuid5": { name: "myName5", isRecipient: false }
+                        }
+                    },
+                    {
+                        reportTypeId: fakeGetReportTypesResponse[1].reportTypeId,
+                        name: fakeGetReportTypesResponse[1].name,
+                        frequency: fakeGetReportTypesResponse[1].frequency,
+                        recipients: {
+                            "uuid1": { name: "myName1", isRecipient: false },
+                            "uuid2": { name: "myName2", isRecipient: true },
+                            "uuid3": { name: "myName3", isRecipient: true },
+                            "uuid4": { name: "myName4", isRecipient: false },
+                            "uuid5": { name: "myName5", isRecipient: true }
+                        }
+                    }
+                ];
+
+                // act and assert
+                await expect(ReportService.getReportTypesWithRecipients())
+                    .resolves.toEqual(expectedResponse);
+            });
+        });
+
+        describe("RS7.2 - given invalid response from getReportTypes", () => {
+            it("RS7.2.1 - when getReportTypes resolves false, should resolve false", async () => {
+                // arrange
+                reportServiceGetReportTypesSpy.mockClear();
+                reportServiceGetReportTypesSpy = jest.spyOn(ReportService, 'getReportTypes')
+                    .mockImplementation(() => new Promise((resolve) => {
+                        resolve(false);
+                    }));
+
+                // act and assert
+                await expect(ReportService.getReportTypesWithRecipients())
+                    .resolves.toEqual(false);
+                expect(reportServiceGetReportTypesSpy).toHaveBeenCalled();
+                expect(reportServiceGetRecipientsSpy).toHaveBeenCalledTimes(0);
+            });
+
+            it("RS7.2.2 - when getReportTypes rejects specified status and message, should reject specified status and message", async () => {
+                // arrange
+                let expectedResponse = {
+                    status: 600,
+                    message: "Error."
+                };
+                reportServiceGetReportTypesSpy = jest.spyOn(ReportService, 'getReportTypes')
+                    .mockImplementation(() => new Promise((resolve, reject) => {
+                        reject(expectedResponse);
+                    }));
+
+                // act and assert
+                await expect(ReportService.getReportTypesWithRecipients())
+                    .rejects.toEqual(expectedResponse);
+                expect(reportServiceGetReportTypesSpy).toHaveBeenCalled();
+                expect(reportServiceGetRecipientsSpy).toHaveBeenCalledTimes(0);
+            });
+
+            it("RS7.2.3 - when getReportTypes rejects unspecified status and message, should reject default status and message", async () => {
+                // arrange
+                let expectedResponse = {
+                    status: 500,
+                    message: "Malfunction in the B&C Engine."
+                };
+                reportServiceGetReportTypesSpy = jest.spyOn(ReportService, 'getReportTypes')
+                    .mockImplementation(() => new Promise((resolve, reject) => {
+                        reject({});
+                    }));
+
+                // act and assert
+                await expect(ReportService.getReportTypesWithRecipients())
+                    .rejects.toEqual(expectedResponse);
+                expect(reportServiceGetReportTypesSpy).toHaveBeenCalled();
+                expect(reportServiceGetRecipientsSpy).toHaveBeenCalledTimes(0);
+            });
+        });
+
+        describe("RS7.3 - given invalid response from getRecipients", () => {
+            it("RS7.3.1 - when getRecipients resolves false, should resolve false", async () => {
+                // arrange
+                reportServiceGetReportTypesSpy = jest.spyOn(ReportService, 'getReportTypes')
+                    .mockImplementation(() => new Promise((resolve) => {
+                        resolve(fakeGetReportTypesResponse);
+                    }));
+                reportServiceGetRecipientsSpy = jest.spyOn(ReportService, 'getRecipients')
+                    .mockImplementation(() => new Promise((resolve) => {
+                        resolve(false);
+                    }));
+
+                // act and assert
+                await expect(ReportService.getReportTypesWithRecipients())
+                    .resolves.toBe(false);
+                expect(reportServiceGetReportTypesSpy).toHaveBeenCalled();
+                expect(reportServiceGetRecipientsSpy).toHaveBeenCalled();
+            });
+
+            it("RS7.3.2 - when getRecipients rejects specified status and message, should reject specified status and message", async () => {
+                // arrange
+                let expectedResponse = {
+                    status: 600,
+                    message: "bop"
+                };
+                reportServiceGetRecipientsSpy = jest.spyOn(ReportService, 'getRecipients')
+                    .mockImplementation(() => new Promise((resolve, reject) => {
+                        reject(expectedResponse);
+                    }));
+
+                // act and assert
+                await expect(ReportService.getReportTypesWithRecipients())
+                    .rejects.toEqual(expectedResponse);
+                expect(reportServiceGetReportTypesSpy).toHaveBeenCalled();
+                expect(reportServiceGetRecipientsSpy).toHaveBeenCalled();
+            });
+
+            it("RS7.3.3 - when getRecipients rejects unspecified status and message, should reject default status and message", async () => {
+                // arrange
+                let expectedResponse = {
+                    status: 500,
+                    message: "Malfunction in the B&C Engine."
+                };
+                reportServiceGetRecipientsSpy = jest.spyOn(ReportService, 'getRecipients')
+                    .mockImplementation(() => new Promise((resolve, reject) => {
+                        reject({});
+                    }));
+
+                // act and assert
+                await expect(ReportService.getReportTypesWithRecipients())
+                    .rejects.toEqual(expectedResponse);
+                expect(reportServiceGetReportTypesSpy).toHaveBeenCalled();
+                expect(reportServiceGetRecipientsSpy).toHaveBeenCalled();
+            });
+        });
+    });
+
+    describe("RS8 - getReportTypes", () => {
+        let fakeGetReportTypeWithRecipientIdsDaoResponse = [
+            {
+                reportTypeId: "someUUID",
+                name: "someName1",
+                frequency: 0,
+                recipients: {
+                    "uuid1": { name: "" },
+                    "uuid2": { name: "" },
+                    "uuid3": { name: "" }
+                }
+            },
+            {
+                reportTypeId: "someUUID1",
+                name: "someName2",
+                frequency: 1,
+                recipients: {
+                    "uuid3": { name: "" },
+                    "uuid2": { name: "" },
+                    "uuid5": { name: "" }
+                }
+            }
+        ];
+        let getReportTypeWithRecipientIdsDaoSpy;
+        describe("RS8.1 - given valid response from dao", () => {
+            it("RS8.1.1 - should resolve response from dao", async () => {
+                // arrange
+                reportServiceGetReportTypesSpy.mockRestore();
+                getReportTypeWithRecipientIdsDaoSpy = jest.spyOn(ReportDao, 'getReportTypesWithRecipientIds')
+                    .mockImplementation(() => new Promise((resolve) => {
+                        resolve(fakeGetReportTypeWithRecipientIdsDaoResponse);
+                    }));
+
+                // act and assert
+                await expect(ReportService.getReportTypes())
+                    .resolves.toEqual(fakeGetReportTypeWithRecipientIdsDaoResponse);
+            });
+        });
+
+        describe("RS8.2 - given invalid response from dao", () => {
+            it("RS9.2.1 - when dao resolves false, should resolve false", async () => {
+                // arrange
+                getReportTypeWithRecipientIdsDaoSpy = jest.spyOn(ReportDao, 'getReportTypesWithRecipientIds')
+                    .mockImplementation(() => new Promise((resolve) => {
+                        resolve(false);
+                    }));
+
+                // act and assert
+                await expect(ReportService.getReportTypes())
+                    .resolves.toEqual(false);
+                expect(getReportTypeWithRecipientIdsDaoSpy).toHaveBeenCalled();
+            });
+
+            it("RS8.2.2 - when dao rejects specified status and messsage, should reject with specified status and message", async () => {
+                // arrange
+                let expectedResponse = {
+                    status: 600,
+                    message: "Error."
+                };
+                getReportTypeWithRecipientIdsDaoSpy = jest.spyOn(ReportDao, 'getReportTypesWithRecipientIds')
+                    .mockImplementation(() => new Promise((resolve, reject) => {
+                        reject(expectedResponse);
+                    }));
+
+                // act and assert
+                await expect(ReportService.getReportTypes())
+                    .rejects.toEqual(expectedResponse);
+                expect(getReportTypeWithRecipientIdsDaoSpy).toHaveBeenCalled();
+            });
+
+            it("RS8.2.3 - when dao rejects unspecified status and messsage, should reject with default status and message", async () => {
+                // arrange
+                let expectedResponse = {
+                    status: 500,
+                    message: "Could not fetch Report Types."
+                };
+                getReportTypeWithRecipientIdsDaoSpy = jest.spyOn(ReportDao, 'getReportTypesWithRecipientIds')
+                    .mockImplementation(() => new Promise((resolve, reject) => {
+                        reject({});
+                    }));
+
+                // act and assert
+                await expect(ReportService.getReportTypes())
+                    .rejects.toEqual(expectedResponse);
+                expect(getReportTypeWithRecipientIdsDaoSpy).toHaveBeenCalled();
+            });
+        });
+
+    });
+
+    describe("RS9 - getRecipients", () => {
+        let fakeGetRecipientsDaoResponse = [
+            {
+                recipientId: "uuid1",
+                name: "myName1",
+                email: "email1"
+            },
+            {
+                recipientId: "uuid2",
+                name: "myName2",
+                email: "email2"
+            },
+            {
+                recipientId: "uuid3",
+                name: "myName3",
+                email: "email3"
+            },
+            {
+                recipientId: "uuid4",
+                name: "myName4",
+                email: "email4"
+            },
+            {
+                recipientId: "uuid5",
+                name: "myName5",
+                email: "email5"
+            },
+        ];
+
+        let getRecipientsDaotSpy;
+        describe("RS9.1 - given valid response from dao", () => {
+            it("RS9.1.1 - should resolve response from dao", async () => {
+                // arrange
+                reportServiceGetRecipientsSpy.mockRestore();
+                getRecipientsDaotSpy = jest.spyOn(ReportDao, 'getRecipients')
+                    .mockImplementation(() => new Promise((resolve) => {
+                        resolve(fakeGetRecipientsDaoResponse);
+                    }));
+
+                // act and assert
+                await expect(ReportService.getRecipients())
+                    .resolves.toEqual(fakeGetRecipientsDaoResponse);
+                expect(getRecipientsDaotSpy).toHaveBeenCalled();
+
+            });
+        });
+
+        describe("RS9.2 - given invalidresponse from dao", () => {
+            it("RS9.2.1 - when dao resolves false, should resolve false", async () => {
+                // arrange
+                getRecipientsDaotSpy = jest.spyOn(ReportDao, 'getRecipients')
+                    .mockImplementation(() => new Promise((resolve) => {
+                        resolve(false);
+                    }));
+
+                // act and assert
+                await expect(ReportService.getRecipients())
+                    .resolves.toEqual(false);
+                expect(getRecipientsDaotSpy).toHaveBeenCalled();
+            });
+
+            it("RS9.2.2 - when dao rejects specified status and messsage, should reject with specified status and message", async () => {
+                // arrange
+                let expectedResponse = {
+                    status: 600,
+                    message: "Error."
+                };
+                getRecipientsDaotSpy = jest.spyOn(ReportDao, 'getRecipients')
+                    .mockImplementation(() => new Promise((resolve, reject) => {
+                        reject(expectedResponse);
+                    }));
+
+                // act and assert
+                await expect(ReportService.getRecipients())
+                    .rejects.toEqual(expectedResponse);
+                expect(getRecipientsDaotSpy).toHaveBeenCalled();
+            });
+
+            it("RS9.2.3 - when dao rejects unspecified status and messsage, should reject with default status and message", async () => {
+                // arrange
+                let expectedResponse = {
+                    status: 500,
+                    message: "Could not fetch Recipients."
+                };
+                getRecipientsDaotSpy = jest.spyOn(ReportDao, 'getRecipients')
+                    .mockImplementation(() => new Promise((resolve, reject) => {
+                        reject({});
+                    }));
+
+                // act and assert
+                await expect(ReportService.getRecipients())
+                    .rejects.toEqual(expectedResponse);
+                expect(getRecipientsDaotSpy).toHaveBeenCalled();
+            });
+        });
+    });
 })
+

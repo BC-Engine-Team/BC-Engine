@@ -130,3 +130,22 @@ exports.getDataForChartReport = async (chartReportId, chartReportDataModel = Cha
         });
     });
 }
+
+exports.deleteChartReportById = async(chartReportId, chartReportModel = ChartReportModel) => {
+    return new Promise((resolve, reject) => {
+        chartReportModel.destroy({where: {chartReportId: chartReportId}})
+            .then(async data => {
+                if (data) {
+                    resolve("Chart report deleted successfully.");
+                }
+                resolve(false);
+            })
+            .catch(err =>{
+                const response = {
+                    status: err.status || 500,
+                    message: err.message || "Could not delete data."
+                }
+                reject(response);
+            });
+    });
+}
