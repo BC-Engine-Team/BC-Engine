@@ -77,38 +77,37 @@ describe("Test Name DAO", () => {
             });
         });
 
+        describe("ND1.2 - given invalid response from db query", () => {
+            it("ND1.2.1 - should return false when db cant fetch data", async () => {
+                // arrange
+                let dbStub = {
+                    query: () => {
+                        return Promise.resolve(false);
+                    }
+                };
 
-        it("ND1.2 - should return false when db cant fetch data", async () => {
-            // arrange
-            let dbStub = {
-                query: () => {
-                    return Promise.resolve(false);
-                }
-            };
+                // act and assert
+                await expect(NameDao.getClientsInClientIdList(fakeClientIdList, dbStub)).resolves
+                    .toEqual(false);
+            });
 
-            let testId = [0];
+            it("ND1.2.2 - should catch error when db throws error", async () => {
+                // arrange
+                let expectedResponse = {
+                    status: 500,
+                    message: "Could not fetch clients."
+                };
+                let dbStub = {
+                    query: () => {
+                        return Promise.reject({});
+                    }
+                };
 
-            // act and assert
-            await expect(NameDao.getClientsInClientIdList(fakeClientIdList, dbStub)).resolves
-                .toEqual(false);
+                // act and assert
+                await expect(NameDao.getClientsInClientIdList(fakeClientIdList, dbStub)).rejects
+                    .toEqual(expectedResponse);
+            });
         });
-
-        it("ND1.3 - should catch error when db throws error", async () => {
-            // arrange
-            let expectedResponse = {
-                status: 500,
-                message: "Could not get clients."
-            };
-            let dbStub = {
-                query: () => {
-                    return Promise.reject({});
-                }
-            };
-
-            // act and assert
-            await expect(NameDao.getClientsInClientIdList(fakeClientIdList, dbStub)).rejects
-                .toEqual(expectedResponse);
-        })
     });
 
     describe("ND2 - getAllEmployeeNames", () => {
