@@ -51,6 +51,7 @@ describe("Test Transac Stat DAO", () => {
     let employeeId = 12345;
     let clientType = 'DIRECT';
     let countryLabel = 'Canada';
+    let ageOfAccount = "<30";
 
     describe("TD1 - getTransactionsStatByYearMonth", () => {
 
@@ -76,9 +77,9 @@ describe("Test Transac Stat DAO", () => {
             ];
 
             // act and assert
-            await expect(TransacStatDao.getTransactionsStatByYearMonth(yearMonthList, employeeId, clientType, countryLabel, dbStub)).resolves
+            await expect(TransacStatDao.getTransactionsStatByYearMonth(yearMonthList, employeeId, clientType, countryLabel, ageOfAccount, dbStub)).resolves
                 .toEqual(expectedResponse);
-            expect(prepareDuesQuerySpy).toHaveBeenCalledWith(yearMonthList, employeeId, clientType, countryLabel);
+            expect(prepareDuesQuerySpy).toHaveBeenCalledWith(yearMonthList, employeeId, clientType, countryLabel, ageOfAccount);
         });
 
         it("TD1.2 - should return false when model cant fetch data", async () => {
@@ -90,9 +91,9 @@ describe("Test Transac Stat DAO", () => {
             };
 
             // act and assert
-            await expect(TransacStatDao.getTransactionsStatByYearMonth(yearMonthList, employeeId, clientType, countryLabel, dbStub)).resolves
+            await expect(TransacStatDao.getTransactionsStatByYearMonth(yearMonthList, employeeId, clientType, countryLabel, ageOfAccount, dbStub)).resolves
                 .toEqual(false);
-            expect(prepareDuesQuerySpy).toHaveBeenCalledWith(yearMonthList, employeeId, clientType, countryLabel);
+            expect(prepareDuesQuerySpy).toHaveBeenCalledWith(yearMonthList, employeeId, clientType, countryLabel,ageOfAccount);
         });
 
         it("TD1.3 - when model throws error with specified status and message, should reject with specified status and message", async () => {
@@ -108,9 +109,9 @@ describe("Test Transac Stat DAO", () => {
             };
 
             // act and assert
-            await expect(TransacStatDao.getTransactionsStatByYearMonth(yearMonthList, employeeId, clientType, countryLabel, dbStub)).rejects
+            await expect(TransacStatDao.getTransactionsStatByYearMonth(yearMonthList, employeeId, clientType, countryLabel, ageOfAccount, dbStub)).rejects
                 .toEqual(expectedResponse);
-            expect(prepareDuesQuerySpy).toHaveBeenCalledWith(yearMonthList, employeeId, clientType, countryLabel);
+            expect(prepareDuesQuerySpy).toHaveBeenCalledWith(yearMonthList, employeeId, clientType, countryLabel, ageOfAccount);
         });
 
         it("TD1.4 - when model throws error with unspecified status and message, should reject with default status and message", async () => {
@@ -126,9 +127,9 @@ describe("Test Transac Stat DAO", () => {
             };
 
             // act and assert
-            await expect(TransacStatDao.getTransactionsStatByYearMonth(yearMonthList, employeeId, clientType, countryLabel, dbStub)).rejects
+            await expect(TransacStatDao.getTransactionsStatByYearMonth(yearMonthList, employeeId, clientType, countryLabel, ageOfAccount, dbStub)).rejects
                 .toEqual(expectedResponse);
-            expect(prepareDuesQuerySpy).toHaveBeenCalledWith(yearMonthList, employeeId, clientType, countryLabel);
+            expect(prepareDuesQuerySpy).toHaveBeenCalledWith(yearMonthList, employeeId, clientType, countryLabel, ageOfAccount);
         });
     });
 

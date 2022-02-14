@@ -65,14 +65,6 @@ exports.prepareBilledQuery = (startDate, endDate, employeeId, clientType, countr
         query.replacements.push(clientType.toUpperCase());
     }
 
-    if (countryCode !== undefined) {
-        fromString = fromString.includes("LEFT OUTER JOIN [Bosco reduction].[dbo].NAME_CONNECTION NC ON NC.CONNECTION_ID=1 AND NC.CONNECTION_NAME_ID=CONVERT(nvarchar, IH.ACTOR_ID)") ?
-            fromString : fromString.concat(" LEFT OUTER JOIN [Bosco reduction].[dbo].NAME_CONNECTION NC ON NC.CONNECTION_ID=1 AND NC.CONNECTION_NAME_ID=CONVERT(nvarchar, IH.ACTOR_ID) ");
-        fromString = fromString.concat(", [Bosco reduction].[dbo].NAME N ");
-        whereString = whereString.concat(" AND N.NAME_ID=NC.NAME_ID AND N.LEGAL_COUNTRY_CODE=? ");
-        query.replacements.push(countryCode);
-    }
-
     if (ageOfAccount !== undefined) {
         fromString = fromString.includes("LEFT OUTER JOIN [Bosco reduction].[dbo].NAME_CONNECTION NC ON NC.CONNECTION_ID=1 AND NC.CONNECTION_NAME_ID=CONVERT(nvarchar, IH.ACTOR_ID)") ?
             fromString : fromString.concat(" LEFT OUTER JOIN [Bosco reduction].[dbo].NAME_CONNECTION NC ON NC.CONNECTION_ID=1 AND NC.CONNECTION_NAME_ID=CONVERT(nvarchar, IH.ACTOR_ID) ");
@@ -95,6 +87,16 @@ exports.prepareBilledQuery = (startDate, endDate, employeeId, clientType, countr
                 break;
         }
     }
+
+    if (countryCode !== undefined) {
+        fromString = fromString.includes("LEFT OUTER JOIN [Bosco reduction].[dbo].NAME_CONNECTION NC ON NC.CONNECTION_ID=1 AND NC.CONNECTION_NAME_ID=CONVERT(nvarchar, IH.ACTOR_ID)") ?
+            fromString : fromString.concat(" LEFT OUTER JOIN [Bosco reduction].[dbo].NAME_CONNECTION NC ON NC.CONNECTION_ID=1 AND NC.CONNECTION_NAME_ID=CONVERT(nvarchar, IH.ACTOR_ID) ");
+        fromString = fromString.concat(", [Bosco reduction].[dbo].NAME N ");
+        whereString = whereString.concat(" AND N.NAME_ID=NC.NAME_ID AND N.LEGAL_COUNTRY_CODE=? ");
+        query.replacements.push(countryCode);
+    }
+
+    
 
     query.queryString = query.queryString.concat(fromString, whereString);
 
