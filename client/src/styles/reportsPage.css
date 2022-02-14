@@ -35,6 +35,10 @@
     float: left;
 }
 
+.performance-table-columns {
+    text-align: center;
+}
+
 h4 {
     margin-bottom: 0;
     padding-bottom: 0.3rem;

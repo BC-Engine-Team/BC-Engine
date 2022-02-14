@@ -1,8 +1,9 @@
 const databases = require("../databases");
 const ChartReportModel = databases['localdb'].chartReports;
 const ChartReportDataModel = databases['localdb'].chartReportsData;
+const PerformanceReportModel = databases['localdb'].performanceReport;
 
-
+// Chart Report Related functions
 exports.getChartReportsByUserId = async (userId, chartReportModel = ChartReportModel) => {
     return new Promise((resolve, reject) => {
         chartReportModel.findAll({
@@ -23,7 +24,6 @@ exports.getChartReportsByUserId = async (userId, chartReportModel = ChartReportM
                 };
                 reject(response);
             });
-
     });
 };
 
@@ -95,6 +95,25 @@ exports.deleteChartReportById = async(chartReportId, chartReportModel = ChartRep
                     status: err.status || 500,
                     message: err.message || "Could not delete data."
                 }
+                reject(response);
+            });
+    });
+}
+
+// Reports Types related functions
+exports.getPerformanceReportsWhenConnectedAsAdmin = async (userId, performanceReportModel = PerformanceReportModel) => {
+    return new Promise((resolve, reject) => {
+        performanceReportModel.findAll().then(async data => {
+            if (data) {
+                resolve(data)
+            }
+            resolve(false);
+        })
+            .catch(async err => {
+                const response = {
+                    status: err.status || 500,
+                    message: err.message || "Could not fetch data."
+                };
                 reject(response);
             });
     });

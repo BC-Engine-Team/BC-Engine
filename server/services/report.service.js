@@ -16,7 +16,7 @@ exports.getChartReportsByUserId = async (userId) => {
                     message: err.message || "Could not fetch data."
                 };
                 reject(response);
-            })
+            });
     });
 }
 
@@ -153,6 +153,24 @@ exports.deleteChartReportById = async (chartReportId) => {
 
 
 // Reports Types related functions
+exports.getPerformanceReportWhenConnectedAsAdmin = async (userId) => {
+    return new Promise(async (resolve, reject) => {
+        await ChartReportDao.getPerformanceReportsWhenConnectedAsAdmin(userId)
+            .then(async data => {
+                if (data) {
+                    resolve(data);
+                }
+                resolve(false);
+            }).catch(async err => {
+                const response = {
+                    status: err.status || 500,
+                    message: err.message || "Could not fetch data."
+                };
+                reject(response);
+            });
+    });
+}
+
 exports.getReportTypesWithRecipients = async () => {
     return new Promise(async (resolve, reject) => {
         this.getReportTypes()
@@ -234,4 +252,3 @@ exports.getRecipients = async () => {
             });
     });
 }
-
