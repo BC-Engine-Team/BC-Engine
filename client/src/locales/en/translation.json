@@ -60,8 +60,8 @@
             "All":"All",
             "labels": {
                 "Employee":"Employee",
-                "ClientType": "Client Type",
                 "Country":"Country",
+                "ClientType": "Client Type",
                 "Age": "Age of Account"
             },
             "StartDateLabel": "Start Month",
