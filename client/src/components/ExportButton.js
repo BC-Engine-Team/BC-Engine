@@ -1,10 +1,11 @@
 import Icon from '@mdi/react'
 import { mdiFileExport, mdiFileExportOutline } from '@mdi/js';
 
-const EditButton = ({ onExport }) => {
+const EditButton = ({ onExport, id, styles, iconColor }) => {
     return (
-        <button className="btnEdit btn-edit" onClick={onExport}>
+        <button id={id} style={styles} className="btnEdit btn-edit" onClick={onExport}>
         <Icon path={mdiFileExport} 
+            style={iconColor}
             className="mdi mdi-edit" 
             title="edit Button"
             size={1}

@@ -16,6 +16,7 @@ const Reports = () => {
     const cookies = new Cookies();
 
     const [pdfLoading, setPdfLoading] = useState(false);
+    const [currentPdfLoading, setCurrentPdfLoading] = useState();
 
     const [chartReports, setChartReports] = useState([{
         chartReportId: "",
@@ -32,7 +33,8 @@ const Reports = () => {
 
     const createAndDownloadPDF = (ReportId) => {
         setPdfLoading(true);
-        console.log(pdfLoading)
+        setCurrentPdfLoading(ReportId);
+
         let header = {
             'authorization': "Bearer " + cookies.get("accessToken"),
         }
@@ -175,17 +177,22 @@ const Reports = () => {
                                             <td>{r.endDate.toString()}</td>
                                             <td className="py-1">
                                                 <div className="d-flex justify-content-center">
-                                                    {pdfLoading 
+                                                    {pdfLoading
                                                     ?   
-                                                    <span className='loadingChartReport align-self-center'>
-                                                        <Oval
-                                                            height="22"
-                                                            width="22"
-                                                            color='black'
-                                                            ariaLabel='loading' />
-                                                    </span>
+                                                        r.chartReportId !== currentPdfLoading
+                                                        ?
+                                                        <ExportButton id={r.chartReportId} iconColor={{color: '#666'}} styles={{pointerEvents: 'none'}}/>
+                                                        :
+                                                        <span className='loadingChartReport align-self-center'>
+                                                            <Oval
+                                                                height="22"
+                                                                width="22"
+                                                                color='black'
+                                                                ariaLabel='loading' />
+                                                        </span>
+                                                        
                                                     :
-                                                    <ExportButton onExport={() => createAndDownloadPDF(r.chartReportId)} />
+                                                    <ExportButton id={r.chartReportId} onExport={() => createAndDownloadPDF(r.chartReportId)} />
                                                     }
                                                     <DeleteButton />
                                                 </div>
