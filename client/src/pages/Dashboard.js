@@ -255,7 +255,8 @@ const Dashboard = () => {
                 employeeId: parseInt(criteria.employee1.id) === -1 ? undefined : criteria.employee1.id,
                 clientType: criteria.clientType === "Any" ? undefined : criteria.clientType,
                 countryCode: parseInt(criteria.country.id) === -1 ? undefined : criteria.country.id,
-                countryLabel: parseInt(criteria.country.id) === -1 ? undefined : criteria.country.name
+                countryLabel: parseInt(criteria.country.id) === -1 ? undefined : criteria.country.name,
+                ageOfAccount: criteria.ageOfAccount === "All" ? undefined : criteria.ageOfAccount
             };
 
             if (c === 1) {
@@ -718,6 +719,22 @@ const Dashboard = () => {
                                         <option key={0} value={"Any"}>{t('dashboard.criteria.clientType.Any')}</option>
                                         <option key={1} value={"CORRES"}>{t('dashboard.criteria.clientType.Corr')}</option>
                                         <option key={2} value={"DIRECT"}>{t('dashboard.criteria.clientType.Direct')}</option>
+
+                                    </Form.Select>
+                                </InputGroup>
+                            </Row>
+
+                            <Row>
+                                <FormLabel htmlFor="ageOfAccountCriteriaDashboard" className="mt-2">{t('dashboard.criteria.labels.Age')}</FormLabel>
+                                <InputGroup className="mb-2">
+                                    <Form.Select id="ageOfAccountCriteriaDashboard" onChange={(e) => {
+                                        setField('ageOfAccount', e.target.value);
+                                    }}>
+                                        <option key={0} value={"All"}>{t('dashboard.criteria.ageOfAccount.All')}</option>
+                                        <option key={1} value={"<30"}>{t('dashboard.criteria.ageOfAccount.DueCurrent')}</option>
+                                        <option key={2} value={"30-60"}>{t('dashboard.criteria.ageOfAccount.Due1Month')}</option>
+                                        <option key={3} value={"60-90"}>{t('dashboard.criteria.ageOfAccount.Due2Month')}</option>
+                                        <option key={4} value={">90"}>{t('dashboard.criteria.ageOfAccount.Due3Month')}</option>
 
                                     </Form.Select>
                                 </InputGroup>

@@ -61,7 +61,8 @@
             "labels": {
                 "Employee":"Employee",
                 "ClientType": "Client Type",
-                "Country":"Country"
+                "Country":"Country",
+                "Age": "Age of Account"
             },
             "StartDateLabel": "Start Month",
             "EndDateLabel": "End Month",
@@ -74,6 +75,13 @@
                 "Corr": "Correspondent",
                 "Direct": "Direct",
                 "Any": "Any"
+            },
+            "ageOfAccount": {
+                "All": "All",
+                "DueCurrent": "Less than 30 days",
+                "Due1Month": "Between 30 and 60 days",
+                "Due2Month": "Between 60 and 90 days",
+                "Due3Month": "More than 90 days"
             }
         },
         "chart":{

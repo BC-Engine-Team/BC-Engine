@@ -59,7 +59,8 @@
           "labels": {
              "Employee":"Employé(e)",
              "Country":"Pays",
-             "ClientType": "Type de Client"
+             "ClientType": "Type de Client",
+             "Age": "Âge de la facture"
           },
          "NamePlaceHolder": "Entrez le nom de votre Rapport Graphique",
          "LoadChartButton": "Mettre à jour le Graphique",
@@ -74,7 +75,14 @@
             "Corr": "Correspondent",
             "Direct": "Direct",
             "Any": "Tous"
-        }
+        },
+        "ageOfAccount": {
+           "All": "Tous",
+            "DueCurrent": "Moins de 30 jours",
+            "Due1Month": "Entre 30 et 60 jours",
+            "Due2Month": "Entre 60 et 90 jours",
+            "Due3Month": "Plus de 90 jours"
+         }
        },
        "chart": {
           "Title": "Moyenne de Jour de Collection par Mois",
