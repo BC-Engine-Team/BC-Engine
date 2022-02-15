@@ -129,6 +129,9 @@
         "ExportButtonLabel": "Export",
         "reports":{
             "Title":"Reports",
+            "NameLabel":"Report Name",
+            "DateLabel":"Report Date",
+            "EmployeeLabel":"Concerned Employee(s)",
             "AverageCollectionDay": "Average Collection Day",
             "AnnualBillingObjective": "Annual Billing Objective",
             "MonthlyBillingObjective": "Monthly Billing Objective",

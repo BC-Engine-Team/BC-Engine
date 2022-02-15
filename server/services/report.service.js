@@ -155,7 +155,7 @@ exports.deleteChartReportById = async (chartReportId) => {
 // Reports Types related functions
 exports.getPerformanceReportWhenConnectedAsAdmin = async (userId) => {
     return new Promise(async (resolve, reject) => {
-        await ChartReportDao.getPerformanceReportsWhenConnectedAsAdmin(userId)
+        await ReportDao.getPerformanceReportsWhenConnectedAsAdmin(userId)
             .then(async data => {
                 if (data) {
                     resolve(data);

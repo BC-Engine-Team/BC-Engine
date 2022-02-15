@@ -2,6 +2,7 @@ const databases = require("../databases");
 const ReportTypeModel = databases['localdb'].reportTypes;
 const RecipientsModel = databases['localdb'].recipients;
 const ReportTypeRecipientsModel = databases['localdb'].reportTypeRecipients;
+const PerformanceReportModel = databases['localdb'].performanceReport;
 
 exports.getReportTypesWithRecipientIds = async (reportTypesModel = ReportTypeModel, reportTypeRecipients = ReportTypeRecipientsModel) => {
     return new Promise((resolve, reject) => {
@@ -74,5 +75,25 @@ exports.getRecipients = async (recipientsModel = RecipientsModel) => {
                 };
                 reject(response);
             })
+    });
+}
+
+
+// Reports Types related functions
+exports.getPerformanceReportsWhenConnectedAsAdmin = async (userId, performanceReportModel = PerformanceReportModel) => {
+    return new Promise((resolve, reject) => {
+        performanceReportModel.findAll().then(async data => {
+            if (data) {
+                resolve(data)
+            }
+            resolve(false);
+        })
+            .catch(async err => {
+                const response = {
+                    status: err.status || 500,
+                    message: err.message || "Could not fetch data."
+                };
+                reject(response);
+            });
     });
 }

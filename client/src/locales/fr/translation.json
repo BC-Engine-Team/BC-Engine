@@ -129,12 +129,15 @@
       "ExportButtonLabel": "Exporter",
        "reports": {
           "Title": "Rapports",
+          "NameLabel":"Nom du rapport",
+          "DateLabel":"Date du rapport",
+          "EmployeeLabel":"Employé(s) concerné(s)",
           "AverageCollectionDay": "Moyenne des jours de collection",
           "AnnualBillingObjective": "Objectif de facturation annuel",
           "MonthlyBillingObjective": "Objectif de facturation mensuel",
           "AnnualBillingNumber": "Numéro de facturation annuel",
           "MonthlyBillingNumber": "Numéro de facturation mensuel",
-          "ProjectedBonus": "Bonus projeté",
+          "ProjectedBonus": "Prime projeté",
           "EmailButtonLabel": "Addresse Courriel"
        },
        "reportsManagement": {

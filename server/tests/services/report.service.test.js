@@ -1203,7 +1203,7 @@ describe("Test Report Service", () => {
         describe("RS10.1 - given a userId", () => {
             it("RS10.1.1 - should return list of chartReports", async () => {
                 // arrange
-                chartReportDaoSpy = jest.spyOn(ChartReportDao, 'getPerformanceReportsWhenConnectedAsAdmin')
+                chartReportDaoSpy = jest.spyOn(ReportDao, 'getPerformanceReportsWhenConnectedAsAdmin')
                     .mockImplementation(() => new Promise((resolve) => {
                         resolve(fakePerformanceReportResponse);
                     }));
@@ -1215,7 +1215,7 @@ describe("Test Report Service", () => {
 
             it("RS10.1.2 - should resolve false when dao returns false", async () => {
                 // arrange
-                chartReportDaoSpy = jest.spyOn(ChartReportDao, 'getPerformanceReportsWhenConnectedAsAdmin')
+                chartReportDaoSpy = jest.spyOn(ReportDao, 'getPerformanceReportsWhenConnectedAsAdmin')
                     .mockImplementation(() => new Promise((resolve) => {
                         resolve(false);
                     }));
@@ -1231,7 +1231,7 @@ describe("Test Report Service", () => {
                     status: 404,
                     message: "Error message."
                 };
-                chartReportDaoSpy = jest.spyOn(ChartReportDao, 'getPerformanceReportsWhenConnectedAsAdmin')
+                chartReportDaoSpy = jest.spyOn(ReportDao, 'getPerformanceReportsWhenConnectedAsAdmin')
                     .mockImplementation(() => new Promise((resolve, reject) => {
                         reject(expectedError);
                     }));
@@ -1247,7 +1247,7 @@ describe("Test Report Service", () => {
                     status: 500,
                     message: "Could not fetch data."
                 };
-                chartReportDaoSpy = jest.spyOn(ChartReportDao, 'getPerformanceReportsWhenConnectedAsAdmin')
+                chartReportDaoSpy = jest.spyOn(ReportDao, 'getPerformanceReportsWhenConnectedAsAdmin')
                     .mockImplementation(() => new Promise((resolve, reject) => {
                         reject({});
                     }));
