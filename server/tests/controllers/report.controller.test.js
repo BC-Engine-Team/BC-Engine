@@ -861,7 +861,7 @@ describe("Test Report Controller", () => {
 
             it("RC6.1.1 - should return valid response with status 200", async () => {
                 // arrange
-                console.log(process.env.NODE_ENV)
+                console.log(process.env.NODE_ENV);
                 if(process.env.NODE_ENV === 'test') {
                     pdf.create(`<div></div>`, {format: "letter"})
                         .toFile(`${__dirname.replace("tests\\controllers", "")}docs\\pdf_files\\chartReport-${fakeReportId}.pdf`, () => {});
