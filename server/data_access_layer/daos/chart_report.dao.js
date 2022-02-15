@@ -2,7 +2,7 @@ const databases = require("../databases");
 const ChartReportModel = databases['localdb'].chartReports;
 const ChartReportDataModel = databases['localdb'].chartReportsData;
 
-
+// Chart Report Related functions
 exports.getChartReportsByUserId = async (userId, chartReportModel = ChartReportModel) => {
     return new Promise((resolve, reject) => {
         chartReportModel.findAll({
@@ -23,7 +23,6 @@ exports.getChartReportsByUserId = async (userId, chartReportModel = ChartReportM
                 };
                 reject(response);
             });
-
     });
 };
 

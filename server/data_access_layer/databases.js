@@ -34,18 +34,15 @@ db.Sequelize = Sequelize;
 [db['localdb'].users,
 db['localdb'].chartReports,
 db['localdb'].chartReportsData,
+db['localdb'].performanceReport,
 db['localdb'].reportTypes,
 db['localdb'].recipients,
 db['localdb'].reportTypeRecipients] = require("./models/localdb/localdb.model")(db['localdb'], Sequelize);
 
 // patricia database tables
 db['mssql_pat'].employees = require("./models/mssql_pat/employee.model")(db['mssql_pat'], Sequelize);
-db['mssql_pat'].invoice_affect = require("./models/mssql_pat/invoice_affect.model")(db['mssql_pat'], Sequelize);
 
 // Bosco database tables
-db['mssql_bosco'].transactions = require("./models/mssql_bosco/accounting_client.model")(db['mssql_bosco'], Sequelize);
-db['mssql_bosco'].transactions_stat = require("./models/mssql_bosco/accounting_client_stat.model")(db['mssql_bosco'], Sequelize);
-db['mssql_bosco'].nameEmployee = require("./models/mssql_bosco/name.model")(db['mssql_bosco'], Sequelize);
 
 
 
@@ -116,6 +113,27 @@ db.sync = async (database, options) => {
       ]);
     })
     .then(async () => {
+      let performanceReports = await db['localdb'].performanceReport.bulkCreate([
+        {
+          averageCollectionDay: "32",
+          annualBillingObjective: "50000",
+          monthlyBillingObjective: "2000",
+          annualBillingNumber: "4500",
+          monthlyBillingNumber: "125",
+          projectedBonus: "750"
+        },
+        {
+          averageCollectionDay: "32",
+          annualBillingObjective: "40000",
+          monthlyBillingObjective: "3000",
+          annualBillingNumber: "7500",
+          monthlyBillingNumber: "333",
+          projectedBonus: "750"
+        }
+      ]);
+      return performanceReports;
+    })
+    .then(async () => {
       let recipients = await db['localdb'].recipients.bulkCreate([
         {
           name: "Charles-André Caron",
@@ -171,7 +189,7 @@ db.sync = async (database, options) => {
         },
         {
           name: "Sabrina Lavoie",
-          email: "sabrina@benoit-cote.com"
+          email: "slavoie@benoit-cote.com"
         },
         {
           name: "Suzanne Antal",
