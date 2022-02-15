@@ -1,5 +1,6 @@
 const reportService = require('../services/report.service');
 let fs = require('fs');
+require("../../config.js");
 
 exports.getChartReportsByUserId = async (req, res) => {
     if (!req.user || !req.user.userId || req.user.userId === "" || req.user.userId === undefined)
@@ -90,15 +91,24 @@ exports.createChartReportPDF = async (req, res) => {
 }
 
 exports.fetchChartReportPDF = async (req, res) => {
+    // create file path
+    let filePath;
+    if(process.env.NODE_ENV === 'test') {
+        filePath = `${__dirname.replace("controllers", "")}docs\\pdf_files\\chartReport-${req.query.reportid}.pdf`
+    }
+    else {
+        filePath = `${__dirname.replace("controllers", "")}docs/pdf_files/chartReport-${req.query.reportid}.pdf`
+    }
+
     if (!req.query.reportid)
     return res.status(400).send({ message: "Content cannot be empty." });
 
-    await res.sendFile(`${__dirname.replace("controllers", "")}docs\\pdf_files\\chartReport-${req.query.reportid}.pdf`, {}, (err) => {
+    await res.sendFile(filePath, {}, (err) => {
         if(err) {
             return res.status(err.status || 500).send({ message: err.message || "File not found." });
         }
         else {
-            fs.unlinkSync(`${__dirname.replace("controllers", "")}docs\\pdf_files\\chartReport-${req.query.reportid}.pdf`);
+            fs.unlinkSync(filePath);
             return res.status(200)
         }
     });

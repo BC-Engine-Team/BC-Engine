@@ -98,7 +98,7 @@ const Reports = () => {
                     });
                 }
                 else {
-                    alert("Could not reach b&C Engine...");
+                    alert("Could not fetch pdf file...");
                 }
             })
             .catch((error) => {
@@ -112,7 +112,7 @@ const Reports = () => {
                     }
                 }
                 else if (error.request) {
-                    alert("Could not generate pdf file...");
+                    alert("Could not fetch Chart Report...");
                 }
             });
     }

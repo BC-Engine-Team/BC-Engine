@@ -3,6 +3,7 @@ const ReportDao = require("../data_access_layer/daos/report.dao");
 
 const pdf = require('html-pdf');
 const pdfTemplate = require("../docs/chartReportPDF");
+require("../../config.js");
 
 // Chart Report Related functions
 exports.getChartReportsByUserId = async (userId) => {
@@ -242,6 +243,14 @@ exports.getRecipients = async () => {
 exports.createChartReportPDFById = async (reportId) => {
     let averagesList = [];
 
+    let filePath;
+    if(process.env.NODE_ENV === 'test') {
+        filePath = `${__dirname.replace("services", "")}docs\\pdf_files\\chartReport-${reportId}.pdf`
+    }
+    else {
+        filePath = `${__dirname.replace("services", "")}docs/pdf_files/chartReport-${reportId}.pdf`
+    }
+
     return new Promise(async (resolve, reject) => {
         ChartReportDao.getChartReportById(reportId)
             .then(async data => {
@@ -256,7 +265,7 @@ exports.createChartReportPDFById = async (reportId) => {
                             resolve(false);
                     }).then(() => {
                         pdf.create(pdfTemplate(data, averagesList), {format: "letter"})
-                        .toFile(`${__dirname.replace("services", "")}docs\\pdf_files\\chartReport-${reportId}.pdf`, () => {
+                        .toFile(filePath, () => {
                             resolve(true);
                         });
                     }).catch(err => {
