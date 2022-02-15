@@ -1,5 +1,4 @@
-const database = require('../databases')['mssql_bosco']
-const databases = require('../databases');
+const database = require('../databases')['mssql_bosco'];
 const { QueryTypes } = require('sequelize');
 
 exports.getTransactionsStatByYearMonth = async (yearMonthList, employeeId = undefined, clientType = undefined, countryLabel = undefined, ageOfAccount = undefined, accountType = 'Receivables', db = database) => {
@@ -97,11 +96,11 @@ exports.prepareDuesQuery = (yearMonthList, employeeId, clientType, countryLabel,
         }
     }
 
-    if(accountType === 'Receivables') {
-        whereString = whereString.concat(" AND ACS.CONNECTION_ID=3 ");
+    if(accountType !== 'Receivables') {
+        whereString = whereString.concat(" AND ACS.CONNECTION_ID=7 ");
     }
     else {
-        whereString = whereString.concat(" AND ACS.CONNECTION_ID=7 ")
+        whereString = whereString.concat(" AND ACS.CONNECTION_ID=3 ");
     }
 
     query.queryString = query.queryString.concat(fromString, whereString);
