@@ -94,10 +94,10 @@ exports.fetchChartReportPDF = async (req, res) => {
     // create file path
     let filePath;
     if(process.env.NODE_ENV === 'test') {
-        filePath = `${__dirname.replace("controllers", "")}docs\\pdf_files\\chartReport-${req.query.reportid}.pdf`
+        filePath = `${__dirname.replace("controllers", "")}docs\\pdf_files\\chartReport-${req.query.reportid}.pdf`;
     }
     else {
-        filePath = `${__dirname.replace("controllers", "")}docs/pdf_files/chartReport-${req.query.reportid}.pdf`
+        filePath = `${__dirname.replace("controllers", "")}docs/pdf_files/chartReport-${req.query.reportid}.pdf`;
     }
 
     if (!req.query.reportid)

@@ -245,10 +245,10 @@ exports.createChartReportPDFById = async (reportId) => {
 
     let filePath;
     if(process.env.NODE_ENV === 'test') {
-        filePath = `${__dirname.replace("services", "")}docs\\pdf_files\\chartReport-${reportId}.pdf`
+        filePath = `${__dirname.replace("services", "")}docs\\pdf_files\\chartReport-${reportId}.pdf`;
     }
     else {
-        filePath = `${__dirname.replace("services", "")}docs/pdf_files/chartReport-${reportId}.pdf`
+        filePath = `${__dirname.replace("services", "")}docs/pdf_files/chartReport-${reportId}.pdf`;
     }
 
     return new Promise(async (resolve, reject) => {
