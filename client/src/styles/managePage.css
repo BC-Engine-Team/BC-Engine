@@ -1,3 +1,18 @@
 .container-clientGradingBrackets {
     width: 50%;
 }
+
+#averageCollectionTime {
+    margin-top: 25px;
+    margin-bottom: 20px;
+}
+
+#saveGradingBracketsButton{
+    width: "50%";
+}
+
+.inputTitle {
+    margin-top: 25px;
+    display: flex;
+    font-size: large;
+}

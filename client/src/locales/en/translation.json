@@ -179,6 +179,9 @@
         }
 
     },
+    "gradings":{
+      "ModifyClientGradingButton": "Modify Client Grading"
+    },
     "form":{
         "Password":"Password",
         "ConfirmPassword":"Confirm Password",
