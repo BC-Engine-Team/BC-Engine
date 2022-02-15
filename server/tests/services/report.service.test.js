@@ -6,6 +6,8 @@ const ReportService = require("../../services/report.service");
 const ChartReportDao = require("../../data_access_layer/daos/chart_report.dao");
 const ReportDao = require("../../data_access_layer/daos/report.dao");
 
+
+
 describe("Test Report Service", () => {
 
     beforeEach(() => {
@@ -1332,6 +1334,11 @@ describe("Test Report Service", () => {
                 // act and assert
                 await expect(ReportService.createChartReportPDFById("fakeUUID1")).resolves
                     .toEqual(true);
+
+                // wait for mock pdf file to be created
+                //await new Promise((r) => setTimeout(r, 2500));
+
+
 
                 // cleanup
                 if(__dirname !== '/home/runner/work/BC-Engine/BC-Engine/server/tests/services') {

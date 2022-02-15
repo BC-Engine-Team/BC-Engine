@@ -11,6 +11,7 @@ import NavB from '../components/NavB'
 import DeleteButton from '../components/DeleteButton'
 import ExportButton from '../components/ExportButton'
 import ConfirmationPopup from '../components/ConfirmationPopup'
+import '../styles/reportsPage.css'
 
 const Reports = () => {
     const { t } = useTranslation();
