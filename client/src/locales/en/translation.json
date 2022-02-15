@@ -123,6 +123,10 @@
                 "Type2":"Subordinate"
             },
             "ViewButton":"View Subordinates"
+        },
+        "clientGrading": {
+            "Title": "Client Grading Brackets"
+
         }
     },
     "reports":{
