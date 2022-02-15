@@ -751,15 +751,6 @@ describe("Test Report Controller", () => {
         });
     });
 
-
-
-
-
-
-
-
-
-
     describe("RC5 - getPerformanceReportsOfAllUsers", () => {
         describe("RC5.1 - given a valid user from auth service", () => {
             it("RC5.1.1 - should respond with 200 and body", async () => {

@@ -81,7 +81,6 @@ const Reports = () => {
         await Axios.get(`${process.env.REACT_APP_API}/reports/performanceReport`, { headers: header })
             .then((response) => {
                 if (response.data) {
-                    console.log(response.data)
                     setPerformanceReport(response.data);
                     return;
                 }

@@ -1176,9 +1176,6 @@ describe("Test Report Service", () => {
         });
     });
 
-
-
-
     describe("RS10 - getPerformanceReportWhenConnectedAsAdmin", () => {
 
         let fakePerformanceReportResponse = [

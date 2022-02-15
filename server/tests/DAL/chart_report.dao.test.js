@@ -40,7 +40,6 @@ let returnedChartReports = [
     }
 ];
 
-
 let returnedPerformanceReports = [
     {
         performanceReportId: "PerformanceUUID",
@@ -63,8 +62,6 @@ let returnedPerformanceReports = [
         projectedBonus: "650"
     }
 ] 
-
-
 
 let SequelizeMock = require('sequelize-mock');
 const dbMock = new SequelizeMock();
@@ -410,20 +407,6 @@ describe("Test Chart Report DAO", () => {
                     .rejects.toEqual(expectedResponse);
             });
         });
-
-
-
-        
-
-
-
-
-
-
-
-
-
-
 
         describe("CRD5 - getPerformanceReportsWhenConnectedAsAdmin", () => {
             describe("CRD5.1 - given a userId", () => {
