@@ -2,6 +2,8 @@ const { afterEach, afterAll } = require('jest-circus');
 var { expect, jest } = require('@jest/globals');
 const supertest = require('supertest');
 var MockExpressResponse = require('mock-express-response');
+const pdf = require('html-pdf');
+require("../../../config.js");
 
 const ReportController = require('../../controllers/report.controller');
 const ReportService = require('../../services/report.service');
@@ -132,7 +134,7 @@ describe("Test Report Controller", () => {
                 expect(authSpy).toHaveBeenCalledTimes(1);
             });
 
-            it("RC1.1.3 - when service throws error with unspecified status and message, should respond with 500 and default message", async () => {
+            it("RC1.1.4 - when service throws error with unspecified status and message, should respond with 500 and default message", async () => {
                 // arrange
                 let expectedResponse = {
                     status: 500,
@@ -279,7 +281,7 @@ describe("Test Report Controller", () => {
                 expect(reportServiceSpy).toHaveBeenCalledWith(fakeChartReportRequest.chartReport, fakeChartReportRequest.chartReportData, reqUser.userId);
             });
 
-            it("RC2.1.3 - when service throws error with unspecified status and message, should return default status and message", async () => {
+            it("RC2.1.4 - when service throws error with unspecified status and message, should return default status and message", async () => {
                 // arrange
                 let expectedResponse = {
                     message: "Malfunction in the B&C Engine."
@@ -622,7 +624,7 @@ describe("Test Report Controller", () => {
                 expect(authSpy).toHaveBeenCalled();
             });
 
-            it("RC4.1.3 - when service throws error with unspecified status and message, should respond with default status and message", async () => {
+            it("RC4.1.4 - when service throws error with unspecified status and message, should respond with default status and message", async () => {
                 // arrange
                 let expectedResponse = {
                     status: 500,
@@ -751,9 +753,168 @@ describe("Test Report Controller", () => {
         });
     });
 
-    describe("RC5 - getPerformanceReportsOfAllUsers", () => {
-        describe("RC5.1 - given a valid user from auth service", () => {
-            it("RC5.1.1 - should respond with 200 and body", async () => {
+    describe("RC5 - createChartReportPDF", () => {
+        describe("RC5.1 - given a valid reportId", () => {
+            const fakeReportId = 54564564654;
+            it("RC5.1.1 - should return valid response 'true' with 200 status", async () => {
+                // arrange
+                reportServiceSpy = jest.spyOn(ReportService, 'createChartReportPDFById')
+                    .mockImplementation(() => new Promise((resolve) => {
+                        resolve(true);
+                    }));
+
+                // act
+                const response = await request.post(`/api/reports/createPdf`)
+                    .send({ reportid: fakeReportId });
+
+                // assert
+                expect(response.status).toBe(200);
+                expect(response.text).toEqual('true');
+                expect(reportServiceSpy).toHaveBeenCalledTimes(1);
+            });
+
+            it("RC5.1.2 - when service resolves false, should return 500 and message", async () => {
+                // arrange
+                let expectedResponse = { message: "The data could not be fetched." };
+
+                reportServiceSpy = jest.spyOn(ReportService, 'createChartReportPDFById')
+                    .mockImplementation(() => new Promise((resolve) => {
+                        resolve(false);
+                    }));
+
+                // act
+                const response = await request.post(`/api/reports/createPdf`)
+                    .send({ reportid: fakeReportId });
+
+                // assert
+                expect(response.status).toBe(500);
+                expect(response.body).toEqual(expectedResponse);
+                expect(reportServiceSpy).toHaveBeenCalledTimes(1);
+                expect(authSpy).toHaveBeenCalledTimes(1);
+            });
+
+            it("RC5.1.3 - when service throws error with specified status and message, should respond with specified status and message", async () => {
+                // arrange
+                let expectedResponse = {
+                    status: 600,
+                    message: "Random error"
+                };
+
+                reportServiceSpy = jest.spyOn(ReportService, 'createChartReportPDFById')
+                    .mockImplementation(async () => {
+                        await Promise.reject(expectedResponse);
+                    });
+
+                // act
+                const response = await request.post(`/api/reports/createPdf`)
+                    .send({ reportid: fakeReportId });
+
+                // assert
+                expect(response.status).toBe(expectedResponse.status);
+                expect(response.body.message).toEqual(expectedResponse.message);
+                expect(reportServiceSpy).toHaveBeenCalledTimes(1);
+                expect(authSpy).toHaveBeenCalledTimes(1);
+            });
+
+
+            it("RC5.1.4 - when service throws error with unspecified status and message, should respond with 500 and default message", async () => {
+                // arrange
+                let expectedResponse = {
+                    status: 500,
+                    message: "Malfunction in the B&C Engine."
+                };
+                reportServiceSpy = jest.spyOn(ReportService, 'createChartReportPDFById')
+                    .mockImplementation(async () => {
+                        await Promise.reject(expectedResponse);
+                    });
+
+                // act
+                const response = await request.post(`/api/reports/createPdf`)
+                .send({ reportid: fakeReportId });
+
+                // assert
+                expect(response.status).toBe(expectedResponse.status);
+                expect(response.body.message).toEqual(expectedResponse.message);
+                expect(reportServiceSpy).toHaveBeenCalledTimes(1);
+                expect(authSpy).toHaveBeenCalledTimes(1);
+            });
+        });
+
+        describe("RC5.2 - given no reportId", () => {
+            it("RC5.2.1 - should return with status 400 and predefined error message", async () => {
+                // arrange 
+                let expectedError = {message: "Content cannot be empty."}
+                
+                // act
+                const response = await request.post(`/api/reports/createPdf`);
+
+                // assert
+                expect(response.status).toBe(400);
+                expect(response.body).toEqual(expectedError);
+            });
+        });
+    });
+
+    describe("RC6 - fetchChartReportPDF", () => {
+        describe("RC6.1 - given a valid reportId", () => {
+            const fakeReportId = 54564564654;
+
+            it("RC6.1.1 - should return valid response with status 200", async () => {
+                // arrange
+                if(__dirname !== '/home/runner/work/BC-Engine/BC-Engine/server/tests/controllers') {
+                    pdf.create(`<div></div>`, {format: "letter"})
+                        .toFile(`${__dirname.replace("tests\\controllers", "")}docs\\pdf_files\\chartReport-${fakeReportId}.pdf`, () => {});
+                }
+                else {
+                    pdf.create(`<div></div>`, {format: "letter"})
+                        .toFile(`${__dirname.replace("tests/controllers", "")}docs/pdf_files/chartReport-${fakeReportId}.pdf`, () => {});
+                }
+                
+                // wait for mock pdf file to be created
+                await new Promise((r) => setTimeout(r, 2000));
+
+                // act
+                const response = await request.get(`/api/reports/fetchPdf?reportid=${fakeReportId}`);
+
+                // assert
+                expect(response.status).toBe(200);
+            });
+
+            it("RC6.1.2 - when file can't be fetched and throws error with specified status and message, should respond with specified status and message", async () => {
+                // arrange
+                let expectedResponse = {
+                    status: 404,
+                    message: "Not Found"
+                };
+
+                // act
+                const response = await request.get(`/api/reports/fetchPdf?reportid=${fakeReportId}`);
+
+                // assert
+                expect(response.status).toBe(expectedResponse.status);
+                expect(response.body.message).toBe(expectedResponse.message);
+
+            });
+        });
+
+        describe("RC6.2 - given no reportId", () => {
+            it("RC6.2.1 - should return with status 400 and predefined error message", async () => {
+                // arrange 
+                let expectedError = {message: "Content cannot be empty."}
+                
+                // act
+                const response = await request.get(`/api/reports/fetchPdf`);
+
+                // assert
+                expect(response.status).toBe(400);
+                expect(response.body).toEqual(expectedError);
+            });
+        });
+    });
+  
+    describe("RC7 - getPerformanceReportsOfAllUsers", () => {
+        describe("RC7.1 - given a valid user from auth service", () => {
+            it("RC7.1.1 - should respond with 200 and body", async () => {
                 // arrange
                 let expectedResponse = [
                     {
@@ -793,7 +954,7 @@ describe("Test Report Controller", () => {
                 expect(authSpy).toHaveBeenCalledTimes(1);
             });
 
-            it("RC5.1.2 - should respond with 500 and message when service resolves false", async () => {
+            it("RC7.1.2 - should respond with 500 and message when service resolves false", async () => {
                 // arrange
                 let expectedResponse = { message: "The data could not be fetched." };
                 reportServiceSpy = jest.spyOn(ReportService, 'getPerformanceReportWhenConnectedAsAdmin')
@@ -811,7 +972,7 @@ describe("Test Report Controller", () => {
                 expect(authSpy).toHaveBeenCalledTimes(1);
             });
 
-            it("RC5.1.3 - when service throws error with specified status and message, should respond with specified status and message", async () => {
+            it("RC7.1.3 - when service throws error with specified status and message, should respond with specified status and message", async () => {
                 // arrange
                 let expectedResponse = {
                     status: 600,
@@ -832,7 +993,7 @@ describe("Test Report Controller", () => {
                 expect(authSpy).toHaveBeenCalledTimes(1);
             });
 
-            it("RC5.1.4 - when service throws error with unspecified status and message, should respond with 500 and default message", async () => {
+            it("RC7.1.4 - when service throws error with unspecified status and message, should respond with 500 and default message", async () => {
                 // arrange
                 let expectedResponse = {
                     status: 500,
@@ -854,8 +1015,8 @@ describe("Test Report Controller", () => {
             });
         });
 
-        describe("RC5.2 - given no valid userId from auth service", () => {
-            it("RC5.2.1 - should respond with 400 and message", async () => {
+        describe("RC7.2 - given no valid userId from auth service", () => {
+            it("RC7.2.1 - should respond with 400 and message", async () => {
                 // arrange
                 let req = {
                     user: {
@@ -871,6 +1032,6 @@ describe("Test Report Controller", () => {
                 expect(response.statusCode).toBe(400);
                 expect(response._responseData.toString('ascii')).toEqual(JSON.stringify(expectedResponse));
             });
-        })
+        });
     });
 });

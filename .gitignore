@@ -3,3 +3,4 @@
 /.env
 
 .env
+server/docs/pdf_files/*
