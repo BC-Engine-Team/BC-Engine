@@ -93,7 +93,7 @@ exports.createChartReportPDF = async (req, res) => {
 exports.fetchChartReportPDF = async (req, res) => {
     // create file path
     let filePath;
-    if(process.env.NODE_ENV === 'test') {
+    if(__dirname !== '/home/runner/work/BC-Engine/BC-Engine/server/controllers') {
         filePath = `${__dirname.replace("controllers", "")}docs\\pdf_files\\chartReport-${req.query.reportid}.pdf`;
     }
     else {

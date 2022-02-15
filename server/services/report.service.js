@@ -244,7 +244,7 @@ exports.createChartReportPDFById = async (reportId) => {
     let averagesList = [];
 
     let filePath;
-    if(process.env.NODE_ENV === 'test') {
+    if(__dirname !== '/home/runner/work/BC-Engine/BC-Engine/server/services') {
         filePath = `${__dirname.replace("services", "")}docs\\pdf_files\\chartReport-${reportId}.pdf`;
     }
     else {

@@ -1236,7 +1236,7 @@ describe("Test Report Service", () => {
                     .toEqual(true);
 
                 // cleanup
-                if(process.env.NODE_ENV === 'test') {
+                if(__dirname !== '/home/runner/work/BC-Engine/BC-Engine/server/tests/services') {
                     fs.unlinkSync(`${__dirname.replace("tests\\services", "")}docs\\pdf_files\\chartReport-fakeUUID1.pdf`);
                 }
                 else {
