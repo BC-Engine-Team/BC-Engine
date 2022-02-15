@@ -75,7 +75,8 @@ exports.deleteChartReport = async (req, res) => {
 exports.getPerformanceReportsOfAllUsers = async (req, res) => {
     if (!req.user || !req.user.userId || req.user.userId === "" || req.user.userId === undefined)
         return res.status(400).send({ message: "Content cannot be empty." });
-    await reportService.getPerformanceReportWhenConnectedAsAdmin(req.user.userId)
+
+    await reportService.getPerformanceReports(req.user.role === "admin" ? undefined : req.user.userId)
         .then(async response => {
             if (response) {
                 return res.send(response);

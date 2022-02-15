@@ -39,9 +39,10 @@ const Reports = () => {
         accountType: ""
     }]);
 
-    const [performanceReport, setPerformanceReport] = useState([{
+    const [performanceReports, setPerformanceReports] = useState([{
         performanceReportId: "",
         employeeId: 0,
+        employees: [],
         averageCollectionDay: "",
         annualBillingObjective: "",
         monthlyBillingObjective: "",
@@ -49,7 +50,7 @@ const Reports = () => {
         monthlyBillingNumber: "",
         projectedBonus: ""
     }]);
-    
+
     const [reportTypes, setReportTypes] = useState([]);
     const [selectedReportType, setSelectedReportType] = useState({});
     const [showReportsManagement, setShowReportsManagement] = useState({
@@ -66,12 +67,12 @@ const Reports = () => {
                 isAdmin: true
             });
             await getReportTypesAndRecipients();
+
         }
-        await getPerformanceReportsByAdmin();
+        await getPerformanceReports();
     }
 
-
-    const getPerformanceReportsByAdmin = async () => {
+    const getPerformanceReports = async () => {
         let header = {
             'authorization': "Bearer " + cookies.get("accessToken")
         }
@@ -81,7 +82,7 @@ const Reports = () => {
         await Axios.get(`${process.env.REACT_APP_API}/reports/performanceReport`, { headers: header })
             .then((response) => {
                 if (response.data) {
-                    setPerformanceReport(response.data);
+                    setPerformanceReports(response.data);
                     return;
                 }
                 alert("The response from the B&C Engine was invalid.");
@@ -222,27 +223,28 @@ const Reports = () => {
                             <Table responsive hover id='reportTypesTable'>
                                 <thead className='bg-light'>
                                     <tr key="0">
-                                        <th className='performance-table-columns'>{t('reports.reports.AverageCollectionDay')}</th>
-                                        <th className='performance-table-columns'>{t('reports.reports.AnnualBillingObjective')}</th>
-                                        <th className='performance-table-columns'>{t('reports.reports.MonthlyBillingObjective')}</th>
-                                        <th className='performance-table-columns'>{t('reports.reports.AnnualBillingNumber')}</th>
-                                        <th className='performance-table-columns'>{t('reports.reports.MonthlyBillingNumber')}</th>
-                                        <th className='performance-table-columns'>{t('reports.reports.ProjectedBonus')}</th>
+                                        <th className='performance-table-columns'>{t('reports.reports.NameLabel')}</th>
+                                        <th className='performance-table-columns'>{t('reports.reports.DateLabel')}</th>
+                                        <th className='performance-table-columns'>{t('reports.reports.EmployeeLabel')}</th>
+                                        <th className='performance-table-columns'>Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                {performanceReport.map((p) => {
-                                    return (
-                                        <tr key={p.performanceReportId}>
-                                            <td className='performance-table-columns'>{p.averageCollectionDay}</td>
-                                            <td className='performance-table-columns'>{p.annualBillingObjective}</td>
-                                            <td className='performance-table-columns'>{p.monthlyBillingObjective}</td>
-                                            <td className='performance-table-columns'>{p.annualBillingNumber}</td>
-                                            <td className='performance-table-columns'>{p.monthlyBillingNumber}</td>
-                                            <td className='performance-table-columns'>{p.projectedBonus}</td>
-                                        </tr>
-                                    )
-                                })}
+                                    {performanceReports.map((p) => {
+                                        return (
+                                            <tr key={p.performanceReportId}>
+                                                <td className='performance-table-columns'>{p.reportName}</td>
+                                                <td className='performance-table-columns'>{p.createdAt}</td>
+                                                <td className='performance-table-columns'>{p.employees.join(', ')}</td>
+                                                <td className="py-1">
+                                                    <div className="d-flex justify-content-center">
+
+                                                        <BiExport size={"1.7rem"} className="pt-1" />
+                                                    </div >
+                                                </td >
+                                            </tr>
+                                        )
+                                    })}
                                 </tbody>
                             </Table>
                         </div>

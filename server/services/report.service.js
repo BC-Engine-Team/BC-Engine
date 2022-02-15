@@ -151,23 +151,40 @@ exports.deleteChartReportById = async (chartReportId) => {
     });
 }
 
-
 // Reports Types related functions
-exports.getPerformanceReportWhenConnectedAsAdmin = async (userId) => {
+exports.getPerformanceReports = async (userId) => {
     return new Promise(async (resolve, reject) => {
-        await ReportDao.getPerformanceReportsWhenConnectedAsAdmin(userId)
-            .then(async data => {
-                if (data) {
-                    resolve(data);
-                }
-                resolve(false);
-            }).catch(async err => {
-                const response = {
-                    status: err.status || 500,
-                    message: err.message || "Could not fetch data."
-                };
-                reject(response);
-            });
+        if (userId !== undefined) {
+            await ReportDao.getPerformanceReportsByUserId(userId)
+                .then(async data => {
+                    if (data) {
+                        resolve(data);
+                    }
+                    resolve(false);
+                }).catch(async err => {
+                    const response = {
+                        status: err.status || 500,
+                        message: err.message || "Could not fetch data."
+                    };
+                    reject(response);
+                });
+        }
+        else {
+            await ReportDao.getPerformanceReports()
+                .then(async data => {
+                    if (data) {
+                        resolve(data);
+                    }
+                    resolve(false);
+                }).catch(async err => {
+                    const response = {
+                        status: err.status || 500,
+                        message: err.message || "Could not fetch data."
+                    };
+                    reject(response);
+                });
+        }
+
     });
 }
 
