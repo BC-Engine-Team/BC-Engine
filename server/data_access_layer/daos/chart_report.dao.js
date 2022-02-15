@@ -90,7 +90,7 @@ exports.getChartReportById = async (chartReportId, chartReportModel = ChartRepor
         })
         .then(async data => {
             if (data) {
-                resolve(data)
+                resolve(data);
             }
             resolve(false);
         })
@@ -112,14 +112,16 @@ exports.getDataForChartReport = async (chartReportId, chartReportDataModel = Cha
             }
         })
         .then(async data => {
-            if (data.length !== 0) {
-                let returnData = [];
-                for (let i = 0; i < data.length; i++) {
-                    returnData.push(data[i].dataValues);
+            if(data) {
+                if (data.length !== 0) {
+                    let returnData = [];
+                    for (let i = 0; i < data.length; i++) {
+                        returnData.push(data[i].dataValues);
+                    }
+                    resolve(returnData)
                 }
-                resolve(returnData)
             }
-            reject({status: 500, message: "Fetched data doesn't exist."})
+            resolve(false)
         })
         .catch(async err => {
             const response = {

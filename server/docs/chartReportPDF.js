@@ -1,8 +1,6 @@
-// const Chart = require('chart.js');
-
 module.exports = (data, averagesList) => {
     // calculate length of for loop for creating averages on the table
-    const calculatedLength = data.dataValues.employee2Name === null ? averagesList.length : averagesList.length / 2
+    const calculatedLength = data.employee2Name === null ? averagesList.length : averagesList.length / 2
     const today = new Date();
 
     const months = [ 
@@ -69,7 +67,7 @@ module.exports = (data, averagesList) => {
 
         /* hours */         formatTimes(date.getHours()), ":",                      
         /* minutes */       formatTimes(date.getMinutes()), ":",                    
-        /* seconds */       formatTimes(date.getSeconds));
+        /* seconds */       formatTimes(date.getSeconds()));
     }
 
     const buildChartDatasets = () => {
@@ -135,7 +133,6 @@ module.exports = (data, averagesList) => {
             str = str.concat("<tr>", "<th class='monthColumn'>", months[i], "</th>")
 
             for(let j = 0; j < averagesList.length; j++) {
-                console.log(counter)
                 if(counter === 5) 
                 counter = 0; 
 
@@ -153,7 +150,7 @@ module.exports = (data, averagesList) => {
                         averageCounter++
                     }
 
-                    if((j + 1) === calculatedLength) {
+                    if((j + 1) === calculatedLength || ((j + 1) === averagesList.length && data.employee2Name !== null)) {
                         averageNormal /= averageCounter;
                         str = str.concat("<td style='border:1px solid #333; border-top: none; border-bottom: none;'>", averageNormal.toFixed(2), "</td>")
                     }
@@ -168,12 +165,11 @@ module.exports = (data, averagesList) => {
                         compareAverageCounter++
                     }
                     
-                    
-
                     if((j + 1) === calculatedLength) {
                         compareAverage /= compareAverageCounter;
                         str = str.concat("<td style='border: 1px solid #333; border-top: none; border-bottom: none;'>", compareAverage.toFixed(2), "</td>")
                     }
+
                 }
             }
             str = str.concat("</tr>")
@@ -187,7 +183,7 @@ module.exports = (data, averagesList) => {
         for(let i = 0; i < averagesList.length; i++) {
             str = str.concat("<th>", averagesList[i].year, "</th>")
 
-            if(averagesList[i].employee === -1 && i + 1 === calculatedLength) {
+            if(i + 1 === calculatedLength || i + 1 === averagesList.length && data.employee2Name !== null) {
                 str = str.concat("<th>AVERAGE</th>")
             }
         }
@@ -375,8 +371,8 @@ module.exports = (data, averagesList) => {
             <div id="chartCriteria">
                 <h2 class="title" >Chart Criteria</h2>
                 <div><span>Name</span> ${data.name}</div>
-                <div><span>Start Date</span> ${months[parseInt(data.endDate.substring(5, 7)) - 1]} ${data.endDate.substring(0, 4)}</div>
-                <div><span>End Date</span> ${months[parseInt(data.startDate.substring(5, 7)) - 1]} ${data.startDate.substring(0, 4)}</div>
+                <div><span>Start Date</span> ${months[parseInt(data.startDate.substring(5, 7)) - 1]} ${data.startDate.substring(0, 4)}</div>
+                <div><span>End Date</span> ${months[parseInt(data.endDate.substring(5, 7)) - 1]} ${data.endDate.substring(0, 4)}</div>
                 <div><span>Employee</span> ${data.employee1Name}</div>
                 ${data.employee2Name !== null ?  `<div><span>Compared With</span> ${data.employee2Name}</div>` : ""}
                 <div><span>Age of Account</span> ${data.ageOfAccount}</div>
@@ -407,7 +403,6 @@ module.exports = (data, averagesList) => {
                         <tr>
                             <th></th>
                             ${buildTableHead()}
-                            ${averagesList.length !== 1 ? `<th>AVERAGE</th>` : ""}
                         </tr>
                     </thead>
                     <tbody>

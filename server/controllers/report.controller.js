@@ -1,5 +1,5 @@
 const reportService = require('../services/report.service');
-var fs = require('fs');
+let fs = require('fs');
 
 exports.getChartReportsByUserId = async (req, res) => {
     if (!req.user || !req.user.userId || req.user.userId === "" || req.user.userId === undefined)
@@ -85,8 +85,7 @@ exports.createChartReportPDF = async (req, res) => {
             return res.status(500).send({ message: "The data could not be fetched." });
         })
         .catch(err => {
-            return res.status(err.status || 500)
-                .send({ message: !!err.message ? err.message : "Malfunction in the B&C Engine." });
+            return res.status(err.status || 500).send({ message: err.message || "Malfunction in the B&C Engine." });
         });
 }
 
@@ -96,7 +95,7 @@ exports.fetchChartReportPDF = async (req, res) => {
 
     await res.sendFile(`${__dirname.replace("controllers", "")}docs\\pdf_files\\chartReport-${req.query.reportid}.pdf`, {}, (err) => {
         if(err) {
-            return res.status(err.status).end();
+            return res.status(err.status || 500).send({ message: err.message || "File not found." });
         }
         else {
             fs.unlinkSync(`${__dirname.replace("controllers", "")}docs\\pdf_files\\chartReport-${req.query.reportid}.pdf`);

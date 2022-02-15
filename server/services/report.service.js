@@ -240,51 +240,26 @@ exports.getRecipients = async () => {
 
 // Chart Report PDF Generation related functions
 exports.createChartReportPDFById = async (reportId) => {
-    const pdfOptions = {
-        format: "letter"
-    };
+    let averagesList = [];
 
     return new Promise(async (resolve, reject) => {
         ChartReportDao.getChartReportById(reportId)
             .then(async data => {
                 if (data) {
-                    let averagesList = [];
+                    data = data.dataValues
 
-                    await this.getChartReportPDFAverages(reportId).then(async (dataAvg) => {
-                        for(let i = 0; i < dataAvg.length; i++) {
-                            let avgObject = {
-                                year: dataAvg[i].year,
-                                employee: dataAvg[i].employee,
-                                data: [
-                                    dataAvg[i].january,
-                                    dataAvg[i].february,
-                                    dataAvg[i].march,
-                                    dataAvg[i].april,
-                                    dataAvg[i].may,
-                                    dataAvg[i].june,
-                                    dataAvg[i].july,
-                                    dataAvg[i].august,
-                                    dataAvg[i].september,
-                                    dataAvg[i].october,
-                                    dataAvg[i].november,
-                                    dataAvg[i].december,
-                                ]
-                            }
-                            averagesList.push(avgObject);
-                        }
-                        console.log(averagesList)
-
+                    await this.getChartReportPDFAverages(reportId)
+                    .then(async (dataAvg) => {
+                        if(dataAvg)
+                            averagesList = dataAvg;
+                        else
+                            resolve(false);
                     }).then(() => {
-                        console.log(averagesList)
-                        pdf.create(pdfTemplate(data, averagesList), pdfOptions)
-                        .toFile(`./docs/pdf_files/chartReport-${reportId}.pdf`, (err) => {
-                            if(err) {
-                                reject(err);
-                            }
+                        pdf.create(pdfTemplate(data, averagesList), {format: "letter"})
+                        .toFile(`${__dirname.replace("services", "")}docs\\pdf_files\\chartReport-${reportId}.pdf`, () => {
                             resolve(true);
                         });
                     }).catch(err => {
-                        console.log(err)
                         reject(err);
                     });
                 }
@@ -305,8 +280,30 @@ exports.getChartReportPDFAverages = async (reportId) => {
     return new Promise(async (resolve, reject) => {
         ChartReportDao.getDataForChartReport(reportId)
         .then(data => {
+            let averagesList = [];
             if (data) {
-                resolve(data);
+                for(let i = 0; i < data.length; i++) {
+                    let avgObject = {
+                        year: data[i].year,
+                        employee: data[i].employee,
+                        data: [
+                            data[i].january,
+                            data[i].february,
+                            data[i].march,
+                            data[i].april,
+                            data[i].may,
+                            data[i].june,
+                            data[i].july,
+                            data[i].august,
+                            data[i].september,
+                            data[i].october,
+                            data[i].november,
+                            data[i].december,
+                        ]
+                    }
+                    averagesList.push(avgObject);
+                }
+                resolve(averagesList);
             }
             resolve(false);
         })
