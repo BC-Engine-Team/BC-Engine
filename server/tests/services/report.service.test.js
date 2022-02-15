@@ -1,5 +1,6 @@
 var { expect, jest } = require('@jest/globals');
 var fs = require('fs');
+require("../../../config.js");
 
 const ReportService = require("../../services/report.service");
 const ChartReportDao = require("../../data_access_layer/daos/chart_report.dao");
@@ -1195,22 +1196,6 @@ describe("Test Report Service", () => {
             }
         }
 
-        let returnedWrongChartReport = {
-            dataValues: {
-                chartReportId: 'fakeUUID1',
-                name: 'CR1',
-                employee1Id: 12345,
-                allo: 'bug-hehe',
-                employee1Name: 'France Cote',
-                employee2Name: null,
-                country: 'Canada',
-                clientType: 'Corr',
-                ageOfAccount: 'All',
-                accountType: 'Receivable',
-                user_user_id: 'fakeUserId'
-            }
-        }
-
         let returnedChartReportData = [
             {
                 year: 2018,
@@ -1251,7 +1236,13 @@ describe("Test Report Service", () => {
                     .toEqual(true);
 
                 // cleanup
-                fs.unlinkSync(`${__dirname.replace("tests\\services", "")}docs\\pdf_files\\chartReport-fakeUUID1.pdf`);
+                if(process.env.NODE_ENV === 'test') {
+                    fs.unlinkSync(`${__dirname.replace("tests\\services", "")}docs\\pdf_files\\chartReport-fakeUUID1.pdf`);
+                }
+                else {
+                    fs.unlinkSync(`${__dirname.replace("tests/services", "")}docs/pdf_files/chartReport-fakeUUID1.pdf`);
+                }
+                
             });
 
             it("RS10.1.2 - should resolve false when dao returns false", async () => {

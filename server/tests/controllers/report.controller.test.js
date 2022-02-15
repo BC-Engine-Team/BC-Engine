@@ -3,6 +3,7 @@ var { expect, jest } = require('@jest/globals');
 const supertest = require('supertest');
 var MockExpressResponse = require('mock-express-response');
 const pdf = require('html-pdf');
+require("../../../config.js");
 
 const ReportController = require('../../controllers/report.controller');
 const ReportService = require('../../services/report.service');
@@ -28,7 +29,6 @@ let reportServiceSpy = jest.spyOn(ReportService, 'getChartReportsByUserId')
     }));
 
 const makeApp = require('../../app');
-const { UUID } = require('sequelize');
 let app = makeApp();
 const request = supertest(app);
 let res;
@@ -861,11 +861,17 @@ describe("Test Report Controller", () => {
 
             it("RC6.1.1 - should return valid response with status 200", async () => {
                 // arrange
-                pdf.create(`<div></div>`, {format: "letter"})
-                     .toFile(`${__dirname.replace("tests\\controllers", "")}docs\\pdf_files\\chartReport-${fakeReportId}.pdf`, () => {});
+                if(process.env.NODE_ENV === 'test') {
+                    pdf.create(`<div></div>`, {format: "letter"})
+                        .toFile(`${__dirname.replace("tests\\controllers", "")}docs\\pdf_files\\chartReport-${fakeReportId}.pdf`, () => {});
+                }
+                else {
+                    pdf.create(`<div></div>`, {format: "letter"})
+                        .toFile(`${__dirname.replace("tests/controllers", "")}docs/pdf_files/chartReport-${fakeReportId}.pdf`, () => {});
+                }
                 
                 // wait for mock pdf file to be created
-                await new Promise((r) => setTimeout(r, 3000));
+                await new Promise((r) => setTimeout(r, 2000));
 
                 // act
                 const response = await request.get(`/api/reports/fetchPdf?reportid=${fakeReportId}`);
