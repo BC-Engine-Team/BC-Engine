@@ -1,11 +1,5 @@
-const { sequelize,
-    dataTypes,
-    checkModelName,
-    checkPropertyExists,
-    checkHookDefined
-} = require('sequelize-test-helpers');
+var { expect, jest } = require('@jest/globals');
 
-const AccountClientStatModel = require('../../data_access_layer/models/mssql_bosco/accounting_client_stat.model');
 const TransacStatDao = require("../../data_access_layer/daos/transac_stat.dao");
 
 
@@ -19,326 +13,384 @@ let returnedAccountStat = {
 
 let fakeStatsList = [
     {
-        dataValues: {
-            yearMonth: 202011,
-            dueCurrent: 100,
-            due1Month: 200,
-            due2Month: 50,
-            due3Month: 20
-        }
-    },
-    {
-        dataValues: {
-            yearMonth: 202012,
-            dueCurrent: 100,
-            due1Month: 200,
-            due2Month: 50,
-            due3Month: 20
-        }
-    }
-];
-
-let fakeStatsListWithColumnName = [
-    {
         YEAR_MONTH: 202011,
-        DUE_CURRENT: 100,
-        DUE_1_MONTH: 200,
-        DUE_2_MONTH: 50,
-        DUE_3_MONTH: 20
+        DUE_1_MONTH: 100,
+        DUE_2_MONTH: 200,
+        DUE_3_MONTH: 50,
+        DUE_CURRENT: 20
     },
     {
         YEAR_MONTH: 202012,
-        DUE_CURRENT: 100,
-        DUE_1_MONTH: 200,
-        DUE_2_MONTH: 50,
-        DUE_3_MONTH: 20
+        DUE_1_MONTH: 100,
+        DUE_2_MONTH: 200,
+        DUE_3_MONTH: 50,
+        DUE_CURRENT: 20
     }
 ];
 
-let yearMonthList = [202011, 202012];
-
-let SequelizeMock = require('sequelize-mock');
-const dbMock = new SequelizeMock();
-var AccountingClientStatMock = dbMock.define('ACCOUNTING_CLIENT_STAT', returnedAccountStat);
 
 describe("Test Transac Stat DAO", () => {
-    const Model = AccountClientStatModel(sequelize, dataTypes);
-    const instance = new Model();
+    let dbStub = {
+        query: () => {
+            return Promise.resolve(fakeStatsList);
+        }
+    };
 
-    afterEach(() => {
-        AccountingClientStatMock.$queryInterface.$clearResults();
-    })
+    let yearMonthList = [202011, 202012];
 
-    beforeEach(() => {
-        AccountingClientStatMock.$queryInterface.$clearResults();
-    })
+    let fakeQuery = {
+        queryString: "fakeQuery",
+        replacements: ["fakeReplace"]
+    };
 
-    // testing the model properties
-    checkModelName(Model)('ACCOUNTING_CLIENT_STAT');
-    ['yearMonth', 'dueCurrent', 'due1Month', 'due2Month', 'due3Month', 'amount', 'transactionDate', 'transactionRef', 'connectionId']
-        .forEach(checkPropertyExists(instance));
+    let prepareDuesQuerySpy = jest.spyOn(TransacStatDao, 'prepareDuesQuery')
+        .mockImplementation(() => { return fakeQuery });
+
+    let employeeId = 12345;
+    let clientType = 'DIRECT';
+    let countryLabel = 'Canada';
+    let ageOfAccount = "<30";
 
     describe("TD1 - getTransactionsStatByYearMonth", () => {
+
+
+
         it("TD1.1 - should return list of stats in correct format", async () => {
             // arrange
-            let expectedResponse = [fakeStatsList[0].dataValues, fakeStatsList[1].dataValues];
-            AccountingClientStatMock.$queryInterface.$useHandler(function (query, queryOptions, done) {
-                return Promise.resolve(fakeStatsList);
-            });
+            let expectedResponse = [
+                {
+                    yearMonth: fakeStatsList[0].YEAR_MONTH,
+                    dueCurrent: fakeStatsList[0].DUE_CURRENT,
+                    due1Month: fakeStatsList[0].DUE_1_MONTH,
+                    due2Month: fakeStatsList[0].DUE_2_MONTH,
+                    due3Month: fakeStatsList[0].DUE_3_MONTH
+                },
+                {
+                    yearMonth: fakeStatsList[1].YEAR_MONTH,
+                    dueCurrent: fakeStatsList[1].DUE_CURRENT,
+                    due1Month: fakeStatsList[1].DUE_1_MONTH,
+                    due2Month: fakeStatsList[1].DUE_2_MONTH,
+                    due3Month: fakeStatsList[1].DUE_3_MONTH
+                }
+            ];
 
             // act and assert
-            await expect(TransacStatDao.getTransactionsStatByYearMonth(yearMonthList, AccountingClientStatMock)).resolves
+            await expect(TransacStatDao.getTransactionsStatByYearMonth(yearMonthList, employeeId, clientType, countryLabel, ageOfAccount, dbStub)).resolves
                 .toEqual(expectedResponse);
+            expect(prepareDuesQuerySpy).toHaveBeenCalledWith(yearMonthList, employeeId, clientType, countryLabel, ageOfAccount);
         });
 
         it("TD1.2 - should return false when model cant fetch data", async () => {
             // arrange
-            AccountingClientStatMock.$queryInterface.$useHandler(function (query, queryOptions, done) {
-                return Promise.resolve(false);
+            dbStub = {
+                query: () => {
+                    return Promise.resolve(false);
+                }
+            };
+
+            // act and assert
+            await expect(TransacStatDao.getTransactionsStatByYearMonth(yearMonthList, employeeId, clientType, countryLabel, ageOfAccount, dbStub)).resolves
+                .toEqual(false);
+            expect(prepareDuesQuerySpy).toHaveBeenCalledWith(yearMonthList, employeeId, clientType, countryLabel, ageOfAccount);
+        });
+
+        it("TD1.3 - when model throws error with specified status and message, should reject with specified status and message", async () => {
+            // arrange
+            let expectedResponse = {
+                status: 600,
+                message: "Error."
+            };
+            dbStub = {
+                query: () => {
+                    return Promise.reject(expectedResponse)
+                }
+            };
+
+            // act and assert
+            await expect(TransacStatDao.getTransactionsStatByYearMonth(yearMonthList, employeeId, clientType, countryLabel, ageOfAccount, dbStub)).rejects
+                .toEqual(expectedResponse);
+            expect(prepareDuesQuerySpy).toHaveBeenCalledWith(yearMonthList, employeeId, clientType, countryLabel, ageOfAccount);
+        });
+
+        it("TD1.4 - when model throws error with unspecified status and message, should reject with default status and message", async () => {
+            // arrange
+            let expectedResponse = {
+                status: 500,
+                message: "Could not fetch transactions."
+            };
+            dbStub = {
+                query: () => {
+                    return Promise.reject({})
+                }
+            };
+
+            // act and assert
+            await expect(TransacStatDao.getTransactionsStatByYearMonth(yearMonthList, employeeId, clientType, countryLabel, ageOfAccount, dbStub)).rejects
+                .toEqual(expectedResponse);
+            expect(prepareDuesQuerySpy).toHaveBeenCalledWith(yearMonthList, employeeId, clientType, countryLabel, ageOfAccount);
+        });
+    });
+
+    describe("TD2 - prepareDuesQuery", () => {
+        let expectedQuery = {
+            queryString: "".concat("SELECT ACS.DUE_CURRENT, ACS.DUE_1_MONTH, ACS.DUE_2_MONTH, ACS.DUE_3_MONTH, ACS.YEAR_MONTH ",
+                "FROM ACCOUNTING_CLIENT_STAT ACS ",
+                "WHERE ACS.YEAR_MONTH in (?) AND ACS.CONNECTION_ID=3 AND ACS.STAT_TYPE=1"),
+            replacements: [yearMonthList]
+        };
+
+        describe("TD2.1 - given a yearMonthList", () => {
+            it("TD2.1.1 - should respond with query filtered by yearMonth", () => {
+                // arrange
+                prepareDuesQuerySpy.mockRestore();
+
+                // act
+                const response = TransacStatDao.prepareDuesQuery(yearMonthList);
+
+                // assert
+                expect(response).toEqual(expectedQuery);
+            });
+        });
+
+        describe("TD2.2 - given a yearMonthList and an employeeId", () => {
+            it("TD2.2.1 - should respond with query filtered by yearMonth and employeeId", () => {
+                // arrange
+                let expectedQuery = {
+                    queryString: "".concat("SELECT ACS.DUE_CURRENT, ACS.DUE_1_MONTH, ACS.DUE_2_MONTH, ACS.DUE_3_MONTH, ACS.YEAR_MONTH ",
+                        "FROM ACCOUNTING_CLIENT_STAT ACS ",
+                        ", NAME_CONNECTION NC, NAME_QUALITY NQ1, NAME RESP ",
+                        "WHERE ACS.YEAR_MONTH in (?) AND ACS.CONNECTION_ID=3 AND ACS.STAT_TYPE=1",
+                        " AND NC.CONNECTION_ID=3 AND NC.CONNECTION_NAME_ID=CONVERT(NVARCHAR, ACS.ACC_NAME_ID)",
+                        " AND NQ1.NAME_ID=NC.NAME_ID AND NQ1.QUALITY_TYPE_ID=5",
+                        " AND CONVERT(NVARCHAR,RESP.NAME_ID)=NQ1.DROPDOWN_CODE",
+                        " AND NQ1.DROPDOWN_CODE=? "),
+                    replacements: [yearMonthList, employeeId]
+                };
+
+                // act
+                const response = TransacStatDao.prepareDuesQuery(yearMonthList, employeeId, undefined, undefined);
+
+                // assert
+                expect(response).toEqual(expectedQuery);
+            });
+        });
+
+        describe("TD2.3 - given a yearMonthList, an employeeId and a clientType", () => {
+            it("TD2.3.1 - should respond with query filtered by yearMonth and employeeId and clientType", () => {
+                // arrange
+                let expectedQuery = {
+                    queryString: "".concat("SELECT ACS.DUE_CURRENT, ACS.DUE_1_MONTH, ACS.DUE_2_MONTH, ACS.DUE_3_MONTH, ACS.YEAR_MONTH ",
+                        "FROM ACCOUNTING_CLIENT_STAT ACS ",
+                        ", NAME_CONNECTION NC, NAME_QUALITY NQ1, NAME RESP ",
+                        ", NAME_QUALITY NQ2 ",
+                        "WHERE ACS.YEAR_MONTH in (?) AND ACS.CONNECTION_ID=3 AND ACS.STAT_TYPE=1",
+                        " AND NC.CONNECTION_ID=3 AND NC.CONNECTION_NAME_ID=CONVERT(NVARCHAR, ACS.ACC_NAME_ID)",
+                        " AND NQ1.NAME_ID=NC.NAME_ID AND NQ1.QUALITY_TYPE_ID=5",
+                        " AND CONVERT(NVARCHAR,RESP.NAME_ID)=NQ1.DROPDOWN_CODE",
+                        " AND NQ1.DROPDOWN_CODE=? ",
+                        " AND NC.NAME_ID=NQ2.NAME_ID",
+                        " AND NQ2.QUALITY_TYPE_ID=3",
+                        " AND NQ2.DROPDOWN_CODE=? "),
+                    replacements: [yearMonthList, employeeId, clientType]
+                };
+
+                // act
+                const response = TransacStatDao.prepareDuesQuery(yearMonthList, employeeId, clientType, undefined);
+
+                // assert
+                expect(response).toEqual(expectedQuery);
+            });
+        });
+
+        describe("TD2.4 - given a yearMonthList, an employeeId, a clientType and a countryLabel", () => {
+            it("TD2.4.1 - should respond with query filtered by yearMonth and employeeId and clientType and country", () => {
+                // arrange
+                let expectedQuery = {
+                    queryString: "".concat("SELECT ACS.DUE_CURRENT, ACS.DUE_1_MONTH, ACS.DUE_2_MONTH, ACS.DUE_3_MONTH, ACS.YEAR_MONTH ",
+                        "FROM ACCOUNTING_CLIENT_STAT ACS ",
+                        ", NAME_CONNECTION NC, NAME_QUALITY NQ1, NAME RESP ",
+                        ", NAME_QUALITY NQ2 ",
+                        ", ACCOUNTING_NAME AN ",
+                        "WHERE ACS.YEAR_MONTH in (?) AND ACS.CONNECTION_ID=3 AND ACS.STAT_TYPE=1",
+                        " AND NC.CONNECTION_ID=3 AND NC.CONNECTION_NAME_ID=CONVERT(NVARCHAR, ACS.ACC_NAME_ID)",
+                        " AND NQ1.NAME_ID=NC.NAME_ID AND NQ1.QUALITY_TYPE_ID=5",
+                        " AND CONVERT(NVARCHAR,RESP.NAME_ID)=NQ1.DROPDOWN_CODE",
+                        " AND NQ1.DROPDOWN_CODE=? ",
+                        " AND NC.NAME_ID=NQ2.NAME_ID",
+                        " AND NQ2.QUALITY_TYPE_ID=3",
+                        " AND NQ2.DROPDOWN_CODE=? ",
+                        " AND ACS.ACC_NAME_ID=AN.ACC_NAME_ID AND AN.ACC_NAME_COUNTRY=? "),
+                    replacements: [yearMonthList, employeeId, clientType, countryLabel]
+                };
+
+                // act
+                const response = TransacStatDao.prepareDuesQuery(yearMonthList, employeeId, clientType, countryLabel);
+
+                // assert
+                expect(response).toEqual(expectedQuery);
+            });
+        });
+
+        describe("TD2.5 - given a yearMonthList, an employeeId, a clientType and a countryLabel and ageOfAccount", () => {
+            it("TD2.5.1 - when <30, should respond with query filtered by yearMonth and employeeId and clientType and country and age of account under 30 days", () => {
+                // arrange
+                let expectedQuery = {
+                    queryString: "".concat("SELECT ACS.DUE_CURRENT, 0 as 'DUE_1_MONTH', 0 as 'DUE_2_MONTH', 0 as 'DUE_3_MONTH', ACS.YEAR_MONTH ",
+                        "FROM ACCOUNTING_CLIENT_STAT ACS ",
+                        ", NAME_CONNECTION NC, NAME_QUALITY NQ1, NAME RESP ",
+                        ", NAME_QUALITY NQ2 ",
+                        ", ACCOUNTING_NAME AN ",
+                        "WHERE ACS.YEAR_MONTH in (?) AND ACS.CONNECTION_ID=3 AND ACS.STAT_TYPE=1",
+                        " AND NC.CONNECTION_ID=3 AND NC.CONNECTION_NAME_ID=CONVERT(NVARCHAR, ACS.ACC_NAME_ID)",
+                        " AND NQ1.NAME_ID=NC.NAME_ID AND NQ1.QUALITY_TYPE_ID=5",
+                        " AND CONVERT(NVARCHAR,RESP.NAME_ID)=NQ1.DROPDOWN_CODE",
+                        " AND NQ1.DROPDOWN_CODE=? ",
+                        " AND NC.NAME_ID=NQ2.NAME_ID",
+                        " AND NQ2.QUALITY_TYPE_ID=3",
+                        " AND NQ2.DROPDOWN_CODE=? ",
+                        " AND ACS.ACC_NAME_ID=AN.ACC_NAME_ID AND AN.ACC_NAME_COUNTRY=? "),
+                    replacements: [yearMonthList, employeeId, clientType, countryLabel]
+                };
+
+                // act
+                const response = TransacStatDao.prepareDuesQuery(yearMonthList, employeeId, clientType, countryLabel, ageOfAccount);
+
+                // assert
+                expect(response).toEqual(expectedQuery);
             });
 
-            // act and assert
-            await expect(TransacStatDao.getTransactionsStatByYearMonth(yearMonthList, AccountingClientStatMock)).resolves
-                .toEqual(false);
-        });
+            it("TD2.5.2 - when 30-60, should respond with query filtered by yearMonth and employeeId and clientType and country and age of account 30-60 days", () => {
+                // arrange
+                let expectedQuery = {
+                    queryString: "".concat("SELECT 0 as 'DUE_CURRENT', ACS.DUE_1_MONTH, 0 as 'DUE_2_MONTH', 0 as 'DUE_3_MONTH', ACS.YEAR_MONTH ",
+                        "FROM ACCOUNTING_CLIENT_STAT ACS ",
+                        ", NAME_CONNECTION NC, NAME_QUALITY NQ1, NAME RESP ",
+                        ", NAME_QUALITY NQ2 ",
+                        ", ACCOUNTING_NAME AN ",
+                        "WHERE ACS.YEAR_MONTH in (?) AND ACS.CONNECTION_ID=3 AND ACS.STAT_TYPE=1",
+                        " AND NC.CONNECTION_ID=3 AND NC.CONNECTION_NAME_ID=CONVERT(NVARCHAR, ACS.ACC_NAME_ID)",
+                        " AND NQ1.NAME_ID=NC.NAME_ID AND NQ1.QUALITY_TYPE_ID=5",
+                        " AND CONVERT(NVARCHAR,RESP.NAME_ID)=NQ1.DROPDOWN_CODE",
+                        " AND NQ1.DROPDOWN_CODE=? ",
+                        " AND NC.NAME_ID=NQ2.NAME_ID",
+                        " AND NQ2.QUALITY_TYPE_ID=3",
+                        " AND NQ2.DROPDOWN_CODE=? ",
+                        " AND ACS.ACC_NAME_ID=AN.ACC_NAME_ID AND AN.ACC_NAME_COUNTRY=? "),
+                    replacements: [yearMonthList, employeeId, clientType, countryLabel]
+                };
 
-        it("TD1.3 - should return error when model throws error", async () => {
-            // arrange
-            AccountingClientStatMock.$queryInterface.$useHandler(function (query, queryOptions, done) {
-                return Promise.reject({ message: "Error with the model." });
+                // act
+                const response = TransacStatDao.prepareDuesQuery(yearMonthList, employeeId, clientType, countryLabel, "30-60");
+
+                // assert
+                expect(response).toEqual(expectedQuery);
             });
 
-            // act and assert
-            await expect(TransacStatDao.getTransactionsStatByYearMonth(yearMonthList, AccountingClientStatMock)).rejects
-                .toEqual({ message: "Error with the model." });
+            it("TD2.5.3 - when 60-90, should respond with query filtered by yearMonth and employeeId and clientType and country and age of account 60-90 days", () => {
+                // arrange
+                let expectedQuery = {
+                    queryString: "".concat("SELECT 0 as 'DUE_CURRENT', 0 as 'DUE_1_MONTH', ACS.DUE_2_MONTH, 0 as 'DUE_3_MONTH', ACS.YEAR_MONTH ",
+                        "FROM ACCOUNTING_CLIENT_STAT ACS ",
+                        ", NAME_CONNECTION NC, NAME_QUALITY NQ1, NAME RESP ",
+                        ", NAME_QUALITY NQ2 ",
+                        ", ACCOUNTING_NAME AN ",
+                        "WHERE ACS.YEAR_MONTH in (?) AND ACS.CONNECTION_ID=3 AND ACS.STAT_TYPE=1",
+                        " AND NC.CONNECTION_ID=3 AND NC.CONNECTION_NAME_ID=CONVERT(NVARCHAR, ACS.ACC_NAME_ID)",
+                        " AND NQ1.NAME_ID=NC.NAME_ID AND NQ1.QUALITY_TYPE_ID=5",
+                        " AND CONVERT(NVARCHAR,RESP.NAME_ID)=NQ1.DROPDOWN_CODE",
+                        " AND NQ1.DROPDOWN_CODE=? ",
+                        " AND NC.NAME_ID=NQ2.NAME_ID",
+                        " AND NQ2.QUALITY_TYPE_ID=3",
+                        " AND NQ2.DROPDOWN_CODE=? ",
+                        " AND ACS.ACC_NAME_ID=AN.ACC_NAME_ID AND AN.ACC_NAME_COUNTRY=? "),
+                    replacements: [yearMonthList, employeeId, clientType, countryLabel]
+                };
+
+                // act
+                const response = TransacStatDao.prepareDuesQuery(yearMonthList, employeeId, clientType, countryLabel, "60-90");
+
+                // assert
+                expect(response).toEqual(expectedQuery);
+            });
+
+            it("TD2.5.4 - when >90, should respond with query filtered by yearMonth and employeeId and clientType and country and age of account over 90 days", () => {
+                // arrange
+                let expectedQuery = {
+                    queryString: "".concat("SELECT 0 as 'DUE_CURRENT', 0 as 'DUE_1_MONTH', 0 as 'DUE_2_MONTH', ACS.DUE_3_MONTH, ACS.YEAR_MONTH ",
+                        "FROM ACCOUNTING_CLIENT_STAT ACS ",
+                        ", NAME_CONNECTION NC, NAME_QUALITY NQ1, NAME RESP ",
+                        ", NAME_QUALITY NQ2 ",
+                        ", ACCOUNTING_NAME AN ",
+                        "WHERE ACS.YEAR_MONTH in (?) AND ACS.CONNECTION_ID=3 AND ACS.STAT_TYPE=1",
+                        " AND NC.CONNECTION_ID=3 AND NC.CONNECTION_NAME_ID=CONVERT(NVARCHAR, ACS.ACC_NAME_ID)",
+                        " AND NQ1.NAME_ID=NC.NAME_ID AND NQ1.QUALITY_TYPE_ID=5",
+                        " AND CONVERT(NVARCHAR,RESP.NAME_ID)=NQ1.DROPDOWN_CODE",
+                        " AND NQ1.DROPDOWN_CODE=? ",
+                        " AND NC.NAME_ID=NQ2.NAME_ID",
+                        " AND NQ2.QUALITY_TYPE_ID=3",
+                        " AND NQ2.DROPDOWN_CODE=? ",
+                        " AND ACS.ACC_NAME_ID=AN.ACC_NAME_ID AND AN.ACC_NAME_COUNTRY=? "),
+                    replacements: [yearMonthList, employeeId, clientType, countryLabel]
+                };
+
+                // act
+                const response = TransacStatDao.prepareDuesQuery(yearMonthList, employeeId, clientType, countryLabel, ">90");
+
+                // assert
+                expect(response).toEqual(expectedQuery);
+            });
+
+            it("TD2.5.5 - when any other string, should respond with query filtered by yearMonth and employeeId and clientType and country and all age of account", () => {
+                // arrange
+                let expectedQuery = {
+                    queryString: "".concat("SELECT ACS.DUE_CURRENT, ACS.DUE_1_MONTH, ACS.DUE_2_MONTH, ACS.DUE_3_MONTH, ACS.YEAR_MONTH ",
+                        "FROM ACCOUNTING_CLIENT_STAT ACS ",
+                        ", NAME_CONNECTION NC, NAME_QUALITY NQ1, NAME RESP ",
+                        ", NAME_QUALITY NQ2 ",
+                        ", ACCOUNTING_NAME AN ",
+                        "WHERE ACS.YEAR_MONTH in (?) AND ACS.CONNECTION_ID=3 AND ACS.STAT_TYPE=1",
+                        " AND NC.CONNECTION_ID=3 AND NC.CONNECTION_NAME_ID=CONVERT(NVARCHAR, ACS.ACC_NAME_ID)",
+                        " AND NQ1.NAME_ID=NC.NAME_ID AND NQ1.QUALITY_TYPE_ID=5",
+                        " AND CONVERT(NVARCHAR,RESP.NAME_ID)=NQ1.DROPDOWN_CODE",
+                        " AND NQ1.DROPDOWN_CODE=? ",
+                        " AND NC.NAME_ID=NQ2.NAME_ID",
+                        " AND NQ2.QUALITY_TYPE_ID=3",
+                        " AND NQ2.DROPDOWN_CODE=? ",
+                        " AND ACS.ACC_NAME_ID=AN.ACC_NAME_ID AND AN.ACC_NAME_COUNTRY=? "),
+                    replacements: [yearMonthList, employeeId, clientType, countryLabel]
+                };
+
+                // act
+                const response = TransacStatDao.prepareDuesQuery(yearMonthList, employeeId, clientType, countryLabel, "otherString");
+
+                // assert
+                expect(response).toEqual(expectedQuery);
+            });
         });
+
+        describe("TD2.6 - given a yearMonthList and client type but no employeeId", () => {
+            it("TD2.6.1 - should return query filtered by yearMonth and client Type", () => {
+                // arrange
+                let expectedQuery = {
+                    queryString: "".concat("SELECT ACS.DUE_CURRENT, ACS.DUE_1_MONTH, ACS.DUE_2_MONTH, ACS.DUE_3_MONTH, ACS.YEAR_MONTH ",
+                        "FROM ACCOUNTING_CLIENT_STAT ACS ",
+                        ", NAME_CONNECTION NC ",
+                        ", NAME_QUALITY NQ2 ",
+                        "WHERE ACS.YEAR_MONTH in (?) AND ACS.CONNECTION_ID=3 AND ACS.STAT_TYPE=1",
+                        " AND NC.CONNECTION_ID=3  AND NC.CONNECTION_NAME_ID=CONVERT(NVARCHAR, ACS.ACC_NAME_ID) ",
+                        " AND NC.NAME_ID=NQ2.NAME_ID",
+                        " AND NQ2.QUALITY_TYPE_ID=3",
+                        " AND NQ2.DROPDOWN_CODE=? "),
+                    replacements: [yearMonthList, clientType]
+                };
+
+                // act
+                const response = TransacStatDao.prepareDuesQuery(yearMonthList, undefined, clientType, undefined);
+
+                // assert
+                expect(response).toEqual(expectedQuery);
+            });
+        });
+
     });
-
-    describe("TD2 - getTransactionsStatByYearMonthAndEmployee", () => {
-        it("TD2.1 - Should return list of clients", async () => {
-            // arrange
-            let employeeId = [22769];
-            let expectedResponse = [fakeStatsList[0].dataValues, fakeStatsList[1].dataValues];
-
-            let dbStub = {
-                query: () => {
-                    return fakeStatsListWithColumnName;
-                }
-            };
-
-            // act and assert
-            await expect(TransacStatDao.getTransactionsStatByYearMonthAndEmployee(yearMonthList, employeeId, dbStub)).resolves
-                .toEqual(expectedResponse);
-
-        });
-
-        it("TD2.2 - Should resolve false when Model cant fetch data", async () => {
-            // arrange
-            let employeeId = [22769];
-
-            let dbStub = {
-                query: () => {
-                    return false;
-                }
-            };
-
-            await expect(TransacStatDao.getTransactionsStatByYearMonthAndEmployee(yearMonthList, employeeId, dbStub)).resolves
-                .toEqual(false);
-        });
-
-        it("TD2.3 - Should reject error with 500 status and predefined message when model does not define them", async () => {
-            // arrange
-            let employeeId = [22769];
-
-            let expectedError = {
-                status: 500,
-                message: "some error occured"
-            };
-
-            let dbStub = {
-                query: () => {
-                    return Promise.reject(expectedError);
-                }
-            };
-
-            // act and assert
-            await expect(TransacStatDao.getTransactionsStatByYearMonthAndEmployee(yearMonthList, employeeId, dbStub)).rejects
-                .toEqual(expectedError);
-        });
-
-        it("TD2.4 - Should reject error when Model throws error with defined status and message", async () => {
-            // arrange
-            let employeeId = [22769];
-
-            let expectedError = {
-                status: 404,
-                message: "Error."
-            };
-
-            let dbStub = {
-                query: () => {
-                    return Promise.reject(expectedError);
-                }
-            };
-
-            // act and assert
-            await expect(TransacStatDao.getTransactionsStatByYearMonthAndEmployee(yearMonthList, employeeId, dbStub)).rejects
-                .toEqual(expectedError);
-        });
-    });
-
-
-    describe("TD3 - getTransactionsStatByYearMonthAndCountry", () => {
-        it("TD3.1 - Should return list of stats based by country", async () => {
-            // arrange
-            let countryName = "Canada";
-            let expectedResponse = [fakeStatsList[0].dataValues, fakeStatsList[1].dataValues];
-
-            let dbStub = {
-                query: () => {
-                    return fakeStatsListWithColumnName;
-                }
-            };
-
-            // act and assert
-            await expect(TransacStatDao.getTransactionsStatByYearMonthAndCountry(yearMonthList, countryName, dbStub)).resolves
-                .toEqual(expectedResponse);
-
-        });
-
-        it("TD3.2 - Should resolve false when Model cant fetch data", async () => {
-            // arrange
-            let countryName = "Canada";
-
-            let dbStub = {
-                query: () => {
-                    return false;
-                }
-            };
-
-            await expect(TransacStatDao.getTransactionsStatByYearMonthAndCountry(yearMonthList, countryName, dbStub)).resolves
-                .toEqual(false);
-        });
-
-        it("TD3.3 - Should reject error with 500 status and predefined message when model does not define them", async () => {
-            // arrange
-            let countryName = "Canada";
-
-            let expectedError = {
-                status: 500,
-                message: "some error occured"
-            };
-
-            let dbStub = {
-                query: () => {
-                    return Promise.reject(expectedError);
-                }
-            };
-
-            // act and assert
-            await expect(TransacStatDao.getTransactionsStatByYearMonthAndCountry(yearMonthList, countryName, dbStub)).rejects
-                .toEqual(expectedError);
-        });
-
-        it("TD3.4 - Should reject error when Model throws error with defined status and message", async () => {
-            // arrange
-            let countryName = "Canada";
-
-            let expectedError = {
-                status: 404,
-                message: "Error."
-            };
-
-            let dbStub = {
-                query: () => {
-                    return Promise.reject(expectedError);
-                }
-            };
-
-            // act and assert
-            await expect(TransacStatDao.getTransactionsStatByYearMonthAndCountry(yearMonthList, countryName, dbStub)).rejects
-                .toEqual(expectedError);
-        });
-    });
-
-    describe("TD4 - getTransactionsStatByYearMonthAndEmployeeAndCountry", () => {
-        it("TD4.1 - Should return list of stats based by employee and country", async () => {
-            // arrange
-            let employeeId = [22769];
-            let countryName = "Canada";
-            let expectedResponse = [fakeStatsList[0].dataValues, fakeStatsList[1].dataValues];
-
-            let dbStub = {
-                query: () => {
-                    return fakeStatsListWithColumnName;
-                }
-            };
-
-            // act and assert
-            await expect(TransacStatDao.getTransactionsStatByYearMonthAndEmployeeAndCountry(yearMonthList, employeeId, countryName, dbStub)).resolves
-                .toEqual(expectedResponse);
-
-        });
-
-        it("TD4.2 - Should resolve false when Model cant fetch data", async () => {
-            // arrange
-            let employeeId = [22769];
-            let countryName = "Canada";
-
-            let dbStub = {
-                query: () => {
-                    return false;
-                }
-            };
-
-            await expect(TransacStatDao.getTransactionsStatByYearMonthAndEmployeeAndCountry(yearMonthList, employeeId, countryName, dbStub)).resolves
-                .toEqual(false);
-        });
-
-        it("TD4.3 - Should reject error with 500 status and predefined message when model does not define them", async () => {
-            // arrange
-            let employeeId = [22769];
-            let countryName = "Canada";
-
-            let expectedError = {
-                status: 500,
-                message: "some error occured"
-            };
-
-            let dbStub = {
-                query: () => {
-                    return Promise.reject(expectedError);
-                }
-            };
-
-            // act and assert
-            await expect(TransacStatDao.getTransactionsStatByYearMonthAndEmployeeAndCountry(yearMonthList, employeeId, countryName, dbStub)).rejects
-                .toEqual(expectedError);
-        });
-
-        it("TD4.4 - Should reject error when Model throws error with defined status and message", async () => {
-
-            // arrange
-            let employeeId = [22769];
-            let countryName = "Canada";
-
-            let expectedError = {
-                status: 404,
-                message: "Error."
-            };
-
-            let dbStub = {
-                query: () => {
-                    return Promise.reject(expectedError);
-                }
-            };
-
-            // act and assert
-            await expect(TransacStatDao.getTransactionsStatByYearMonthAndEmployeeAndCountry(yearMonthList, employeeId, countryName, dbStub)).rejects
-                .toEqual(expectedError);
-        });
-    });
-
-
-
 });

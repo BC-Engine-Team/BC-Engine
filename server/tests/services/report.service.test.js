@@ -1175,7 +1175,105 @@ describe("Test Report Service", () => {
         });
     });
 
-    describe("RS10 - createChartReportPDFById", () => {
+    describe("RS10 - getPerformanceReportWhenConnectedAsAdmin", () => {
+
+        let fakePerformanceReportResponse = [
+            {
+                performanceReportId: "PerformanceUUID",
+                employeeId: 1,
+                averageCollectionDay: "35",
+                annualBillingObjective: "4500",
+                monthlyBillingObjective: "300",
+                annualBillingNumber: "200",
+                monthlyBillingNumber: "300",
+                projectedBonus: "650"
+            },
+            {
+                performanceReportId: "PerformanceUUID",
+                employeeId: 2,
+                averageCollectionDay: "35",
+                annualBillingObjective: "4500",
+                monthlyBillingObjective: "300",
+                annualBillingNumber: "200",
+                monthlyBillingNumber: "300",
+                projectedBonus: "650"
+            }
+        ]; 
+      
+        describe("RS10.1 - given a userId", () => {
+            it("RS10.1.1 - should return list of chartReports", async () => {
+                // arrange
+                chartReportDaoSpy = jest.spyOn(ReportDao, 'getPerformanceReportsWhenConnectedAsAdmin')
+                    .mockImplementation(() => new Promise((resolve) => {
+                        resolve(fakePerformanceReportResponse);
+                    }));
+
+                // act and assert
+                await expect(ReportService.getPerformanceReportWhenConnectedAsAdmin("randomUserId")).resolves
+                    .toEqual(fakePerformanceReportResponse);
+            });
+
+            it("RS10.1.2 - should resolve false when dao returns false", async () => {
+                // arrange
+                chartReportDaoSpy = jest.spyOn(ReportDao, 'getPerformanceReportsWhenConnectedAsAdmin')
+                    .mockImplementation(() => new Promise((resolve) => {
+                        resolve(false);
+                    }));
+
+                // act and assert
+                await expect(ReportService.getPerformanceReportWhenConnectedAsAdmin("someUserId")).resolves
+                    .toEqual(false);
+            });
+
+            it("RS10.1.3 - should reject with dao error status and message when dao throws error", async () => {
+                // arrange
+                let expectedError = {
+                    status: 404,
+                    message: "Error message."
+                };
+                chartReportDaoSpy = jest.spyOn(ReportDao, 'getPerformanceReportsWhenConnectedAsAdmin')
+                    .mockImplementation(() => new Promise((resolve, reject) => {
+                        reject(expectedError);
+                    }));
+
+                // act and assert
+                await expect(ReportService.getPerformanceReportWhenConnectedAsAdmin("someUserId")).rejects
+                    .toEqual(expectedError);
+            });
+
+            it("RS10.1.4 - should reject with status 500 and message when dao error doesn't specify", async () => {
+                // arrange
+                let expectedError = {
+                    status: 500,
+                    message: "Could not fetch data."
+                };
+                chartReportDaoSpy = jest.spyOn(ReportDao, 'getPerformanceReportsWhenConnectedAsAdmin')
+                    .mockImplementation(() => new Promise((resolve, reject) => {
+                        reject({});
+                    }));
+
+                // act and assert
+                await expect(ReportService.getPerformanceReportWhenConnectedAsAdmin("someUserId")).rejects
+                    .toEqual(expectedError);
+            });
+        });
+
+        describe("RS10.2 - given no userId", () => {
+            it("RS10.2.1 - should reject with 500 status and message", async () => {
+                // arrange
+                let expectedError = {
+                    status: 500,
+                    message: "Could not fetch data."
+                };
+
+                // act and assert
+                await expect(ReportService.getPerformanceReportWhenConnectedAsAdmin()).rejects
+                    .toEqual(expectedError);
+            });
+        });
+    });
+
+    describe("RS11 - createChartReportPDFById", () => {
         let returnedChartReport = {
             dataValues: {
                 chartReportId: 'fakeUUID1',
@@ -1218,8 +1316,8 @@ describe("Test Report Service", () => {
             }
         ]
 
-        describe("RS10.1 - given a reportId", () => {
-            it("RS10.1.1 - should return true", async () => {
+        describe("RS11.1 - given a reportId", () => {
+            it("RS11.1.1 - should return true", async () => {
                 // arrange
                 chartReportDaoSpy = jest.spyOn(ChartReportDao, 'getChartReportById')
                     .mockImplementation(() => new Promise((resolve) => {
@@ -1245,7 +1343,7 @@ describe("Test Report Service", () => {
                 
             });
 
-            it("RS10.1.2 - should resolve false when dao returns false", async () => {
+            it("RS11.1.2 - should resolve false when dao returns false", async () => {
                 // arrange
                 chartReportDaoSpy = jest.spyOn(ChartReportDao, 'getChartReportById')
                     .mockImplementation(() => new Promise((resolve) => {
@@ -1262,7 +1360,7 @@ describe("Test Report Service", () => {
                     .toEqual(false);
             });
 
-            it("RS1.1.3 - should reject with dao error status and message when dao throws error", async () => {
+            it("RS11.1.3 - should reject with dao error status and message when dao throws error", async () => {
                 // arrange
                 let expectedError = {
                     status: 404,
@@ -1284,7 +1382,7 @@ describe("Test Report Service", () => {
                     .toEqual(expectedError);
             });
 
-            it("RS1.1.4 - should reject with status 500 and message when dao error doesn't specify", async () => {
+            it("RS11.1.4 - should reject with status 500 and message when dao error doesn't specify", async () => {
                 // arrange
                 let expectedError = {
                     status: 500,
@@ -1307,8 +1405,8 @@ describe("Test Report Service", () => {
             });
         });
 
-        describe("RS10.2 - given no reportId", () => {
-            it("RS10.2.1 - should reject with 500 status and message", async () => {
+        describe("RS11.2 - given no reportId", () => {
+            it("RS11.2.1 - should reject with 500 status and message", async () => {
                 // arrange
                 let expectedError = {
                     status: 500,
@@ -1321,8 +1419,8 @@ describe("Test Report Service", () => {
             });
         });   
 
-        describe("RS10.3 - getChartReportPDFAverages", () => {
-            it("RS10.3.1 - when returned data is false should return error", async () => {
+        describe("RS11.3 - getChartReportPDFAverages", () => {
+            it("RS11.3.1 - when returned data is false should return error", async () => {
                 // arrange
                 chartReportDaoSpy = jest.spyOn(ChartReportDao, 'getChartReportById')
                     .mockImplementation(() => new Promise((resolve, reject) => {
@@ -1339,7 +1437,7 @@ describe("Test Report Service", () => {
                     .toEqual(false);
             });
 
-            it("RS10.3.2 - should reject with status 500 and message defined by the dao", async () => {
+            it("RS11.3.2 - should reject with status 500 and message defined by the dao", async () => {
                 // arrange
                 let expectedError = {
                     status: 500,

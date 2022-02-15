@@ -2,11 +2,9 @@ const database = require('../databases')['mssql_bosco'];
 const { QueryTypes } = require('sequelize');
 
 
-exports.getAllCountries = async (db=database) => {
-
+exports.getAllCountries = async (db = database) => {
     return new Promise(async (resolve, reject) => {
-
-        try{
+        try {
             const data = await db.query(
                 "SELECT DISTINCT C.[COUNTRY_CODE], \
                 C.[COUNTRY_LABEL] \
@@ -23,6 +21,7 @@ exports.getAllCountries = async (db=database) => {
                     type: QueryTypes.SELECT
                 }
             );
+
             if (data) {
                 let returnData = [];
                 data.forEach(c => {

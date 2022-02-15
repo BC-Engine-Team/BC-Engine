@@ -57,8 +57,10 @@
           "CompareBTN":"Comparer",
           "All":"Tous",
           "labels": {
+             "Employee":"Employé(e)",
              "Country":"Pays",
-             "Employee":"Employé"
+             "ClientType": "Type de Client",
+             "Age": "Âge de la facture"
           },
          "NamePlaceHolder": "Entrez le nom de votre Rapport Graphique",
          "LoadChartButton": "Mettre à jour le Graphique",
@@ -68,7 +70,19 @@
          "EndMonthExceedError": "Mois de fin ne peut pas être avant le Mois de début.",
          "EndMonthExceedCurrentError": "Mois de fin ne peut pas être après le mois actuel.",
          "EndYearExceedError": "Année de fin ne peut pas être avant l'Année de début.",
-         "SaveConfirmPrompt": "Êtes-vous certain de vouloir sauvegarder "
+         "SaveConfirmPrompt": "Êtes-vous certain de vouloir sauvegarder ",
+         "clientType": {
+            "Corr": "Correspondent",
+            "Direct": "Direct",
+            "Any": "Tous"
+        },
+        "ageOfAccount": {
+           "All": "Tous",
+            "DueCurrent": "Moins de 30 jours",
+            "Due1Month": "Entre 30 et 60 jours",
+            "Due2Month": "Entre 60 et 90 jours",
+            "Due3Month": "Plus de 90 jours"
+         }
        },
        "chart": {
           "Title": "Moyenne de Jour de Collection par Mois",
@@ -123,9 +137,15 @@
       "ExportButtonLabel": "Exporter",
        "reports": {
           "Title": "Rapports",
-          "NameLabel": "Nom du Rapport",
-          "DateLabel": "Date du Rapport",
-          "EmployeeLabel": "Employé(es) concerné(es)",
+          "NameLabel":"Nom du rapport",
+          "DateLabel":"Date du rapport",
+          "EmployeeLabel":"Employé(s) concerné(s)",
+          "AverageCollectionDay": "Moyenne des jours de collection",
+          "AnnualBillingObjective": "Objectif de facturation annuel",
+          "MonthlyBillingObjective": "Objectif de facturation mensuel",
+          "AnnualBillingNumber": "Numéro de facturation annuel",
+          "MonthlyBillingNumber": "Numéro de facturation mensuel",
+          "ProjectedBonus": "Prime projeté",
           "EmailButtonLabel": "Addresse Courriel"
        },
        "reportsManagement": {

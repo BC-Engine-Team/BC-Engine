@@ -42,6 +42,17 @@ const Reports = () => {
         accountType: ""
     }]);
 
+    const [performanceReport, setPerformanceReport] = useState([{
+        performanceReportId: "",
+        employeeId: 0,
+        averageCollectionDay: "",
+        annualBillingObjective: "",
+        monthlyBillingObjective: "",
+        annualBillingNumber: "",
+        monthlyBillingNumber: "",
+        projectedBonus: ""
+    }]);
+    
     const [reportTypes, setReportTypes] = useState([]);
     const [selectedReportType, setSelectedReportType] = useState({});
     const [showReportsManagement, setShowReportsManagement] = useState({
@@ -126,12 +137,44 @@ const Reports = () => {
             });
             await getReportTypesAndRecipients();
         }
-
+        await getPerformanceReportsByAdmin();
     }
+
+
+    const getPerformanceReportsByAdmin = async () => {
+        let header = {
+            'authorization': "Bearer " + cookies.get("accessToken")
+        }
+
+        Axios.defaults.withCredentials = true;
+
+        await Axios.get(`${process.env.REACT_APP_API}/reports/performanceReport`, { headers: header })
+            .then((response) => {
+                if (response.data) {
+                    setPerformanceReport(response.data);
+                    return;
+                }
+                alert("The response from the B&C Engine was invalid.");
+            })
+            .catch((error) => {
+                if (error.response) {
+                    if (error.response.status === 403 || error.response.status === 401) {
+                        alert("You are not authorized to perform this action.");
+                    }
+                    else {
+                        alert("Malfunction in the B&C Engine.");
+                    }
+                }
+                else if (error.request) {
+                    alert("Could not reach b&C Engine...");
+                }
+            });
+    }
+
 
     const getReportTypesAndRecipients = async () => {
         let header = {
-            'authorization': "Bearer " + cookies.get("accessToken"),
+            'authorization': "Bearer " + cookies.get("accessToken")
         }
 
         Axios.defaults.withCredentials = true;
@@ -250,15 +293,27 @@ const Reports = () => {
                             <Table responsive hover id='reportTypesTable'>
                                 <thead className='bg-light'>
                                     <tr key="0">
-                                        <th>{t('reports.reports.NameLabel')}</th>
-                                        <th>{t('reports.reports.EmployeeLabel')}</th>
-                                        <th>{t('reports.reports.DateLabel')}</th>
-                                        <th className='text-center'>Actions</th>
+                                        <th className='performance-table-columns'>{t('reports.reports.AverageCollectionDay')}</th>
+                                        <th className='performance-table-columns'>{t('reports.reports.AnnualBillingObjective')}</th>
+                                        <th className='performance-table-columns'>{t('reports.reports.MonthlyBillingObjective')}</th>
+                                        <th className='performance-table-columns'>{t('reports.reports.AnnualBillingNumber')}</th>
+                                        <th className='performance-table-columns'>{t('reports.reports.MonthlyBillingNumber')}</th>
+                                        <th className='performance-table-columns'>{t('reports.reports.ProjectedBonus')}</th>
                                     </tr>
                                 </thead>
-
                                 <tbody>
-
+                                {performanceReport.map((p) => {
+                                    return (
+                                        <tr key={p.performanceReportId}>
+                                            <td className='performance-table-columns'>{p.averageCollectionDay}</td>
+                                            <td className='performance-table-columns'>{p.annualBillingObjective}</td>
+                                            <td className='performance-table-columns'>{p.monthlyBillingObjective}</td>
+                                            <td className='performance-table-columns'>{p.annualBillingNumber}</td>
+                                            <td className='performance-table-columns'>{p.monthlyBillingNumber}</td>
+                                            <td className='performance-table-columns'>{p.projectedBonus}</td>
+                                        </tr>
+                                    )
+                                })}
                                 </tbody>
                             </Table>
                         </div>
