@@ -4,7 +4,7 @@ const { sequelize,
     checkPropertyExists
 } = require('sequelize-test-helpers');
 
-const [UserModel, ChartReportModel] = require('../../data_access_layer/models/localdb/localdb.model')(sequelize, dataTypes);
+const [UserModel, ChartReportModel, ChartReportDataModel, PerformanceReportModel,  ReportTypeModel, RecipientModel, ReportTypeRecipientModel] = require('../../data_access_layer/models/localdb/localdb.model')(sequelize, dataTypes);
 const ChartReportDAO = require('../../data_access_layer/daos/chart_report.dao');
 
 let returnedChartReports = [
@@ -40,27 +40,63 @@ let returnedChartReports = [
     }
 ];
 
+
+let returnedPerformanceReports = [
+    {
+        performanceReportId: "PerformanceUUID",
+        employeeId: 1,
+        averageCollectionDay: "35",
+        annualBillingObjective: "4500",
+        monthlyBillingObjective: "300",
+        annualBillingNumber: "200",
+        monthlyBillingNumber: "300",
+        projectedBonus: "650"
+    },
+    {
+        performanceReportId: "PerformanceUUID",
+        employeeId: 2,
+        averageCollectionDay: "35",
+        annualBillingObjective: "4500",
+        monthlyBillingObjective: "300",
+        annualBillingNumber: "200",
+        monthlyBillingNumber: "300",
+        projectedBonus: "650"
+    }
+] 
+
+
+
 let SequelizeMock = require('sequelize-mock');
 const dbMock = new SequelizeMock();
 var ChartReportMock = dbMock.define('chart_reports', returnedChartReports);
-
+var PerformanceReportMock = dbMock.define('performance_reports', returnedPerformanceReports);
 
 describe("Test Chart Report DAO", () => {
-    const instance = new ChartReportModel();
+    const ChartReport = new ChartReportModel();
+    const PerformanceReport = new PerformanceReportModel(); 
 
     afterEach(() => {
         ChartReportMock.$queryInterface.$clearResults();
+        PerformanceReportMock.$queryInterface.$clearResults();
     })
 
     beforeEach(() => {
         ChartReportMock.$queryInterface.$clearResults();
+        PerformanceReportMock.$queryInterface.$clearResults();
     })
 
     // testing the chart report model properties
     checkModelName(ChartReportModel)('chart_reports');
+
     ['chartReportId', 'name', 'startDate', 'endDate', 'employee1Id', 'employee1Name',
         'employee2Id', 'employee2Name', 'country', 'clientType', 'ageOfAccount', 'accountType']
-        .forEach(checkPropertyExists(instance));
+        .forEach(checkPropertyExists(ChartReport));
+
+    checkModelName(PerformanceReportModel)('performance_reports');
+    
+    ['performanceReportId', 'employeeId', 'averageCollectionDay', 'annualBillingObjective', 'monthlyBillingObjective', 'annualBillingNumber', 'monthlyBillingNumber', 'projectedBonus']
+        .forEach(checkPropertyExists(PerformanceReport));
+
 
     describe("CRD1 - getChartReportsByUserId", () => {
         describe("CRD1.1 - given a userId", () => {
@@ -372,6 +408,76 @@ describe("Test Chart Report DAO", () => {
                 // act and assert
                 expect(ChartReportDAO.deleteChartReportById("fakeUUID", fakeChartReportModel))
                     .rejects.toEqual(expectedResponse);
+            });
+        });
+
+
+
+        
+
+
+
+
+
+
+
+
+
+
+
+        describe("CRD5 - getPerformanceReportsWhenConnectedAsAdmin", () => {
+            describe("CRD5.1 - given a userId", () => {
+                it("CRD5.1.1 - should return list of performance reports", async () => {
+                    // arrange
+                    PerformanceReportMock.$queryInterface.$useHandler(function (query, queryOptions, done) {
+                        return Promise.resolve(returnedPerformanceReports);
+                    });
+    
+                    // act and assert
+                    await expect(ChartReportDAO.getPerformanceReportsWhenConnectedAsAdmin('fakeUserId', PerformanceReportMock)).resolves
+                        .toEqual(returnedPerformanceReports);
+                });
+    
+                it("CRD5.1.2 - should resolve false when Model cant fetch data", async () => {
+                    // arrange
+                    PerformanceReportMock.$queryInterface.$useHandler(function (query, queryOptions, done) {
+                        return Promise.resolve(false);
+                    });
+    
+                    // act and assert
+                    await expect(ChartReportDAO.getPerformanceReportsWhenConnectedAsAdmin('fakeUserId', PerformanceReportMock)).resolves
+                        .toEqual(false);
+                });
+    
+                it("CRD5.1.3 - should reject error when Model throws error with defined status and message", async () => {
+                    // arrange
+                    let expectedError = {
+                        status: 404,
+                        message: "Error."
+                    };
+                    PerformanceReportMock.$queryInterface.$useHandler(function (query, queryOptions, done) {
+                        return Promise.reject(expectedError);
+                    });
+    
+                    // act and assert
+                    await expect(ChartReportDAO.getPerformanceReportsWhenConnectedAsAdmin('fakeUserId', PerformanceReportMock)).rejects
+                        .toEqual(expectedError);
+                });
+    
+                it("CRD1.1.4 - should reject error with 500 status and predefined message when model does not define them", async () => {
+                    // arrange
+                    let expectedError = {
+                        status: 500,
+                        message: "Could not fetch data."
+                    };
+                    PerformanceReportMock.$queryInterface.$useHandler(function (query, queryOptions, done) {
+                        return Promise.reject({});
+                    });
+    
+                    // act and assert
+                    await expect(ChartReportDAO.getPerformanceReportsWhenConnectedAsAdmin('fakeUserId', PerformanceReportMock)).rejects
+                        .toEqual(expectedError);
+                });
             });
         });
     });

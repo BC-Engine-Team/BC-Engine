@@ -5,16 +5,21 @@ const { sequelize,
     checkPropertyExists
 } = require('sequelize-test-helpers');
 
-const [user, cr, crd, ReportTypeModel, RecipientModel, ReportTypeRecipientModel] = require('../../data_access_layer/models/localdb/localdb.model')(sequelize, dataTypes);
+const [user, cr, crd, PerformanceReportModel, ReportTypeModel, RecipientModel, ReportTypeRecipientModel] = require('../../data_access_layer/models/localdb/localdb.model')(sequelize, dataTypes);
 const ReportDAO = require('../../data_access_layer/daos/report.dao');
 
 
 describe("Test Report Related Models", () => {
     const ReportTypeInstance = new ReportTypeModel();
     const RecipientInstance = new RecipientModel();
+    const PerformanceInstance = new PerformanceReportModel();
+    checkModelName(PerformanceReportModel)('performance_reports');
     checkModelName(ReportTypeModel)('report_types');
     checkModelName(RecipientModel)('recipients');
     checkModelName(ReportTypeRecipientModel)('report_type_recipients');
+
+    ['performanceReportId', 'employeeId', 'averageCollectionDay', 'annualBillingObjective', 'monthlyBillingObjective', 'annualBillingNumber', 'monthlyBillingNumber', 'projectedBonus']
+        .forEach(checkPropertyExists(PerformanceInstance));
 
     ['reportTypeId', 'reportTypeName', 'frequency']
         .forEach(checkPropertyExists(ReportTypeInstance));
