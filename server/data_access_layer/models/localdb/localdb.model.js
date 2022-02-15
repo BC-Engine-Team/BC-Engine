@@ -205,6 +205,59 @@ module.exports = (localdb, Sequelize) => {
         onDelete: 'CASCADE'
     });
 
+
+    const PerformanceReport = localdb.define("performance_reports", {
+        performanceReportId: {
+            field: 'performance_report_id',
+            type: Sequelize.UUID,
+            defaultValue: Sequelize.UUIDV4,
+            primaryKey: true
+        },
+        employeeId: {
+            field: 'employee_id',
+            type: Sequelize.INTEGER,
+            defaultValue: null
+        },
+        averageCollectionDay: {
+            field: 'average_collection_day',
+            type: Sequelize.STRING,
+            defaultValue: null
+        },
+        annualBillingObjective: {
+            field: 'annual_billing_objective',
+            type: Sequelize.STRING,
+            defaultValue: null
+        },
+        monthlyBillingObjective: {
+            field: 'monthly_billing_objective',
+            type: Sequelize.STRING,
+            defaultValue: null
+        },
+        annualBillingNumber: {
+            field: 'annual_billing_number',
+            type: Sequelize.STRING,
+            defaultValue: null
+        },
+        monthlyBillingNumber: {
+            field: 'monthly_billing_number',
+            type: Sequelize.STRING,
+            defaultValue: null
+        },
+        projectedBonus: {
+            field: 'projected_bonus',
+            type: Sequelize.STRING,
+            defaultValue: null
+        }
+    });
+
+    PerformanceReport.belongsTo(User, {
+        foreignKey: {
+            name: 'user_user_id',
+            allowNull: true,
+        }
+    });
+
+
     const ReportType = localdb.define("report_types", {
         reportTypeId: {
             field: 'report_type_id',
@@ -258,5 +311,6 @@ module.exports = (localdb, Sequelize) => {
         onDelete: 'CASCADE'
     });
 
-    return [User, ChartReport, ChartReportData, ReportType, Recipients, ReportTypeRecipients];
+
+    return [User, ChartReport, ChartReportData, PerformanceReport, ReportType, Recipients, ReportTypeRecipients];
 };

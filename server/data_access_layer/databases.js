@@ -34,6 +34,7 @@ db.Sequelize = Sequelize;
 [db['localdb'].users,
 db['localdb'].chartReports,
 db['localdb'].chartReportsData,
+db['localdb'].performanceReport,
 db['localdb'].reportTypes,
 db['localdb'].recipients,
 db['localdb'].reportTypeRecipients] = require("./models/localdb/localdb.model")(db['localdb'], Sequelize);
@@ -110,6 +111,27 @@ db.sync = async (database, options) => {
           user_user_id: data[1].userId
         }
       ]);
+    })
+    .then(async () => {
+      let performanceReports = await db['localdb'].performanceReport.bulkCreate([
+        {
+          averageCollectionDay: "32",
+          annualBillingObjective: "50000",
+          monthlyBillingObjective: "2000",
+          annualBillingNumber: "4500",
+          monthlyBillingNumber: "125",
+          projectedBonus: "750"
+        },
+        {
+          averageCollectionDay: "32",
+          annualBillingObjective: "40000",
+          monthlyBillingObjective: "3000",
+          annualBillingNumber: "7500",
+          monthlyBillingNumber: "333",
+          projectedBonus: "750"
+        }
+      ]);
+      return performanceReports;
     })
     .then(async () => {
       let recipients = await db['localdb'].recipients.bulkCreate([

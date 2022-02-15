@@ -10,6 +10,8 @@ router.post("/chartReport", authService.authenticateToken, reportController.crea
 router.delete("/delete/:chartReportId", authService.authenticateToken, reportController.deleteChartReport);
 
 // Report Types routes
+router.get("/performanceReport", authService.authenticateToken, reportController.getPerformanceReportsOfAllUsers);
+
 router.get("/reportTypes", authService.authenticateToken, reportController.getReportTypesWithRecipients);
 
 module.exports = router;

@@ -140,6 +140,12 @@
             "NameLabel":"Report Name",
             "DateLabel":"Report Date",
             "EmployeeLabel":"Concerned Employee(s)",
+            "AverageCollectionDay": "Average Collection Day",
+            "AnnualBillingObjective": "Annual Billing Objective",
+            "MonthlyBillingObjective": "Monthly Billing Objective",
+            "AnnualBillingNumber": "Annual Billing Number",
+            "MonthlyBillingNumber": "Monthly Billing Number",
+            "ProjectedBonus": "Projected Bonus",
             "EmailButtonLabel":"Email"
         },
         "reportsManagement":{

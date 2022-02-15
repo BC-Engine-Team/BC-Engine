@@ -4,7 +4,7 @@ const { sequelize,
     checkPropertyExists
 } = require('sequelize-test-helpers');
 
-const [UserModel, ChartReportModel] = require('../../data_access_layer/models/localdb/localdb.model')(sequelize, dataTypes);
+const [UserModel, ChartReportModel, ChartReportDataModel, PerformanceReportModel,  ReportTypeModel, RecipientModel, ReportTypeRecipientModel] = require('../../data_access_layer/models/localdb/localdb.model')(sequelize, dataTypes);
 const ChartReportDAO = require('../../data_access_layer/daos/chart_report.dao');
 
 let returnedChartReports = [
@@ -44,9 +44,9 @@ let SequelizeMock = require('sequelize-mock');
 const dbMock = new SequelizeMock();
 var ChartReportMock = dbMock.define('chart_reports', returnedChartReports);
 
-
 describe("Test Chart Report DAO", () => {
-    const instance = new ChartReportModel();
+    const ChartReport = new ChartReportModel();
+    
 
     afterEach(() => {
         ChartReportMock.$queryInterface.$clearResults();
@@ -58,9 +58,12 @@ describe("Test Chart Report DAO", () => {
 
     // testing the chart report model properties
     checkModelName(ChartReportModel)('chart_reports');
+
     ['chartReportId', 'name', 'startDate', 'endDate', 'employee1Id', 'employee1Name',
         'employee2Id', 'employee2Name', 'country', 'clientType', 'ageOfAccount', 'accountType']
-        .forEach(checkPropertyExists(instance));
+        .forEach(checkPropertyExists(ChartReport));
+
+
 
     describe("CRD1 - getChartReportsByUserId", () => {
         describe("CRD1.1 - given a userId", () => {

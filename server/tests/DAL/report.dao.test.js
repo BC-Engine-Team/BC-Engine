@@ -5,16 +5,50 @@ const { sequelize,
     checkPropertyExists
 } = require('sequelize-test-helpers');
 
-const [user, cr, crd, ReportTypeModel, RecipientModel, ReportTypeRecipientModel] = require('../../data_access_layer/models/localdb/localdb.model')(sequelize, dataTypes);
+const [UserModel, ChartReportModel, ChartReportDataModel, PerformanceReportModel,  ReportTypeModel, RecipientModel, ReportTypeRecipientModel] = require('../../data_access_layer/models/localdb/localdb.model')(sequelize, dataTypes);
 const ReportDAO = require('../../data_access_layer/daos/report.dao');
+
+
+
+let returnedPerformanceReports = [
+    {
+        performanceReportId: "PerformanceUUID",
+        employeeId: 1,
+        averageCollectionDay: "35",
+        annualBillingObjective: "4500",
+        monthlyBillingObjective: "300",
+        annualBillingNumber: "200",
+        monthlyBillingNumber: "300",
+        projectedBonus: "650"
+    },
+    {
+        performanceReportId: "PerformanceUUID",
+        employeeId: 2,
+        averageCollectionDay: "35",
+        annualBillingObjective: "4500",
+        monthlyBillingObjective: "300",
+        annualBillingNumber: "200",
+        monthlyBillingNumber: "300",
+        projectedBonus: "650"
+    }
+] 
+
+let SequelizeMock = require('sequelize-mock');
+const dbMock = new SequelizeMock();
+var PerformanceReportMock = dbMock.define('performance_reports', returnedPerformanceReports);
 
 
 describe("Test Report Related Models", () => {
     const ReportTypeInstance = new ReportTypeModel();
     const RecipientInstance = new RecipientModel();
+    const PerformanceInstance = new PerformanceReportModel();
+    checkModelName(PerformanceReportModel)('performance_reports');
     checkModelName(ReportTypeModel)('report_types');
     checkModelName(RecipientModel)('recipients');
     checkModelName(ReportTypeRecipientModel)('report_type_recipients');
+
+    ['performanceReportId', 'employeeId', 'averageCollectionDay', 'annualBillingObjective', 'monthlyBillingObjective', 'annualBillingNumber', 'monthlyBillingNumber', 'projectedBonus']
+        .forEach(checkPropertyExists(PerformanceInstance));
 
     ['reportTypeId', 'reportTypeName', 'frequency']
         .forEach(checkPropertyExists(ReportTypeInstance));
@@ -325,6 +359,75 @@ describe("Test Report DAO", () => {
                 // act and assert
                 await expect(ReportDAO.getRecipients(fakeRecipientModel))
                     .rejects.toEqual(expectedResponse);
+            });
+        });
+    });
+
+
+
+    describe("CRD5 - getPerformanceReportsWhenConnectedAsAdmin", () => {
+        const PerformanceReport = new PerformanceReportModel(); 
+
+        afterEach(() => {
+            PerformanceReportMock.$queryInterface.$clearResults();
+        })
+        
+        beforeEach(() => {
+            PerformanceReportMock.$queryInterface.$clearResults();
+        })
+
+
+        describe("CRD5.1 - given a userId", () => {
+            it("CRD5.1.1 - should return list of performance reports", async () => {
+                // arrange
+                PerformanceReportMock.$queryInterface.$useHandler(function (query, queryOptions, done) {
+                    return Promise.resolve(returnedPerformanceReports);
+                });
+
+                // act and assert
+                await expect(ReportDAO.getPerformanceReportsWhenConnectedAsAdmin('fakeUserId', PerformanceReportMock)).resolves
+                    .toEqual(returnedPerformanceReports);
+            });
+
+            it("CRD5.1.2 - should resolve false when Model cant fetch data", async () => {
+                // arrange
+                PerformanceReportMock.$queryInterface.$useHandler(function (query, queryOptions, done) {
+                    return Promise.resolve(false);
+                });
+
+                // act and assert
+                await expect(ReportDAO.getPerformanceReportsWhenConnectedAsAdmin('fakeUserId', PerformanceReportMock)).resolves
+                    .toEqual(false);
+            });
+
+            it("CRD5.1.3 - should reject error when Model throws error with defined status and message", async () => {
+                // arrange
+                let expectedError = {
+                    status: 404,
+                    message: "Error."
+                };
+                PerformanceReportMock.$queryInterface.$useHandler(function (query, queryOptions, done) {
+                    return Promise.reject(expectedError);
+                });
+
+                // act and assert
+                await expect(ReportDAO.getPerformanceReportsWhenConnectedAsAdmin('fakeUserId', PerformanceReportMock)).rejects
+                    .toEqual(expectedError);
+            });
+
+            it("CRD1.1.4 - should reject error with 500 status and predefined message when model does not define them", async () => {
+                // arrange
+                let expectedError = {
+                    status: 500,
+                    message: "Could not fetch data."
+                };
+                PerformanceReportMock.$queryInterface.$useHandler(function (query, queryOptions, done) {
+                    return Promise.reject({});
+                });
+
+                // act and assert
+                await expect(ReportDAO.getPerformanceReportsWhenConnectedAsAdmin('fakeUserId', PerformanceReportMock)).rejects
+                    .toEqual(expectedError);
             });
         });
     });
