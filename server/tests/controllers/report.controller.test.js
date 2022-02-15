@@ -865,7 +865,7 @@ describe("Test Report Controller", () => {
                      .toFile(`${__dirname.replace("tests\\controllers", "")}docs\\pdf_files\\chartReport-${fakeReportId}.pdf`, () => {});
                 
                 // wait for mock pdf file to be created
-                await new Promise((r) => setTimeout(r, 2000));
+                await new Promise((r) => setTimeout(r, 3000));
 
                 // act
                 const response = await request.get(`/api/reports/fetchPdf?reportid=${fakeReportId}`);
