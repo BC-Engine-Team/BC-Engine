@@ -62,7 +62,8 @@
                 "Employee":"Employee",
                 "Country":"Country",
                 "ClientType": "Client Type",
-                "Age": "Age of Account"
+                "Age": "Age of Account",
+                "AccountType": "Account Type"
             },
             "StartDateLabel": "Start Month",
             "EndDateLabel": "End Month",
@@ -71,6 +72,10 @@
             "EndMonthExceedCurrentError": "End Month cannot exceed current month.",
             "EndYearExceedError": "End Year cannot be before Start Year.",
             "SaveConfirmPrompt": "Are you sure you want to save ",
+            "accountType": {
+                "Receivables": "Account receivables",
+                "Payables": "Account payables"
+            },
             "clientType": {
                 "Corr": "Correspondent",
                 "Direct": "Direct",

@@ -119,7 +119,7 @@ const Dashboard = () => {
         },
         clientType: "Any",
         ageOfAccount: "All",
-        accountType: 'Receivable',
+        accountType: 'Receivables',
     });
     const [errors, setErrors] = useState({});
 
@@ -239,6 +239,7 @@ const Dashboard = () => {
         setChartLoading(true);
         setChartData(fallbackChartData);
         localStorage.setItem("dash_previous_criteria", JSON.stringify(criteria));
+
         let compareData = [];
         let arrayLength = 1;
         if (compare) arrayLength = 2;
@@ -257,7 +258,8 @@ const Dashboard = () => {
                 clientType: criteria.clientType === "Any" ? undefined : criteria.clientType,
                 countryCode: parseInt(criteria.country.id) === -1 ? undefined : criteria.country.id,
                 countryLabel: parseInt(criteria.country.id) === -1 ? undefined : criteria.country.name,
-                ageOfAccount: criteria.ageOfAccount === "All" ? undefined : criteria.ageOfAccount
+                ageOfAccount: criteria.ageOfAccount === "All" ? undefined : criteria.ageOfAccount,
+                accountType: criteria.accountType
             };
 
             if (c === 1) {
@@ -735,6 +737,19 @@ const Dashboard = () => {
                                         <option key={2} value={"30-60"}>{t('dashboard.criteria.ageOfAccount.Due1Month')}</option>
                                         <option key={3} value={"60-90"}>{t('dashboard.criteria.ageOfAccount.Due2Month')}</option>
                                         <option key={4} value={">90"}>{t('dashboard.criteria.ageOfAccount.Due3Month')}</option>
+
+                                    </Form.Select>
+                                </InputGroup>
+                            </Row>
+
+                            <Row>
+                                <FormLabel htmlFor="accountTypeCriteriaDashboard" className="mt-2">{t('dashboard.criteria.labels.AccountType')}</FormLabel>
+                                <InputGroup className="mb-2">
+                                    <Form.Select id="accountTypeCriteriaDashboard" onChange={(e) => {
+                                        setField('accountType', e.target.value);
+                                    }}>
+                                        <option key={0} value={"Receivables"}>{t('dashboard.criteria.accountType.Receivables')}</option>
+                                        <option key={1} value={"Payables"}>{t('dashboard.criteria.accountType.Payables')}</option>
 
                                     </Form.Select>
                                 </InputGroup>

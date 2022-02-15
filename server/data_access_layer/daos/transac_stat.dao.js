@@ -2,10 +2,10 @@ const database = require('../databases')['mssql_bosco']
 const databases = require('../databases');
 const { QueryTypes } = require('sequelize');
 
-exports.getTransactionsStatByYearMonth = async (yearMonthList, employeeId = undefined, clientType = undefined, countryLabel = undefined, ageOfAccount = undefined, db = database) => {
+exports.getTransactionsStatByYearMonth = async (yearMonthList, employeeId = undefined, clientType = undefined, countryLabel = undefined, ageOfAccount = undefined, accountType = 'Receivables', db = database) => {
     return new Promise(async (resolve, reject) => {
         try {
-            let query = this.prepareDuesQuery(yearMonthList, employeeId, clientType, countryLabel, ageOfAccount);
+            let query = this.prepareDuesQuery(yearMonthList, employeeId, clientType, countryLabel, ageOfAccount, accountType);
 
             const data = await db.query(query.queryString, {
                 replacements: query.replacements,
@@ -38,21 +38,21 @@ exports.getTransactionsStatByYearMonth = async (yearMonthList, employeeId = unde
     })
 }
 
-exports.prepareDuesQuery = (yearMonthList, employeeId, clientType, countryLabel, ageOfAccount) => {
+exports.prepareDuesQuery = (yearMonthList, employeeId, clientType, countryLabel, ageOfAccount, accountType) => {
     let query = {
         queryString: "SELECT ACS.DUE_CURRENT, ACS.DUE_1_MONTH, ACS.DUE_2_MONTH, ACS.DUE_3_MONTH, ACS.YEAR_MONTH ",
         replacements: [yearMonthList]
     };
 
     let fromString = "FROM ACCOUNTING_CLIENT_STAT ACS ";
-    let whereString = "WHERE ACS.YEAR_MONTH in (?) AND ACS.CONNECTION_ID=3 AND ACS.STAT_TYPE=1";
+    let whereString = "WHERE ACS.YEAR_MONTH in (?) AND ACS.STAT_TYPE=1";
 
     if (employeeId !== undefined) {
         fromString = fromString.concat(", NAME_CONNECTION NC, NAME_QUALITY NQ1, NAME RESP ");
         whereString = whereString.concat(" AND NC.CONNECTION_ID=3 AND NC.CONNECTION_NAME_ID=CONVERT(NVARCHAR, ACS.ACC_NAME_ID)",
-            " AND NQ1.NAME_ID=NC.NAME_ID AND NQ1.QUALITY_TYPE_ID=5",
-            " AND CONVERT(NVARCHAR,RESP.NAME_ID)=NQ1.DROPDOWN_CODE",
-            " AND NQ1.DROPDOWN_CODE=? ");
+                                         " AND NQ1.NAME_ID=NC.NAME_ID AND NQ1.QUALITY_TYPE_ID=5",
+                                         " AND CONVERT(NVARCHAR,RESP.NAME_ID)=NQ1.DROPDOWN_CODE",
+                                         " AND NQ1.DROPDOWN_CODE=? ");
         query.replacements.push(employeeId);
     }
 
@@ -66,8 +66,8 @@ exports.prepareDuesQuery = (yearMonthList, employeeId, clientType, countryLabel,
         whereString = whereString.includes("NC.CONNECTION_NAME_ID=CONVERT(NVARCHAR, ACS.ACC_NAME_ID)") ?
             whereString : whereString.concat(" AND NC.CONNECTION_NAME_ID=CONVERT(NVARCHAR, ACS.ACC_NAME_ID) ");
         whereString = whereString.concat(" AND NC.NAME_ID=NQ2.NAME_ID",
-            " AND NQ2.QUALITY_TYPE_ID=3",
-            " AND NQ2.DROPDOWN_CODE=? ");
+                                         " AND NQ2.QUALITY_TYPE_ID=3",
+                                         " AND NQ2.DROPDOWN_CODE=? ");
 
         query.replacements.push(clientType.toUpperCase());
     }
@@ -95,6 +95,13 @@ exports.prepareDuesQuery = (yearMonthList, employeeId, clientType, countryLabel,
             default:
                 query.queryString = query.queryString;
         }
+    }
+
+    if(accountType === 'Receivables') {
+        whereString = whereString.concat(" AND ACS.CONNECTION_ID=3 ");
+    }
+    else {
+        whereString = whereString.concat(" AND ACS.CONNECTION_ID=7 ")
     }
 
     query.queryString = query.queryString.concat(fromString, whereString);
