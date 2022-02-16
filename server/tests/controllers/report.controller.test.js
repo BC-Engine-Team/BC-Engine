@@ -33,7 +33,7 @@ let app = makeApp();
 const request = supertest(app);
 let res;
 
-jest.setTimeout(6000)
+jest.setTimeout(10000)
 
 describe("Test Report Controller", () => {
 
@@ -832,7 +832,7 @@ describe("Test Report Controller", () => {
 
                 // act
                 const response = await request.post(`/api/reports/createPdf`)
-                .send({ reportid: fakeReportId });
+                    .send({ reportid: fakeReportId });
 
                 // assert
                 expect(response.status).toBe(expectedResponse.status);
@@ -845,8 +845,8 @@ describe("Test Report Controller", () => {
         describe("RC5.2 - given no reportId", () => {
             it("RC5.2.1 - should return with status 400 and predefined error message", async () => {
                 // arrange 
-                let expectedError = {message: "Content cannot be empty."}
-                
+                let expectedError = { message: "Content cannot be empty." }
+
                 // act
                 const response = await request.post(`/api/reports/createPdf`);
 
@@ -863,15 +863,15 @@ describe("Test Report Controller", () => {
 
             it("RC6.1.1 - should return valid response with status 200", async () => {
                 // arrange
-                if(__dirname !== '/home/runner/work/BC-Engine/BC-Engine/server/tests/controllers') {
-                    pdf.create(`<div></div>`, {format: "letter"})
-                        .toFile(`${__dirname.replace("tests\\controllers", "")}docs\\pdf_files\\chartReport-${fakeReportId}.pdf`, () => {});
+                if (__dirname !== '/home/runner/work/BC-Engine/BC-Engine/server/tests/controllers') {
+                    pdf.create(`<div></div>`, { format: "letter" })
+                        .toFile(`${__dirname.replace("tests\\controllers", "")}docs\\pdf_files\\chartReport-${fakeReportId}.pdf`, () => { });
                 }
                 else {
-                    pdf.create(`<div></div>`, {format: "letter"})
-                        .toFile(`${__dirname.replace("tests/controllers", "")}docs/pdf_files/chartReport-${fakeReportId}.pdf`, () => {});
+                    pdf.create(`<div></div>`, { format: "letter" })
+                        .toFile(`${__dirname.replace("tests/controllers", "")}docs/pdf_files/chartReport-${fakeReportId}.pdf`, () => { });
                 }
-                
+
                 // act
                 const response = await request.get(`/api/reports/fetchPdf?reportid=${fakeReportId}`);
 
@@ -899,8 +899,8 @@ describe("Test Report Controller", () => {
         describe("RC6.2 - given no reportId", () => {
             it("RC6.2.1 - should return with status 400 and predefined error message", async () => {
                 // arrange 
-                let expectedError = {message: "Content cannot be empty."}
-                
+                let expectedError = { message: "Content cannot be empty." }
+
                 // act
                 const response = await request.get(`/api/reports/fetchPdf`);
 
@@ -910,7 +910,7 @@ describe("Test Report Controller", () => {
             });
         });
     });
-  
+
     describe("RC7 - getPerformanceReportsOfAllUsers", () => {
         describe("RC7.1 - given a valid user from auth service", () => {
             it("RC7.1.1 - should respond with 200 and body", async () => {
@@ -936,7 +936,7 @@ describe("Test Report Controller", () => {
                         monthlyBillingNumber: "300",
                         projectedBonus: "650"
                     }
-                ]; 
+                ];
 
                 reportServiceSpy = jest.spyOn(ReportService, 'getPerformanceReportWhenConnectedAsAdmin')
                     .mockImplementation(() => new Promise((resolve) => {

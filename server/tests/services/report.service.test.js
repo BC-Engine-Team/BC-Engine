@@ -6,7 +6,7 @@ const ReportService = require("../../services/report.service");
 const ChartReportDao = require("../../data_access_layer/daos/chart_report.dao");
 const ReportDao = require("../../data_access_layer/daos/report.dao");
 
-
+jest.setTimeout(10000)
 
 describe("Test Report Service", () => {
 
@@ -1200,8 +1200,8 @@ describe("Test Report Service", () => {
                 monthlyBillingNumber: "300",
                 projectedBonus: "650"
             }
-        ]; 
-      
+        ];
+
         describe("RS10.1 - given a userId", () => {
             it("RS10.1.1 - should return list of chartReports", async () => {
                 // arrange
@@ -1301,19 +1301,19 @@ describe("Test Report Service", () => {
                 year: 2018,
                 employee: -1,
                 data: [
-                    0,     0,     0,  0,
-                    0,     0,     0,  0,
-                91.65, 83.36, 88.35, 89
+                    0, 0, 0, 0,
+                    0, 0, 0, 0,
+                    91.65, 83.36, 88.35, 89
                 ]
             },
             {
                 year: 2019,
                 employee: -1,
                 data: [
-                84.12, 87.92, 93.05,
-                99.39, 96.37,     0,
-                    0,     0,     0,
-                    0,     0,     0
+                    84.12, 87.92, 93.05,
+                    99.39, 96.37, 0,
+                    0, 0, 0,
+                    0, 0, 0
                 ]
             }
         ]
@@ -1341,13 +1341,13 @@ describe("Test Report Service", () => {
 
 
                 // cleanup
-                if(__dirname !== '/home/runner/work/BC-Engine/BC-Engine/server/tests/services') {
+                if (__dirname !== '/home/runner/work/BC-Engine/BC-Engine/server/tests/services') {
                     fs.unlinkSync(`${__dirname.replace("tests\\services", "")}docs\\pdf_files\\chartReport-fakeUUID1.pdf`);
                 }
                 else {
                     fs.unlinkSync(`${__dirname.replace("tests/services", "")}docs/pdf_files/chartReport-fakeUUID1.pdf`);
                 }
-                
+
             });
 
             it("RS11.1.2 - should resolve false when dao returns false", async () => {
@@ -1422,9 +1422,9 @@ describe("Test Report Service", () => {
 
                 // act and assert
                 await expect(ReportService.createChartReportPDFById()).rejects
-                .toEqual(expectedError);
+                    .toEqual(expectedError);
             });
-        });   
+        });
 
         describe("RS11.3 - getChartReportPDFAverages", () => {
             it("RS11.3.1 - when returned data is false should return error", async () => {
@@ -1460,6 +1460,6 @@ describe("Test Report Service", () => {
                 await expect(ReportService.getChartReportPDFAverages("fakeUUID1")).rejects
                     .toEqual(expectedError);
             });
-        }); 
+        });
     });
 });
