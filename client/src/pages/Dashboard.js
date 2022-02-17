@@ -186,7 +186,7 @@ const Dashboard = () => {
       })
   }
 
-  // to display the list of all countries in the select box
+  // To display the list of all countries in the select box
   const countrySelectBox = async () => {
     const countryList = []
 
