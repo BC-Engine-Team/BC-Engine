@@ -20,12 +20,21 @@
 .popup-inner .delete-user-button {
   appearance: none;
   background-color: #05a105;
-  color: #ffffff;
+  color: #fff;
   border-radius: 15px;
   box-sizing: border-box;
   cursor: pointer;
-  font-family: Roobert, -apple-system, BlinkMacSystemFont,
-    "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+  font-family: 
+    Roobert, 
+    -apple-system, 
+    BlinkMacSystemFont,
+    "Segoe UI", 
+    Helvetica, 
+    Arial, 
+    sans-serif, 
+    "Apple Color Emoji", 
+    "Segoe UI Emoji", 
+    "Segoe UI Symbol";
   font-size: 22px;
   font-weight: 600;
   line-height: normal;
@@ -56,12 +65,21 @@
   appearance: none;
   background-color: #df0404;
   margin-right: 20px;
-  color: #ffffff;
+  color: #fff;
   border-radius: 15px;
   box-sizing: border-box;
   cursor: pointer;
-  font-family: Roobert, -apple-system, BlinkMacSystemFont,
-    "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+  font-family: 
+    Roobert, 
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI", 
+    Helvetica, 
+    Arial, 
+    sans-serif, 
+    "Apple Color Emoji", 
+    "Segoe UI Emoji", 
+    "Segoe UI Symbol";
   font-size: 22px;
   font-weight: 600;
   line-height: normal;

@@ -2,14 +2,6 @@ const { expect } = require('@jest/globals')
 
 const TransacStatDao = require('../../data_access_layer/daos/transac_stat.dao')
 
-const returnedAccountStat = {
-  yearMonth: 202011,
-  dueCurrent: 100,
-  due1Month: 200,
-  due2Month: 50,
-  due3Month: 20
-}
-
 const fakeStatsList = [
   {
     YEAR_MONTH: 202011,

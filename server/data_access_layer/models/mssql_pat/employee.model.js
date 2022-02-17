@@ -1,5 +1,5 @@
-module.exports = (mssql_pat, DataTypes) => {
-  const Employee = mssql_pat.define('PERSON', {
+module.exports = (mssqlPat, DataTypes) => {
+  const Employee = mssqlPat.define('PERSON', {
     firstName: {
       field: 'PERSON_FIRST_NAME',
       type: DataTypes.STRING
@@ -18,12 +18,12 @@ module.exports = (mssql_pat, DataTypes) => {
       type: DataTypes.BOOLEAN
     }
   },
-  {
-    modelName: 'Employee',
-    tableName: 'PERSON',
-    underscore: true,
-    timestamps: false
-  })
+    {
+      modelName: 'Employee',
+      tableName: 'PERSON',
+      underscore: true,
+      timestamps: false
+    })
 
   Employee.removeAttribute('id')
   return Employee

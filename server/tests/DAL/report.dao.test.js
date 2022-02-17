@@ -6,8 +6,12 @@ const {
   checkPropertyExists
 } = require('sequelize-test-helpers')
 
-const [UserModel, ChartReportModel, ChartReportDataModel, PerformanceReportModel, ReportTypeModel, RecipientModel, ReportTypeRecipientModel] = require('../../data_access_layer/models/localdb/localdb.model')(sequelize, dataTypes)
+const Models = require('../../data_access_layer/models/localdb/localdb.model')(sequelize, dataTypes)
 const ReportDAO = require('../../data_access_layer/daos/report.dao')
+const PerformanceReportModel = Models[3];
+const ReportTypeModel = Models[4];
+const RecipientModel = Models[5];
+const ReportTypeRecipientModel = Models[6];
 
 const returnedPerformanceReports = [
   {

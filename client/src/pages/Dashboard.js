@@ -498,7 +498,7 @@ const Dashboard = () => {
                       {yearList.map((y, i) => {
                         return (
                           <option key={i} value={y}>{y}</option>
-                        );
+                        )
                       })}
 
                     </Form.Select>
@@ -548,7 +548,7 @@ const Dashboard = () => {
                       {yearList.map((y, i) => {
                         return (
                           <option key={i} value={y}>{y}</option>
-                        );
+                        )
                       })}
                     </Form.Select>
 
@@ -609,7 +609,8 @@ const Dashboard = () => {
                   <OverlayTrigger
                     placement='top'
                     overlay={criteria.employee1.name !== 'All'
-                      ? <ToolTipBootstrap id='compareBTN-tooltip' className='transparent'>
+                      ?
+                      <ToolTipBootstrap id='compareBTN-tooltip' className='transparent'>
                         {criteria.employee1.name}
                       </ToolTipBootstrap>
                       : <></>}
@@ -708,7 +709,8 @@ const Dashboard = () => {
                     variant='primary'
                   >
                     {chartLoading
-                      ? <span className='me-3 align-self-center'>
+                      ?
+                      <span className='me-3 align-self-center'>
                         <Oval
                           height='20'
                           width='20'

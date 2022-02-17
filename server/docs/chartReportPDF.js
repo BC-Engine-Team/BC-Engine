@@ -58,7 +58,7 @@ module.exports = (data, averagesList) => {
 
   const getFullDateFormatted = (date) => {
     let str = ''
-    return str = str.concat(
+    return str.concat(
 
       /* month */ months[date.getMonth()], ' ',
       /* date */ formatTimes(date.getDate()),
@@ -172,7 +172,7 @@ module.exports = (data, averagesList) => {
     for (let i = 0; i < averagesList.length; i++) {
       str = str.concat('<th>', averagesList[i].year, '</th>')
 
-      if (i + 1 === calculatedLength || i + 1 === averagesList.length && data.employee2Name !== null) {
+      if (i + 1 === calculatedLength || (i + 1 === averagesList.length && data.employee2Name !== null)) {
         str = str.concat('<th>AVERAGE</th>')
       }
     }
@@ -205,7 +205,7 @@ module.exports = (data, averagesList) => {
                     height: 11in; 
                     margin: 0 auto; 
                     color: #001028;
-                    background: #FFFFFF; 
+                    background: #fff; 
                     font-family: Arial, sans-serif; 
                     font-size: 12px; 
                     font-family: Arial;
@@ -445,6 +445,9 @@ module.exports = (data, averagesList) => {
                                 fontSize: 15
                             }
                         }]
+                    },
+                    animation: {
+                      duration: 0
                     }
                 }
             });

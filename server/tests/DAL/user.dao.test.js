@@ -6,8 +6,9 @@ const {
   checkHookDefined
 } = require('sequelize-test-helpers')
 
-const [UserModel, ChartReportModel] = require('../../data_access_layer/models/localdb/localdb.model')(sequelize, dataTypes)
+const Models = require('../../data_access_layer/models/localdb/localdb.model')(sequelize, dataTypes)
 const UserDAO = require('../../data_access_layer/daos/user.dao')
+const UserModel = Models[0];
 
 const returnedUser = {
   userId: 1,

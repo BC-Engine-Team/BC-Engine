@@ -5,8 +5,9 @@ const {
   checkPropertyExists
 } = require('sequelize-test-helpers')
 
-const [UserModel, ChartReportModel, ChartReportDataModel, PerformanceReportModel, ReportTypeModel, RecipientModel, ReportTypeRecipientModel] = require('../../data_access_layer/models/localdb/localdb.model')(sequelize, dataTypes)
+const Models = require('../../data_access_layer/models/localdb/localdb.model')(sequelize, dataTypes)
 const ChartReportDAO = require('../../data_access_layer/daos/chart_report.dao')
+const ChartReportModel = Models[1];
 
 const returnedChartReports = [
   {
@@ -429,12 +430,12 @@ describe('Test Chart Report DAO', () => {
       it('CRD5.1.1 - should return one chart report', async () => {
         // arrange
         ChartReportMock.$queryInterface.$useHandler(function (query, queryOptions, done) {
-          return Promise.resolve(returnedOneChartReport)
+          return Promise.resolve(returnedChartReports[0])
         })
 
         // act and assert
         await expect(ChartReportDAO.getChartReportById('fakeUUID1', ChartReportMock)).resolves
-          .toEqual(returnedOneChartReport)
+          .toEqual(returnedChartReports[0])
       })
 
       it('CRD5.1.2 - should resolve false when Model cant fetch data', async () => {

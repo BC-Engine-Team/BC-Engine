@@ -206,9 +206,9 @@ exports.getYearMonth = (startDateStr, endDateStr) => {
 
   // make list of yearMonth [201911,202001,202002,...] to select dues
   for (let y = startYear; y <= endYear; y++) {
-    if (y != startYear) startMonth = 1
+    if (y !== startYear) startMonth = 1
     for (let m = startMonth; m <= 12; m++) {
-      if (y == endYear && m > endMonth) break
+      if (y === endYear && m > endMonth) break
       let yearMonthStr = y.toString()
       if (m < 10) yearMonthStr += '0'
       yearMonthStr += m.toString()

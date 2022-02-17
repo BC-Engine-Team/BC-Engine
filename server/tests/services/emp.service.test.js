@@ -61,14 +61,14 @@ let empDaoCheckEmailSpy = jest.spyOn(EmpDao, 'getEmployeeByEmail')
     resolve(fakeDaoCheckEmailResponse)
   }))
 
-const nameDAOSpy = jest.spyOn(NameDao, 'getAllEmployeeNames')
+let NameDaoSpy = jest.spyOn(NameDao, 'getAllEmployeeNames')
   .mockImplementation(() => new Promise((resolve) => {
     resolve(fakeEmployeeByNameList)
   }))
 
 const makeApp = require('../../app')
 const MockExpressResponse = require('mock-express-response')
-app = makeApp()
+let app = makeApp()
 const request = supertest(app)
 let res
 

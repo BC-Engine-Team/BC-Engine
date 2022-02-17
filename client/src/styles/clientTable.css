@@ -21,14 +21,6 @@
   justify-content: center;
 }
 
-.rowsViewerSelectionStyle {
-  background-color: white;
-  border: none;
-  font-size: 20px;
-  padding: 1em;
-  cursor: pointer;
-}
-
 .client-swap .left-button {
   background-color: white;
   border: none;

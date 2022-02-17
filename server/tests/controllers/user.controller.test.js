@@ -490,7 +490,7 @@ describe('Test UserController', () => {
 
         userSpy = jest.spyOn(UserService, 'deleteUser')
           .mockImplementation(() => new Promise((resolve) => {
-            resolve(expectedUserToDeleteInvalid)
+            resolve()
           }))
 
         const response = await supertest(app).delete(`/api/users/delete/${expectedUserToDelete.email}`)

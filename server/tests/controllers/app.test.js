@@ -2,7 +2,7 @@ const makeApp = require('../../app')
 let app = makeApp()
 const supertest = require('supertest')
 
-const response404 = '\"<!DOCTYPE html>'
+const response404 = '"<!DOCTYPE html>'
 describe('GET /api', () => {
   it('should respond with a 200 status code', async () => {
     const response = await supertest(app).get('/api')

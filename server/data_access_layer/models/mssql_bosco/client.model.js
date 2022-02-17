@@ -1,5 +1,5 @@
-module.exports = (mssql_bosco, DataTypes) => {
-  const Client = mssql_bosco.define('NAME', {
+module.exports = (mssqlBosco, DataTypes) => {
+  const Client = mssqlBosco.define('NAME', {
     nameId: {
       field: 'NAME_ID',
       type: DataTypes.INTEGER
@@ -17,12 +17,12 @@ module.exports = (mssql_bosco, DataTypes) => {
       type: DataTypes.STRING
     }
   },
-  {
-    modelName: 'Client',
-    tableName: 'NAME',
-    underscore: true,
-    timestamps: false
-  })
+    {
+      modelName: 'Client',
+      tableName: 'NAME',
+      underscore: true,
+      timestamps: false
+    })
 
   Client.removeAttribute('id')
   return Client

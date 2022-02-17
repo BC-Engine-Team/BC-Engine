@@ -1,20 +1,10 @@
 const AuthService = require('../../services/auth.service')
 const EmpService = require('../../services/emp.service')
-const UserController = require('../../controllers/user.controller')
 const jwt = require('jsonwebtoken')
 const { expect } = require('@jest/globals')
 const supertest = require('supertest')
 const sinon = require('sinon')
 
-const resUser = {
-  userId: 'validUUID',
-  email: 'valid@email.com',
-  password: 'validPassword',
-  name: 'validName',
-  role: 'admin',
-  updatedAt: new Date('2020-12-20'),
-  createdAt: new Date('2020-12-20')
-}
 
 const reqUser = {
   email: 'valid@email.com',
@@ -98,10 +88,11 @@ describe('Test Authentication Service', () => {
     describe('AS2.2 - given valid token in header', () => {
       it('AS2.2.1 - should return 200 OK', async () => {
         // arrange
-        const [aToken, rToken] = AuthService.getTokens(reqUser)
+        const tokens = AuthService.getTokens(reqUser)
+        const aToken = tokens[0];
 
         // act
-        const resp = await request.post('/api/users')
+        await request.post('/api/users')
           .set('authorization', `Bearer ${aToken}`)
           .send(reqUser)
 

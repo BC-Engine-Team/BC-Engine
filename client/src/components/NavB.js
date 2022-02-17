@@ -83,10 +83,10 @@ const NavB = (props) => {
   }
 
   return (
-    <Navbar variant='dark' bg='dark' expand={page.page === 'login' ? '' : 'md'} className='mb-2' collapseOnSelect={page.page === 'login' ? false : true}>
+    <Navbar variant='dark' bg='dark' expand={page.page === 'login' ? '' : 'md'} className='mb-2' collapseOnSelect={page.page !== 'login'}>
       <Container fluid className={page.page === 'login' ? 'nav-container' : ''}>
-        {page.page === 'login' ?
-          <>
+        {page.page === 'login'
+          ? <>
             <Navbar.Brand className='nav-brand-login'>
               <img
                 alt='logo'
@@ -114,8 +114,8 @@ const NavB = (props) => {
                 ))}
               </NavDropdown>
             </Nav>
-          </> :
-          <>
+            </>
+          : <>
             <LinkContainer to='/dashboard'>
               <Navbar.Brand>
                 <img alt='logo' src={logo} width='30' height='30' className='d-inline-block align-top' />
@@ -134,14 +134,14 @@ const NavB = (props) => {
                 </LinkContainer>
                 {
                   role === 'admin' &&
-                  <>
-                    <LinkContainer to='/users' className='px-2' onClick={handleNavClick}>
-                      <Nav.Link>{UsersLabel}</Nav.Link>
-                    </LinkContainer>
-                    <LinkContainer to='/manage' className='px-2' onClick={handleNavClick}>
-                      <Nav.Link>{ManageLabel}</Nav.Link>
-                    </LinkContainer>
-                  </>
+                    <>
+                      <LinkContainer to='/users' className='px-2' onClick={handleNavClick}>
+                        <Nav.Link>{UsersLabel}</Nav.Link>
+                      </LinkContainer>
+                      <LinkContainer to='/manage' className='px-2' onClick={handleNavClick}>
+                        <Nav.Link>{ManageLabel}</Nav.Link>
+                      </LinkContainer>
+                    </>
                 }
               </Nav>
 
@@ -169,8 +169,7 @@ const NavB = (props) => {
               </Nav>
 
             </Navbar.Collapse>
-          </>
-        }
+            </>}
       </Container>
     </Navbar>
   )

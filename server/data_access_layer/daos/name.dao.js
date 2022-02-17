@@ -40,13 +40,13 @@ exports.getClientsInClientIdList = async (clientIDList, db = database) => {
 exports.getAllEmployeeNames = async (db = database) => {
   return new Promise(async (resolve, reject) => {
     try {
-      const data = await db.query(
-        "SELECT ISNULL(NAME_1,'') + ISNULL(' '+NAME_2,'') + ISNULL(' '+NAME_3,'') AS FULLNAME, NAME_ID \
-                FROM NAME \
-                WHERE NAME_ID IN \
-                ( SELECT DISTINCT DROPDOWN_CODE FROM NAME_QUALITY \
-                WHERE DROPDOWN_ID = 5 ) \
-                ORDER BY NAME_1",
+      const queryString = "".concat("SELECT ISNULL(NAME_1,'') + ISNULL(' '+NAME_2,'') + ISNULL(' '+NAME_3,'') AS FULLNAME, NAME_ID ",
+        "FROM NAME ",
+        "WHERE NAME_ID IN ",
+        "( SELECT DISTINCT DROPDOWN_CODE FROM NAME_QUALITY WHERE DROPDOWN_ID = 5 ) ",
+        "ORDER BY NAME_1")
+
+      const data = await db.query(queryString,
         {
           type: QueryTypes.SELECT
         }

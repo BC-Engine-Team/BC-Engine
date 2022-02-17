@@ -4,9 +4,13 @@
     <meta charset="utf-8">
     <title>B&C Engine Web Application</title>
      
+      
+  </head>
+  <body>
+    <script type="text/javascript">
       var pathSegmentsToKeep = 0;
 
-      var l = window.location;
+      var l = window.location;  
       l.replace(
         l.protocol + '//' + l.hostname + (l.port ? ':' + l.port : '') +
         l.pathname.split('/').slice(0, 1 + pathSegmentsToKeep).join('/') + '/?/' +
@@ -16,8 +20,5 @@
       );
 
     </script>
-  </head>
-  <body>
-    <script type="text/javascript">
   </body>
 </html>

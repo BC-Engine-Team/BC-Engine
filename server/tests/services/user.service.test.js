@@ -1,5 +1,4 @@
 const UserService = require('../../services/user.service')
-const AuthService = require('../../services/auth.service')
 const UserDAO = require('../../data_access_layer/daos/user.dao')
 
 const sinon = require('sinon')
@@ -70,10 +69,6 @@ const resUserFromService = {
   email: 'valid@email.com',
   name: 'validName',
   role: 'validRole'
-}
-
-const userDAOError = {
-  message: 'Error with the user model.'
 }
 
 const sandbox = sinon.createSandbox()

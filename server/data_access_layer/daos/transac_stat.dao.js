@@ -93,8 +93,6 @@ exports.prepareDuesQuery = (yearMonthList, employeeId, clientType, countryLabel,
       case '>90':
         query.queryString = "SELECT 0 as 'DUE_CURRENT', 0 as 'DUE_1_MONTH', 0 as 'DUE_2_MONTH', ACS.DUE_3_MONTH, ACS.YEAR_MONTH "
         break
-      default:
-        query.queryString = query.queryString
     }
   }
 

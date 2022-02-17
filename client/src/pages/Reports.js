@@ -203,17 +203,7 @@ const Reports = () => {
       .then((response) => {
         setChartReports(response.data)
       })
-      .catch((error) => {
-        if (error.response) {
-          if (error.response.status === 403 || error.response.status === 401) {
-            alert('You are not authorized to perform this action.')
-          } else {
-            alert('Malfunction in the B&C Engine.')
-          }
-        } else if (error.request) {
-          alert('Could not reach b&C Engine...')
-        }
-      })
+      .catch((error) => handleNon2xxResponse(error))
   }
 
   const handleDeleteChartReport = (id, chartReportName) => {
@@ -240,18 +230,20 @@ const Reports = () => {
           alert(t('reports.delete.Confirmation'))
         }
       })
-      .catch((error) => {
-        if (error.response) {
-          if (error.response.status === 401 || error.response.status === 403) {
-            alert(t('reports.delete.NotAuthorized'))
-          } else {
-            alert(malfunctionError)
-          }
-        } else if (error.request) {
-          alert(notFoundError)
-        }
-      })
+      .catch((error) => handleNon2xxResponse(error))
     setDeleteButtonActivated(false)
+  }
+
+  const handleNon2xxResponse = (error) => {
+    if (error.response) {
+      if (error.response.status === 401 || error.response.status === 403) {
+        alert(t('reports.delete.NotAuthorized'))
+      } else {
+        alert(malfunctionError)
+      }
+    } else if (error.request) {
+      alert(notFoundError)
+    }
   }
 
   useEffect(() => {
@@ -278,27 +270,27 @@ const Reports = () => {
               <Table responsive hover id='report-types-table'>
                 <thead className='bg-light'>
                   <tr key='0'>
-                      <th className='performance-table-columns'>{t('reports.reports.AverageCollectionDay')}</th>
-                      <th className='performance-table-columns'>{t('reports.reports.AnnualBillingObjective')}</th>
-                      <th className='performance-table-columns'>{t('reports.reports.MonthlyBillingObjective')}</th>
-                      <th className='performance-table-columns'>{t('reports.reports.AnnualBillingNumber')}</th>
-                      <th className='performance-table-columns'>{t('reports.reports.MonthlyBillingNumber')}</th>
-                      <th className='performance-table-columns'>{t('reports.reports.ProjectedBonus')}</th>
-                    </tr>
+                    <th className='performance-table-columns'>{t('reports.reports.AverageCollectionDay')}</th>
+                    <th className='performance-table-columns'>{t('reports.reports.AnnualBillingObjective')}</th>
+                    <th className='performance-table-columns'>{t('reports.reports.MonthlyBillingObjective')}</th>
+                    <th className='performance-table-columns'>{t('reports.reports.AnnualBillingNumber')}</th>
+                    <th className='performance-table-columns'>{t('reports.reports.MonthlyBillingNumber')}</th>
+                    <th className='performance-table-columns'>{t('reports.reports.ProjectedBonus')}</th>
+                  </tr>
                 </thead>
                 <tbody>
                   {performanceReport.map((p) => {
-                      return (
-                        <tr key={p.performanceReportId}>
-                            <td className='performance-table-columns'>{p.averageCollectionDay}</td>
-                            <td className='performance-table-columns'>{p.annualBillingObjective}</td>
-                            <td className='performance-table-columns'>{p.monthlyBillingObjective}</td>
-                            <td className='performance-table-columns'>{p.annualBillingNumber}</td>
-                            <td className='performance-table-columns'>{p.monthlyBillingNumber}</td>
-                            <td className='performance-table-columns'>{p.projectedBonus}</td>
-                          </tr>
-                      )
-                    })}
+                    return (
+                      <tr key={p.performanceReportId}>
+                        <td className='performance-table-columns'>{p.averageCollectionDay}</td>
+                        <td className='performance-table-columns'>{p.annualBillingObjective}</td>
+                        <td className='performance-table-columns'>{p.monthlyBillingObjective}</td>
+                        <td className='performance-table-columns'>{p.annualBillingNumber}</td>
+                        <td className='performance-table-columns'>{p.monthlyBillingNumber}</td>
+                        <td className='performance-table-columns'>{p.projectedBonus}</td>
+                      </tr>
+                    )
+                  })}
                 </tbody>
               </Table>
             </div>
@@ -310,65 +302,65 @@ const Reports = () => {
                 <Form.Group className='my-2' controlId='floatingModifyReportType'>
                   <Form.Label>{t('reports.reportsManagement.reportType.Title')}</Form.Label>
                   <Form.Select
-                      required
-                      id='reportTypeSelect'
-                      size='sm'
-                      aria-label='Default select example'
-                    >
-                      {reportTypes.map((t) => {
-                        return (
-                            <option key={t.id} value={t.id}>
-                                {t.name}
-                              </option>
-                        )
-                      })}
-                    </Form.Select>
+                    required
+                    id='reportTypeSelect'
+                    size='sm'
+                    aria-label='Default select example'
+                  >
+                    {reportTypes.map((t) => {
+                      return (
+                        <option key={t.id} value={t.id}>
+                          {t.name}
+                        </option>
+                      )
+                    })}
+                  </Form.Select>
                 </Form.Group>
                 <Form.Group className='my-2' controlId='floatingModifyFrequency'>
                   <Form.Label>{t('reports.reportsManagement.frequency.Title')}</Form.Label>
                   <Form.Select
-                      required
-                      id='reportFreqSelect'
-                      size='sm'
-                      aria-label='Default select example'
-                      disabled
-                    >
-                      <option key={selectedReportType.frequency} value={selectedReportType.frequency}>
-                        {selectedReportType.frequency === -2
-                            ? t('reports.reportsManagement.frequency.Week')
-                            : selectedReportType.frequency === -1
-                              ? t('reports.reportsManagement.frequency.BiWeek')
-                              : selectedReportType.frequency === 0
-                                ? t('reports.reportsManagement.frequency.Month')
-                                : selectedReportType.frequency === 1
-                                  ? t('reports.reportsManagement.frequency.BiMonth')
-                                  : selectedReportType.frequency === 2
-                                    ? t('reports.reportsManagement.frequency.Yearly')
-                                    : t('reports.reportsManagement.frequency.Month')}
-                      </option>
-                    </Form.Select>
+                    required
+                    id='reportFreqSelect'
+                    size='sm'
+                    aria-label='Default select example'
+                    disabled
+                  >
+                    <option key={selectedReportType.frequency} value={selectedReportType.frequency}>
+                      {selectedReportType.frequency === -2
+                        ? t('reports.reportsManagement.frequency.Week')
+                        : selectedReportType.frequency === -1
+                          ? t('reports.reportsManagement.frequency.BiWeek')
+                          : selectedReportType.frequency === 0
+                            ? t('reports.reportsManagement.frequency.Month')
+                            : selectedReportType.frequency === 1
+                              ? t('reports.reportsManagement.frequency.BiMonth')
+                              : selectedReportType.frequency === 2
+                                ? t('reports.reportsManagement.frequency.Yearly')
+                                : t('reports.reportsManagement.frequency.Month')}
+                    </option>
+                  </Form.Select>
                 </Form.Group>
 
                 <Form.Group className='my-2' controlId='floatingModifyFrequency'>
                   <Form.Label>{t('reports.reportsManagement.recipients.Title')}</Form.Label>
                   <ListGroup id='report-recipient-list'>
-                      {selectedReportType.recipients
-                        ? Object.keys(selectedReportType.recipients).map((rId, i) => {
-                            return (
-                                <ListGroupItem
-                                    key={i}
-                                    value={rId}
-                                    id={rId}
-                                  >
-                                    <Form.Check
-                                          label={selectedReportType.recipients[rId].name}
-                                          defaultChecked={selectedReportType.recipients[rId].isRecipient}
-                                        />
-                                  </ListGroupItem>
-                            )
-                          })
-                        : <></>}
-                    </ListGroup>
+                    {selectedReportType.recipients
+                      ? Object.keys(selectedReportType.recipients).map((rId, i) => {
+                        return (
+                          <ListGroupItem
+                            key={i}
+                            value={rId}
+                            id={rId}
+                          >
+                            <Form.Check
+                              label={selectedReportType.recipients[rId].name}
+                              defaultChecked={selectedReportType.recipients[rId].isRecipient}
+                            />
+                          </ListGroupItem>
+                        )
+                      })
+                      : <></>}
+                  </ListGroup>
                 </Form.Group>
               </div>
             </div>
@@ -380,58 +372,58 @@ const Reports = () => {
               <Table responsive hover id='chartReportsTable'>
                 <thead className='bg-light'>
                   <tr key='0'>
-                      <th>{t('reports.chartReports.Name')}</th>
-                      <th>{t('reports.chartReports.Employee')}</th>
-                      <th>{t('reports.chartReports.ClientType')}</th>
-                      <th>{t('reports.chartReports.Country')}</th>
-                      <th>{t('reports.chartReports.AgeOfAccount')}</th>
-                      <th>{t('reports.chartReports.AccountType')}</th>
-                      <th>{t('reports.chartReports.StartDate')}</th>
-                      <th>{t('reports.chartReports.EndDate')}</th>
-                      <th>
-                        <div className='d-flex justify-content-center'>
-                            <Button
-                                className='btn py-0 shadow-sm border'
-                              >
-                                {t('reports.chartReports.CreateButton')}
-                              </Button>
-                          </div>
-                      </th>
-                    </tr>
+                    <th>{t('reports.chartReports.Name')}</th>
+                    <th>{t('reports.chartReports.Employee')}</th>
+                    <th>{t('reports.chartReports.ClientType')}</th>
+                    <th>{t('reports.chartReports.Country')}</th>
+                    <th>{t('reports.chartReports.AgeOfAccount')}</th>
+                    <th>{t('reports.chartReports.AccountType')}</th>
+                    <th>{t('reports.chartReports.StartDate')}</th>
+                    <th>{t('reports.chartReports.EndDate')}</th>
+                    <th>
+                      <div className='d-flex justify-content-center'>
+                        <Button
+                          className='btn py-0 shadow-sm border'
+                        >
+                          {t('reports.chartReports.CreateButton')}
+                        </Button>
+                      </div>
+                    </th>
+                  </tr>
                 </thead>
                 <tbody>
                   {chartReports.map(r => {
-                      return (
-                        <tr key={r.chartReportId} id={r.chartReportId}>
-                            <td>{r.name}</td>
-                            <td>{r.employee1Name}{r.employee2Name === null ? '' : ', ' + r.employee2Name}</td>
-                            <td>{r.clientType}</td>
-                            <td>{r.country}</td>
-                            <td>{r.ageOfAccount}</td>
-                            <td>{r.accountType}</td>
-                            <td>{r.startDate.toString()}</td>
-                            <td>{r.endDate.toString()}</td>
-                            <td className='py-1'>
-                                <div className='d-flex justify-content-center'>
-                                    {pdfLoading
-                                        ? r.chartReportId !== currentPdfLoading
-                                            ? <ExportButton id={r.chartReportId} iconColor={{ color: '#666' }} styles={{ pointerEvents: 'none' }} />
-                                            : <span className='loading-chart-report align-self-center'>
-                                                <Oval
-                                                    height='22'
-                                                    width='22'
-                                                    color='black'
-                                                    ariaLabel='loading'
-                                                  />
-                                                </span>
+                    return (
+                      <tr key={r.chartReportId} id={r.chartReportId}>
+                        <td>{r.name}</td>
+                        <td>{r.employee1Name}{r.employee2Name === null ? '' : ', ' + r.employee2Name}</td>
+                        <td>{r.clientType}</td>
+                        <td>{r.country}</td>
+                        <td>{r.ageOfAccount}</td>
+                        <td>{r.accountType}</td>
+                        <td>{r.startDate.toString()}</td>
+                        <td>{r.endDate.toString()}</td>
+                        <td className='py-1'>
+                          <div className='d-flex justify-content-center'>
+                            {pdfLoading
+                              ? r.chartReportId !== currentPdfLoading
+                                ? <ExportButton id={r.chartReportId} iconColor={{ color: '#666' }} styles={{ pointerEvents: 'none' }} />
+                                : <span className='loading-chart-report align-self-center'>
+                                  <Oval
+                                    height='22'
+                                    width='22'
+                                    color='black'
+                                    ariaLabel='loading'
+                                  />
+                                </span>
 
-                                        : <ExportButton id={r.chartReportId} onExport={() => createAndDownloadPDF(r.chartReportId)} />}
-                                    <DeleteButton onDelete={() => handleDeleteChartReport(r.chartReportId, r.name)} />
-                                  </div>
-                              </td>
-                          </tr>
-                      )
-                    })}
+                              : <ExportButton id={r.chartReportId} onExport={() => createAndDownloadPDF(r.chartReportId)} />}
+                            <DeleteButton onDelete={() => handleDeleteChartReport(r.chartReportId, r.name)} />
+                          </div>
+                        </td>
+                      </tr>
+                    )
+                  })}
                 </tbody>
               </Table>
             </div>

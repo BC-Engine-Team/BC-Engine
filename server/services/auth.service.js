@@ -60,10 +60,10 @@ exports.logout = async (req, res) => {
   const authHeader = req.headers.authorization
   const token = authHeader && authHeader.split(' ')[1]
 
-  if (token == null || !refreshTokens.find(t => t == token)) {
+  if (token === null || !refreshTokens.find(t => t === token)) {
     return res.sendStatus(403)
   }
-  refreshTokens = refreshTokens.filter(t => t != token)
+  refreshTokens = refreshTokens.filter(t => t !== token)
 
   return res.sendStatus(204)
 }

@@ -180,23 +180,23 @@ const Users = () => {
                 <tr key='0'>
 
                   <th>
-                      <div className='justify-content-center d-flex'>
-                        #
-                                        </div>
-                    </th>
+                    <div className='justify-content-center d-flex'>
+                      #
+                    </div>
+                  </th>
                   <th>{t('user.table.Name')}</th>
                   <th>{t('user.table.Email')}</th>
                   <th>{t('user.table.Role')}</th>
                   <th>
-                      <div className='d-flex justify-content-center'>
-                        <Button
-                            className='btn py-0 shadow-sm border'
-                            onClick={() => addUser()}
-                          >
-                            {t('user.table.AddButton')}
-                          </Button>
-                      </div>
-                    </th>
+                    <div className='d-flex justify-content-center'>
+                      <Button
+                        className='btn py-0 shadow-sm border'
+                        onClick={() => addUser()}
+                      >
+                        {t('user.table.AddButton')}
+                      </Button>
+                    </div>
+                  </th>
 
                 </tr>
               </thead>
@@ -205,25 +205,25 @@ const Users = () => {
                 {users.map(u => {
                   counter++
                   return (
-                      <tr key={counter}>
+                    <tr key={counter}>
 
-                        <td>
-                            <div className='justify-content-center d-flex'>
-                                {counter}
-                              </div>
-                          </td>
-                        <td>{u.name}</td>
-                        <td>{u.email}</td>
-                        <td>{u.role}</td>
+                      <td>
+                        <div className='justify-content-center d-flex'>
+                          {counter}
+                        </div>
+                      </td>
+                      <td>{u.name}</td>
+                      <td>{u.email}</td>
+                      <td>{u.role}</td>
 
-                        <td className='py-1'>
-                            <div className='d-flex justify-content-center'>
-                                <EditButton onEdit={() => editUser(u.email, u.role)} />
-                                <DeleteButton onDelete={() => handleDeleteUser(u.email)} />
-                              </div>
-                          </td>
+                      <td className='py-1'>
+                        <div className='d-flex justify-content-center'>
+                          <EditButton onEdit={() => editUser(u.email, u.role)} />
+                          <DeleteButton onDelete={() => handleDeleteUser(u.email)} />
+                        </div>
+                      </td>
 
-                      </tr>
+                    </tr>
                   )
                 })}
               </tbody>

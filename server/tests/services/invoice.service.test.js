@@ -180,7 +180,7 @@ let getDuesSpy = jest.spyOn(InvoiceService, 'getDues')
 let getClientInformationSpy = jest.spyOn(InvoiceService, 'getClientInformation')
   .mockImplementation(() => new Promise((resolve) => {
     console.log('whatf FhASBRFIhWASEBFiwsnebfgiojnaswzeiogjn')
-    resolve(fakeClientNameCountryList)
+    resolve(fakeGetClientInformationDaoResponse)
   }))
 
 // the dao objects to get data from database
@@ -293,7 +293,7 @@ describe('Test Invoice Service', () => {
           .mockImplementation(() => new Promise((resolve) => {
             resolve(fakeBilledList)
           }))
-        getClientSpy = jest.spyOn(InvoiceService, 'getClientInformation')
+        getClientInformationSpy = jest.spyOn(InvoiceService, 'getClientInformation')
           .mockImplementation(() => new Promise((resolve, reject) => {
             reject(expectedResponse)
           }))
@@ -318,7 +318,7 @@ describe('Test Invoice Service', () => {
           .mockImplementation(() => new Promise((resolve) => {
             resolve(fakeBilledList)
           }))
-        getClientSpy = jest.spyOn(InvoiceService, 'getClientInformation')
+        getClientInformationSpy = jest.spyOn(InvoiceService, 'getClientInformation')
           .mockImplementation(() => new Promise((resolve, reject) => {
             reject({})
           }))
@@ -336,7 +336,7 @@ describe('Test Invoice Service', () => {
           .mockImplementation(() => new Promise((resolve) => {
             resolve(fakeDuesList)
           }))
-        getClientSpy = jest.spyOn(InvoiceService, 'getClientInformation')
+        getClientInformationSpy = jest.spyOn(InvoiceService, 'getClientInformation')
           .mockImplementation(() => new Promise((resolve) => {
             resolve('expectedResponse')
           }))

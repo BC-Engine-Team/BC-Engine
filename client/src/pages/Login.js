@@ -134,12 +134,13 @@ const Login = () => {
           >
 
             {
-                            InvalidCredential.length > 0
-                              ? <Alert variant='danger'>
-                                {InvalidCredential}
-                              </Alert>
-                              : <></>
-                        }
+              InvalidCredential.length > 0
+                ?
+                <Alert variant='danger'>
+                  {InvalidCredential}
+                </Alert>
+                : <></>
+            }
 
             <Form.Group className='mb-4' controlId='floatingEmail'>
               <FloatingLabel controlId='floatingEmail' label={t('form.EmailAddress')} className='mb-3'>

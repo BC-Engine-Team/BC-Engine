@@ -194,6 +194,7 @@ const UsersForm = (props) => {
   const findFormErrors = () => {
     const { email, password1, password2, role } = form
     const newErrors = {}
+    const passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.{8,})/;
 
     // email errors
     if (!email || email === '') newErrors.email = emptyError
@@ -202,7 +203,7 @@ const UsersForm = (props) => {
     // password errors
     if (!password1 || password1 === '') {
       newErrors.password1 = emptyError
-    } else if (!RegExp('^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.{8,})').exec(password1)) {
+    } else if (!RegExp(passwordPattern).exec(password1)) {
       newErrors.password1 = t('user.error.InvalidPasswordValidation')
     }
     if (password1 !== password2) {
@@ -333,12 +334,12 @@ const UsersForm = (props) => {
         <h1 className='display-4 text-center mb-5'>{FormTitle}</h1>
 
         {
-                    InvalidInput.length > 0
-                      ? <Alert id='alertUserForm' variant='danger'>
-                        {InvalidInput}
-                      </Alert>
-                      : <></>
-                }
+          InvalidInput.length > 0 ?
+            <Alert id='alertUserForm' variant='danger'>
+              {InvalidInput}
+            </Alert>
+            : <></>
+        }
 
         <Form.Group className='mb-4' controlId='floatingEmail'>
           <FloatingLabel controlId='floatingEmail' label={t('form.EmailAddress')} className='mb-3'>
@@ -371,15 +372,15 @@ const UsersForm = (props) => {
               isInvalid={!!errors.password1}
             />
             {
-                            passwordEnable
-                              ? <></>
-                              : <Icon
-                                  className='show-hide-button'
-                                  path={showPass ? mdiEye : mdiEyeOff}
-                                  onClick={() => showHide(true)}
-                                  size={1}
-                                />
-                        }
+              passwordEnable
+                ? <></>
+                : <Icon
+                  className='show-hide-button'
+                  path={showPass ? mdiEye : mdiEyeOff}
+                  onClick={() => showHide(true)}
+                  size={1}
+                />
+            }
 
             <Form.Control.Feedback type='invalid'>
               {errors.password1}
@@ -401,15 +402,15 @@ const UsersForm = (props) => {
             />
 
             {
-                            passwordEnable
-                              ? <></>
-                              : <Icon
-                                  className='show-hide-button'
-                                  path={showPass2 ? mdiEye : mdiEyeOff}
-                                  onClick={() => showHide(false)}
-                                  size={1}
-                                />
-                        }
+              passwordEnable
+                ? <></>
+                : <Icon
+                  className='show-hide-button'
+                  path={showPass2 ? mdiEye : mdiEyeOff}
+                  onClick={() => showHide(false)}
+                  size={1}
+                />
+            }
 
             <Form.Control.Feedback type='invalid'>
               {errors.password2}

@@ -2,8 +2,7 @@ const {
   sequelize,
   dataTypes,
   checkModelName,
-  checkPropertyExists,
-  checkHookDefined
+  checkPropertyExists
 } = require('sequelize-test-helpers')
 
 const EmpModel = require('../../data_access_layer/models/mssql_pat/employee.model')

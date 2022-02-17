@@ -1,9 +1,9 @@
 {
-    "extends": [
-      "eslint:recommended",
-      "react-hooks"
-    ],
-    "plugins": [
-      "react-hooks"
-    ]
+  "plugins": [
+    "react-hooks"
+  ],
+  "extends": [
+    "eslint:recommended",
+    "react-hooks"
+  ]
 }
