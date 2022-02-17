@@ -70,6 +70,8 @@ jobs:
           OUTPUT_DETAILS: detailed
           VALIDATE_ALL_CODEBASE: false
           VALIDATE_DOCKERFILE_HADOLINT: false
+          VALIDATE_JAVASCRIPT_STANDARD: false
           
           LINTER_RULES_PATH: /
           CSS_FILE_NAME: .stylelintrc.json
+          JAVASCRIPT_ES_CONFIG_FILE: .eslintrc.json
