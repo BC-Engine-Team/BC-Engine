@@ -1,98 +1,95 @@
-const CountryDao = require("../../data_access_layer/daos/country.dao");
+const CountryDao = require('../../data_access_layer/daos/country.dao')
 
-
-let fakeCountriesList = [
-    {
-        COUNTRY_LABEL: "Albania"
-    },
-    {
-        COUNTRY_LABEL: "Italy"
-    },
-    {
-        COUNTRY_LABEL: "Morocco"
-    }
+const fakeCountriesList = [
+  {
+    COUNTRY_LABEL: 'Albania'
+  },
+  {
+    COUNTRY_LABEL: 'Italy'
+  },
+  {
+    COUNTRY_LABEL: 'Morocco'
+  }
 ]
 
+describe('Test Country DAO', () => {
+  describe('CD1 - getAllCountries', () => {
+    it('CD1.1 - Should return list of countries', async () => {
+      // arrange
+      const dbStub = {
+        query: () => {
+          return fakeCountriesList
+        }
+      }
 
-describe("Test Country DAO", () => {
-    describe("CD1 - getAllCountries", () => {
-        it("CD1.1 - Should return list of countries", async () => {
+      const expectedResponse = [
+        {
+          countryLabel: fakeCountriesList[0].COUNTRY_LABEL
+        },
+        {
+          countryLabel: fakeCountriesList[1].COUNTRY_LABEL
+        },
+        {
+          countryLabel: fakeCountriesList[2].COUNTRY_LABEL
+        }
+      ]
 
-            // arrange
-            let dbStub = {
-                query: () => {
-                    return fakeCountriesList;
-                }
-            };
+      // act
+      const response = await CountryDao.getAllCountries(dbStub)
 
-            let expectedResponse = [
-                {
-                    countryLabel: fakeCountriesList[0].COUNTRY_LABEL
-                },
-                {
-                    countryLabel: fakeCountriesList[1].COUNTRY_LABEL
-                },
-                {
-                    countryLabel: fakeCountriesList[2].COUNTRY_LABEL
-                }
-            ];
+      // assert
+      expect(response).toEqual(expectedResponse)
+    })
 
-            // act
-            const response = await CountryDao.getAllCountries(dbStub);
+    it('CD1.2 - should return false when db cant fetch data', async () => {
+      // arrange
+      const dbStub = {
+        query: () => {
+          return false
+        }
+      }
 
-            // assert
-            expect(response).toEqual(expectedResponse);
-        });
+      // act and assert
+      await expect(CountryDao.getAllCountries(dbStub)).resolves
+        .toEqual(false)
+    })
 
-        it("CD1.2 - should return false when db cant fetch data", async () => {
-            // arrange
-            let dbStub = {
-                query: () => {
-                    return false;
-                }
-            };
+    it('CD1.3 - should return a specific error message when it is of 500', async () => {
+      // arrange
 
-            // act and assert
-            await expect(CountryDao.getAllCountries(dbStub)).resolves
-                .toEqual(false);
-        });
+      const expectedError = {
+        message: 'Error with the db.',
+        status: 500
+      }
 
-        it("CD1.3 - should return a specific error message when it is of 500", async () => {
-            // arrange
+      const dbStub = {
+        query: () => {
+          return Promise.reject(expectedError)
+        }
+      }
 
-            let expectedError = {
-                message: "Error with the db.",
-                status: 500
-            }
+      // act and assert
+      await expect(CountryDao.getAllCountries(dbStub)).rejects
+        .toEqual(expectedError)
+    })
 
-            let dbStub = {
-                query: () => {
-                    return Promise.reject(expectedError);
-                }
-            };
+    it('CD1.4 - should return an unspecific error message', async () => {
+      // arrange
 
-            // act and assert
-            await expect(CountryDao.getAllCountries(dbStub)).rejects
-                .toEqual(expectedError);
-        });
+      const expectedError = {
+        message: 'some error occured',
+        status: 500
+      }
 
-        it("CD1.4 - should return an unspecific error message", async () => {
-            // arrange
+      const dbStub = {
+        query: () => {
+          return Promise.reject({})
+        }
+      }
 
-            let expectedError = {
-                message: "some error occured",
-                status: 500
-            }
-
-            let dbStub = {
-                query: () => {
-                    return Promise.reject({});
-                }
-            };
-
-            // act and assert
-            await expect(CountryDao.getAllCountries(dbStub)).rejects
-                .toEqual(expectedError);
-        })
-    });
-});
+      // act and assert
+      await expect(CountryDao.getAllCountries(dbStub)).rejects
+        .toEqual(expectedError)
+    })
+  })
+})

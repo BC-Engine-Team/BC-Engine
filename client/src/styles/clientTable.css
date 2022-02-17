@@ -1,56 +1,56 @@
 .row-style {
-    text-align: center;
+  text-align: center;
 }
 
-.amount-owed{
-    text-align: center;
-    color: #df0404;
+.amount-owed {
+  text-align: center;
+  color: #df0404;
 }
 
-.amount-due{
-    text-align: center;
-    color: #05a105;
+.amount-due {
+  text-align: center;
+  color: #05a105;
 }
 
-.client-swap{
-    padding: 5px 10px 3px 3px;
-    width: 100%;
-    background-color: #fff;
-    text-align: center;
-    display: flex;
-    justify-content: center;
+.client-swap {
+  padding: 5px 10px 3px 3px;
+  width: 100%;
+  background-color: #fff;
+  text-align: center;
+  display: flex;
+  justify-content: center;
 }
 
-.rowsViewerSelectionStyle{
-    background-color: white;
-    border: none;
-    font-size: 20px;
-    padding: 1em;
-    cursor: pointer;
+.rowsViewerSelectionStyle {
+  background-color: white;
+  border: none;
+  font-size: 20px;
+  padding: 1em;
+  cursor: pointer;
 }
 
-.client-swap .left-button{
-    background-color: white;
-    border: none;
-    color: black;
-    font-size: 20px;
-    padding: 1em;
-    cursor: pointer;
+.client-swap .left-button {
+  background-color: white;
+  border: none;
+  color: black;
+  font-size: 20px;
+  padding: 1em;
+  cursor: pointer;
 }
 
-.client-swap .right-button{
-    background-color: white;
-    border: none;
-    color: black;
-    font-size: 20px;
-    padding: 1em;
-    cursor: pointer;
+.client-swap .right-button {
+  background-color: white;
+  border: none;
+  color: black;
+  font-size: 20px;
+  padding: 1em;
+  cursor: pointer;
 }
 
 .left-button:hover {
-    background-color: rgba(0, 0, 0, 0.25);
+  background-color: rgb(0 0 0 / 25%);
 }
 
 .right-button:hover {
-    background-color: rgba(0, 0, 0, 0.25);
+  background-color: rgb(0 0 0 / 25%);
 }

@@ -5,31 +5,33 @@
   float: left;
 }
 
-.uForm {
+.user-form {
   height: 700px !important;
 }
 
-.uTable {
+.user-table {
   height: 700px !important;
   overflow-y: auto;
 }
 
-.showHideBTN {
+.show-hide-button {
   position: absolute;
-  
-  /* These are set relative to the height of the input box to bound the box neatly inside. This is aesthetic to me but you may change the dimensions of course. */
+
+  /* These are set relative to the height of the input box to bound the box neatly inside. 
+  This is aesthetic to me but you may change the dimensions of course. */
   right: 0.3rem;
   top: 1.15rem;
   color: gray;
-  
-  /* content in the icon div is centered, without bootstrap or font-awesome you may wish to add your own text in the span */
+
+  /* content in the icon div is centered, without bootstrap or 
+  font-awesome you may wish to add your own text in the span */
   display: flex;
   justify-content: center;
   align-items: center;
   box-sizing: border-box;
 }
 
-.inputWithShowHide {
+.input-with-show-hide {
   position: relative;
   box-sizing: border-box;
 }
@@ -43,15 +45,15 @@ thead {
 }
 
 @media (max-width: 1000px) {
-  .mainContainer {
+  .main-container {
     display: block !important;
   }
 
   .container-form-enabled-form,
   .container-form-enabled-table {
     width: 100%;
-    padding-right: var(--bs-gutter-x,.75rem);
-    padding-left: var(--bs-gutter-x,.75rem);
+    padding-right: var(--bs-gutter-x, 0.75rem);
+    padding-left: var(--bs-gutter-x, 0.75rem);
     margin-right: auto;
     margin-left: auto;
     float: none;

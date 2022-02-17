@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Cookies from 'universal-cookie'
-import { useTranslation } from 'react-i18next';
-import Axios from 'axios';
+import { useTranslation } from 'react-i18next'
+import Axios from 'axios'
 
 import { Button, Table, Form, ListGroup, ListGroupItem } from 'react-bootstrap'
 import { Oval } from 'react-loader-spinner'
@@ -14,444 +14,439 @@ import ConfirmationPopup from '../components/ConfirmationPopup'
 import '../styles/reportsPage.css'
 
 const Reports = () => {
-    const { t } = useTranslation();
-    let navigate = useNavigate();
+  const { t } = useTranslation()
+  const navigate = useNavigate()
 
-    const cookies = new Cookies();
-    const malfunctionError = t('error.Malfunction');
-    const notFoundError = t('error.NotFound');
+  const cookies = new Cookies()
+  const malfunctionError = t('error.Malfunction')
+  const notFoundError = t('error.NotFound')
 
-    let role = cookies.get("role");
+  const role = cookies.get('role')
 
-    const [pdfLoading, setPdfLoading] = useState(false);
-    const [currentPdfLoading, setCurrentPdfLoading] = useState();
-    
-    const [chartReportId, setChartReportId] = useState("");
-    const [chartReportName, setChartReportName] = useState("");
-    const [deleteButtonActivated, setDeleteButtonActivated] = useState(false);
+  const [pdfLoading, setPdfLoading] = useState(false)
+  const [currentPdfLoading, setCurrentPdfLoading] = useState()
 
-    const [chartReports, setChartReports] = useState([{
-        chartReportId: "",
-        name: "",
-        startDate: new Date(),
-        endDate: new Date(),
-        employee1: "",
-        employee2: "",
-        country: "",
-        clientType: "",
-        ageOfAccount: "",
-        accountType: ""
-    }]);
+  const [chartReportId, setChartReportId] = useState('')
+  const [chartReportName, setChartReportName] = useState('')
+  const [deleteButtonActivated, setDeleteButtonActivated] = useState(false)
 
-    const [performanceReport, setPerformanceReport] = useState([{
-        performanceReportId: "",
-        employeeId: 0,
-        averageCollectionDay: "",
-        annualBillingObjective: "",
-        monthlyBillingObjective: "",
-        annualBillingNumber: "",
-        monthlyBillingNumber: "",
-        projectedBonus: ""
-    }]);
-    
-    const [reportTypes, setReportTypes] = useState([]);
-    const [selectedReportType, setSelectedReportType] = useState({});
-    const [showReportsManagement, setShowReportsManagement] = useState({
-        isAdmin: false,
-        employee: "container-reportsTable-employee",
-        admin: "container-reportsTable"
-    });
+  const [chartReports, setChartReports] = useState([{
+    chartReportId: '',
+    name: '',
+    startDate: new Date(),
+    endDate: new Date(),
+    employee1: '',
+    employee2: '',
+    country: '',
+    clientType: '',
+    ageOfAccount: '',
+    accountType: ''
+  }])
 
-    const createAndDownloadPDF = (ReportId) => {
-        setPdfLoading(true);
-        setCurrentPdfLoading(ReportId);
+  const [performanceReport, setPerformanceReport] = useState([{
+    performanceReportId: '',
+    employeeId: 0,
+    averageCollectionDay: '',
+    annualBillingObjective: '',
+    monthlyBillingObjective: '',
+    annualBillingNumber: '',
+    monthlyBillingNumber: '',
+    projectedBonus: ''
+  }])
 
-        let header = {
-            'authorization': "Bearer " + cookies.get("accessToken"),
-        }
+  const [reportTypes, setReportTypes] = useState([])
+  const [selectedReportType, setSelectedReportType] = useState({})
+  const [showReportsManagement, setShowReportsManagement] = useState({
+    isAdmin: false,
+    employee: 'container-reports-table-employee',
+    admin: 'container-reports-table'
+  })
 
-        let param = {
-            reportid: ReportId
-        }
+  const createAndDownloadPDF = (ReportId) => {
+    setPdfLoading(true)
+    setCurrentPdfLoading(ReportId)
 
-        Axios.defaults.withCredentials = true;
-
-        Axios.post(`${process.env.REACT_APP_API}/reports/createPdf`, param, { headers: header })
-            .then((response) => {
-                if(response.data === true) {
-                    Axios.get(`${process.env.REACT_APP_API}/reports/fetchPdf`, { params: param, headers: header, responseType: 'arraybuffer' })
-                    .then((res) => {
-                        const pdfBlob = new Blob([res.data], { type: 'application/pdf' });
-
-                        const url = URL.createObjectURL(pdfBlob);
-
-                        var element = document.createElement('a');
-                        document.body.appendChild(element);
-                        element.style = "display: none";
-                        element.href = url;
-                        element.download = `ChartReport-${ReportId}`;
-                        element.click();
-                        document.body.removeChild(element);
-                        setPdfLoading(false);
-                    })
-                    .catch((error) => {
-                        setPdfLoading(false);
-                        if (error.response) {
-                            if (error.response.status === 403 || error.response.status === 401) {
-                                alert("You are not authorized to perform this action.");
-                            }
-                            else {
-                                alert("Could not fetch pdf file...");
-                            }
-                        }
-                        else if (error.request) {
-                            alert("Could not fetch pdf file...");
-                        }
-                    });
-                }
-                else {
-                    alert("Could not fetch pdf file...");
-                }
-            })
-            .catch((error) => {
-                setPdfLoading(false);
-                if (error.response) {
-                    if (error.response.status === 403 || error.response.status === 401) {
-                        alert("You are not authorized to perform this action.");
-                    }
-                    else {
-                        alert("Could not generate pdf file...");
-                    }
-                }
-                else if (error.request) {
-                    alert("Could not fetch Chart Report...");
-                }
-            });
+    const header = {
+      authorization: 'Bearer ' + cookies.get('accessToken')
     }
 
-    const handleRefresh = async () => {
-        await getChartReports();
-        if (cookies.get("role") === 'admin') {
-            setShowReportsManagement({
-                ...showReportsManagement,
-                isAdmin: true
-            });
-            await getReportTypesAndRecipients();
-        }
-        await getPerformanceReportsByAdmin();
+    const param = {
+      reportid: ReportId
     }
 
+    Axios.defaults.withCredentials = true
 
-    const getPerformanceReportsByAdmin = async () => {
-        let header = {
-            'authorization': "Bearer " + cookies.get("accessToken")
-        }
+    Axios.post(`${process.env.REACT_APP_API}/reports/createPdf`, param, { headers: header })
+      .then((response) => {
+        if (response.data === true) {
+          Axios.get(`${process.env.REACT_APP_API}/reports/fetchPdf`, { params: param, headers: header, responseType: 'arraybuffer' })
+            .then((res) => {
+              const pdfBlob = new Blob([res.data], { type: 'application/pdf' })
 
-        Axios.defaults.withCredentials = true;
+              const url = URL.createObjectURL(pdfBlob)
 
-        await Axios.get(`${process.env.REACT_APP_API}/reports/performanceReport`, { headers: header })
-            .then((response) => {
-                if (response.data) {
-                    setPerformanceReport(response.data);
-                    return;
-                }
-                alert("The response from the B&C Engine was invalid.");
+              const element = document.createElement('a')
+              document.body.appendChild(element)
+              element.style = 'display: none'
+              element.href = url
+              element.download = `ChartReport-${ReportId}`
+              element.click()
+              document.body.removeChild(element)
+              setPdfLoading(false)
             })
             .catch((error) => {
-                if (error.response) {
-                    if (error.response.status === 403 || error.response.status === 401) {
-                        alert("You are not authorized to perform this action.");
-                    }
-                    else {
-                        alert("Malfunction in the B&C Engine.");
-                    }
+              setPdfLoading(false)
+              if (error.response) {
+                if (error.response.status === 403 || error.response.status === 401) {
+                  alert('You are not authorized to perform this action.')
+                } else {
+                  alert('Could not fetch pdf file...')
                 }
-                else if (error.request) {
-                    alert("Could not reach b&C Engine...");
-                }
-            });
+              } else if (error.request) {
+                alert('Could not fetch pdf file...')
+              }
+            })
+        } else {
+          alert('Could not fetch pdf file...')
+        }
+      })
+      .catch((error) => {
+        setPdfLoading(false)
+        if (error.response) {
+          if (error.response.status === 403 || error.response.status === 401) {
+            alert('You are not authorized to perform this action.')
+          } else {
+            alert('Could not generate pdf file...')
+          }
+        } else if (error.request) {
+          alert('Could not fetch Chart Report...')
+        }
+      })
+  }
+
+  const handleRefresh = async () => {
+    await getChartReports()
+    if (cookies.get('role') === 'admin') {
+      setShowReportsManagement({
+        ...showReportsManagement,
+        isAdmin: true
+      })
+      await getReportTypesAndRecipients()
+    }
+    await getPerformanceReportsByAdmin()
+  }
+
+  const getPerformanceReportsByAdmin = async () => {
+    const header = {
+      authorization: 'Bearer ' + cookies.get('accessToken')
     }
 
+    Axios.defaults.withCredentials = true
 
-    const getReportTypesAndRecipients = async () => {
-        let header = {
-            'authorization': "Bearer " + cookies.get("accessToken")
+    await Axios.get(`${process.env.REACT_APP_API}/reports/performanceReport`, { headers: header })
+      .then((response) => {
+        if (response.data) {
+          setPerformanceReport(response.data)
+          return
         }
+        alert('The response from the B&C Engine was invalid.')
+      })
+      .catch((error) => {
+        if (error.response) {
+          if (error.response.status === 403 || error.response.status === 401) {
+            alert('You are not authorized to perform this action.')
+          } else {
+            alert('Malfunction in the B&C Engine.')
+          }
+        } else if (error.request) {
+          alert('Could not reach b&C Engine...')
+        }
+      })
+  }
 
-        Axios.defaults.withCredentials = true;
-
-        await Axios.get(`${process.env.REACT_APP_API}/reports/reportTypes`, { headers: header })
-            .then((response) => {
-                if (response.data) {
-                    setReportTypes(response.data);
-                    setSelectedReportType(response.data[0]);
-                    return;
-                }
-                alert("The response from the B&C Engine was invalid.");
-            })
-            .catch((error) => {
-                if (error.response) {
-                    if (error.response.status === 403 || error.response.status === 401) {
-                        alert("You are not authorized to perform this action.");
-                    }
-                    else {
-                        alert("Malfunction in the B&C Engine.");
-                    }
-                }
-                else if (error.request) {
-                    alert("Could not reach b&C Engine...");
-                }
-            });
+  const getReportTypesAndRecipients = async () => {
+    const header = {
+      authorization: 'Bearer ' + cookies.get('accessToken')
     }
 
-    const getChartReports = async () => {
-        let header = {
-            'authorization': "Bearer " + cookies.get("accessToken")
+    Axios.defaults.withCredentials = true
+
+    await Axios.get(`${process.env.REACT_APP_API}/reports/reportTypes`, { headers: header })
+      .then((response) => {
+        if (response.data) {
+          setReportTypes(response.data)
+          setSelectedReportType(response.data[0])
+          return
         }
+        alert('The response from the B&C Engine was invalid.')
+      })
+      .catch((error) => {
+        if (error.response) {
+          if (error.response.status === 403 || error.response.status === 401) {
+            alert('You are not authorized to perform this action.')
+          } else {
+            alert('Malfunction in the B&C Engine.')
+          }
+        } else if (error.request) {
+          alert('Could not reach b&C Engine...')
+        }
+      })
+  }
 
-        Axios.defaults.withCredentials = true;
-        await Axios.get(`${process.env.REACT_APP_API}/reports/chartReport`, { headers: header })
-            .then((response) => {
-                setChartReports(response.data);
-            })
-            .catch((error) => {
-                if (error.response) {
-                    if (error.response.status === 403 || error.response.status === 401) {
-                        alert("You are not authorized to perform this action.");
-                    }
-                    else {
-                        alert("Malfunction in the B&C Engine.");
-                    }
-                }
-                else if (error.request) {
-                    alert("Could not reach b&C Engine...");
-                }
-            });
-    };
-
-    const handleDeleteChartReport = (id, chartReportName) => {
-        setChartReportId(id);
-        setChartReportName(chartReportName);
-        setDeleteButtonActivated(true);
+  const getChartReports = async () => {
+    const header = {
+      authorization: 'Bearer ' + cookies.get('accessToken')
     }
 
-    const onDeleteClick = () => {
-        let header = {
-            'authorization': "Bearer " + cookies.get("accessToken")
+    Axios.defaults.withCredentials = true
+    await Axios.get(`${process.env.REACT_APP_API}/reports/chartReport`, { headers: header })
+      .then((response) => {
+        setChartReports(response.data)
+      })
+      .catch((error) => {
+        if (error.response) {
+          if (error.response.status === 403 || error.response.status === 401) {
+            alert('You are not authorized to perform this action.')
+          } else {
+            alert('Malfunction in the B&C Engine.')
+          }
+        } else if (error.request) {
+          alert('Could not reach b&C Engine...')
         }
+      })
+  }
 
-        let data = {
-            chartReportId: chartReportId
+  const handleDeleteChartReport = (id, chartReportName) => {
+    setChartReportId(id)
+    setChartReportName(chartReportName)
+    setDeleteButtonActivated(true)
+  }
+
+  const onDeleteClick = () => {
+    const header = {
+      authorization: 'Bearer ' + cookies.get('accessToken')
+    }
+
+    const data = {
+      chartReportId: chartReportId
+    }
+
+    Axios.defaults.withCredentials = true
+
+    Axios.delete(`${process.env.REACT_APP_API}/reports/delete/${chartReportId}`, { headers: header, data: data })
+      .then((response) => {
+        if (response.status === 200 || response.status === 204) {
+          handleRefresh()
+          alert(t('reports.delete.Confirmation'))
         }
-
-        Axios.defaults.withCredentials = true;
-
-
-        Axios.delete(`${process.env.REACT_APP_API}/reports/delete/${chartReportId}`, { headers: header, data: data })
-            .then((response) => {
-                if (response.status === 200 || response.status === 204) {
-                    handleRefresh();
-                    alert(t('reports.delete.Confirmation'));
-                }
-            })
-            .catch((error) => {
-                if (error.response) {
-                    if (error.response.status === 401 || error.response.status === 403) {
-                        alert(t('reports.delete.NotAuthorized'));
-                    }
-                    else {
-                        alert(malfunctionError)
-                    }
-                }
-                else if (error.request) {
-                    alert(notFoundError);
-                }
-            });
-        setDeleteButtonActivated(false);
-    };
-
-
-    useEffect(() => {
-        if (cookies.get("accessToken") === undefined) {
-            navigate("/login");
+      })
+      .catch((error) => {
+        if (error.response) {
+          if (error.response.status === 401 || error.response.status === 403) {
+            alert(t('reports.delete.NotAuthorized'))
+          } else {
+            alert(malfunctionError)
+          }
+        } else if (error.request) {
+          alert(notFoundError)
         }
+      })
+    setDeleteButtonActivated(false)
+  }
 
-        handleRefresh();
+  useEffect(() => {
+    if (cookies.get('accessToken') === undefined) {
+      navigate('/login')
+    }
 
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    handleRefresh()
 
-    return (
-        <div>
-            <NavB />
-            <div className='mainContainer mainDiv'>
-                <div className='justify-content-center main'>
-                    <div className={showReportsManagement.isAdmin ?
-                        showReportsManagement.admin :
-                        showReportsManagement.employee} >
-                        <div className='card shadow my-3 mx-3' >
-                            <h4 className="text-center bg-light">{t('reports.reports.Title')}</h4>
-                            <Table responsive hover id='reportTypesTable'>
-                                <thead className='bg-light'>
-                                    <tr key="0">
-                                        <th className='performance-table-columns'>{t('reports.reports.AverageCollectionDay')}</th>
-                                        <th className='performance-table-columns'>{t('reports.reports.AnnualBillingObjective')}</th>
-                                        <th className='performance-table-columns'>{t('reports.reports.MonthlyBillingObjective')}</th>
-                                        <th className='performance-table-columns'>{t('reports.reports.AnnualBillingNumber')}</th>
-                                        <th className='performance-table-columns'>{t('reports.reports.MonthlyBillingNumber')}</th>
-                                        <th className='performance-table-columns'>{t('reports.reports.ProjectedBonus')}</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                {performanceReport.map((p) => {
-                                    return (
-                                        <tr key={p.performanceReportId}>
-                                            <td className='performance-table-columns'>{p.averageCollectionDay}</td>
-                                            <td className='performance-table-columns'>{p.annualBillingObjective}</td>
-                                            <td className='performance-table-columns'>{p.monthlyBillingObjective}</td>
-                                            <td className='performance-table-columns'>{p.annualBillingNumber}</td>
-                                            <td className='performance-table-columns'>{p.monthlyBillingNumber}</td>
-                                            <td className='performance-table-columns'>{p.projectedBonus}</td>
-                                        </tr>
-                                    )
-                                })}
-                                </tbody>
-                            </Table>
-                        </div>
-                    </div>
-                    {role === "admin" ?
-                        <div className='container-reportsManagement'>
-                            <div className='card shadow my-3 mx-3 px-3 py-2'>
-                                <h3 className='text-center'>{t('reports.reportsManagement.Title')}</h3>
-                                <Form.Group className="my-2" controlId="floatingModifyReportType">
-                                    <Form.Label>{t('reports.reportsManagement.reportType.Title')}</Form.Label>
-                                    <Form.Select required
-                                        id='reportTypeSelect'
-                                        size="sm"
-                                        aria-label="Default select example">
-                                        {reportTypes.map((t) => {
-                                            return (
-                                                <option key={t.id} value={t.id}>
-                                                    {t.name}
-                                                </option>)
-                                        })}
-                                    </Form.Select>
-                                </Form.Group>
-                                <Form.Group className="my-2" controlId="floatingModifyFrequency">
-                                    <Form.Label>{t('reports.reportsManagement.frequency.Title')}</Form.Label>
-                                    <Form.Select required
-                                        id='reportFreqSelect'
-                                        size="sm"
-                                        aria-label="Default select example"
-                                        disabled={true}>
-                                        <option key={selectedReportType.frequency} value={selectedReportType.frequency}>
-                                            {selectedReportType.frequency === -2 ? t('reports.reportsManagement.frequency.Week') :
-                                                selectedReportType.frequency === -1 ? t('reports.reportsManagement.frequency.BiWeek') :
-                                                    selectedReportType.frequency === 0 ? t('reports.reportsManagement.frequency.Month') :
-                                                        selectedReportType.frequency === 1 ? t('reports.reportsManagement.frequency.BiMonth') :
-                                                            selectedReportType.frequency === 2 ? t('reports.reportsManagement.frequency.Yearly') :
-                                                                t('reports.reportsManagement.frequency.Month')}
-                                        </option>
-                                    </Form.Select>
-                                </Form.Group>
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
-                                <Form.Group className="my-2" controlId="floatingModifyFrequency">
-                                    <Form.Label>{t('reports.reportsManagement.recipients.Title')}</Form.Label>
-                                    <ListGroup id='reportRecipientList'>
-                                        {selectedReportType.recipients ? Object.keys(selectedReportType.recipients).map((rId, i) => {
-                                            return (
-                                                <ListGroupItem
-                                                    key={i}
-                                                    value={rId}
-                                                    id={rId}>
-                                                    <Form.Check label={selectedReportType.recipients[rId].name}
-                                                        defaultChecked={selectedReportType.recipients[rId].isRecipient} />
-                                                </ListGroupItem>
-                                            );
-                                        }) : <></>}
-                                    </ListGroup>
-                                </Form.Group>
-                            </div>
-                        </div>
-                        :
-                        <></>
-                    }
+  return (
+    <div>
+      <NavB />
+      <div className='main-container main-div'>
+        <div className='justify-content-center main'>
+          <div className={showReportsManagement.isAdmin
+            ? showReportsManagement.admin
+            : showReportsManagement.employee}
+          >
+            <div className='card shadow my-3 mx-3'>
+              <h4 className='text-center bg-light'>{t('reports.reports.Title')}</h4>
+              <Table responsive hover id='report-types-table'>
+                <thead className='bg-light'>
+                  <tr key='0'>
+                      <th className='performance-table-columns'>{t('reports.reports.AverageCollectionDay')}</th>
+                      <th className='performance-table-columns'>{t('reports.reports.AnnualBillingObjective')}</th>
+                      <th className='performance-table-columns'>{t('reports.reports.MonthlyBillingObjective')}</th>
+                      <th className='performance-table-columns'>{t('reports.reports.AnnualBillingNumber')}</th>
+                      <th className='performance-table-columns'>{t('reports.reports.MonthlyBillingNumber')}</th>
+                      <th className='performance-table-columns'>{t('reports.reports.ProjectedBonus')}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                  {performanceReport.map((p) => {
+                      return (
+                        <tr key={p.performanceReportId}>
+                            <td className='performance-table-columns'>{p.averageCollectionDay}</td>
+                            <td className='performance-table-columns'>{p.annualBillingObjective}</td>
+                            <td className='performance-table-columns'>{p.monthlyBillingObjective}</td>
+                            <td className='performance-table-columns'>{p.annualBillingNumber}</td>
+                            <td className='performance-table-columns'>{p.monthlyBillingNumber}</td>
+                            <td className='performance-table-columns'>{p.projectedBonus}</td>
+                          </tr>
+                      )
+                    })}
+                </tbody>
+              </Table>
+            </div>
+          </div>
+          {role === 'admin'
+            ? <div className='container-reports-management'>
+              <div className='card shadow my-3 mx-3 px-3 py-2'>
+                <h3 className='text-center'>{t('reports.reportsManagement.Title')}</h3>
+                <Form.Group className='my-2' controlId='floatingModifyReportType'>
+                  <Form.Label>{t('reports.reportsManagement.reportType.Title')}</Form.Label>
+                  <Form.Select
+                      required
+                      id='reportTypeSelect'
+                      size='sm'
+                      aria-label='Default select example'
+                    >
+                      {reportTypes.map((t) => {
+                        return (
+                            <option key={t.id} value={t.id}>
+                                {t.name}
+                              </option>
+                        )
+                      })}
+                    </Form.Select>
+                </Form.Group>
+                <Form.Group className='my-2' controlId='floatingModifyFrequency'>
+                  <Form.Label>{t('reports.reportsManagement.frequency.Title')}</Form.Label>
+                  <Form.Select
+                      required
+                      id='reportFreqSelect'
+                      size='sm'
+                      aria-label='Default select example'
+                      disabled
+                    >
+                      <option key={selectedReportType.frequency} value={selectedReportType.frequency}>
+                        {selectedReportType.frequency === -2
+                            ? t('reports.reportsManagement.frequency.Week')
+                            : selectedReportType.frequency === -1
+                              ? t('reports.reportsManagement.frequency.BiWeek')
+                              : selectedReportType.frequency === 0
+                                ? t('reports.reportsManagement.frequency.Month')
+                                : selectedReportType.frequency === 1
+                                  ? t('reports.reportsManagement.frequency.BiMonth')
+                                  : selectedReportType.frequency === 2
+                                    ? t('reports.reportsManagement.frequency.Yearly')
+                                    : t('reports.reportsManagement.frequency.Month')}
+                      </option>
+                    </Form.Select>
+                </Form.Group>
 
-                    <div className='container-chartReports'>
-                        <div className='card shadow my-3 mx-3'>
-                            <h4 className="text-center bg-light">{t('reports.chartReports.Title')}</h4>
-                            <Table responsive hover id='chartReportsTable'>
-                                <thead className='bg-light'>
-                                    <tr key="0">
-                                        <th>{t('reports.chartReports.Name')}</th>
-                                        <th>{t('reports.chartReports.Employee')}</th>
-                                        <th>{t('reports.chartReports.ClientType')}</th>
-                                        <th>{t('reports.chartReports.Country')}</th>
-                                        <th>{t('reports.chartReports.AgeOfAccount')}</th>
-                                        <th>{t('reports.chartReports.AccountType')}</th>
-                                        <th>{t('reports.chartReports.StartDate')}</th>
-                                        <th>{t('reports.chartReports.EndDate')}</th>
-                                        <th>
-                                            <div className="d-flex justify-content-center">
-                                                <Button
-                                                    className="btn py-0 shadow-sm border">
-                                                    {t('reports.chartReports.CreateButton')}
-                                                </Button>
-                                            </div>
-                                        </th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {chartReports.map(r => {
-                                        return (
-                                            <tr key={r.chartReportId} id={r.chartReportId}>
-                                                <td>{r.name}</td>
-                                                <td>{r.employee1Name}{r.employee2Name === null ? "" : ", " + r.employee2Name}</td>
-                                                <td>{r.clientType}</td>
-                                                <td>{r.country}</td>
-                                                <td>{r.ageOfAccount}</td>
-                                                <td>{r.accountType}</td>
-                                                <td>{r.startDate.toString()}</td>
-                                                <td>{r.endDate.toString()}</td>
-                                                <td className="py-1">
-                                                    <div className="d-flex justify-content-center">
-                                                        {pdfLoading
-                                                        ?   
-                                                            r.chartReportId !== currentPdfLoading
-                                                            ?
-                                                            <ExportButton id={r.chartReportId} iconColor={{color: '#666'}} styles={{pointerEvents: 'none'}}/>
-                                                            :
-                                                            <span className='loadingChartReport align-self-center'>
-                                                                <Oval
-                                                                    height="22"
-                                                                    width="22"
-                                                                    color='black'
-                                                                    ariaLabel='loading' />
-                                                            </span>
-                                                            
-                                                        :
-                                                        <ExportButton id={r.chartReportId} onExport={() => createAndDownloadPDF(r.chartReportId)} />
-                                                        }
-                                                        <DeleteButton onDelete={() => handleDeleteChartReport(r.chartReportId, r.name)} />
-                                                    </div >
-                                                </td >
-                                            </tr >
-                                        );
-                                    })}
-                                </tbody >
-                            </Table >
-                        </div >
-                    </div >
-                </div>
-            </div >
-            <ConfirmationPopup
-                open={deleteButtonActivated}
-                prompt={t('reports.delete.Title')}
-                title={chartReportName}
-                onAccept={() => { onDeleteClick() }}
-                onClose={() => { setDeleteButtonActivated(false) }} />
+                <Form.Group className='my-2' controlId='floatingModifyFrequency'>
+                  <Form.Label>{t('reports.reportsManagement.recipients.Title')}</Form.Label>
+                  <ListGroup id='report-recipient-list'>
+                      {selectedReportType.recipients
+                        ? Object.keys(selectedReportType.recipients).map((rId, i) => {
+                            return (
+                                <ListGroupItem
+                                    key={i}
+                                    value={rId}
+                                    id={rId}
+                                  >
+                                    <Form.Check
+                                          label={selectedReportType.recipients[rId].name}
+                                          defaultChecked={selectedReportType.recipients[rId].isRecipient}
+                                        />
+                                  </ListGroupItem>
+                            )
+                          })
+                        : <></>}
+                    </ListGroup>
+                </Form.Group>
+              </div>
+            </div>
+            : <></>}
+
+          <div className='container-chart-reports'>
+            <div className='card shadow my-3 mx-3'>
+              <h4 className='text-center bg-light'>{t('reports.chartReports.Title')}</h4>
+              <Table responsive hover id='chartReportsTable'>
+                <thead className='bg-light'>
+                  <tr key='0'>
+                      <th>{t('reports.chartReports.Name')}</th>
+                      <th>{t('reports.chartReports.Employee')}</th>
+                      <th>{t('reports.chartReports.ClientType')}</th>
+                      <th>{t('reports.chartReports.Country')}</th>
+                      <th>{t('reports.chartReports.AgeOfAccount')}</th>
+                      <th>{t('reports.chartReports.AccountType')}</th>
+                      <th>{t('reports.chartReports.StartDate')}</th>
+                      <th>{t('reports.chartReports.EndDate')}</th>
+                      <th>
+                        <div className='d-flex justify-content-center'>
+                            <Button
+                                className='btn py-0 shadow-sm border'
+                              >
+                                {t('reports.chartReports.CreateButton')}
+                              </Button>
+                          </div>
+                      </th>
+                    </tr>
+                </thead>
+                <tbody>
+                  {chartReports.map(r => {
+                      return (
+                        <tr key={r.chartReportId} id={r.chartReportId}>
+                            <td>{r.name}</td>
+                            <td>{r.employee1Name}{r.employee2Name === null ? '' : ', ' + r.employee2Name}</td>
+                            <td>{r.clientType}</td>
+                            <td>{r.country}</td>
+                            <td>{r.ageOfAccount}</td>
+                            <td>{r.accountType}</td>
+                            <td>{r.startDate.toString()}</td>
+                            <td>{r.endDate.toString()}</td>
+                            <td className='py-1'>
+                                <div className='d-flex justify-content-center'>
+                                    {pdfLoading
+                                        ? r.chartReportId !== currentPdfLoading
+                                            ? <ExportButton id={r.chartReportId} iconColor={{ color: '#666' }} styles={{ pointerEvents: 'none' }} />
+                                            : <span className='loading-chart-report align-self-center'>
+                                                <Oval
+                                                    height='22'
+                                                    width='22'
+                                                    color='black'
+                                                    ariaLabel='loading'
+                                                  />
+                                                </span>
+
+                                        : <ExportButton id={r.chartReportId} onExport={() => createAndDownloadPDF(r.chartReportId)} />}
+                                    <DeleteButton onDelete={() => handleDeleteChartReport(r.chartReportId, r.name)} />
+                                  </div>
+                              </td>
+                          </tr>
+                      )
+                    })}
+                </tbody>
+              </Table>
+            </div>
+          </div>
         </div>
-    )
+      </div>
+      <ConfirmationPopup
+        open={deleteButtonActivated}
+        prompt={t('reports.delete.Title')}
+        title={chartReportName}
+        onAccept={() => { onDeleteClick() }}
+        onClose={() => { setDeleteButtonActivated(false) }}
+      />
+    </div>
+  )
 }
 
 export default Reports

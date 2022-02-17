@@ -6,21 +6,23 @@ html {
   max-width: 800px !important;
 }
 
-.mainContainer {
+.main-container {
   display: flex;
 }
 
 .card {
   border-radius: 1rem;
   border: 0;
-}  
+}
 
-.submitButton {
+.submit-button {
   font-size: 20px;
   background-color: lightgrey;
 }
 
-input, select, button{
+input,
+select,
+button {
   border-radius: 0.7rem !important;
 }
 
@@ -32,75 +34,67 @@ input, select, button{
   border-radius: 0.7rem !important;
 }
 
-.inputSelect {
+.input-select {
   border-radius: 0.7rem !important;
-  border-color: rgb(206, 212, 218);
-  max-width: min-content
+  border-color: rgb(206 212 218);
+  max-width: min-content;
 }
 
-.inputSelect:hover {
-  background-color: rgb(228, 228, 228);
+.input-select:hover {
+  background-color: rgb(228 228 228);
 }
 
-.navLogin {
-  text-align: center;
-}
-
-.navContainer {
+.nav-container {
   position: relative;
 }
 
-.navBrandLogin {
+.nav-brand-login {
   float: none;
   position: absolute;
   top: 50%;
   left: 50%;
-  transform: translate(-50%, -50%)
+  transform: translate(-50%, -50%);
 }
 
-.passwordValidationField.form-control.is-invalid, 
-.passwordValidationField.was-validated,
-.passwordValidationField.form-control:invalid {
-  padding-right: 4.125rem!important;
-  background-position: center right 2.25rem!important;
+.password-validation-field.form-control.is-invalid,
+.password-validation-field.was-validated,
+.password-validation-field.form-control:invalid {
+  padding-right: 4.125rem !important;
+  background-position: center right 2.25rem !important;
 }
 
 @media (max-width: 768px) {
-  .navBarGreeting {
-    display: none;
-  } 
-
-  #loginForm {
+  #login-form {
     margin-top: 2rem !important;
     margin-right: 2rem !important;
     margin-left: 2rem !important;
   }
 
   #login-card {
-    margin: 2rem!important;
+    margin: 2rem !important;
   }
 }
 
 @media (max-width: 576px) {
-  #loginForm {
+  #login-form {
     margin-top: 1.5rem !important;
     margin-right: 1rem !important;
     margin-left: 1rem !important;
   }
 
   #login-card {
-    margin: 1rem!important;
+    margin: 1rem !important;
   }
 }
 
 @media (max-width: 482px) {
-  #loginForm {
+  #login-form {
     margin-top: 1rem !important;
     margin-right: 0 !important;
     margin-left: 0 !important;
   }
 
   #login-card {
-    margin: 0!important;
+    margin: 0 !important;
   }
 }
