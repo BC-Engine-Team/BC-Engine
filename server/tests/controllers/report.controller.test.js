@@ -32,7 +32,7 @@ const app = makeApp()
 const request = supertest(app)
 let res
 
-// jest.setTimeout(10000)
+jest.setTimeout(10000)
 
 describe('Test Report Controller', () => {
   beforeEach(() => {
