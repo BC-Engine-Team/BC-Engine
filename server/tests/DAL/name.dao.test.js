@@ -1,4 +1,4 @@
-const { expect, jest } = require('@jest/globals')
+const { expect } = require('@jest/globals')
 
 const NameDao = require('../../data_access_layer/daos/name.dao')
 

@@ -3,7 +3,7 @@ const AuthService = require('../../services/auth.service')
 const UserDAO = require('../../data_access_layer/daos/user.dao')
 
 const sinon = require('sinon')
-const { expect, jest } = require('@jest/globals')
+const { expect } = require('@jest/globals')
 
 const listReqUserUnsorted = [
   {

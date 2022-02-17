@@ -2,7 +2,7 @@ const AuthService = require('../../services/auth.service')
 const EmpService = require('../../services/emp.service')
 const UserController = require('../../controllers/user.controller')
 const jwt = require('jsonwebtoken')
-const { expect, jest } = require('@jest/globals')
+const { expect } = require('@jest/globals')
 const supertest = require('supertest')
 const sinon = require('sinon')
 

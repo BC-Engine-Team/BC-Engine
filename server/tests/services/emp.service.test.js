@@ -4,7 +4,7 @@ const EmpDao = require('../../data_access_layer/daos/emp.dao')
 const NameDao = require('../../data_access_layer/daos/name.dao')
 const supertest = require('supertest')
 const { afterAll } = require('jest-circus')
-const { expect, jest } = require('@jest/globals')
+const { expect } = require('@jest/globals')
 const sinon = require('sinon')
 
 const reqUser = {

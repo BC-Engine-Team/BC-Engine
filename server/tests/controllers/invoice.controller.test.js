@@ -1,6 +1,6 @@
 const sinon = require('sinon')
 const { afterEach, afterAll } = require('jest-circus')
-const { expect, jest } = require('@jest/globals')
+const { expect } = require('@jest/globals')
 const supertest = require('supertest')
 const MockExpressResponse = require('mock-express-response')
 

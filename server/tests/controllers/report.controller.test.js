@@ -1,9 +1,8 @@
 const { afterEach, afterAll } = require('jest-circus')
-const { expect, jest } = require('@jest/globals')
+const { expect } = require('@jest/globals')
 const supertest = require('supertest')
 const MockExpressResponse = require('mock-express-response')
 const pdf = require('html-pdf')
-require('../../../config.js')
 
 const ReportController = require('../../controllers/report.controller')
 const ReportService = require('../../services/report.service')
@@ -933,7 +932,7 @@ describe('Test Report Controller', () => {
           }
         ]
 
-        reportServiceSpy = jest.spyOn(ReportService, 'getPerformanceReportWhenConnectedAsAdmin')
+        reportServiceSpy = jest.spyOn(ReportService, 'getPerformanceReports')
           .mockImplementation(() => new Promise((resolve) => {
             resolve(expectedResponse)
           }))
@@ -951,7 +950,7 @@ describe('Test Report Controller', () => {
       it('RC7.1.2 - should respond with 500 and message when service resolves false', async () => {
         // arrange
         const expectedResponse = { message: 'The data could not be fetched.' }
-        reportServiceSpy = jest.spyOn(ReportService, 'getPerformanceReportWhenConnectedAsAdmin')
+        reportServiceSpy = jest.spyOn(ReportService, 'getPerformanceReports')
           .mockImplementation(() => new Promise((resolve) => {
             resolve(false)
           }))
@@ -972,7 +971,7 @@ describe('Test Report Controller', () => {
           status: 600,
           message: 'Error.'
         }
-        reportServiceSpy = jest.spyOn(ReportService, 'getPerformanceReportWhenConnectedAsAdmin')
+        reportServiceSpy = jest.spyOn(ReportService, 'getPerformanceReports')
           .mockImplementation(async () => {
             await Promise.reject(expectedResponse)
           })
@@ -993,7 +992,7 @@ describe('Test Report Controller', () => {
           status: 500,
           message: 'Malfunction in the B&C Engine.'
         }
-        reportServiceSpy = jest.spyOn(ReportService, 'getPerformanceReportWhenConnectedAsAdmin')
+        reportServiceSpy = jest.spyOn(ReportService, 'getPerformanceReports')
           .mockImplementation(async () => {
             await Promise.reject({})
           })
