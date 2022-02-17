@@ -173,17 +173,7 @@ const Dashboard = () => {
         }
         setEmployeeSelect(listEmployee)
       })
-      .catch((error) => {
-        if (error.response) {
-          if (error.response.status === 403 || error.response.status === 401) {
-            alert(error.response.body)
-          } else {
-            alert('Malfunction in the B&C Engine...')
-          }
-        } else if (error.request) {
-          alert('Could not reach b&C Engine...')
-        }
-      })
+      .catch((error) => handleNon2xxResponse(error))
   }
 
   // To display the list of all countries in the select box
@@ -410,21 +400,7 @@ const Dashboard = () => {
             alert('Chart Report has been saved successfully!')
           }
         })
-        .catch((error) => {
-          if (error.response) {
-            if (error.response.status === 403 || error.response.status === 401) {
-              navigate('/login')
-              alert('You are not authorized to perform this action.')
-            } else {
-              alert('Malfunction in the B&C Engine.')
-            }
-          } else if (error.request) {
-            // The request was made but no response was received
-            // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
-            // http.ClientRequest in node.js
-            alert('Could not reach the B&C Engine.')
-          }
-        })
+        .catch((error) => handleNon2xxResponse(error))
       setConfirmSaveActivated(false)
     }
   }
