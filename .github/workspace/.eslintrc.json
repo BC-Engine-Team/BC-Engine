@@ -1,0 +1,9 @@
+{
+    "extends": [
+      "eslint:recommended",
+      "react-hooks"
+    ],
+    "plugins": [
+      "react-hooks"
+    ]
+  }
