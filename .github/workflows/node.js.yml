@@ -64,6 +64,7 @@ jobs:
       - name: Super-Linter
         uses: github/super-linter@v4.9.0
         env:
+          DEFAULT_BRANCH: 'main'
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           OUTPUT_FOLDER: reports
           OUTPUT_DETAILS: detailed
