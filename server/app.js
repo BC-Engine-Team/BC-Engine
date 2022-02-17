@@ -38,7 +38,7 @@ module.exports = (database) => {
   });
 
   // Routes
-  app.use('/api/invoice', invoiceRoutes);
+  app.use('/api/invoices', invoiceRoutes);
   app.use('/api/users', userRoutes);
   app.use('/api/reports', reportRoutes);
 

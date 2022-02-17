@@ -80,7 +80,7 @@ exports.getRecipients = async (recipientsModel = RecipientsModel) => {
 
 
 // Reports Types related functions
-exports.getPerformanceReportsWhenConnectedAsAdmin = async (userId, performanceReportModel = PerformanceReportModel) => {
+exports.getPerformanceReports = async (userId, performanceReportModel = PerformanceReportModel) => {
     return new Promise((resolve, reject) => {
         performanceReportModel.findAll().then(async data => {
             if (data) {

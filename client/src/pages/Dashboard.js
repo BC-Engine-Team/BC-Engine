@@ -165,7 +165,7 @@ const Dashboard = () => {
             'authorization': "Bearer " + cookies.get("accessToken"),
         }
 
-        await Axios.get(`${process.env.REACT_APP_API}/invoice/employees`, { headers: header })
+        await Axios.get(`${process.env.REACT_APP_API}/invoices/employees`, { headers: header })
             .then((res) => {
                 if (res.status === 403 && res.status === 401) {
                     setAuthorized(false);
@@ -204,7 +204,7 @@ const Dashboard = () => {
             'authorization': "Bearer " + cookies.get("accessToken"),
         }
 
-        await Axios.get(`${process.env.REACT_APP_API}/invoice/getCountries`, { headers: header })
+        await Axios.get(`${process.env.REACT_APP_API}/invoices/getCountries`, { headers: header })
             .then(async (res) => {
                 if (res.status === 403 && res.status === 401) {
                     setAuthorized(false);
@@ -267,7 +267,7 @@ const Dashboard = () => {
                 };
             }
 
-            await Axios.get(`${process.env.REACT_APP_API}/invoice/defaultChartAndTable/${startDate}/${endDate}`, { params: param, headers: header })
+            await Axios.get(`${process.env.REACT_APP_API}/invoices/defaultChartAndTable/${startDate}/${endDate}`, { params: param, headers: header })
                 .then((res) => {
                     if (res.status === 403 && res.status === 401) {
                         setAuthorized(false);

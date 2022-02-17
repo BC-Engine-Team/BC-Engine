@@ -77,7 +77,7 @@ exports.deleteChartReport = async (req, res) => {
 exports.getPerformanceReportsOfAllUsers = async (req, res) => {
     if (!req.user || !req.user.userId || req.user.userId === "" || req.user.userId === undefined)
         return res.status(400).send({ message: "Content cannot be empty." });
-    await reportService.getPerformanceReportWhenConnectedAsAdmin(req.user.userId)
+    await reportService.getPerformanceReports(req.user.userId)
         .then(async response => {
             if (response) {
                 return res.send(response);
@@ -91,11 +91,11 @@ exports.getPerformanceReportsOfAllUsers = async (req, res) => {
 
 exports.createChartReportPDF = async (req, res) => {
     if (!req.body.reportid)
-    return res.status(400).send({ message: "Content cannot be empty." });
+        return res.status(400).send({ message: "Content cannot be empty." });
 
     await reportService.createChartReportPDFById(req.body.reportid)
         .then(response => {
-            if(response) {
+            if (response) {
                 return res.status(200).send(response);
             }
             return res.status(500).send({ message: "The data could not be fetched." });
@@ -108,7 +108,7 @@ exports.createChartReportPDF = async (req, res) => {
 exports.fetchChartReportPDF = async (req, res) => {
     // create file path
     let filePath;
-    if(__dirname !== '/home/runner/work/BC-Engine/BC-Engine/server/controllers') {
+    if (__dirname !== '/home/runner/work/BC-Engine/BC-Engine/server/controllers') {
         filePath = `${__dirname.replace("controllers", "")}docs\\pdf_files\\chartReport-${req.query.reportid}.pdf`;
     }
     else {
@@ -116,10 +116,10 @@ exports.fetchChartReportPDF = async (req, res) => {
     }
 
     if (!req.query.reportid)
-    return res.status(400).send({ message: "Content cannot be empty." });
+        return res.status(400).send({ message: "Content cannot be empty." });
 
     await res.sendFile(filePath, {}, (err) => {
-        if(err) {
+        if (err) {
             return res.status(err.status || 500).send({ message: err.message || "File not found." });
         }
         else {

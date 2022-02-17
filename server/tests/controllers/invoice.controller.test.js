@@ -74,7 +74,7 @@ describe("Test Invoice Controller", () => {
                     }));
 
                 // act
-                const response = await request.get("/api/invoice/defaultChartAndTable/2019-12-01/2020-04-01");
+                const response = await request.get("/api/invoices/defaultChartAndTable/2019-12-01/2020-04-01");
 
                 // assert
                 expect(response.status).toBe(200);
@@ -127,7 +127,7 @@ describe("Test Invoice Controller", () => {
                 let expectedResponseMessage = "Wrong format.";
 
                 // act 
-                const response = await request.get("/api/invoice/defaultChartAndTable/wonrg format/invalid-date");
+                const response = await request.get("/api/invoices/defaultChartAndTable/wonrg format/invalid-date");
 
                 // assert
                 expect(response.status).toBe(400);
@@ -145,7 +145,7 @@ describe("Test Invoice Controller", () => {
                     }));
 
                 // act
-                const response = await request.get("/api/invoice/defaultChartAndTable/2019-12-01/2020-04-01");
+                const response = await request.get("/api/invoices/defaultChartAndTable/2019-12-01/2020-04-01");
 
                 // assert
                 expect(response.status).toBe(500);
@@ -165,7 +165,7 @@ describe("Test Invoice Controller", () => {
                     });
 
                 // act
-                const response = await request.get("/api/invoice/defaultChartAndTable/2019-12-01/2020-04-01");
+                const response = await request.get("/api/invoices/defaultChartAndTable/2019-12-01/2020-04-01");
 
                 // assert
                 expect(response.status).toBe(500);
@@ -184,7 +184,7 @@ describe("Test Invoice Controller", () => {
                     });
 
                 // act
-                const response = await request.get("/api/invoice/defaultChartAndTable/2019-12-01/2020-04-01");
+                const response = await request.get("/api/invoices/defaultChartAndTable/2019-12-01/2020-04-01");
 
                 // assert
                 expect(response.status).toBe(400);
@@ -208,7 +208,7 @@ describe("Test Invoice Controller", () => {
                     }));
 
                 // act
-                const response = await request.get("/api/invoice/defaultChartAndTable/2019-12-01/2020-04-01?employeeId=22769");
+                const response = await request.get("/api/invoices/defaultChartAndTable/2019-12-01/2020-04-01?employeeId=22769");
 
                 // assert
                 expect(response.status).toBe(200);
@@ -255,7 +255,7 @@ describe("Test Invoice Controller", () => {
                         resolve(expectedEmpServiceResponse);
                     }));
 
-                const response = await request.get("/api/invoice/employees");
+                const response = await request.get("/api/invoices/employees");
 
                 // assert
                 expect(response.status).toBe(200);
@@ -273,7 +273,7 @@ describe("Test Invoice Controller", () => {
                     }));
 
                 // act
-                const response = await request.get("/api/invoice/employees");
+                const response = await request.get("/api/invoices/employees");
 
                 // assert
                 expect(response.status).toBe(500);
@@ -291,7 +291,7 @@ describe("Test Invoice Controller", () => {
                     });
 
                 // act
-                const response = await request.get("/api/invoice/employees");
+                const response = await request.get("/api/invoices/employees");
 
                 // assert
                 expect(response.status).toBe(500);
@@ -310,7 +310,7 @@ describe("Test Invoice Controller", () => {
                     });
 
                 // act
-                const response = await request.get("/api/invoice/employees");
+                const response = await request.get("/api/invoices/employees");
 
                 // assert
                 expect(response.status).toBe(400);
@@ -343,7 +343,7 @@ describe("Test Invoice Controller", () => {
                         resolve(expectedEmpServiceResponse);
                     }));
 
-                const response = await request.get("/api/invoice/employees")
+                const response = await request.get("/api/invoices/employees")
                     .send(reqUserEmployee);
 
                 // assert
@@ -362,7 +362,7 @@ describe("Test Invoice Controller", () => {
                     }));
 
                 // act
-                const response = await request.get("/api/invoice/employees");
+                const response = await request.get("/api/invoices/employees");
 
                 // assert
                 expect(response.status).toBe(500);
@@ -380,7 +380,7 @@ describe("Test Invoice Controller", () => {
                     });
 
                 // act
-                const response = await request.get("/api/invoice/employees");
+                const response = await request.get("/api/invoices/employees");
 
                 // assert
                 expect(response.status).toBe(500);
@@ -399,7 +399,7 @@ describe("Test Invoice Controller", () => {
                     });
 
                 // act
-                const response = await request.get("/api/invoice/employees");
+                const response = await request.get("/api/invoices/employees");
 
                 // assert
                 expect(response.status).toBe(400);
@@ -410,7 +410,7 @@ describe("Test Invoice Controller", () => {
 
 
     describe("IC3 - Get All Countries for Dropdown ", () => {
-        
+
         describe("IC3.1 - given any user", () => {
 
             it("IC3.1.1 - Should respond with 200 and a list of countries", async () => {
@@ -432,7 +432,7 @@ describe("Test Invoice Controller", () => {
                         resolve(expectedCountryResponse);
                     }));
 
-                const response = await request.get("/api/invoice/getCountries");
+                const response = await request.get("/api/invoices/getCountries");
 
                 // assert
                 expect(response.status).toBe(200);
@@ -450,13 +450,13 @@ describe("Test Invoice Controller", () => {
                     }));
 
                 // act
-                const response = await request.get("/api/invoice/getCountries");
+                const response = await request.get("/api/invoices/getCountries");
 
                 // assert
                 expect(response.status).toBe(500);
                 expect(response.body.message).toBe(expectedResponse);
             });
-        
+
 
             it("IC3.1.3 - should respond with 500 status code and message when not specified", async () => {
                 // arrange
@@ -470,7 +470,7 @@ describe("Test Invoice Controller", () => {
                     });
 
                 // act
-                const response = await request.get("/api/invoice/getCountries");
+                const response = await request.get("/api/invoices/getCountries");
 
                 // assert
                 expect(response.status).toBe(500);
@@ -490,7 +490,7 @@ describe("Test Invoice Controller", () => {
                     });
 
                 // act
-                const response = await request.get("/api/invoice/getCountries");
+                const response = await request.get("/api/invoices/getCountries");
 
                 // assert
                 expect(response.status).toBe(400);
