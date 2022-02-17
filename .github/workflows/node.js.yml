@@ -69,6 +69,7 @@ jobs:
           OUTPUT_FOLDER: reports
           OUTPUT_DETAILS: detailed
           VALIDATE_ALL_CODEBASE: false
+          VALIDATE_DOCKERFILE_HADOLINT: false
           
           LINTER_RULES_PATH: /
           CSS_FILE_NAME: .stylelintrc.json
