@@ -215,9 +215,6 @@ const Manage = () => {
                                 </Col>
                             </Row>
 
-
-
-
                             <Form.Label class="inputTitle">A</Form.Label>
                             <Row>
                                 <Col sm={6} md={4}>
@@ -269,9 +266,6 @@ const Manage = () => {
                                 </Col>
                             </Row>
 
-
-
-
                             <Form.Label class="inputTitle">B</Form.Label>
                             <Row>
                                 <Col sm={6} md={4}>
@@ -322,9 +316,6 @@ const Manage = () => {
                                     </Form.Control.Feedback>
                                 </Col>
                             </Row>
-
-
-
 
                             <Form.Label class="inputTitle">C</Form.Label>
                             <Row>
@@ -431,12 +422,11 @@ const Manage = () => {
                                 </Col>
                             </Row>
                             
-
-                            <Row>
-                                <Col colspan={3}>
+                            <Row className='mt-2'>
+                                <Col md={12}>
                                     <Button
                                         id='saveGradingBracketsButton'
-                                        className='my-2 d-flex justify-content-center'
+                                        className='my-2 w-100 d-flex justify-content-center'
                                         onClick={handleSaveGradingBrackets}
                                         variant='primary'>
                                         {saveGradingBracketsText}
