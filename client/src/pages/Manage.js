@@ -1,20 +1,20 @@
 import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Form, Table, InputGroup, FormControl, FormLabel, Button, ButtonGroup, OverlayTrigger, DropdownButton, Dropdown, Tooltip as ToolTipBootstrap, FormCheck, Col, Row } from 'react-bootstrap';
+import { Form, Button, Col, Row } from 'react-bootstrap'
 import Cookies from 'universal-cookie'
-import { useTranslation } from 'react-i18next';
+import { useTranslation } from 'react-i18next'
 import NavB from '../components/NavB'
-import '../styles/managePage.css';
+import '../styles/managePage.css'
 
 const Manage = () => {
-    let navigate = useNavigate();
-    const cookies = new Cookies();
-    const { t } = useTranslation();
+    let navigate = useNavigate()
+    const cookies = new Cookies()
+    const { t } = useTranslation()
 
-    const saveGradingBracketsText = t('gradings.ModifyClientGradingButton');
+    const saveGradingBracketsText = t('gradings.ModifyClientGradingButton')
 
-    const [errors, setErrors] = useState({});
-
+    const [errors, setErrors] = useState({})
+    const grades = ['A+', 'A', 'B', 'C', 'E+']
 
     const [clientGrading, setClientGrading] = useState({
         maximumGradeAPlus: "",
@@ -32,20 +32,20 @@ const Manage = () => {
         maximumGradeEPlus: "",
         minimumGradeEPlus: "",
         averageCollectionTimeGradeEPlus: ""
-    });
+    })
 
 
     const setField = (field, value) => {
         setClientGrading({
             ...clientGrading,
             [field]: value
-        });
-    };
+        })
+    }
 
 
     const findCriteriaErrors = () => {
-        const { maximumGradeAPlus, minimumGradeAPlus, maximumGradeA, minimumGradeA, maximumGradeB, minimumGradeB, maximumGradeC, minimumGradeC, maximumGradeEPlus, minimumGradeEPlus } = clientGrading;
-        let newErrors = {};
+        const { maximumGradeAPlus, minimumGradeAPlus, maximumGradeA, minimumGradeA, maximumGradeB, minimumGradeB, maximumGradeC, minimumGradeC, maximumGradeEPlus, minimumGradeEPlus } = clientGrading
+        let newErrors = {}
 
 
         //maximum grade A+ errors
@@ -58,12 +58,11 @@ const Manage = () => {
             && parseInt(maximumGradeAPlus) < parseInt(minimumGradeC) 
             && parseInt(maximumGradeAPlus) < parseInt(maximumGradeEPlus) 
             && parseInt(maximumGradeAPlus) < parseInt(minimumGradeEPlus))
-            newErrors.minimumGradeAPlus = "The maximum grade A+ is smaller than one or multiple client grading bolow him";
-
+            newErrors.minimumGradeAPlus = "The maximum grade A+ is smaller than one or multiple client grading bolow him"
 
         // minimum grade A+ errors
         if (parseInt(minimumGradeAPlus) > parseInt(maximumGradeAPlus) )
-            newErrors.minimumGradeAPlus = "The minimum grade A+ is bigger than maximum grade A+";
+            newErrors.minimumGradeAPlus = "The minimum grade A+ is bigger than maximum grade A+"
 
         if (parseInt(minimumGradeAPlus) < parseInt(maximumGradeA) 
             && parseInt(minimumGradeAPlus) < parseInt(minimumGradeA) 
@@ -73,13 +72,12 @@ const Manage = () => {
             && parseInt(minimumGradeAPlus) < parseInt(minimumGradeC) 
             && parseInt(minimumGradeAPlus) < parseInt(maximumGradeEPlus) 
             && parseInt(minimumGradeAPlus) < parseInt(minimumGradeEPlus))
-            newErrors.minimumGradeAPlus = "The minimum grade A+ is smaller than one or multiple client gradings";
-
+            newErrors.minimumGradeAPlus = "The minimum grade A+ is smaller than one or multiple client gradings"
 
         // maximum grade A errors
         if (parseInt(maximumGradeA) > parseInt(minimumGradeAPlus) 
             && parseInt(maximumGradeA) > parseInt(maximumGradeAPlus))
-            newErrors.minimumGradeAPlus = "The maximum grade A is bigger than the gradings above";
+            newErrors.minimumGradeAPlus = "The maximum grade A is bigger than the gradings above"
 
         if (parseInt(maximumGradeA) < parseInt(minimumGradeA) 
             && parseInt(maximumGradeA) < parseInt(maximumGradeB) 
@@ -88,14 +86,13 @@ const Manage = () => {
             && parseInt(maximumGradeA) < parseInt(minimumGradeC) 
             && parseInt(maximumGradeA) < parseInt(maximumGradeEPlus) 
             && parseInt(maximumGradeA) < parseInt(minimumGradeEPlus))
-            newErrors.minimumGradeAPlus = "The maximum grade A is smaller than one or multiple client gradings";
-        
+            newErrors.minimumGradeAPlus = "The maximum grade A is smaller than one or multiple client gradings"
 
         // minimum grade A errors
         if (parseInt(minimumGradeA) > parseInt(maximumGradeA) 
             && parseInt(minimumGradeA) > parseInt(minimumGradeAPlus)
             && parseInt(minimumGradeA) > parseInt(maximumGradeAPlus))
-            newErrors.minimumGradeAPlus = "The minimum grade A is bigger than the gradings above it";
+            newErrors.minimumGradeAPlus = "The minimum grade A is bigger than the gradings above it"
 
         if (parseInt(minimumGradeA) < parseInt(maximumGradeB) 
             && parseInt(minimumGradeA) < parseInt(minimumGradeB) 
@@ -103,32 +100,27 @@ const Manage = () => {
             && parseInt(minimumGradeA) < parseInt(minimumGradeC) 
             && parseInt(minimumGradeA) < parseInt(maximumGradeEPlus) 
             && parseInt(minimumGradeA) < parseInt(minimumGradeEPlus))
-            newErrors.minimumGradeAPlus = "The minimum grade A is smaller than one or multiple client gradings";
-        
-
+            newErrors.minimumGradeAPlus = "The minimum grade A is smaller than one or multiple client gradings"
 
         // maximum grade B errors
         if (parseInt(maximumGradeB) > parseInt(minimumGradeA) 
             && parseInt(maximumGradeB) > parseInt(maximumGradeA) 
             && parseInt(maximumGradeB) > parseInt(minimumGradeAPlus)
             && parseInt(maximumGradeB) > parseInt(maximumGradeAPlus))
-            newErrors.minimumGradeAPlus = "The maximum grade A is bigger than the gradings above it";
+            newErrors.minimumGradeAPlus = "The maximum grade A is bigger than the gradings above it"
 
         if (parseInt(maximumGradeB) < parseInt(minimumGradeB) 
             && parseInt(maximumGradeB) < parseInt(maximumGradeC) 
             && parseInt(maximumGradeB) < parseInt(minimumGradeC) 
             && parseInt(maximumGradeB) < parseInt(maximumGradeEPlus) 
             && parseInt(maximumGradeB) < parseInt(minimumGradeEPlus))
-            newErrors.minimumGradeAPlus = "The maximum grade B is smaller than one or multiple client gradings";
+            newErrors.minimumGradeAPlus = "The maximum grade B is smaller than one or multiple client gradings"
 
-
-
-            
         // minimum grade B errors
         if (parseInt(minimumGradeA) > parseInt(maximumGradeA) 
             && parseInt(minimumGradeA) > parseInt(minimumGradeAPlus)
             && parseInt(minimumGradeA) > parseInt(maximumGradeAPlus))
-            newErrors.minimumGradeAPlus = "The minimum grade A is bigger than the gradings above it";
+            newErrors.minimumGradeAPlus = "The minimum grade A is bigger than the gradings above it"
 
         if (parseInt(minimumGradeA) < parseInt(maximumGradeB) 
             && parseInt(minimumGradeA) < parseInt(minimumGradeB) 
@@ -136,35 +128,28 @@ const Manage = () => {
             && parseInt(minimumGradeA) < parseInt(minimumGradeC) 
             && parseInt(minimumGradeA) < parseInt(maximumGradeEPlus) 
             && parseInt(minimumGradeA) < parseInt(minimumGradeEPlus))
-            newErrors.minimumGradeAPlus = "The minimum grade A is smaller than one or multiple client gradings";
+            newErrors.minimumGradeAPlus = "The minimum grade A is smaller than one or multiple client gradings"
         
-        return newErrors;
+        return newErrors
     };
 
 
     const handleSaveGradingBrackets = async (event) => {
-        event.preventDefault();
-        event.stopPropagation();
+        event.preventDefault()
+        event.stopPropagation()
 
-        const newErrors = findCriteriaErrors();
-        setErrors(newErrors);
+        const newErrors = findCriteriaErrors()
+        setErrors(newErrors)
 
-        setConfirmSaveActivated(true);
+        //setConfirmSaveActivated(true)
     }
-
-
-
-
-
-
-
 
     useEffect(() => {
         if (cookies.get("accessToken") === undefined) {
-            navigate("/login");
+            navigate("/login")
         }
         else if (cookies.get("role") !== "admin") {
-            navigate("/dashboard");
+            navigate("/dashboard")
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
@@ -178,7 +163,6 @@ const Manage = () => {
                     <div className='card shadow my-3 mx-3 px-3 py2'>
                         <h3 className="text-center">{t('manage.clientGrading.Title')}</h3>
                         <Form.Group className="my-2" controlId="floatingModifyStartMonth">
-
                             
                             <Form.Label class="inputTitle">A+</Form.Label>
                             <Row>
@@ -186,7 +170,7 @@ const Manage = () => {
                                     <Form.Control required
                                             id='maximumGradeA+'
                                             size="md"
-                                            type="text"
+                                            type="number"
                                             placeholder="Maximum treshold"
                                             onChange={(g) => setField('maximumGradeAPlus', g.target.value)}
                                             value={clientGrading.maximumGradeAPlus}>
@@ -201,7 +185,7 @@ const Manage = () => {
                                     <Form.Control required
                                             id='minimumGradeA+'
                                             size="md"
-                                            type="text"
+                                            type="number"
                                             placeholder="Minimum treshold"
                                             onChange={(g) => setField('minimumGradeAPlus', g.target.value)}
                                             value={clientGrading.minimumGradeAPlus}>
@@ -449,13 +433,15 @@ const Manage = () => {
                             
 
                             <Row>
-                                <Button
-                                    id='saveGradingBracketsButton'
-                                    className='my-2 d-flex justify-content-center'
-                                    onClick={handleSaveGradingBrackets}
-                                    variant='primary'>
-                                    {saveGradingBracketsText}
-                                </Button>
+                                <Col colspan={3}>
+                                    <Button
+                                        id='saveGradingBracketsButton'
+                                        className='my-2 d-flex justify-content-center'
+                                        onClick={handleSaveGradingBrackets}
+                                        variant='primary'>
+                                        {saveGradingBracketsText}
+                                    </Button>
+                                </Col>
                             </Row>
                         </Form.Group>
                     </div>
