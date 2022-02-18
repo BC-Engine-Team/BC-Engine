@@ -1,5 +1,7 @@
 {
+  "parser": "babel-eslint",
   "plugins": [
+    "react",
     "react-hooks"
   ],
   "extends": [
@@ -9,7 +11,7 @@
     "react-hooks/exhaustive-deps": "warn"
   },
   "parserOptions": {
-    "ecmaVersion": 2020,
+    "ecmaVersion": 6,
     "sourceType":"module"
   }
 }
