@@ -1,9 +1,8 @@
 {
-    "extends": [
-      "eslint:recommended",
-      "react-hooks"
-    ],
-    "plugins": [
-      "react-hooks"
-    ]
+  "plugins": [
+    "react-hooks"
+  ],
+  "rules": {
+    "react-hooks/exhaustive-deps": "warn"
+  }
 }
