@@ -97,7 +97,6 @@ exports.prepareBilledQuery = (startDate, endDate, employeeId, clientType, countr
         query.replacements.push(countryCode);
     }
 
-
     if(accountType !== 'Receivables') {
         fromString = fromString.concat("LEFT OUTER JOIN [Bosco reduction].[dbo].NAME_CONNECTION NC ON NC.CONNECTION_ID = 1 AND",
     "NC.CONNECTION_NAME_ID = CONVERT(nvarchar, IH.ACTOR_ID)",
@@ -109,7 +108,6 @@ exports.prepareBilledQuery = (startDate, endDate, employeeId, clientType, countr
     "LEFT OUTER JOIN [Bosco reduction].[dbo].NAME_QUALITY NQ");
     }
     
-
     query.queryString = query.queryString.concat(fromString, whereString);
 
     return query;
