@@ -42,16 +42,18 @@ jobs:
         SKIP_PREFLIGHT_CHECK: ${{ secrets.SKIP_PREFLIGHT_CHECK }}
       run: | 
           touch .env
-          echo ACCESS_TOKEN_SECRET="$ACCESS_TOKEN_SECRET" >> .env
-          echo LOCAL_DATABASE="$LOCAL_DATABASE" >> .env
-          echo LOCAL_DOCKER_PORT="$LOCAL_DOCKER_PORT" >> .env
-          echo LOCAL_HOST="$LOCAL_HOST" >> .env
-          echo LOCAL_PORT="$LOCAL_PORT" >> .env
-          echo LOCAL_ROOT_PASSWORD="$LOCAL_ROOT_PASSWORD" >> .env
-          echo LOCAL_USER="$LOCAL_USER" >> .env
-          echo NODE_ENV="$NODE_ENV" >> .env
-          echo REFRESH_TOKEN_SECRET="$REFRESH_TOKEN_SECRET" >> .env
-          echo SKIP_PREFLIGHT_CHECK="$SKIP_PREFLIGHT_CHECK" >> .env
+          {
+            echo ACCESS_TOKEN_SECRET="$ACCESS_TOKEN_SECRET"
+            echo LOCAL_DATABASE="$LOCAL_DATABASE"
+            echo LOCAL_DOCKER_PORT="$LOCAL_DOCKER_PORT"
+            echo LOCAL_HOST="$LOCAL_HOST"
+            echo LOCAL_PORT="$LOCAL_PORT"
+            echo LOCAL_ROOT_PASSWORD="$LOCAL_ROOT_PASSWORD"
+            echo LOCAL_USER="$LOCAL_USER"
+            echo NODE_ENV="$NODE_ENV"
+            echo REFRESH_TOKEN_SECRET="$REFRESH_TOKEN_SECRET"
+            echo SKIP_PREFLIGHT_CHECK="$SKIP_PREFLIGHT_CHECK" 
+          } >> .env
     - run: npm test
   
   lint:

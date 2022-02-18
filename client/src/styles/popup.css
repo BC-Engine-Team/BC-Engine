@@ -1,97 +1,117 @@
 .popup {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background-color: #fff;
-    padding: 50px;
-    z-index: 1000;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: #fff;
+  padding: 50px;
+  z-index: 1000;
 }
-  
-  .popup-inner{
-    padding: 32px;
-    width: 100%;
-    background-color: #fff;
-    text-align: center;
-    display: flex;
-    justify-content: center;
+
+.popup-inner {
+  padding: 32px;
+  width: 100%;
+  background-color: #fff;
+  text-align: center;
+  display: flex;
+  justify-content: center;
 }
-  
-  .popup-inner .deleteUserButton {
-    appearance: none;
-    background-color: #05a105;
-    color:#FFFFFF;
-    border-radius: 15px;
-    box-sizing: border-box;
-    cursor: pointer;
-    font-family: Roobert,-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol";
-    font-size: 22px;
-    font-weight: 600;
-    line-height: normal;
-    min-height: 60px;
-    padding: 16px 24px;
-    text-align: center;
-    transition: all 300ms cubic-bezier(.23, 1, 0.32, 1);
-    touch-action: manipulation;
-    width: 100%;
-    will-change: transform;
+
+.popup-inner .delete-user-button {
+  appearance: none;
+  background-color: #05a105;
+  color: #fff;
+  border-radius: 15px;
+  box-sizing: border-box;
+  cursor: pointer;
+  font-family: 
+    Roobert,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    Helvetica,
+    Arial,
+    sans-serif,
+    "Apple Color Emoji",
+    "Segoe UI Emoji",
+    "Segoe UI Symbol";
+  font-size: 22px;
+  font-weight: 600;
+  line-height: normal;
+  min-height: 60px;
+  padding: 16px 24px;
+  text-align: center;
+  transition: all 300ms cubic-bezier(0.23, 1, 0.32, 1);
+  touch-action: manipulation;
+  width: 100%;
+  will-change: transform;
 }
-  
-  .popup-inner .deleteUserButton:disabled {
-    pointer-events: none;
+
+.popup-inner .delete-user-button:disabled {
+  pointer-events: none;
 }
-  
-  .popup-inner .deleteUserButton:hover {
-    box-shadow: rgba(0, 0, 0, 0.25) 0 8px 15px;
-    transform: translateY(-2px);
+
+.popup-inner .delete-user-button:hover {
+  box-shadow: rgb(0 0 0 / 25%) 0 8px 15px;
+  transform: translateY(-2px);
 }
-  
-  .popup-inner .deleteUserButton:active {
-    box-shadow: none;
-    transform: translateY(0);
+
+.popup-inner .delete-user-button:active {
+  box-shadow: none;
+  transform: translateY(0);
 }
-  
-  .popup-inner .cancelDeleteUserButton {
-    appearance: none;
-    background-color: #df0404;
-    margin-right: 20px;
-    color:#FFFFFF;
-    border-radius: 15px;
-    box-sizing: border-box;
-    cursor: pointer;
-    font-family: Roobert,-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol";
-    font-size: 22px;
-    font-weight: 600;
-    line-height: normal;
-    min-height: 60px;
-    padding: 16px 24px;
-    text-align: center;
-    transition: all 300ms cubic-bezier(.23, 1, 0.32, 1);
-    touch-action: manipulation;
-    width: 100%;
-    will-change: transform;
+
+.popup-inner .cancel-delete-user-button {
+  appearance: none;
+  background-color: #df0404;
+  margin-right: 20px;
+  color: #fff;
+  border-radius: 15px;
+  box-sizing: border-box;
+  cursor: pointer;
+  font-family:
+    Roobert,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    Helvetica,
+    Arial,
+    sans-serif,
+    "Apple Color Emoji",
+    "Segoe UI Emoji",
+    "Segoe UI Symbol";
+  font-size: 22px;
+  font-weight: 600;
+  line-height: normal;
+  min-height: 60px;
+  padding: 16px 24px;
+  text-align: center;
+  transition: all 300ms cubic-bezier(0.23, 1, 0.32, 1);
+  touch-action: manipulation;
+  width: 100%;
+  will-change: transform;
 }
-  
-  .popup-inner .cancelDeleteUserButton:disabled {
-    pointer-events: none;
+
+.popup-inner .cancel-delete-user-button:disabled {
+  pointer-events: none;
 }
-  
-  .popup-inner .cancelDeleteUserButton:hover {
-    box-shadow: rgba(0, 0, 0, 0.25) 0 8px 15px;
-    transform: translateY(-2px);
+
+.popup-inner .cancel-delete-user-button:hover {
+  box-shadow: rgb(0 0 0 / 25%) 0 8px 15px;
+  transform: translateY(-2px);
 }
-  
-  .popup-inner .cancelDeleteUserButton:active {
-    box-shadow: none;
-    transform: translateY(0);
+
+.popup-inner .cancel-delete-user-button:active {
+  box-shadow: none;
+  transform: translateY(0);
 }
-  
-  .obscureBackground {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: rgba(0, 0, 0, 0.7);
-    z-index: 1000;
+
+.obscure-background {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgb(0 0 0 / 70%);
+  z-index: 1000;
 }
