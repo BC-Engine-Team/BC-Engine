@@ -1,7 +1,7 @@
 {
-    "extends": "stylelint-config-standard",
-    "rules": {
-      "no-missing-end-of-source-newline": false,
-      "value-no-vendor-prefix": false
-    }
+  "extends": "stylelint-config-standard",
+  "rules": {
+    "no-missing-end-of-source-newline": "warn",
+    "value-no-vendor-prefix": "warn"
+  }
 }
