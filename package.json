@@ -43,7 +43,7 @@
     "tedious": "^14.0.0"
   },
   "devDependencies": {
-    "babel-eslint": "^10.1.0",
+    "@babel/eslint-parser": "^7.17.0",
     "chai": "^4.3.4",
     "eslint-plugin-react-hooks": "^4.3.0",
     "jest": "^27.4.3",
