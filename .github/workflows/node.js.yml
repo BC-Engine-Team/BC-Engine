@@ -77,5 +77,3 @@ jobs:
           CSS_FILE_NAME: .stylelintrc.json
           JAVASCRIPT_ES_CONFIG_FILE: .eslintrc.json
           JSCPD_CONFIG_FILE: .jscpd.json
-  
-
