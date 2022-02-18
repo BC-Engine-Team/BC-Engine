@@ -489,11 +489,11 @@ describe('Test UserController', () => {
         }
 
         userSpy = jest.spyOn(UserService, 'deleteUser')
-          .mockImplementation(() => new Promise((resolve) => {
-            resolve()
+          .mockImplementation(() => new Promise((resolve, reject) => {
+            reject({})
           }))
 
-        const response = await supertest(app).delete(`/api/users/delete/${expectedUserToDelete.email}`)
+        const response = await request.delete(`/api/users/delete/${expectedUserToDelete.email}`)
           .set('authorization', 'Bearer validToken')
           .send(expectedUserToDelete)
 
