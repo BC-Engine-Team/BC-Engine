@@ -12,7 +12,11 @@
 }
 
 .inputTitle {
-    margin-top: 25px;
     display: flex;
-    font-size: large;
+    font-size: x-large;
+    font-weight: bold;
+}
+
+.row{
+    margin-bottom: 40px;
 }

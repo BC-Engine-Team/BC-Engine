@@ -25,7 +25,7 @@ const NavB = (props) => {
     const GreetingLabel = t('navbar.Greeting');
     const SignOutLabel = t('navbar.SignOutLabel');
 
-    const [languageTitle, setLanguageTitle] = useState(lngs[i18n.language].nativeName);
+    const [languageTitle, setLanguageTitle] = useState(lngs['en'].nativeName);
 
     let username;
     let role;
