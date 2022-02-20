@@ -34,8 +34,9 @@
     display: flex;
     font-size: x-large;
     font-weight: bold;
+    margin-bottom: 50px;
 }
 
-.row{
-    margin-bottom: 40px;
+.rowForm{
+    margin-top: 40px;
 }

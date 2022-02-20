@@ -19,3 +19,11 @@ exports.modifyClientGradings = async (clientGradingGroup) => {
             });
     }); 
 }
+
+// exports.modifyGradingOfAllClients = async(clientGradingGroup) => {
+//     return new Promise((resolve, reject) => {
+
+        
+
+//     });
+// };
