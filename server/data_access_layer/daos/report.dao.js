@@ -86,7 +86,15 @@ exports.getPerformanceReports = async (performanceReportModel = PerformanceRepor
             include: [{ model: RecipientsModel, attributes: ['name'] }]
         }).then(async data => {
             if (data) {
-                resolve(data)
+                let returnData = []
+                for (let i = 0; i < data.length; i++) {
+                    returnData.push({
+                        ...data[i].dataValues,
+                        recipient: data[i].recipient.dataValues.name,
+                        createdAt: data[i].dataValues.createdAt.toISOString().split('T')[0]
+                    })
+                }
+                resolve(returnData)
             }
             resolve(false);
         })
@@ -118,7 +126,6 @@ exports.getPerformanceReportsByUserId = async (userId, performanceReportModel = 
                             createdAt: data[i].dataValues.createdAt.toISOString().split('T')[0]
                         })
                     }
-                    console.log(returnData)
                     resolve(returnData)
                 }
                 resolve(false)

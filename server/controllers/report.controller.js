@@ -89,8 +89,14 @@ exports.getPerformanceReports = async (req, res) => {
 }
 
 exports.getPerformanceReportsByUserId = async (req, res) => {
-    if (!req.user || !req.user.userId || req.user.userId === "" || req.user.userId === undefined || req.params.userId === undefined || req.params === '')
+    if (!req.user || !req.user.userId || req.user.userId === "" || req.user.userId === undefined)
         return res.status(400).send({ message: "Content cannot be empty." });
+
+    let regexUUIDStr = /^[0-9a-fA-F]{8}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{12}$/
+    let regexUUID = new RegExp(regexUUIDStr)
+
+    if (!regexUUID.test(req.params.userId))
+        return res.status(400).send({ message: 'Invalid userId format.' })
 
     await reportService.getPerformanceReportsByUserId(req.params.userId)
         .then(async response => {

@@ -16,24 +16,26 @@ const ReportDAO = require('../../data_access_layer/daos/report.dao');
 
 let returnedPerformanceReports = [
     {
-        performanceReportId: "PerformanceUUID",
-        employeeId: 1,
-        averageCollectionDay: "35",
-        annualBillingObjective: "4500",
-        monthlyBillingObjective: "300",
-        annualBillingNumber: "200",
-        monthlyBillingNumber: "300",
-        projectedBonus: "650"
+        dataValues: {
+            name: 'reportName1',
+            createdAt: new Date(2020, 11, 1)
+        },
+        recipient: {
+            dataValues: {
+                name: 'recipientName1'
+            }
+        }
     },
     {
-        performanceReportId: "PerformanceUUID",
-        employeeId: 2,
-        averageCollectionDay: "35",
-        annualBillingObjective: "4500",
-        monthlyBillingObjective: "300",
-        annualBillingNumber: "200",
-        monthlyBillingNumber: "300",
-        projectedBonus: "650"
+        dataValues: {
+            name: 'reportName2',
+            createdAt: new Date(2020, 11, 1)
+        },
+        recipient: {
+            dataValues: {
+                name: 'recipientName1'
+            }
+        }
     }
 ]
 
@@ -386,10 +388,22 @@ describe("Test Report DAO", () => {
                 PerformanceReportMock.$queryInterface.$useHandler(function (query, queryOptions, done) {
                     return Promise.resolve(returnedPerformanceReports);
                 });
+                let expectedResponse = [
+                    {
+                        name: returnedPerformanceReports[0].dataValues.name,
+                        createdAt: '2020-12-01',
+                        recipient: returnedPerformanceReports[0].recipient.dataValues.name
+                    },
+                    {
+                        name: returnedPerformanceReports[1].dataValues.name,
+                        createdAt: '2020-12-01',
+                        recipient: returnedPerformanceReports[1].recipient.dataValues.name
+                    }
+                ]
 
                 // act and assert
                 await expect(ReportDAO.getPerformanceReports(PerformanceReportMock)).resolves
-                    .toEqual(returnedPerformanceReports);
+                    .toEqual(expectedResponse);
             });
 
             it("CRD5.1.2 - should resolve false when Model cant fetch data", async () => {

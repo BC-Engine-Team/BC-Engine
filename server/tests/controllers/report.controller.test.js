@@ -751,7 +751,7 @@ describe("Test Report Controller", () => {
         });
     });
 
-    describe("RC5 - getPerformanceReportsOfAllUsers", () => {
+    describe("RC5 - getPerformanceReports", () => {
         describe("RC5.1 - given a valid user from auth service", () => {
             it("RC5.1.1 - should respond with 200 and body", async () => {
                 // arrange
@@ -873,4 +873,213 @@ describe("Test Report Controller", () => {
             });
         })
     });
+
+    describe("RC6 - getPerformanceReportsByUserId", () => {
+        let expectedServiceResponse = [
+            {
+                name: 'reportName1',
+                recipient: 'recipientName1',
+                createdAt: '2020-11-01'
+            },
+            {
+                name: 'reportName2',
+                recipient: 'recipientName2',
+                createdAt: '2020-11-01'
+            },
+            {
+                name: 'reportName3',
+                recipient: 'recipientName3',
+                createdAt: '2020-11-01'
+            }
+        ]
+
+        let userId = '14afdb08-9e56-4ba0-8ef1-5e316f9930a5'
+
+        let getPerformanceReportsByUserIdServiceSpy = jest.spyOn(ReportService, 'getPerformanceReportsByUserId')
+            .mockImplementation(() => new Promise((resolve, reject) => {
+                resolve(expectedServiceResponse)
+            }))
+
+        describe("RC6.1 - given valid response from service", () => {
+            it("RC6.1.1 - should respond with 200 and service response", async () => {
+                // arrange
+                let expectedResponse = expectedServiceResponse
+
+                // act
+                const response = await request.get(`/api/reports/performanceReport/${userId}`)
+
+                // assert
+                expect(authSpy).toHaveBeenCalled()
+                expect(getPerformanceReportsByUserIdServiceSpy).toHaveBeenCalledWith(userId)
+                expect(response.status).toBe(200)
+                expect(response.body).toEqual(expectedResponse)
+            })
+        })
+
+        describe("RC6.2 - given invalid request", () => {
+            let expectedResponse = {
+                status: 400,
+                message: 'Content cannot be empty.'
+            }
+
+            it("RC6.2.1 - when no user, should respond with 400 and message", async () => {
+                // arrange
+                authSpy = jest.spyOn(AuthService, 'authenticateToken')
+                    .mockImplementation((req, res, next) => {
+                        next()
+                    })
+
+                // act
+                const response = await request.get(`/api/reports/performanceReport/${userId}`)
+
+                // assert
+                expect(authSpy).toHaveBeenCalled()
+                expect(getPerformanceReportsByUserIdServiceSpy).toHaveBeenCalledTimes(0)
+                expect(response.status).toBe(expectedResponse.status)
+                expect(response.body.message).toEqual(expectedResponse.message)
+            })
+
+            it("RC6.2.2 - when no userId, should respond with 400 and message", async () => {
+                // arrange
+                authSpy = jest.spyOn(AuthService, 'authenticateToken')
+                    .mockImplementation((req, res, next) => {
+                        req.user = {}
+                        next()
+                    })
+
+                // act
+                const response = await request.get(`/api/reports/performanceReport/${userId}`)
+
+                // assert
+                expect(authSpy).toHaveBeenCalled()
+                expect(getPerformanceReportsByUserIdServiceSpy).toHaveBeenCalledTimes(0)
+                expect(response.status).toBe(expectedResponse.status)
+                expect(response.body.message).toEqual(expectedResponse.message)
+            })
+
+            it("RC6.2.3 - when userId is empty, should respond with 400 and message", async () => {
+                // arrange
+                authSpy = jest.spyOn(AuthService, 'authenticateToken')
+                    .mockImplementation((req, res, next) => {
+                        req.user = { userId: '' }
+                        next()
+                    })
+
+                // act
+                const response = await request.get(`/api/reports/performanceReport/${userId}`)
+
+                // assert
+                expect(authSpy).toHaveBeenCalled()
+                expect(getPerformanceReportsByUserIdServiceSpy).toHaveBeenCalledTimes(0)
+                expect(response.status).toBe(expectedResponse.status)
+                expect(response.body.message).toEqual(expectedResponse.message)
+            })
+
+            it("RC6.2.4 - when userId is undefined, should respond with 400 and message", async () => {
+                // arrange
+                authSpy = jest.spyOn(AuthService, 'authenticateToken')
+                    .mockImplementation((req, res, next) => {
+                        req.user = { userId: undefined }
+                        next()
+                    })
+
+                // act
+                const response = await request.get(`/api/reports/performanceReport/${userId}`)
+
+                // assert
+                expect(authSpy).toHaveBeenCalled()
+                expect(getPerformanceReportsByUserIdServiceSpy).toHaveBeenCalledTimes(0)
+                expect(response.status).toBe(expectedResponse.status)
+                expect(response.body.message).toEqual(expectedResponse.message)
+            })
+
+            it("RC6.2.5 - when invalid userId, should respond with 400 and message", async () => {
+                // arrange
+                authSpy = jest.spyOn(AuthService, 'authenticateToken')
+                    .mockImplementation((req, res, next) => {
+                        req.user = reqUser;
+                        return next()
+                    });
+                let invalidUserId = 'fakeUUid'
+                let expectedMessage = 'Invalid userId format.'
+
+                // act
+                const response = await request.get(`/api/reports/performanceReport/${invalidUserId}`)
+
+                // assert
+                expect(authSpy).toHaveBeenCalled()
+                expect(getPerformanceReportsByUserIdServiceSpy).toHaveBeenCalledTimes(0)
+                expect(response.status).toBe(expectedResponse.status)
+                expect(response.body.message).toEqual(expectedMessage)
+            })
+        })
+
+        describe("RC6.3 - given invalid response from service", () => {
+            it("RC6.3.1 - when service resolves false, should return 500 with message", async () => {
+                // arrange 
+                authSpy = jest.spyOn(AuthService, 'authenticateToken')
+                    .mockImplementation((req, res, next) => {
+                        req.user = reqUser;
+                        return next()
+                    });
+                getPerformanceReportsByUserIdServiceSpy = jest.spyOn(ReportService, 'getPerformanceReportsByUserId')
+                    .mockImplementation(() => new Promise((resolve, reject) => {
+                        resolve(false)
+                    }))
+                let expectedResponse = { message: 'The data could not be fetched.' }
+
+
+                // act
+                const response = await request.get(`/api/reports/performanceReport/${userId}`)
+
+                // assert
+                expect(authSpy).toHaveBeenCalled()
+                expect(getPerformanceReportsByUserIdServiceSpy).toHaveBeenCalledTimes(1)
+                expect(response.status).toBe(500)
+                expect(response.body).toEqual(expectedResponse)
+            })
+
+            it("RC6.3.2 - when service rejects error with specified status and message, should return specified status and message", async () => {
+                // arrange 
+                let expectedResponse = {
+                    status: 600,
+                    message: 'Error.'
+                }
+                getPerformanceReportsByUserIdServiceSpy = jest.spyOn(ReportService, 'getPerformanceReportsByUserId')
+                    .mockImplementation(() => new Promise((resolve, reject) => {
+                        reject(expectedResponse)
+                    }))
+
+                // act
+                const response = await request.get(`/api/reports/performanceReport/${userId}`)
+
+                // assert
+                expect(authSpy).toHaveBeenCalled()
+                expect(getPerformanceReportsByUserIdServiceSpy).toHaveBeenCalledTimes(1)
+                expect(response.status).toBe(expectedResponse.status)
+                expect(response.body.message).toEqual(expectedResponse.message)
+            })
+
+            it("RC6.3.3 -  when service rejects error with unspecified status and message, should return default status and message", async () => {
+                // arrange 
+                let expectedResponse = {
+                    status: 500,
+                    message: 'Malfunction in the B&C Engine.'
+                }
+                getPerformanceReportsByUserIdServiceSpy = jest.spyOn(ReportService, 'getPerformanceReportsByUserId')
+                    .mockImplementation(() => new Promise((resolve, reject) => {
+                        reject({})
+                    }))
+
+                // act
+                const response = await request.get(`/api/reports/performanceReport/${userId}`)
+
+                // assert
+                expect(authSpy).toHaveBeenCalled()
+                expect(getPerformanceReportsByUserIdServiceSpy).toHaveBeenCalledTimes(1)
+                expect(response.status).toBe(expectedResponse.status)
+                expect(response.body.message).toEqual(expectedResponse.message)
+            })
+        })
+    })
 });
