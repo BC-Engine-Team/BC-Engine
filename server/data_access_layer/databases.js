@@ -36,7 +36,9 @@ db['localdb'].chartReports,
 db['localdb'].chartReportsData,
 db['localdb'].reportTypes,
 db['localdb'].recipients,
-db['localdb'].reportTypeRecipients] = require("./models/localdb/localdb.model")(db['localdb'], Sequelize);
+db['localdb'].reportTypeRecipients,
+db['localdb'].clientGradingData] = require("./models/localdb/localdb.model")(db['localdb'], Sequelize);
+
 
 // patricia database tables
 db['mssql_pat'].employees = require("./models/mssql_pat/employee.model")(db['mssql_pat'], Sequelize);
@@ -110,6 +112,25 @@ db.sync = async (database, options) => {
           user_user_id: data[1].userId
         }
       ]);
+    })
+    .then(async () => {
+      await db[database].clientGradingData.bulkCreate({
+        maximumGradeAPlus: 50000,
+        minimumGradeAPlus: 45000,
+        averageCollectionTimeGradeAPlus: "30 days or less",
+        maximumGradeA: 44999,
+        minimumGradeA: 25000,
+        averageCollectionTimeGradeA: "30 days or less",
+        maximumGradeB: 24999,
+        minimumGradeB: 15000,
+        averageCollectionTimeGradeB: "30 days or less",
+        maximumGradeC: 14999,
+        minimumGradeC: 9000,
+        averageCollectionTimeGradeC: "30 days or less",
+        maximumGradeEPlus: 8999,
+        minimumGradeEPlus: 500,
+        averageCollectionTimeGradeEPlus: "30 days or less"
+      });
     })
     .then(async () => {
       let recipients = await db['localdb'].recipients.bulkCreate([

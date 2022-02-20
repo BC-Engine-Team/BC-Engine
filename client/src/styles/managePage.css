@@ -1,5 +1,6 @@
 .container-clientGradingBrackets {
     width: 50%;
+    float: left;
 }
 
 #averageCollectionTime {
@@ -9,6 +10,24 @@
 
 #saveGradingBracketsButton{
     width: "50%";
+}
+
+#mainTitle{
+    display: flex;
+    align-items: center;
+    font-size: large;
+    font-weight: bold;
+    margin-left: 130px;  
+    margin-top: 20px; 
+}
+
+#mainTitle2{
+    display: flex;
+    align-items: center;
+    font-size: large;
+    font-weight: bold; 
+    margin-left: 180px;
+    margin-top: 20px; 
 }
 
 .inputTitle {
