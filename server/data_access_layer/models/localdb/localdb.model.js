@@ -205,59 +205,6 @@ module.exports = (localdb, Sequelize) => {
         onDelete: 'CASCADE'
     });
 
-
-    const PerformanceReport = localdb.define("performance_reports", {
-        performanceReportId: {
-            field: 'performance_report_id',
-            type: Sequelize.UUID,
-            defaultValue: Sequelize.UUIDV4,
-            primaryKey: true
-        },
-        employeeId: {
-            field: 'employee_id',
-            type: Sequelize.INTEGER,
-            defaultValue: null
-        },
-        averageCollectionDay: {
-            field: 'average_collection_day',
-            type: Sequelize.STRING,
-            defaultValue: null
-        },
-        annualBillingObjective: {
-            field: 'annual_billing_objective',
-            type: Sequelize.STRING,
-            defaultValue: null
-        },
-        monthlyBillingObjective: {
-            field: 'monthly_billing_objective',
-            type: Sequelize.STRING,
-            defaultValue: null
-        },
-        annualBillingNumber: {
-            field: 'annual_billing_number',
-            type: Sequelize.STRING,
-            defaultValue: null
-        },
-        monthlyBillingNumber: {
-            field: 'monthly_billing_number',
-            type: Sequelize.STRING,
-            defaultValue: null
-        },
-        projectedBonus: {
-            field: 'projected_bonus',
-            type: Sequelize.STRING,
-            defaultValue: null
-        }
-    });
-
-    PerformanceReport.belongsTo(User, {
-        foreignKey: {
-            name: 'user_user_id',
-            allowNull: true,
-        }
-    });
-
-
     const ReportType = localdb.define("report_types", {
         reportTypeId: {
             field: 'report_type_id',
@@ -282,6 +229,11 @@ module.exports = (localdb, Sequelize) => {
             type: Sequelize.UUID,
             defaultValue: Sequelize.UUIDV4,
             primaryKey: true
+        },
+        employeeId: {
+            field: 'employee_id',
+            type: Sequelize.INTEGER,
+            unique: true
         },
         name: {
             field: 'recipient_name',
@@ -311,6 +263,140 @@ module.exports = (localdb, Sequelize) => {
         onDelete: 'CASCADE'
     });
 
+    const BillingNumbers = localdb.define("billing_numbers", {
 
-    return [User, ChartReport, ChartReportData, PerformanceReport, ReportType, Recipients, ReportTypeRecipients];
+        year: {
+            field: 'year',
+            type: Sequelize.INTEGER
+        },
+        january: {
+            field: 'january',
+            type: Sequelize.FLOAT,
+            defaultValue: 0
+        },
+        february: {
+            field: 'february',
+            type: Sequelize.FLOAT,
+            defaultValue: 0
+        },
+        march: {
+            field: 'march',
+            type: Sequelize.FLOAT,
+            defaultValue: 0
+        },
+        april: {
+            field: 'april',
+            type: Sequelize.FLOAT,
+            defaultValue: 0
+        },
+        may: {
+            field: 'may',
+            type: Sequelize.FLOAT,
+            defaultValue: 0
+        },
+        june: {
+            field: 'june',
+            type: Sequelize.FLOAT,
+            defaultValue: 0
+        },
+        july: {
+            field: 'july',
+            type: Sequelize.FLOAT,
+            defaultValue: 0
+        },
+        august: {
+            field: 'august',
+            type: Sequelize.FLOAT,
+            defaultValue: 0
+        },
+        september: {
+            field: 'september',
+            type: Sequelize.FLOAT,
+            defaultValue: 0
+        },
+        october: {
+            field: 'october',
+            type: Sequelize.FLOAT,
+            defaultValue: 0
+        },
+        november: {
+            field: 'november',
+            type: Sequelize.FLOAT,
+            defaultValue: 0
+        },
+        december: {
+            field: 'december',
+            type: Sequelize.FLOAT,
+            defaultValue: 0
+        },
+        total: {
+            field: 'total',
+            type: Sequelize.FLOAT,
+            defaultValue: 0
+        }
+    })
+
+    BillingNumbers.belongsTo(Recipients, {
+        foreignKey: 'employee_id',
+        targetKey: 'employeeId',
+    })
+
+    BillingNumbers.hasOne(BillingNumbers, {
+        foreignKey: {
+            name: 'objectivesId',
+            allowNull: true
+        }
+    })
+
+    const PerformanceReport = localdb.define("performance_reports", {
+        performanceReportId: {
+            field: 'performance_report_id',
+            type: Sequelize.UUID,
+            defaultValue: Sequelize.UUIDV4,
+            primaryKey: true
+        },
+        projectedBonus: {
+            field: 'projected_bonus',
+            type: Sequelize.STRING,
+            defaultValue: null
+        }
+    });
+
+    PerformanceReport.belongsTo(User, {
+        foreignKey: {
+            name: 'user_user_id',
+            allowNull: true,
+        }
+    });
+
+    PerformanceReport.belongsTo(ReportType, {
+        foreignKey: {
+            name: 'report_type_id',
+            allowNull: false
+        }
+    })
+
+    PerformanceReport.belongsTo(BillingNumbers, {
+        foreignKey: {
+            name: 'billing_actual_numbers',
+            allowNull: false
+        }
+    })
+
+    PerformanceReport.belongsTo(BillingNumbers, {
+        foreignKey: {
+            name: 'billing_obj_numbers',
+            allowNull: false
+        }
+    })
+
+    PerformanceReport.belongsTo(Recipients, {
+        foreignKey: {
+            name: 'recipient_id',
+            allowNull: false
+        }
+    })
+
+
+    return [User, ChartReport, ChartReportData, ReportType, Recipients, ReportTypeRecipients, BillingNumbers, PerformanceReport];
 };
