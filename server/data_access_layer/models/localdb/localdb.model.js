@@ -208,6 +208,12 @@ module.exports = (localdb, Sequelize) => {
 
 
     const ClientGradingData = localdb.define("client_grading_data", {
+        clientGradingId: {
+            field: 'client_grading_id',
+            type: Sequelize.INTEGER,
+            defaultValue: 1,
+            primaryKey: true
+        },
         maximumGradeAPlus: {
             field: 'maximum_grade_a_plus',
             type: Sequelize.FLOAT,

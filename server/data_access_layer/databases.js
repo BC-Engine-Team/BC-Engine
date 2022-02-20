@@ -114,7 +114,8 @@ db.sync = async (database, options) => {
       ]);
     })
     .then(async () => {
-      await db[database].clientGradingData.bulkCreate({
+      await db[database].clientGradingData.create({
+        clientGradingId: 1,
         maximumGradeAPlus: 50000,
         minimumGradeAPlus: 45000,
         averageCollectionTimeGradeAPlus: "30 days or less",

@@ -4,7 +4,11 @@ const ClientGradingModel = databases['localdb'].clientGradingData;
 
 exports.updateClientGrading = async (clientGradingGroup, clientGradingModel = ClientGradingModel) => {
     return new Promise((resolve, reject) => {
-        clientGradingModel.update(clientGradingGroup)
+        clientGradingModel.update(clientGradingGroup,
+            {
+                where: { clientGradingId: 1 },
+                individualHooks: true
+            })
         .then(async data => {
             if (data) {
                 resolve("Client grading modified successfully");
