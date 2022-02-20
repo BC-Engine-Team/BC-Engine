@@ -1,4 +1,6 @@
 const reportService = require('../services/report.service');
+let fs = require('fs');
+require("../../config.js");
 
 exports.getChartReportsByUserId = async (req, res) => {
     if (!req.user || !req.user.userId || req.user.userId === "" || req.user.userId === undefined)
@@ -109,3 +111,43 @@ exports.getPerformanceReportsByUserId = async (req, res) => {
             return res.status(err.status || 500).send({ message: err.message || "Malfunction in the B&C Engine." })
         })
 }
+exports.createChartReportPDF = async (req, res) => {
+    if (!req.body.reportid)
+        return res.status(400).send({ message: "Content cannot be empty." });
+
+    await reportService.createChartReportPDFById(req.body.reportid)
+        .then(response => {
+            if (response) {
+                return res.status(200).send(response);
+            }
+            return res.status(500).send({ message: "The data could not be fetched." });
+        })
+        .catch(err => {
+            return res.status(err.status || 500).send({ message: err.message || "Malfunction in the B&C Engine." });
+        });
+}
+
+exports.fetchChartReportPDF = async (req, res) => {
+    // create file path
+    let filePath;
+    if (__dirname !== '/home/runner/work/BC-Engine/BC-Engine/server/controllers') {
+        filePath = `${__dirname.replace("controllers", "")}docs\\pdf_files\\chartReport-${req.query.reportid}.pdf`;
+    }
+    else {
+        filePath = `${__dirname.replace("controllers", "")}docs/pdf_files/chartReport-${req.query.reportid}.pdf`;
+    }
+
+    if (!req.query.reportid)
+        return res.status(400).send({ message: "Content cannot be empty." });
+
+    await res.sendFile(filePath, {}, (err) => {
+        if (err) {
+            return res.status(err.status || 500).send({ message: err.message || "File not found." });
+        }
+        else {
+            fs.unlinkSync(filePath);
+            return res.status(200)
+        }
+    });
+}
+

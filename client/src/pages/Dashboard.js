@@ -312,7 +312,7 @@ const Dashboard = () => {
                         });
 
                         colorCounter++;
-                        if (colorCounter === colors.length - 1) colorCounter = 0;
+                        if (colorCounter === colors.length) colorCounter = 0;
                     }
 
                     for (let i = 0; i < res.data[0].table.length; i++) {

@@ -53,3 +53,25 @@ jobs:
           echo REFRESH_TOKEN_SECRET="$REFRESH_TOKEN_SECRET" >> .env
           echo SKIP_PREFLIGHT_CHECK="$SKIP_PREFLIGHT_CHECK" >> .env
     - run: npm test
+  
+  lint:
+  
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v2
+      
+      - name: Super-Linter
+        uses: github/super-linter@v4.9.0
+        env:
+          DEFAULT_BRANCH: main
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          LINTER_RULES_PATH: .github/workspace
+          OUTPUT_FOLDER: reports
+          OUTPUT_DETAILS: detailed
+          VALIDATE_ALL_CODEBASE: false
+          VALIDATE_DOCKERFILE_HADOLINT: false
+          VALIDATE_JAVASCRIPT_STANDARD: false
+          CSS_FILE_NAME: .stylelintrc.json
+          JAVASCRIPT_ES_CONFIG_FILE: .eslintrc.json
+          JSCPD_CONFIG_FILE: .jscpd.json

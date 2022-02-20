@@ -1,5 +1,4 @@
 const database = require('../databases')['mssql_bosco']
-const databases = require('../databases');
 const { QueryTypes } = require('sequelize');
 
 exports.getTransactionsStatByYearMonth = async (yearMonthList, employeeId = undefined, clientType = undefined, countryLabel = undefined, ageOfAccount = undefined, db = database) => {

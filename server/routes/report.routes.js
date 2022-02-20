@@ -7,6 +7,10 @@ router.get("/chartReport", authService.authenticateToken, reportController.getCh
 
 router.post("/chartReport", authService.authenticateToken, reportController.createChartReport);
 
+router.get("/fetchPdf", authService.authenticateToken, reportController.fetchChartReportPDF);
+
+router.post("/createPdf", authService.authenticateToken, reportController.createChartReportPDF);
+
 router.delete("/delete/:chartReportId", authService.authenticateToken, reportController.deleteChartReport);
 
 // Report Types routes

@@ -61,3 +61,8 @@ The application might not be running at the time that you wish to access it so p
 ## Link to the selenium testing repo
 
 [BC-Engine-Selenium](https://github.com/Funnyadd/BC-Engine-Selenium)
+
+## Super Linter
+
+Super Linter is being used to establish good coding practices and prevent duplicates and formatting errors.
+[![GitHub Super-Linter](https://github.com/<OWNER>/<REPOSITORY>/workflows/Lint%20Code%20Base/badge.svg)](https://github.com/marketplace/actions/super-linter)

@@ -5,12 +5,13 @@ import { useTranslation } from 'react-i18next';
 import Axios from 'axios';
 
 import { Button, Table, Form, ListGroup, ListGroupItem } from 'react-bootstrap'
-import '../styles/reportsPage.css';
+import { Oval } from 'react-loader-spinner'
 
 import NavB from '../components/NavB'
-import ConfirmationPopup from '../components/ConfirmationPopup'
 import DeleteButton from '../components/DeleteButton'
-import { BiExport } from "react-icons/bi";
+import ExportButton from '../components/ExportButton'
+import ConfirmationPopup from '../components/ConfirmationPopup'
+import '../styles/reportsPage.css'
 
 const Reports = () => {
     const { t } = useTranslation();
@@ -18,10 +19,13 @@ const Reports = () => {
 
     const cookies = new Cookies();
     const malfunctionError = t('error.Malfunction');
-    const notFoundError = t('error.NotFound')
+    const notFoundError = t('error.NotFound');
 
     let role = cookies.get("role");
 
+    const [pdfLoading, setPdfLoading] = useState(false);
+    const [currentPdfLoading, setCurrentPdfLoading] = useState();
+    
     const [chartReportId, setChartReportId] = useState("");
     const [chartReportName, setChartReportName] = useState("");
     const [deleteButtonActivated, setDeleteButtonActivated] = useState(false);
@@ -52,6 +56,73 @@ const Reports = () => {
         employee: "container-reportsTable-employee",
         admin: "container-reportsTable"
     });
+
+    const createAndDownloadPDF = (ReportId) => {
+        setPdfLoading(true);
+        setCurrentPdfLoading(ReportId);
+
+        let header = {
+            'authorization': "Bearer " + cookies.get("accessToken"),
+        }
+
+        let param = {
+            reportid: ReportId
+        }
+
+        Axios.defaults.withCredentials = true;
+
+        Axios.post(`${process.env.REACT_APP_API}/reports/createPdf`, param, { headers: header })
+            .then((response) => {
+                if(response.data === true) {
+                    Axios.get(`${process.env.REACT_APP_API}/reports/fetchPdf`, { params: param, headers: header, responseType: 'arraybuffer' })
+                    .then((res) => {
+                        const pdfBlob = new Blob([res.data], { type: 'application/pdf' });
+
+                        const url = URL.createObjectURL(pdfBlob);
+
+                        var element = document.createElement('a');
+                        document.body.appendChild(element);
+                        element.style = "display: none";
+                        element.href = url;
+                        element.download = `ChartReport-${ReportId}`;
+                        element.click();
+                        document.body.removeChild(element);
+                        setPdfLoading(false);
+                    })
+                    .catch((error) => {
+                        setPdfLoading(false);
+                        if (error.response) {
+                            if (error.response.status === 403 || error.response.status === 401) {
+                                alert("You are not authorized to perform this action.");
+                            }
+                            else {
+                                alert("Could not fetch pdf file...");
+                            }
+                        }
+                        else if (error.request) {
+                            alert("Could not fetch pdf file...");
+                        }
+                    });
+                }
+                else {
+                    alert("Could not fetch pdf file...");
+                }
+            })
+            .catch((error) => {
+                setPdfLoading(false);
+                if (error.response) {
+                    if (error.response.status === 403 || error.response.status === 401) {
+                        alert("You are not authorized to perform this action.");
+                    }
+                    else {
+                        alert("Could not generate pdf file...");
+                    }
+                }
+                else if (error.request) {
+                    alert("Could not fetch Chart Report...");
+                }
+            });
+    }
 
     const handleRefresh = async () => {
         await getChartReports();
@@ -199,6 +270,7 @@ const Reports = () => {
         setDeleteButtonActivated(false);
     };
 
+
     useEffect(() => {
         if (cookies.get("accessToken") === undefined) {
             navigate("/login");
@@ -212,7 +284,7 @@ const Reports = () => {
     return (
         <div>
             <NavB />
-            <div className=' mainContainer mainDiv'>
+            <div className='mainContainer mainDiv'>
                 <div className='justify-content-center main'>
                     <div className={showReportsManagement.isAdmin ?
                         showReportsManagement.admin :
@@ -343,8 +415,23 @@ const Reports = () => {
                                                 <td>{r.endDate.toString()}</td>
                                                 <td className="py-1">
                                                     <div className="d-flex justify-content-center">
-
-                                                        <BiExport size={"1.7rem"} className="pt-1" />
+                                                        {pdfLoading
+                                                        ?   
+                                                            r.chartReportId !== currentPdfLoading
+                                                            ?
+                                                            <ExportButton id={r.chartReportId} iconColor={{color: '#666'}} styles={{pointerEvents: 'none'}}/>
+                                                            :
+                                                            <span className='loadingChartReport align-self-center'>
+                                                                <Oval
+                                                                    height="22"
+                                                                    width="22"
+                                                                    color='black'
+                                                                    ariaLabel='loading' />
+                                                            </span>
+                                                            
+                                                        :
+                                                        <ExportButton id={r.chartReportId} onExport={() => createAndDownloadPDF(r.chartReportId)} />
+                                                        }
                                                         <DeleteButton onDelete={() => handleDeleteChartReport(r.chartReportId, r.name)} />
                                                     </div >
                                                 </td >

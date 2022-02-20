@@ -1,10 +1,12 @@
 var { expect, jest } = require('@jest/globals');
+var fs = require('fs');
+require("../../../config.js");
 
 const ReportService = require("../../services/report.service");
 const ChartReportDao = require("../../data_access_layer/daos/chart_report.dao");
 const ReportDao = require("../../data_access_layer/daos/report.dao");
 
-
+jest.setTimeout(10000)
 
 describe("Test Report Service", () => {
 
@@ -780,7 +782,6 @@ describe("Test Report Service", () => {
         });
     });
 
-
     let reportServiceGetReportTypesSpy;
     let reportServiceGetRecipientsSpy;
     describe("RS7 - getReportTypesWithRecipients", () => {
@@ -1200,6 +1201,7 @@ describe("Test Report Service", () => {
                 projectedBonus: "650"
             }
         ];
+
         describe("RS10.1 - given a userId", () => {
             it("RS10.1.1 - should return list of chartReports", async () => {
                 // arrange
@@ -1272,5 +1274,192 @@ describe("Test Report Service", () => {
             });
         });
     });
-})
 
+    describe("RS11 - createChartReportPDFById", () => {
+        let returnedChartReport = {
+            dataValues: {
+                chartReportId: 'fakeUUID1',
+                name: 'CR1',
+                startDate: '2019-12-01',
+                endDate: '2020-12-01',
+                employee1Id: 12345,
+                employee1Name: 'France Cote',
+                employee2Id: null,
+                employee2Name: null,
+                country: 'Canada',
+                clientType: 'Corr',
+                ageOfAccount: 'All',
+                accountType: 'Receivable',
+                createdAt: new Date('2022-02-14T16:12:21'),
+                updatedAt: new Date('2022-02-14T16:12:21'),
+                user_user_id: 'fakeUserId'
+            }
+        }
+
+        let returnedChartReportData = [
+            {
+                year: 2018,
+                employee: -1,
+                data: [
+                    0, 0, 0, 0,
+                    0, 0, 0, 0,
+                    91.65, 83.36, 88.35, 89
+                ]
+            },
+            {
+                year: 2019,
+                employee: -1,
+                data: [
+                    84.12, 87.92, 93.05,
+                    99.39, 96.37, 0,
+                    0, 0, 0,
+                    0, 0, 0
+                ]
+            }
+        ]
+
+        describe("RS11.1 - given a reportId", () => {
+            it("RS11.1.1 - should return true", async () => {
+                // arrange
+                chartReportDaoSpy = jest.spyOn(ChartReportDao, 'getChartReportById')
+                    .mockImplementation(() => new Promise((resolve) => {
+                        resolve(returnedChartReport);
+                    }));
+
+                jest.spyOn(ChartReportDao, 'getDataForChartReport')
+                    .mockImplementation(() => new Promise((resolve) => {
+                        resolve(returnedChartReportData);
+                    }));
+
+                // act and assert
+                await expect(ReportService.createChartReportPDFById("fakeUUID1")).resolves
+                    .toEqual(true);
+
+                // wait for mock pdf file to be created
+                //await new Promise((r) => setTimeout(r, 2500));
+
+
+
+                // cleanup
+                if (__dirname !== '/home/runner/work/BC-Engine/BC-Engine/server/tests/services') {
+                    fs.unlinkSync(`${__dirname.replace("tests\\services", "")}docs\\pdf_files\\chartReport-fakeUUID1.pdf`);
+                }
+                else {
+                    fs.unlinkSync(`${__dirname.replace("tests/services", "")}docs/pdf_files/chartReport-fakeUUID1.pdf`);
+                }
+
+            });
+
+            it("RS11.1.2 - should resolve false when dao returns false", async () => {
+                // arrange
+                chartReportDaoSpy = jest.spyOn(ChartReportDao, 'getChartReportById')
+                    .mockImplementation(() => new Promise((resolve) => {
+                        resolve(false);
+                    }));
+
+                jest.spyOn(ChartReportDao, 'getDataForChartReport')
+                    .mockImplementation(() => new Promise((resolve) => {
+                        resolve(returnedChartReportData);
+                    }));
+
+                // act and assert
+                await expect(ReportService.createChartReportPDFById("fakeUUID1")).resolves
+                    .toEqual(false);
+            });
+
+            it("RS11.1.3 - should reject with dao error status and message when dao throws error", async () => {
+                // arrange
+                let expectedError = {
+                    status: 404,
+                    message: "Error message."
+                };
+
+                chartReportDaoSpy = jest.spyOn(ChartReportDao, 'getChartReportById')
+                    .mockImplementation(() => new Promise((resolve, reject) => {
+                        reject(expectedError);
+                    }));
+
+                jest.spyOn(ChartReportDao, 'getDataForChartReport')
+                    .mockImplementation(() => new Promise((resolve) => {
+                        resolve(returnedChartReportData);
+                    }));
+
+                // act and assert
+                await expect(ReportService.createChartReportPDFById("fakeUUID1")).rejects
+                    .toEqual(expectedError);
+            });
+
+            it("RS11.1.4 - should reject with status 500 and message when dao error doesn't specify", async () => {
+                // arrange
+                let expectedError = {
+                    status: 500,
+                    message: "Malfunction in the B&C Engine."
+                };
+
+                chartReportDaoSpy = jest.spyOn(ChartReportDao, 'getChartReportById')
+                    .mockImplementation(() => new Promise((resolve, reject) => {
+                        reject(() => new Promise.reject());
+                    }));
+
+                jest.spyOn(ChartReportDao, 'getDataForChartReport')
+                    .mockImplementation(() => new Promise((resolve) => {
+                        resolve(returnedChartReportData);
+                    }));
+
+                // act and assert
+                await expect(ReportService.createChartReportPDFById("fakeUUID1")).rejects
+                    .toEqual(expectedError);
+            });
+        });
+
+        describe("RS11.2 - given no reportId", () => {
+            it("RS11.2.1 - should reject with 500 status and message", async () => {
+                // arrange
+                let expectedError = {
+                    status: 500,
+                    message: "Malfunction in the B&C Engine."
+                };
+
+                // act and assert
+                await expect(ReportService.createChartReportPDFById()).rejects
+                    .toEqual(expectedError);
+            });
+        });
+
+        describe("RS11.3 - getChartReportPDFAverages", () => {
+            it("RS11.3.1 - when returned data is false should return error", async () => {
+                // arrange
+                chartReportDaoSpy = jest.spyOn(ChartReportDao, 'getChartReportById')
+                    .mockImplementation(() => new Promise((resolve, reject) => {
+                        resolve(true)
+                    }));
+
+                jest.spyOn(ChartReportDao, 'getDataForChartReport')
+                    .mockImplementation(() => new Promise((resolve) => {
+                        resolve(false);
+                    }));
+
+                // act and assert
+                await expect(ReportService.createChartReportPDFById("fakeUUID1")).resolves
+                    .toEqual(false);
+            });
+
+            it("RS11.3.2 - should reject with status 500 and message defined by the dao", async () => {
+                // arrange
+                let expectedError = {
+                    status: 500,
+                    message: "Malfunction in the B&C Engine."
+                };
+
+                jest.spyOn(ChartReportDao, 'getDataForChartReport')
+                    .mockImplementation(() => new Promise((resolve, reject) => {
+                        reject(expectedError);
+                    }));
+
+                // act and assert
+                await expect(ReportService.getChartReportPDFAverages("fakeUUID1")).rejects
+                    .toEqual(expectedError);
+            });
+        });
+    });
+});
