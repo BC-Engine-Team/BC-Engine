@@ -355,6 +355,10 @@ module.exports = (localdb, Sequelize) => {
             defaultValue: Sequelize.UUIDV4,
             primaryKey: true
         },
+        name: {
+            field: 'performance_report_name',
+            type: Sequelize.STRING
+        },
         projectedBonus: {
             field: 'projected_bonus',
             type: Sequelize.STRING,

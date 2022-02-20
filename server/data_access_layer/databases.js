@@ -31,18 +31,108 @@ db.Sequelize = Sequelize;
 
 
 // Add any tables to the local database here
-[db['localdb'].users,
-db['localdb'].chartReports,
-db['localdb'].chartReportsData,
-db['localdb'].reportTypes,
-db['localdb'].recipients,
-db['localdb'].reportTypeRecipients,
-db['localdb'].billingNumbers,
-db['localdb'].performanceReport,
-] = require("./models/localdb/localdb.model")(db['localdb'], Sequelize);
+// [db['localdb'].users,
+// db['localdb'].chartReports,
+// db['localdb'].chartReportsData,
+// db['localdb'].reportTypes,
+// db['localdb'].recipients,
+// db['localdb'].reportTypeRecipients,
+// db['localdb'].billingNumbers,
+// db['localdb'].performanceReport,
+// ] = require("./models/localdb/localdb.model")(db['localdb'], Sequelize);
+
+db['localdb'].users = require('./models/localdb/user.model')(db['localdb'], Sequelize.DataTypes)
+db['localdb'].chartReports = require('./models/localdb/chart_report.model')(db['localdb'], Sequelize.DataTypes)
+db['localdb'].chartReportsData = require('./models/localdb/chart_report_data.model')(db['localdb'], Sequelize.DataTypes)
+db['localdb'].reportTypes = require('./models/localdb/report_type.model')(db['localdb'], Sequelize.DataTypes)
+db['localdb'].recipients = require('./models/localdb/recipient.model')(db['localdb'], Sequelize.DataTypes)
+db['localdb'].reportTypeRecipients = require('./models/localdb/report_type_recipient.model')(db['localdb'], Sequelize.DataTypes)
+db['localdb'].billingNumbers = require('./models/localdb/billing_numbers.model')(db['localdb'], Sequelize.DataTypes)
+db['localdb'].performanceReports = require('./models/localdb/performance_report.model')(db['localdb'], Sequelize.DataTypes)
+
+// Configure relationships for localdb models
+db['localdb'].chartReports.belongsTo(db['localdb'].users, {
+  foreignKey: {
+    name: 'user_user_id',
+    allowNull: false,
+  },
+  onDelete: 'CASCADE'
+})
+
+db['localdb'].chartReportsData.belongsTo(db['localdb'].chartReports, {
+  foreignKey: {
+    name: 'chart_report_id',
+    allowNull: false
+  },
+  onDelete: 'CASCADE'
+});
+
+db['localdb'].reportTypeRecipients.belongsTo(db['localdb'].reportTypes, {
+  foreignKey: {
+    name: 'report_type_id',
+    allowNull: false
+  },
+  onDelete: 'CASCADE'
+});
+
+db['localdb'].reportTypeRecipients.belongsTo(db['localdb'].recipients, {
+  foreignKey: {
+    name: 'recipient_id',
+    allowNull: false
+  },
+  onDelete: 'CASCADE'
+});
+
+db['localdb'].billingNumbers.belongsTo(db['localdb'].recipients, {
+  foreignKey: 'employee_id',
+  targetKey: 'employeeId',
+})
+
+db['localdb'].billingNumbers.hasOne(db['localdb'].billingNumbers, {
+  foreignKey: {
+    name: 'objectivesId',
+    allowNull: true
+  }
+})
+
+db['localdb'].performanceReports.belongsTo(db['localdb'].users, {
+  foreignKey: {
+    name: 'user_user_id',
+    allowNull: true,
+  }
+});
+
+db['localdb'].performanceReports.belongsTo(db['localdb'].reportTypes, {
+  foreignKey: {
+    name: 'report_type_id',
+    allowNull: false
+  }
+})
+
+db['localdb'].performanceReports.belongsTo(db['localdb'].billingNumbers, {
+  foreignKey: {
+    name: 'billing_actual_numbers',
+    allowNull: false
+  }
+})
+
+db['localdb'].performanceReports.belongsTo(db['localdb'].billingNumbers, {
+  foreignKey: {
+    name: 'billing_obj_numbers',
+    allowNull: false
+  }
+})
+
+db['localdb'].performanceReports.belongsTo(db['localdb'].recipients, {
+  foreignKey: {
+    name: 'recipient_id',
+    allowNull: false
+  }
+})
+
 
 // patricia database tables
-db['mssql_pat'].employees = require("./models/mssql_pat/employee.model")(db['mssql_pat'], Sequelize);
+db['mssql_pat'].employees = require("./models/mssql_pat/employee.model")(db['mssql_pat'], Sequelize.DataTypes);
 
 // Bosco database tables
 
@@ -51,9 +141,7 @@ db['mssql_pat'].employees = require("./models/mssql_pat/employee.model")(db['mss
 db.sync = async (database, options) => {
   await db[database].sync(options)
     .then(async () => {
-      let data = {
-        users: null
-      }
+      let data = {}
 
       data.users = await db[database].users.bulkCreate([
         {
@@ -72,6 +160,30 @@ db.sync = async (database, options) => {
           email: 'mathieu@benoit-cote.com',
           password: 'verySecurePassword1',
           name: 'Mathieu Miron',
+          role: 'employee'
+        },
+        {
+          email: 'france@benoit-cote.com',
+          password: 'verySecurePassword1',
+          name: 'France Côté',
+          role: 'employee'
+        },
+        {
+          email: 'ibrahim@benoit-cote.com',
+          password: 'verySecurePassword1',
+          name: 'Ibrahim Tamer',
+          role: 'employee'
+        },
+        {
+          email: 'marc@benoit-cote.com',
+          password: 'verySecurePassword1',
+          name: 'Marc Benoit',
+          role: 'employee'
+        },
+        {
+          email: 'hilal@benoit-cote.com',
+          password: 'verySecurePassword1',
+          name: 'Hilal El Ayoubi',
           role: 'employee'
         }
       ],
@@ -280,14 +392,123 @@ db.sync = async (database, options) => {
       return data
     })
     .then(async data => {
-      await db['localdb'].performanceReport.create({
+      await db['localdb'].performanceReports.bulkCreate([{
+        name: 'MyFirstReportCool',
         projectedBonus: 20384.09,
-        user_user_id: data.users[1].userId,
+        user_user_id: data.users[2].userId,
         report_type_id: data.reportTypes.reportTypeId,
-        recipient_id: data.recipients[0].recipientId,
+        recipient_id: data.recipients[10].recipientId,
         billing_actual_numbers: data.billingNumbers[1].id,
         billing_obj_numbers: data.billingNumbers[1].objectivesId
-      })
+      },
+      {
+        name: 'MyFirstReportCool2',
+        projectedBonus: 20384.09,
+        user_user_id: data.users[2].userId,
+        report_type_id: data.reportTypes.reportTypeId,
+        recipient_id: data.recipients[10].recipientId,
+        billing_actual_numbers: data.billingNumbers[19].id,
+        billing_obj_numbers: data.billingNumbers[19].objectivesId
+      },
+      {
+        name: 'MyFirstReportCool2',
+        projectedBonus: 20384.09,
+        user_user_id: data.users[2].userId,
+        report_type_id: data.reportTypes.reportTypeId,
+        recipient_id: data.recipients[10].recipientId,
+        billing_actual_numbers: data.billingNumbers[19].id,
+        billing_obj_numbers: data.billingNumbers[19].objectivesId
+      },
+      {
+        name: 'MyFirstReportCool2',
+        projectedBonus: 20384.09,
+        user_user_id: data.users[3].userId,
+        report_type_id: data.reportTypes.reportTypeId,
+        recipient_id: data.recipients[1].recipientId,
+        billing_actual_numbers: data.billingNumbers[3].id,
+        billing_obj_numbers: data.billingNumbers[3].objectivesId
+      },
+      {
+        name: 'MyFirstReportCool2',
+        projectedBonus: 20384.09,
+        user_user_id: data.users[3].userId,
+        report_type_id: data.reportTypes.reportTypeId,
+        recipient_id: data.recipients[1].recipientId,
+        billing_actual_numbers: data.billingNumbers[3].id,
+        billing_obj_numbers: data.billingNumbers[3].objectivesId
+      },
+      {
+        name: 'MyFirstReportCool2',
+        projectedBonus: 20384.09,
+        user_user_id: data.users[2].userId,
+        report_type_id: data.reportTypes.reportTypeId,
+        recipient_id: data.recipients[10].recipientId,
+        billing_actual_numbers: data.billingNumbers[19].id,
+        billing_obj_numbers: data.billingNumbers[19].objectivesId
+      },
+      {
+        name: 'MyFirstReportCool2',
+        projectedBonus: 20384.09,
+        user_user_id: data.users[2].userId,
+        report_type_id: data.reportTypes.reportTypeId,
+        recipient_id: data.recipients[10].recipientId,
+        billing_actual_numbers: data.billingNumbers[19].id,
+        billing_obj_numbers: data.billingNumbers[19].objectivesId
+      },
+      {
+        name: 'MyFirstReportCool2',
+        projectedBonus: 20384.09,
+        user_user_id: data.users[2].userId,
+        report_type_id: data.reportTypes.reportTypeId,
+        recipient_id: data.recipients[10].recipientId,
+        billing_actual_numbers: data.billingNumbers[19].id,
+        billing_obj_numbers: data.billingNumbers[19].objectivesId
+      },
+      {
+        name: 'MyFirstReportCool2',
+        projectedBonus: 20384.09,
+        user_user_id: data.users[2].userId,
+        report_type_id: data.reportTypes.reportTypeId,
+        recipient_id: data.recipients[10].recipientId,
+        billing_actual_numbers: data.billingNumbers[19].id,
+        billing_obj_numbers: data.billingNumbers[19].objectivesId
+      },
+      {
+        name: 'MyFirstReportCool2',
+        projectedBonus: 20384.09,
+        user_user_id: data.users[2].userId,
+        report_type_id: data.reportTypes.reportTypeId,
+        recipient_id: data.recipients[10].recipientId,
+        billing_actual_numbers: data.billingNumbers[19].id,
+        billing_obj_numbers: data.billingNumbers[19].objectivesId
+      },
+      {
+        name: 'MyFirstReportCool2',
+        projectedBonus: 20384.09,
+        user_user_id: data.users[2].userId,
+        report_type_id: data.reportTypes.reportTypeId,
+        recipient_id: data.recipients[10].recipientId,
+        billing_actual_numbers: data.billingNumbers[19].id,
+        billing_obj_numbers: data.billingNumbers[19].objectivesId
+      },
+      {
+        name: 'MyFirstReportCool2',
+        projectedBonus: 20384.09,
+        user_user_id: data.users[2].userId,
+        report_type_id: data.reportTypes.reportTypeId,
+        recipient_id: data.recipients[10].recipientId,
+        billing_actual_numbers: data.billingNumbers[19].id,
+        billing_obj_numbers: data.billingNumbers[19].objectivesId
+      },
+      {
+        name: 'MyFirstReportCool2',
+        projectedBonus: 20384.09,
+        user_user_id: data.users[2].userId,
+        report_type_id: data.reportTypes.reportTypeId,
+        recipient_id: data.recipients[10].recipientId,
+        billing_actual_numbers: data.billingNumbers[19].id,
+        billing_obj_numbers: data.billingNumbers[19].objectivesId
+      }])
     })
     .catch((err) => {
       console.log(err);

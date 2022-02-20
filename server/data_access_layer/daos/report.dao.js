@@ -2,7 +2,7 @@ const databases = require("../databases");
 const ReportTypeModel = databases['localdb'].reportTypes;
 const RecipientsModel = databases['localdb'].recipients;
 const ReportTypeRecipientsModel = databases['localdb'].reportTypeRecipients;
-const PerformanceReportModel = databases['localdb'].performanceReport;
+const PerformanceReportModel = databases['localdb'].performanceReports;
 
 exports.getReportTypesWithRecipientIds = async (reportTypesModel = ReportTypeModel, reportTypeRecipients = ReportTypeRecipientsModel) => {
     return new Promise((resolve, reject) => {
@@ -80,9 +80,11 @@ exports.getRecipients = async (recipientsModel = RecipientsModel) => {
 
 
 // Reports Types related functions
-exports.getPerformanceReportsWhenConnectedAsAdmin = async (userId, performanceReportModel = PerformanceReportModel) => {
+exports.getPerformanceReports = async (performanceReportModel = PerformanceReportModel) => {
     return new Promise((resolve, reject) => {
-        performanceReportModel.findAll().then(async data => {
+        performanceReportModel.findAll({
+            include: [{ model: RecipientsModel, attributes: ['name'] }]
+        }).then(async data => {
             if (data) {
                 resolve(data)
             }
@@ -96,4 +98,38 @@ exports.getPerformanceReportsWhenConnectedAsAdmin = async (userId, performanceRe
                 reject(response);
             });
     });
+}
+
+exports.getPerformanceReportsByUserId = async (userId, performanceReportModel = PerformanceReportModel) => {
+    return new Promise((resolve, reject) => {
+        performanceReportModel.findAll({
+            where: {
+                user_user_id: userId
+            },
+            include: [{ model: RecipientsModel, attributes: ['name'] }]
+        })
+            .then(async data => {
+                if (data) {
+                    let returnData = []
+                    for (let i = 0; i < data.length; i++) {
+                        returnData.push({
+                            ...data[i].dataValues,
+                            recipient: data[i].recipient.dataValues.name,
+                            createdAt: data[i].dataValues.createdAt.toISOString().split('T')[0]
+                        })
+                    }
+                    console.log(returnData)
+                    resolve(returnData)
+                }
+                resolve(false)
+            })
+            .catch(err => {
+                console.log(err)
+                const response = {
+                    status: err.status || 500,
+                    message: err.message || 'Could not fetch Performance Reports by User Id.'
+                }
+                reject(response)
+            })
+    })
 }

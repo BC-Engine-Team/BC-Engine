@@ -10,7 +10,9 @@ router.post("/chartReport", authService.authenticateToken, reportController.crea
 router.delete("/delete/:chartReportId", authService.authenticateToken, reportController.deleteChartReport);
 
 // Report Types routes
-router.get("/performanceReport", authService.authenticateToken, reportController.getPerformanceReportsOfAllUsers);
+router.get("/performanceReport", authService.authenticateToken, reportController.getPerformanceReports);
+
+router.get('/performanceReport/:userId', authService.authenticateToken, reportController.getPerformanceReportsByUserId)
 
 router.get("/reportTypes", authService.authenticateToken, reportController.getReportTypesWithRecipients);
 

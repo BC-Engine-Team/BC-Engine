@@ -40,15 +40,9 @@ const Reports = () => {
     }]);
 
     const [performanceReports, setPerformanceReports] = useState([{
-        performanceReportId: "",
-        employeeId: 0,
-        employees: [],
-        averageCollectionDay: "",
-        annualBillingObjective: "",
-        monthlyBillingObjective: "",
-        annualBillingNumber: "",
-        monthlyBillingNumber: "",
-        projectedBonus: ""
+        name: '',
+        createdAt: '',
+        recipient: ''
     }]);
 
     const [reportTypes, setReportTypes] = useState([]);
@@ -76,10 +70,15 @@ const Reports = () => {
         let header = {
             'authorization': "Bearer " + cookies.get("accessToken")
         }
+        let url = `${process.env.REACT_APP_API}/reports/performanceReport`
+
+        if (role !== 'admin') {
+            url = url.concat(`/${cookies.get('userId')}`)
+        }
 
         Axios.defaults.withCredentials = true;
 
-        await Axios.get(`${process.env.REACT_APP_API}/reports/performanceReport`, { headers: header })
+        await Axios.get(url, { headers: header })
             .then((response) => {
                 if (response.data) {
                     setPerformanceReports(response.data);
@@ -218,7 +217,7 @@ const Reports = () => {
                     <div className={showReportsManagement.isAdmin ?
                         showReportsManagement.admin :
                         showReportsManagement.employee} >
-                        <div className='card shadow my-3 mx-3' >
+                        <div className='card shadow my-3 mx-3 reports-table-card' >
                             <h4 className="text-center bg-light">{t('reports.reports.Title')}</h4>
                             <Table responsive hover id='reportTypesTable'>
                                 <thead className='bg-light'>
@@ -233,12 +232,11 @@ const Reports = () => {
                                     {performanceReports.map((p) => {
                                         return (
                                             <tr key={p.performanceReportId}>
-                                                <td className='performance-table-columns'>{p.reportName}</td>
-                                                <td className='performance-table-columns'>{p.createdAt}</td>
-                                                <td className='performance-table-columns'>{p.employees.join(', ')}</td>
+                                                <td className='performance-table-columns'>{p.name}</td>
+                                                <td className='performance-table-columns'>{p.createdAt.toString()}</td>
+                                                <td className='performance-table-columns'>{p.recipient}</td>
                                                 <td className="py-1">
                                                     <div className="d-flex justify-content-center">
-
                                                         <BiExport size={"1.7rem"} className="pt-1" />
                                                     </div >
                                                 </td >
@@ -251,10 +249,10 @@ const Reports = () => {
                     </div>
                     {role === "admin" ?
                         <div className='container-reportsManagement'>
-                            <div className='card shadow my-3 mx-3 px-3 py-2'>
+                            <div className='card shadow my-3 mx-3 px-3 py-2 report-management-card'>
                                 <h3 className='text-center'>{t('reports.reportsManagement.Title')}</h3>
                                 <Form.Group className="my-2" controlId="floatingModifyReportType">
-                                    <Form.Label>{t('reports.reportsManagement.reportType.Title')}</Form.Label>
+                                    <Form.Label key='reportsManagementTitle'>{t('reports.reportsManagement.reportType.Title')}</Form.Label>
                                     <Form.Select required
                                         id='reportTypeSelect'
                                         size="sm"

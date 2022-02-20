@@ -72,11 +72,11 @@ exports.deleteChartReport = async (req, res) => {
         });
 }
 
-exports.getPerformanceReportsOfAllUsers = async (req, res) => {
+exports.getPerformanceReports = async (req, res) => {
     if (!req.user || !req.user.userId || req.user.userId === "" || req.user.userId === undefined)
         return res.status(400).send({ message: "Content cannot be empty." });
 
-    await reportService.getPerformanceReports(req.user.role === "admin" ? undefined : req.user.userId)
+    await reportService.getPerformanceReports()
         .then(async response => {
             if (response) {
                 return res.send(response);
@@ -86,4 +86,20 @@ exports.getPerformanceReportsOfAllUsers = async (req, res) => {
         .catch(async err => {
             return res.status(err.status || 500).send({ message: err.message || "Malfunction in the B&C Engine." });
         });
+}
+
+exports.getPerformanceReportsByUserId = async (req, res) => {
+    if (!req.user || !req.user.userId || req.user.userId === "" || req.user.userId === undefined || req.params.userId === undefined || req.params === '')
+        return res.status(400).send({ message: "Content cannot be empty." });
+
+    await reportService.getPerformanceReportsByUserId(req.params.userId)
+        .then(async response => {
+            if (response) {
+                return res.send(response)
+            }
+            return res.status(500).send({ message: 'The data could not be fetched.' })
+        })
+        .catch(err => {
+            return res.status(err.status || 500).send({ message: err.message || "Malfunction in the B&C Engine." })
+        })
 }

@@ -151,43 +151,47 @@ exports.deleteChartReportById = async (chartReportId) => {
     });
 }
 
-// Reports Types related functions
-exports.getPerformanceReports = async (userId) => {
-    return new Promise(async (resolve, reject) => {
-        if (userId !== undefined) {
-            await ReportDao.getPerformanceReportsByUserId(userId)
-                .then(async data => {
-                    if (data) {
-                        resolve(data);
-                    }
-                    resolve(false);
-                }).catch(async err => {
-                    const response = {
-                        status: err.status || 500,
-                        message: err.message || "Could not fetch data."
-                    };
-                    reject(response);
-                });
-        }
-        else {
-            await ReportDao.getPerformanceReports()
-                .then(async data => {
-                    if (data) {
-                        resolve(data);
-                    }
-                    resolve(false);
-                }).catch(async err => {
-                    const response = {
-                        status: err.status || 500,
-                        message: err.message || "Could not fetch data."
-                    };
-                    reject(response);
-                });
-        }
 
+// Performance Report functions
+exports.getPerformanceReports = async () => {
+    return new Promise(async (resolve, reject) => {
+        await ReportDao.getPerformanceReports()
+            .then(async data => {
+                if (data) {
+                    resolve(data);
+                }
+                resolve(false);
+            }).catch(async err => {
+                const response = {
+                    status: err.status || 500,
+                    message: err.message || "Could not fetch data."
+                };
+                reject(response);
+            });
     });
 }
 
+exports.getPerformanceReportsByUserId = async (userId) => {
+    return new Promise(async (resolve, reject) => {
+        await ReportDao.getPerformanceReportsByUserId(userId)
+            .then(async data => {
+                if (data) {
+                    resolve(data)
+                }
+                resolve(false)
+            })
+            .catch(err => {
+                const response = {
+                    status: err.status || 500,
+                    message: err.message || 'Could not fetch data.'
+                }
+                reject(response)
+            })
+    })
+}
+
+
+// Reports Types related functions
 exports.getReportTypesWithRecipients = async () => {
     return new Promise(async (resolve, reject) => {
         this.getReportTypes()

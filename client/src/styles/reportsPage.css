@@ -1,5 +1,5 @@
 #reportTypesTable {
-    width: 100%
+    width: 100%;
 }
 
 #reportRecipientList {
@@ -19,6 +19,11 @@
 
 .container-reportsManagement {
     width: 40%;
+    height: 36rem;
+}
+
+.report-management-card {
+    height: 32rem;
 }
 
 .container-reportsTable-employee {
@@ -28,6 +33,11 @@
 .container-reportsTable {
     width: 60%;
     float: left;
+}
+
+.reports-table-card {
+    max-height: 32rem;
+    overflow-x: hidden;
 }
 
 .container-chartReports {
