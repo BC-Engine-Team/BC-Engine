@@ -776,9 +776,9 @@ describe("Test Report Controller", () => {
                         monthlyBillingNumber: "300",
                         projectedBonus: "650"
                     }
-                ]; 
+                ];
 
-                reportServiceSpy = jest.spyOn(ReportService, 'getPerformanceReportWhenConnectedAsAdmin')
+                reportServiceSpy = jest.spyOn(ReportService, 'getPerformanceReports')
                     .mockImplementation(() => new Promise((resolve) => {
                         resolve(expectedResponse);
                     }));
@@ -796,7 +796,7 @@ describe("Test Report Controller", () => {
             it("RC5.1.2 - should respond with 500 and message when service resolves false", async () => {
                 // arrange
                 let expectedResponse = { message: "The data could not be fetched." };
-                reportServiceSpy = jest.spyOn(ReportService, 'getPerformanceReportWhenConnectedAsAdmin')
+                reportServiceSpy = jest.spyOn(ReportService, 'getPerformanceReports')
                     .mockImplementation(() => new Promise((resolve) => {
                         resolve(false);
                     }));
@@ -817,7 +817,7 @@ describe("Test Report Controller", () => {
                     status: 600,
                     message: "Error."
                 };
-                reportServiceSpy = jest.spyOn(ReportService, 'getPerformanceReportWhenConnectedAsAdmin')
+                reportServiceSpy = jest.spyOn(ReportService, 'getPerformanceReports')
                     .mockImplementation(async () => {
                         await Promise.reject(expectedResponse);
                     });
@@ -838,7 +838,7 @@ describe("Test Report Controller", () => {
                     status: 500,
                     message: "Malfunction in the B&C Engine."
                 };
-                reportServiceSpy = jest.spyOn(ReportService, 'getPerformanceReportWhenConnectedAsAdmin')
+                reportServiceSpy = jest.spyOn(ReportService, 'getPerformanceReports')
                     .mockImplementation(async () => {
                         await Promise.reject({});
                     });
@@ -865,7 +865,7 @@ describe("Test Report Controller", () => {
                 let expectedResponse = { message: "Content cannot be empty." };
 
                 // act
-                const response = await ReportController.getPerformanceReportsOfAllUsers(req, res);
+                const response = await ReportController.getPerformanceReports(req, res);
 
                 // assert
                 expect(response.statusCode).toBe(400);

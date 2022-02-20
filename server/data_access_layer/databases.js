@@ -31,16 +31,6 @@ db.Sequelize = Sequelize;
 
 
 // Add any tables to the local database here
-// [db['localdb'].users,
-// db['localdb'].chartReports,
-// db['localdb'].chartReportsData,
-// db['localdb'].reportTypes,
-// db['localdb'].recipients,
-// db['localdb'].reportTypeRecipients,
-// db['localdb'].billingNumbers,
-// db['localdb'].performanceReport,
-// ] = require("./models/localdb/localdb.model")(db['localdb'], Sequelize);
-
 db['localdb'].users = require('./models/localdb/user.model')(db['localdb'], Sequelize.DataTypes)
 db['localdb'].chartReports = require('./models/localdb/chart_report.model')(db['localdb'], Sequelize.DataTypes)
 db['localdb'].chartReportsData = require('./models/localdb/chart_report_data.model')(db['localdb'], Sequelize.DataTypes)

@@ -5,7 +5,11 @@ const { sequelize,
     checkPropertyExists
 } = require('sequelize-test-helpers');
 
-const [UserModel, ChartReportModel, ChartReportDataModel, PerformanceReportModel,  ReportTypeModel, RecipientModel, ReportTypeRecipientModel] = require('../../data_access_layer/models/localdb/localdb.model')(sequelize, dataTypes);
+const databases = require('../../data_access_layer/databases')
+const PerformanceReportModel = require('../../data_access_layer/models/localdb/performance_report.model')(sequelize, dataTypes);
+const ReportTypeModel = require('../../data_access_layer/models/localdb/report_type.model')(sequelize, dataTypes);
+const RecipientModel = require('../../data_access_layer/models/localdb/recipient.model')(sequelize, dataTypes);
+const ReportTypeRecipientModel = require('../../data_access_layer/models/localdb/report_type_recipient.model')(sequelize, dataTypes);
 const ReportDAO = require('../../data_access_layer/daos/report.dao');
 
 
@@ -31,7 +35,7 @@ let returnedPerformanceReports = [
         monthlyBillingNumber: "300",
         projectedBonus: "650"
     }
-] 
+]
 
 let SequelizeMock = require('sequelize-mock');
 const dbMock = new SequelizeMock();
@@ -47,7 +51,7 @@ describe("Test Report Related Models", () => {
     checkModelName(RecipientModel)('recipients');
     checkModelName(ReportTypeRecipientModel)('report_type_recipients');
 
-    ['performanceReportId', 'employeeId', 'averageCollectionDay', 'annualBillingObjective', 'monthlyBillingObjective', 'annualBillingNumber', 'monthlyBillingNumber', 'projectedBonus']
+    ['performanceReportId', 'name', 'projectedBonus']
         .forEach(checkPropertyExists(PerformanceInstance));
 
     ['reportTypeId', 'reportTypeName', 'frequency']
@@ -366,12 +370,11 @@ describe("Test Report DAO", () => {
 
 
     describe("CRD5 - getPerformanceReportsWhenConnectedAsAdmin", () => {
-        const PerformanceReport = new PerformanceReportModel(); 
 
         afterEach(() => {
             PerformanceReportMock.$queryInterface.$clearResults();
         })
-        
+
         beforeEach(() => {
             PerformanceReportMock.$queryInterface.$clearResults();
         })
@@ -385,7 +388,7 @@ describe("Test Report DAO", () => {
                 });
 
                 // act and assert
-                await expect(ReportDAO.getPerformanceReportsWhenConnectedAsAdmin('fakeUserId', PerformanceReportMock)).resolves
+                await expect(ReportDAO.getPerformanceReports(PerformanceReportMock)).resolves
                     .toEqual(returnedPerformanceReports);
             });
 
@@ -396,7 +399,7 @@ describe("Test Report DAO", () => {
                 });
 
                 // act and assert
-                await expect(ReportDAO.getPerformanceReportsWhenConnectedAsAdmin('fakeUserId', PerformanceReportMock)).resolves
+                await expect(ReportDAO.getPerformanceReports(PerformanceReportMock)).resolves
                     .toEqual(false);
             });
 
@@ -411,7 +414,7 @@ describe("Test Report DAO", () => {
                 });
 
                 // act and assert
-                await expect(ReportDAO.getPerformanceReportsWhenConnectedAsAdmin('fakeUserId', PerformanceReportMock)).rejects
+                await expect(ReportDAO.getPerformanceReports(PerformanceReportMock)).rejects
                     .toEqual(expectedError);
             });
 
@@ -426,7 +429,7 @@ describe("Test Report DAO", () => {
                 });
 
                 // act and assert
-                await expect(ReportDAO.getPerformanceReportsWhenConnectedAsAdmin('fakeUserId', PerformanceReportMock)).rejects
+                await expect(ReportDAO.getPerformanceReports(PerformanceReportMock)).rejects
                     .toEqual(expectedError);
             });
         });
