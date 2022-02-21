@@ -25,7 +25,7 @@ const Reports = () => {
 
     const [pdfLoading, setPdfLoading] = useState(false);
     const [currentPdfLoading, setCurrentPdfLoading] = useState();
-    
+
     const [chartReportId, setChartReportId] = useState("");
     const [chartReportName, setChartReportName] = useState("");
     const [deleteButtonActivated, setDeleteButtonActivated] = useState(false);
@@ -73,36 +73,36 @@ const Reports = () => {
 
         Axios.post(`${process.env.REACT_APP_API}/reports/createPdf`, param, { headers: header })
             .then((response) => {
-                if(response.data === true) {
+                if (response.data === true) {
                     Axios.get(`${process.env.REACT_APP_API}/reports/fetchPdf`, { params: param, headers: header, responseType: 'arraybuffer' })
-                    .then((res) => {
-                        const pdfBlob = new Blob([res.data], { type: 'application/pdf' });
+                        .then((res) => {
+                            const pdfBlob = new Blob([res.data], { type: 'application/pdf' });
 
-                        const url = URL.createObjectURL(pdfBlob);
+                            const url = URL.createObjectURL(pdfBlob);
 
-                        var element = document.createElement('a');
-                        document.body.appendChild(element);
-                        element.style = "display: none";
-                        element.href = url;
-                        element.download = `ChartReport-${ReportId}`;
-                        element.click();
-                        document.body.removeChild(element);
-                        setPdfLoading(false);
-                    })
-                    .catch((error) => {
-                        setPdfLoading(false);
-                        if (error.response) {
-                            if (error.response.status === 403 || error.response.status === 401) {
-                                alert("You are not authorized to perform this action.");
+                            var element = document.createElement('a');
+                            document.body.appendChild(element);
+                            element.style = "display: none";
+                            element.href = url;
+                            element.download = `ChartReport-${ReportId}`;
+                            element.click();
+                            document.body.removeChild(element);
+                            setPdfLoading(false);
+                        })
+                        .catch((error) => {
+                            setPdfLoading(false);
+                            if (error.response) {
+                                if (error.response.status === 403 || error.response.status === 401) {
+                                    alert("You are not authorized to perform this action.");
+                                }
+                                else {
+                                    alert("Could not fetch pdf file...");
+                                }
                             }
-                            else {
+                            else if (error.request) {
                                 alert("Could not fetch pdf file...");
                             }
-                        }
-                        else if (error.request) {
-                            alert("Could not fetch pdf file...");
-                        }
-                    });
+                        });
                 }
                 else {
                     alert("Could not fetch pdf file...");
@@ -309,7 +309,23 @@ const Reports = () => {
                                                 <td className='performance-table-columns'>{p.recipient}</td>
                                                 <td className="py-1">
                                                     <div className="d-flex justify-content-center">
-                                                        <BiExport size={"1.7rem"} className="pt-1" />
+                                                        {pdfLoading
+                                                            ?
+                                                            p.performanceReportId !== currentPdfLoading
+                                                                ?
+                                                                <ExportButton id={p.performanceReportId} iconColor={{ color: '#666' }} styles={{ pointerEvents: 'none' }} />
+                                                                :
+                                                                <span className='loadingChartReport align-self-center'>
+                                                                    <Oval
+                                                                        height="22"
+                                                                        width="22"
+                                                                        color='black'
+                                                                        ariaLabel='loading' />
+                                                                </span>
+
+                                                            :
+                                                            <ExportButton id={p.performanceReportId} onExport={() => createAndDownloadPDF(p.performanceReportId)} />
+                                                        }
                                                     </div >
                                                 </td >
                                             </tr>
@@ -416,21 +432,21 @@ const Reports = () => {
                                                 <td className="py-1">
                                                     <div className="d-flex justify-content-center">
                                                         {pdfLoading
-                                                        ?   
-                                                            r.chartReportId !== currentPdfLoading
                                                             ?
-                                                            <ExportButton id={r.chartReportId} iconColor={{color: '#666'}} styles={{pointerEvents: 'none'}}/>
+                                                            r.chartReportId !== currentPdfLoading
+                                                                ?
+                                                                <ExportButton id={r.chartReportId} iconColor={{ color: '#666' }} styles={{ pointerEvents: 'none' }} />
+                                                                :
+                                                                <span className='loadingChartReport align-self-center'>
+                                                                    <Oval
+                                                                        height="22"
+                                                                        width="22"
+                                                                        color='black'
+                                                                        ariaLabel='loading' />
+                                                                </span>
+
                                                             :
-                                                            <span className='loadingChartReport align-self-center'>
-                                                                <Oval
-                                                                    height="22"
-                                                                    width="22"
-                                                                    color='black'
-                                                                    ariaLabel='loading' />
-                                                            </span>
-                                                            
-                                                        :
-                                                        <ExportButton id={r.chartReportId} onExport={() => createAndDownloadPDF(r.chartReportId)} />
+                                                            <ExportButton id={r.chartReportId} onExport={() => createAndDownloadPDF(r.chartReportId)} />
                                                         }
                                                         <DeleteButton onDelete={() => handleDeleteChartReport(r.chartReportId, r.name)} />
                                                     </div >

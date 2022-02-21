@@ -97,8 +97,8 @@ exports.getPerformanceReportsByUserId = async (req, res) => {
     let regexUUIDStr = /^[0-9a-fA-F]{8}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{12}$/
     let regexUUID = new RegExp(regexUUIDStr)
 
-    if (!regexUUID.test(req.params.userId))
-        return res.status(400).send({ message: 'Invalid userId format.' })
+    if (!regexUUID.test(req.params.userId) || req.params.userId !== req.user.userId)
+        return res.status(400).send({ message: 'Invalid userId.' })
 
     await reportService.getPerformanceReportsByUserId(req.params.userId)
         .then(async response => {

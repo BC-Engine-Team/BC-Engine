@@ -10,7 +10,7 @@ const ReportService = require('../../services/report.service');
 const AuthService = require('../../services/auth.service');
 
 let reqUser = {
-    userId: "fakeUUID",
+    userId: "14afdb08-9e56-4ba0-8ef1-5e316f9930a5",
     email: "valid@benoit-cote.com",
     password: "validPassword1",
     name: "validName",
@@ -1057,8 +1057,6 @@ describe("Test Report Controller", () => {
             }
         ]
 
-        let userId = '14afdb08-9e56-4ba0-8ef1-5e316f9930a5'
-
         let getPerformanceReportsByUserIdServiceSpy = jest.spyOn(ReportService, 'getPerformanceReportsByUserId')
             .mockImplementation(() => new Promise((resolve, reject) => {
                 resolve(expectedServiceResponse)
@@ -1067,14 +1065,19 @@ describe("Test Report Controller", () => {
         describe("RC8.1 - given valid response from service", () => {
             it("RC8.1.1 - should respond with 200 and service response", async () => {
                 // arrange
+                authSpy = jest.spyOn(AuthService, 'authenticateToken')
+                    .mockImplementation((req, res, next) => {
+                        req.user = reqUser;
+                        return next()
+                    });
                 let expectedResponse = expectedServiceResponse
 
                 // act
-                const response = await request.get(`/api/reports/performanceReport/${userId}`)
+                const response = await request.get(`/api/reports/performanceReport/${reqUser.userId}`)
 
                 // assert
                 expect(authSpy).toHaveBeenCalled()
-                expect(getPerformanceReportsByUserIdServiceSpy).toHaveBeenCalledWith(userId)
+                expect(getPerformanceReportsByUserIdServiceSpy).toHaveBeenCalledWith(reqUser.userId)
                 expect(response.status).toBe(200)
                 expect(response.body).toEqual(expectedResponse)
             })
@@ -1094,7 +1097,7 @@ describe("Test Report Controller", () => {
                     })
 
                 // act
-                const response = await request.get(`/api/reports/performanceReport/${userId}`)
+                const response = await request.get(`/api/reports/performanceReport/${reqUser.userId}`)
 
                 // assert
                 expect(authSpy).toHaveBeenCalled()
@@ -1112,7 +1115,7 @@ describe("Test Report Controller", () => {
                     })
 
                 // act
-                const response = await request.get(`/api/reports/performanceReport/${userId}`)
+                const response = await request.get(`/api/reports/performanceReport/${reqUser.userId}`)
 
                 // assert
                 expect(authSpy).toHaveBeenCalled()
@@ -1130,7 +1133,7 @@ describe("Test Report Controller", () => {
                     })
 
                 // act
-                const response = await request.get(`/api/reports/performanceReport/${userId}`)
+                const response = await request.get(`/api/reports/performanceReport/${reqUser.userId}`)
 
                 // assert
                 expect(authSpy).toHaveBeenCalled()
@@ -1148,7 +1151,7 @@ describe("Test Report Controller", () => {
                     })
 
                 // act
-                const response = await request.get(`/api/reports/performanceReport/${userId}`)
+                const response = await request.get(`/api/reports/performanceReport/${reqUser.userId}`)
 
                 // assert
                 expect(authSpy).toHaveBeenCalled()
@@ -1165,7 +1168,7 @@ describe("Test Report Controller", () => {
                         return next()
                     });
                 let invalidUserId = 'fakeUUid'
-                let expectedMessage = 'Invalid userId format.'
+                let expectedMessage = 'Invalid userId.'
 
                 // act
                 const response = await request.get(`/api/reports/performanceReport/${invalidUserId}`)
@@ -1175,6 +1178,26 @@ describe("Test Report Controller", () => {
                 expect(getPerformanceReportsByUserIdServiceSpy).toHaveBeenCalledTimes(0)
                 expect(response.status).toBe(expectedResponse.status)
                 expect(response.body.message).toEqual(expectedMessage)
+            })
+
+            it('RC8.2.6 - when userId from auth does not match params userId, should respond with 400 and message', async () => {
+                // arrange
+                authSpy = jest.spyOn(AuthService, 'authenticateToken')
+                    .mockImplementation((req, res, next) => {
+                        req.user = reqUser;
+                        return next()
+                    });
+                let unmatchedUserId = '73aecca6-8a0b-425e-8932-c124b3fa8ef2'
+                let expectedMessage = 'Invalid userId.'
+
+                // act
+                const response = await request.get(`/api/reports/performanceReport/${unmatchedUserId}`)
+
+                // assert
+                expect(authSpy).toHaveBeenCalled()
+                expect(getPerformanceReportsByUserIdServiceSpy).toHaveBeenCalledTimes(0)
+                expect(response.status).toBe(400)
+                expect((await response).body.message).toEqual(expectedMessage)
             })
         })
 
@@ -1194,7 +1217,7 @@ describe("Test Report Controller", () => {
 
 
                 // act
-                const response = await request.get(`/api/reports/performanceReport/${userId}`)
+                const response = await request.get(`/api/reports/performanceReport/${reqUser.userId}`)
 
                 // assert
                 expect(authSpy).toHaveBeenCalled()
@@ -1215,7 +1238,7 @@ describe("Test Report Controller", () => {
                     }))
 
                 // act
-                const response = await request.get(`/api/reports/performanceReport/${userId}`)
+                const response = await request.get(`/api/reports/performanceReport/${reqUser.userId}`)
 
                 // assert
                 expect(authSpy).toHaveBeenCalled()
@@ -1236,7 +1259,7 @@ describe("Test Report Controller", () => {
                     }))
 
                 // act
-                const response = await request.get(`/api/reports/performanceReport/${userId}`)
+                const response = await request.get(`/api/reports/performanceReport/${reqUser.userId}`)
 
                 // assert
                 expect(authSpy).toHaveBeenCalled()
