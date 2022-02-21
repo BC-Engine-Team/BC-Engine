@@ -33,7 +33,7 @@ let returnedPerformanceReports = [
         },
         recipient: {
             dataValues: {
-                name: 'recipientName1'
+                name: 'recipientName2'
             }
         }
     }
@@ -371,7 +371,7 @@ describe("Test Report DAO", () => {
 
 
 
-    describe("CRD5 - getPerformanceReportsWhenConnectedAsAdmin", () => {
+    describe("RD3 - getPerformanceReports", () => {
 
         afterEach(() => {
             PerformanceReportMock.$queryInterface.$clearResults();
@@ -382,8 +382,8 @@ describe("Test Report DAO", () => {
         })
 
 
-        describe("CRD5.1 - given a userId", () => {
-            it("CRD5.1.1 - should return list of performance reports", async () => {
+        describe("RD3.1 - given a userId", () => {
+            it("RD3.1.1 - should return list of performance reports", async () => {
                 // arrange
                 PerformanceReportMock.$queryInterface.$useHandler(function (query, queryOptions, done) {
                     return Promise.resolve(returnedPerformanceReports);
@@ -406,7 +406,7 @@ describe("Test Report DAO", () => {
                     .toEqual(expectedResponse);
             });
 
-            it("CRD5.1.2 - should resolve false when Model cant fetch data", async () => {
+            it("RD3.1.2 - should resolve false when Model cant fetch data", async () => {
                 // arrange
                 PerformanceReportMock.$queryInterface.$useHandler(function (query, queryOptions, done) {
                     return Promise.resolve(false);
@@ -417,7 +417,7 @@ describe("Test Report DAO", () => {
                     .toEqual(false);
             });
 
-            it("CRD5.1.3 - should reject error when Model throws error with defined status and message", async () => {
+            it("RD3.1.3 - should reject error when Model throws error with defined status and message", async () => {
                 // arrange
                 let expectedError = {
                     status: 404,
@@ -432,7 +432,7 @@ describe("Test Report DAO", () => {
                     .toEqual(expectedError);
             });
 
-            it("CRD1.1.4 - should reject error with 500 status and predefined message when model does not define them", async () => {
+            it("RD3.1.4 - should reject error with 500 status and predefined message when model does not define them", async () => {
                 // arrange
                 let expectedError = {
                     status: 500,
@@ -448,4 +448,84 @@ describe("Test Report DAO", () => {
             });
         });
     });
+
+    describe('RD4 - getPerformanceReportsByUserId', () => {
+        let userId = '6075fbef-62fb-4f83-a6f8-6921835d6689'
+        let performanceReportModelStub = {
+            findAll: () => {
+                return Promise.resolve(returnedPerformanceReports)
+            }
+        }
+
+        describe('RD4.1 - given valid response from model', () => {
+            it('RD4.1.1 - should resolve formatted list of reports', async () => {
+                // arrange
+                let expectedResponse = [
+                    {
+                        name: returnedPerformanceReports[0].dataValues.name,
+                        recipient: returnedPerformanceReports[0].recipient.dataValues.name,
+                        createdAt: '2020-12-01'
+                    },
+                    {
+                        name: returnedPerformanceReports[1].dataValues.name,
+                        recipient: returnedPerformanceReports[1].recipient.dataValues.name,
+                        createdAt: '2020-12-01'
+                    }
+                ]
+
+                // act and assert
+                await expect(ReportDAO.getPerformanceReportsByUserId(userId, performanceReportModelStub))
+                    .resolves.toEqual(expectedResponse)
+            })
+        })
+
+        describe('RD4.2 - given invalid response from model', () => {
+            it('RD4.2.1 - when model resolves false, should resolve false', async () => {
+                // arrange
+                performanceReportModelStub = {
+                    findAll: () => {
+                        return Promise.resolve(false)
+                    }
+                }
+
+                // act and assert
+                await expect(ReportDAO.getPerformanceReportsByUserId(userId, performanceReportModelStub))
+                    .resolves.toEqual(false)
+            })
+
+            it('RD4.2.2 - when model rejects specified status and message, should reject specified status and message', async () => {
+                // arrange
+                let expectedResponse= {
+                    status: 600,
+                    message: 'Error.'
+                }
+                performanceReportModelStub = {
+                    findAll: () => {
+                        return Promise.reject(expectedResponse)
+                    }
+                }
+
+                // act and assert
+                await expect(ReportDAO.getPerformanceReportsByUserId(userId, performanceReportModelStub))
+                    .rejects.toEqual(expectedResponse)
+            })
+
+            it('RD4.2.3 - when model rejects unspecified status and message, should reject default status and message', async () => {
+                // arrange
+                let expectedResponse= {
+                    status: 500,
+                    message: 'Could not fetch Performance Reports by User Id.'
+                }
+                performanceReportModelStub = {
+                    findAll: () => {
+                        return Promise.reject({})
+                    }
+                }
+
+                // act and assert
+                await expect(ReportDAO.getPerformanceReportsByUserId(userId, performanceReportModelStub))
+                    .rejects.toEqual(expectedResponse)
+            })
+        })
+    })
 });
