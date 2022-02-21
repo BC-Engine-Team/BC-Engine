@@ -25,7 +25,7 @@ const Reports = () => {
 
     const [pdfLoading, setPdfLoading] = useState(false);
     const [currentPdfLoading, setCurrentPdfLoading] = useState();
-    
+
     const [chartReportId, setChartReportId] = useState("");
     const [chartReportName, setChartReportName] = useState("");
     const [deleteButtonActivated, setDeleteButtonActivated] = useState(false);
@@ -43,17 +43,12 @@ const Reports = () => {
         accountType: ""
     }]);
 
-    const [performanceReport, setPerformanceReport] = useState([{
-        performanceReportId: "",
-        employeeId: 0,
-        averageCollectionDay: "",
-        annualBillingObjective: "",
-        monthlyBillingObjective: "",
-        annualBillingNumber: "",
-        monthlyBillingNumber: "",
-        projectedBonus: ""
+    const [performanceReports, setPerformanceReports] = useState([{
+        name: '',
+        createdAt: '',
+        recipient: ''
     }]);
-    
+
     const [reportTypes, setReportTypes] = useState([]);
     const [selectedReportType, setSelectedReportType] = useState({});
     const [showReportsManagement, setShowReportsManagement] = useState({
@@ -78,36 +73,36 @@ const Reports = () => {
 
         Axios.post(`${process.env.REACT_APP_API}/reports/createPdf`, param, { headers: header })
             .then((response) => {
-                if(response.data === true) {
+                if (response.data === true) {
                     Axios.get(`${process.env.REACT_APP_API}/reports/fetchPdf`, { params: param, headers: header, responseType: 'arraybuffer' })
-                    .then((res) => {
-                        const pdfBlob = new Blob([res.data], { type: 'application/pdf' });
+                        .then((res) => {
+                            const pdfBlob = new Blob([res.data], { type: 'application/pdf' });
 
-                        const url = URL.createObjectURL(pdfBlob);
+                            const url = URL.createObjectURL(pdfBlob);
 
-                        var element = document.createElement('a');
-                        document.body.appendChild(element);
-                        element.style = "display: none";
-                        element.href = url;
-                        element.download = `ChartReport-${ReportId}`;
-                        element.click();
-                        document.body.removeChild(element);
-                        setPdfLoading(false);
-                    })
-                    .catch((error) => {
-                        setPdfLoading(false);
-                        if (error.response) {
-                            if (error.response.status === 403 || error.response.status === 401) {
-                                alert("You are not authorized to perform this action.");
+                            var element = document.createElement('a');
+                            document.body.appendChild(element);
+                            element.style = "display: none";
+                            element.href = url;
+                            element.download = `ChartReport-${ReportId}`;
+                            element.click();
+                            document.body.removeChild(element);
+                            setPdfLoading(false);
+                        })
+                        .catch((error) => {
+                            setPdfLoading(false);
+                            if (error.response) {
+                                if (error.response.status === 403 || error.response.status === 401) {
+                                    alert("You are not authorized to perform this action.");
+                                }
+                                else {
+                                    alert("Could not fetch pdf file...");
+                                }
                             }
-                            else {
+                            else if (error.request) {
                                 alert("Could not fetch pdf file...");
                             }
-                        }
-                        else if (error.request) {
-                            alert("Could not fetch pdf file...");
-                        }
-                    });
+                        });
                 }
                 else {
                     alert("Could not fetch pdf file...");
@@ -137,22 +132,27 @@ const Reports = () => {
                 isAdmin: true
             });
             await getReportTypesAndRecipients();
+
         }
-        await getPerformanceReportsByAdmin();
+        await getPerformanceReports();
     }
 
-
-    const getPerformanceReportsByAdmin = async () => {
+    const getPerformanceReports = async () => {
         let header = {
             'authorization': "Bearer " + cookies.get("accessToken")
+        }
+        let url = `${process.env.REACT_APP_API}/reports/performanceReport`
+
+        if (role !== 'admin') {
+            url = url.concat(`/${cookies.get('userId')}`)
         }
 
         Axios.defaults.withCredentials = true;
 
-        await Axios.get(`${process.env.REACT_APP_API}/reports/performanceReport`, { headers: header })
+        await Axios.get(url, { headers: header })
             .then((response) => {
                 if (response.data) {
-                    setPerformanceReport(response.data);
+                    setPerformanceReports(response.data);
                     return;
                 }
                 alert("The response from the B&C Engine was invalid.");
@@ -289,42 +289,58 @@ const Reports = () => {
                     <div className={showReportsManagement.isAdmin ?
                         showReportsManagement.admin :
                         showReportsManagement.employee} >
-                        <div className='card shadow my-3 mx-3' >
+                        <div className='card shadow my-3 mx-3 reports-table-card' >
                             <h4 className="text-center bg-light">{t('reports.reports.Title')}</h4>
                             <Table responsive hover id='reportTypesTable'>
                                 <thead className='bg-light'>
                                     <tr key="0">
-                                        <th className='performance-table-columns'>{t('reports.reports.AverageCollectionDay')}</th>
-                                        <th className='performance-table-columns'>{t('reports.reports.AnnualBillingObjective')}</th>
-                                        <th className='performance-table-columns'>{t('reports.reports.MonthlyBillingObjective')}</th>
-                                        <th className='performance-table-columns'>{t('reports.reports.AnnualBillingNumber')}</th>
-                                        <th className='performance-table-columns'>{t('reports.reports.MonthlyBillingNumber')}</th>
-                                        <th className='performance-table-columns'>{t('reports.reports.ProjectedBonus')}</th>
+                                        <th className='performance-table-columns'>{t('reports.reports.NameLabel')}</th>
+                                        <th className='performance-table-columns'>{t('reports.reports.DateLabel')}</th>
+                                        <th className='performance-table-columns'>{t('reports.reports.EmployeeLabel')}</th>
+                                        <th className='performance-table-columns'>Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                {performanceReport.map((p) => {
-                                    return (
-                                        <tr key={p.performanceReportId}>
-                                            <td className='performance-table-columns'>{p.averageCollectionDay}</td>
-                                            <td className='performance-table-columns'>{p.annualBillingObjective}</td>
-                                            <td className='performance-table-columns'>{p.monthlyBillingObjective}</td>
-                                            <td className='performance-table-columns'>{p.annualBillingNumber}</td>
-                                            <td className='performance-table-columns'>{p.monthlyBillingNumber}</td>
-                                            <td className='performance-table-columns'>{p.projectedBonus}</td>
-                                        </tr>
-                                    )
-                                })}
+                                    {performanceReports.map((p) => {
+                                        return (
+                                            <tr key={p.performanceReportId}>
+                                                <td className='performance-table-columns'>{p.name}</td>
+                                                <td className='performance-table-columns'>{p.createdAt.toString()}</td>
+                                                <td className='performance-table-columns'>{p.recipient}</td>
+                                                <td className="py-1">
+                                                    <div className="d-flex justify-content-center">
+                                                        {pdfLoading
+                                                            ?
+                                                            p.performanceReportId !== currentPdfLoading
+                                                                ?
+                                                                <ExportButton id={p.performanceReportId} iconColor={{ color: '#666' }} styles={{ pointerEvents: 'none' }} />
+                                                                :
+                                                                <span className='loadingChartReport align-self-center'>
+                                                                    <Oval
+                                                                        height="22"
+                                                                        width="22"
+                                                                        color='black'
+                                                                        ariaLabel='loading' />
+                                                                </span>
+
+                                                            :
+                                                            <ExportButton id={p.performanceReportId} onExport={() => createAndDownloadPDF(p.performanceReportId)} />
+                                                        }
+                                                    </div >
+                                                </td >
+                                            </tr>
+                                        )
+                                    })}
                                 </tbody>
                             </Table>
                         </div>
                     </div>
                     {role === "admin" ?
                         <div className='container-reportsManagement'>
-                            <div className='card shadow my-3 mx-3 px-3 py-2'>
+                            <div className='card shadow my-3 mx-3 px-3 py-2 report-management-card'>
                                 <h3 className='text-center'>{t('reports.reportsManagement.Title')}</h3>
                                 <Form.Group className="my-2" controlId="floatingModifyReportType">
-                                    <Form.Label>{t('reports.reportsManagement.reportType.Title')}</Form.Label>
+                                    <Form.Label key='reportsManagementTitle'>{t('reports.reportsManagement.reportType.Title')}</Form.Label>
                                     <Form.Select required
                                         id='reportTypeSelect'
                                         size="sm"
@@ -416,21 +432,21 @@ const Reports = () => {
                                                 <td className="py-1">
                                                     <div className="d-flex justify-content-center">
                                                         {pdfLoading
-                                                        ?   
-                                                            r.chartReportId !== currentPdfLoading
                                                             ?
-                                                            <ExportButton id={r.chartReportId} iconColor={{color: '#666'}} styles={{pointerEvents: 'none'}}/>
+                                                            r.chartReportId !== currentPdfLoading
+                                                                ?
+                                                                <ExportButton id={r.chartReportId} iconColor={{ color: '#666' }} styles={{ pointerEvents: 'none' }} />
+                                                                :
+                                                                <span className='loadingChartReport align-self-center'>
+                                                                    <Oval
+                                                                        height="22"
+                                                                        width="22"
+                                                                        color='black'
+                                                                        ariaLabel='loading' />
+                                                                </span>
+
                                                             :
-                                                            <span className='loadingChartReport align-self-center'>
-                                                                <Oval
-                                                                    height="22"
-                                                                    width="22"
-                                                                    color='black'
-                                                                    ariaLabel='loading' />
-                                                            </span>
-                                                            
-                                                        :
-                                                        <ExportButton id={r.chartReportId} onExport={() => createAndDownloadPDF(r.chartReportId)} />
+                                                            <ExportButton id={r.chartReportId} onExport={() => createAndDownloadPDF(r.chartReportId)} />
                                                         }
                                                         <DeleteButton onDelete={() => handleDeleteChartReport(r.chartReportId, r.name)} />
                                                     </div >

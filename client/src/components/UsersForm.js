@@ -258,7 +258,7 @@ const UsersForm = (props) => {
         Axios.put(`${process.env.REACT_APP_API}/users/modify/${form.email}`, user, { headers: header })
             .then((response) => {
                 if (response.data === true) {
-                    console.log("User modified successfully!");
+                    alert("User modified successfully!");
                 }
                 disableForm();
             })

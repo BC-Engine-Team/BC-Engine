@@ -4,7 +4,8 @@ const { sequelize,
     checkPropertyExists
 } = require('sequelize-test-helpers');
 
-const [UserModel, ChartReportModel, ChartReportDataModel, PerformanceReportModel,  ReportTypeModel, RecipientModel, ReportTypeRecipientModel] = require('../../data_access_layer/models/localdb/localdb.model')(sequelize, dataTypes);
+const databases = require('../../data_access_layer/databases')
+const ChartReportModel = require('../../data_access_layer/models/localdb/chart_report.model')(sequelize, dataTypes);
 const ChartReportDAO = require('../../data_access_layer/daos/chart_report.dao');
 
 let returnedChartReports = [
@@ -91,7 +92,7 @@ var ChartReportDataMock = dbMock.define('chart_reports_data', returnedChartRepor
 
 describe("Test Chart Report DAO", () => {
     const ChartReport = new ChartReportModel();
-    
+
 
     afterEach(() => {
         ChartReportMock.$queryInterface.$clearResults();

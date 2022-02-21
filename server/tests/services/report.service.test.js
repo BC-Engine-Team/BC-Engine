@@ -6,7 +6,7 @@ const ReportService = require("../../services/report.service");
 const ChartReportDao = require("../../data_access_layer/daos/chart_report.dao");
 const ReportDao = require("../../data_access_layer/daos/report.dao");
 
-jest.setTimeout(10000)
+jest.setTimeout(15000)
 
 describe("Test Report Service", () => {
 
@@ -1177,7 +1177,7 @@ describe("Test Report Service", () => {
         });
     });
 
-    describe("RS10 - getPerformanceReportWhenConnectedAsAdmin", () => {
+    describe("RS10 - getPerformanceReports", () => {
 
         let fakePerformanceReportResponse = [
             {
@@ -1205,25 +1205,25 @@ describe("Test Report Service", () => {
         describe("RS10.1 - given a userId", () => {
             it("RS10.1.1 - should return list of chartReports", async () => {
                 // arrange
-                chartReportDaoSpy = jest.spyOn(ReportDao, 'getPerformanceReportsWhenConnectedAsAdmin')
+                chartReportDaoSpy = jest.spyOn(ReportDao, 'getPerformanceReports')
                     .mockImplementation(() => new Promise((resolve) => {
                         resolve(fakePerformanceReportResponse);
                     }));
 
                 // act and assert
-                await expect(ReportService.getPerformanceReportWhenConnectedAsAdmin("randomUserId")).resolves
+                await expect(ReportService.getPerformanceReports("randomUserId")).resolves
                     .toEqual(fakePerformanceReportResponse);
             });
 
             it("RS10.1.2 - should resolve false when dao returns false", async () => {
                 // arrange
-                chartReportDaoSpy = jest.spyOn(ReportDao, 'getPerformanceReportsWhenConnectedAsAdmin')
+                chartReportDaoSpy = jest.spyOn(ReportDao, 'getPerformanceReports')
                     .mockImplementation(() => new Promise((resolve) => {
                         resolve(false);
                     }));
 
                 // act and assert
-                await expect(ReportService.getPerformanceReportWhenConnectedAsAdmin("someUserId")).resolves
+                await expect(ReportService.getPerformanceReports("someUserId")).resolves
                     .toEqual(false);
             });
 
@@ -1233,13 +1233,13 @@ describe("Test Report Service", () => {
                     status: 404,
                     message: "Error message."
                 };
-                chartReportDaoSpy = jest.spyOn(ReportDao, 'getPerformanceReportsWhenConnectedAsAdmin')
+                chartReportDaoSpy = jest.spyOn(ReportDao, 'getPerformanceReports')
                     .mockImplementation(() => new Promise((resolve, reject) => {
                         reject(expectedError);
                     }));
 
                 // act and assert
-                await expect(ReportService.getPerformanceReportWhenConnectedAsAdmin("someUserId")).rejects
+                await expect(ReportService.getPerformanceReports("someUserId")).rejects
                     .toEqual(expectedError);
             });
 
@@ -1249,13 +1249,13 @@ describe("Test Report Service", () => {
                     status: 500,
                     message: "Could not fetch data."
                 };
-                chartReportDaoSpy = jest.spyOn(ReportDao, 'getPerformanceReportsWhenConnectedAsAdmin')
+                chartReportDaoSpy = jest.spyOn(ReportDao, 'getPerformanceReports')
                     .mockImplementation(() => new Promise((resolve, reject) => {
                         reject({});
                     }));
 
                 // act and assert
-                await expect(ReportService.getPerformanceReportWhenConnectedAsAdmin("someUserId")).rejects
+                await expect(ReportService.getPerformanceReports("someUserId")).rejects
                     .toEqual(expectedError);
             });
         });
@@ -1269,7 +1269,7 @@ describe("Test Report Service", () => {
                 };
 
                 // act and assert
-                await expect(ReportService.getPerformanceReportWhenConnectedAsAdmin()).rejects
+                await expect(ReportService.getPerformanceReports()).rejects
                     .toEqual(expectedError);
             });
         });
@@ -1462,4 +1462,91 @@ describe("Test Report Service", () => {
             });
         });
     });
+
+    describe('RS12 - getPerformanceReportsByUserId', () => {
+        let expectedDaoResponse = [
+            {
+                name: 'reportName1',
+                recipient: 'recipientName1',
+                createdAt: '2020-11-01'
+            },
+            {
+                name: 'reportName2',
+                recipient: 'recipientName2',
+                createdAt: '2020-11-01'
+            },
+            {
+                name: 'reportName3',
+                recipient: 'recipientName3',
+                createdAt: '2020-11-01'
+            }
+        ]
+        let userId = '6075fbef-62fb-4f83-a6f8-6921835d6689'
+        let getPerformanceReportsByUserIdDaoSpy = jest.spyOn(ReportDao, 'getPerformanceReportsByUserId')
+            .mockImplementation(() => new Promise((resolve,reject) => {
+                resolve(expectedDaoResponse)
+            }))
+
+
+        describe('RS12.1 - given valid reponse from dao', () => {
+            it('RS12.1.1 - should return response from dao', async () => {
+                // arrange
+                let expectedResponse = expectedDaoResponse
+
+                // act and assert
+                await expect(ReportService.getPerformanceReportsByUserId(userId)).resolves
+                    .toEqual(expectedResponse)
+                expect(getPerformanceReportsByUserIdDaoSpy).toHaveBeenCalledWith(userId)
+            })
+        })
+
+        describe('RS12.2 - given invalid response from dao', () => {
+            it('RS12.2.1 - when dao resolves false, should resolve false', async () => {
+                // arrange
+                getPerformanceReportsByUserIdDaoSpy = jest.spyOn(ReportDao, 'getPerformanceReportsByUserId')
+                    .mockImplementation(() => new Promise((resolve,reject) => {
+                        resolve(false)
+                    }))
+
+                // act and assert
+                await expect(ReportService.getPerformanceReportsByUserId(userId)).resolves
+                    .toEqual(false)
+                expect(getPerformanceReportsByUserIdDaoSpy).toHaveBeenCalledWith(userId)
+            })
+
+            it('RS12.2.2 - when dao rejects specified status and message, should reject specified status and message', async () => {
+                // arrange
+                let expectedResponse = {
+                    status: 600,
+                    message: 'Error.'
+                }
+                getPerformanceReportsByUserIdDaoSpy = jest.spyOn(ReportDao, 'getPerformanceReportsByUserId')
+                    .mockImplementation(() => new Promise((resolve,reject) => {
+                        reject(expectedResponse)
+                    }))
+
+                // act and assert
+                await expect(ReportService.getPerformanceReportsByUserId(userId)).rejects
+                    .toEqual(expectedResponse)
+                expect(getPerformanceReportsByUserIdDaoSpy).toHaveBeenCalledWith(userId)
+            })
+
+            it('RS12.2.3 -  when dao rejects unspecified status and message, should reject default status and message', async () => {
+                // arrange
+                let expectedResponse = {
+                    status: 500,
+                    message: 'Could not fetch data.'
+                }
+                getPerformanceReportsByUserIdDaoSpy = jest.spyOn(ReportDao, 'getPerformanceReportsByUserId')
+                    .mockImplementation(() => new Promise((resolve,reject) => {
+                        reject({})
+                    }))
+
+                // act and assert
+                await expect(ReportService.getPerformanceReportsByUserId(userId)).rejects
+                    .toEqual(expectedResponse)
+                expect(getPerformanceReportsByUserIdDaoSpy).toHaveBeenCalledWith(userId)
+            })
+        })
+    })
 });

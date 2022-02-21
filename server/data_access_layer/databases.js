@@ -29,27 +29,111 @@ for (let i = 0; i < databases.length; i++) {
 
 db.Sequelize = Sequelize;
 
-// Add any tables to the database here
+
 // Add any tables to the local database here
-[db['localdb'].users,
-db['localdb'].chartReports,
-db['localdb'].chartReportsData,
-db['localdb'].performanceReport,
-db['localdb'].reportTypes,
-db['localdb'].recipients,
-db['localdb'].reportTypeRecipients] = require("./models/localdb/localdb.model")(db['localdb'], Sequelize);
+db['localdb'].users = require('./models/localdb/user.model')(db['localdb'], Sequelize.DataTypes)
+db['localdb'].chartReports = require('./models/localdb/chart_report.model')(db['localdb'], Sequelize.DataTypes)
+db['localdb'].chartReportsData = require('./models/localdb/chart_report_data.model')(db['localdb'], Sequelize.DataTypes)
+db['localdb'].reportTypes = require('./models/localdb/report_type.model')(db['localdb'], Sequelize.DataTypes)
+db['localdb'].recipients = require('./models/localdb/recipient.model')(db['localdb'], Sequelize.DataTypes)
+db['localdb'].reportTypeRecipients = require('./models/localdb/report_type_recipient.model')(db['localdb'], Sequelize.DataTypes)
+db['localdb'].billingNumbers = require('./models/localdb/billing_numbers.model')(db['localdb'], Sequelize.DataTypes)
+db['localdb'].performanceReports = require('./models/localdb/performance_report.model')(db['localdb'], Sequelize.DataTypes)
+
+// Configure relationships for localdb models
+db['localdb'].chartReports.belongsTo(db['localdb'].users, {
+  foreignKey: {
+    name: 'user_user_id',
+    allowNull: false,
+  },
+  onDelete: 'CASCADE'
+})
+
+db['localdb'].chartReportsData.belongsTo(db['localdb'].chartReports, {
+  foreignKey: {
+    name: 'chart_report_id',
+    allowNull: false
+  },
+  onDelete: 'CASCADE'
+});
+
+db['localdb'].reportTypeRecipients.belongsTo(db['localdb'].reportTypes, {
+  foreignKey: {
+    name: 'report_type_id',
+    allowNull: false
+  },
+  onDelete: 'CASCADE'
+});
+
+db['localdb'].reportTypeRecipients.belongsTo(db['localdb'].recipients, {
+  foreignKey: {
+    name: 'recipient_id',
+    allowNull: false
+  },
+  onDelete: 'CASCADE'
+});
+
+db['localdb'].billingNumbers.belongsTo(db['localdb'].recipients, {
+  foreignKey: 'employee_id',
+  targetKey: 'employeeId',
+})
+
+db['localdb'].billingNumbers.hasOne(db['localdb'].billingNumbers, {
+  foreignKey: {
+    name: 'objectivesId',
+    allowNull: true
+  }
+})
+
+db['localdb'].performanceReports.belongsTo(db['localdb'].users, {
+  foreignKey: {
+    name: 'user_user_id',
+    allowNull: true,
+  }
+});
+
+db['localdb'].performanceReports.belongsTo(db['localdb'].reportTypes, {
+  foreignKey: {
+    name: 'report_type_id',
+    allowNull: false
+  }
+})
+
+db['localdb'].performanceReports.belongsTo(db['localdb'].billingNumbers, {
+  foreignKey: {
+    name: 'billing_actual_numbers',
+    allowNull: false
+  }
+})
+
+db['localdb'].performanceReports.belongsTo(db['localdb'].billingNumbers, {
+  foreignKey: {
+    name: 'billing_obj_numbers',
+    allowNull: false
+  }
+})
+
+db['localdb'].performanceReports.belongsTo(db['localdb'].recipients, {
+  foreignKey: {
+    name: 'recipient_id',
+    allowNull: false
+  }
+})
+
 
 // patricia database tables
-db['mssql_pat'].employees = require("./models/mssql_pat/employee.model")(db['mssql_pat'], Sequelize);
+db['mssql_pat'].employees = require("./models/mssql_pat/employee.model")(db['mssql_pat'], Sequelize.DataTypes);
 
 // Bosco database tables
 
 
-
+// Populate local (MySQL) db with dummy data once db sync is successful
 db.sync = async (database, options) => {
   await db[database].sync(options)
     .then(async () => {
-      return await db[database].users.bulkCreate([
+      let data = {}
+
+      data.users = await db[database].users.bulkCreate([
         {
           email: 'first@benoit-cote.com',
           password: 'verySecurePassword1',
@@ -61,11 +145,44 @@ db.sync = async (database, options) => {
           password: 'verySecurePassword1',
           name: 'JC Benoit',
           role: 'employee'
-        }],
+        },
+        {
+          email: 'mathieu@benoit-cote.com',
+          password: 'verySecurePassword1',
+          name: 'Mathieu Miron',
+          role: 'employee'
+        },
+        {
+          email: 'france@benoit-cote.com',
+          password: 'verySecurePassword1',
+          name: 'France Côté',
+          role: 'employee'
+        },
+        {
+          email: 'ibrahim@benoit-cote.com',
+          password: 'verySecurePassword1',
+          name: 'Ibrahim Tamer',
+          role: 'employee'
+        },
+        {
+          email: 'marc@benoit-cote.com',
+          password: 'verySecurePassword1',
+          name: 'Marc Benoit',
+          role: 'employee'
+        },
+        {
+          email: 'hilal@benoit-cote.com',
+          password: 'verySecurePassword1',
+          name: 'Hilal El Ayoubi',
+          role: 'employee'
+        }
+      ],
         {
           validate: true,
           individualHooks: true
         });
+
+      return data
     })
     .then(async (data) => {
       await db[database].chartReports.bulkCreate([
@@ -80,7 +197,7 @@ db.sync = async (database, options) => {
           clientType: 'Corr',
           ageOfAccount: 'All',
           accountType: 'Receivable',
-          user_user_id: data[0].userId
+          user_user_id: data.users[0].userId
         },
         {
           name: 'CR2',
@@ -95,7 +212,7 @@ db.sync = async (database, options) => {
           clientType: 'Direct',
           ageOfAccount: '60-90',
           accountType: 'Receivable',
-          user_user_id: data[0].userId
+          user_user_id: data.users[0].userId
         },
         {
           name: 'CR3',
@@ -108,115 +225,282 @@ db.sync = async (database, options) => {
           clientType: 'Any',
           ageOfAccount: '<30',
           accountType: 'Payable',
-          user_user_id: data[1].userId
+          user_user_id: data.users[1].userId
         }
       ]);
+      return data;
     })
-    .then(async () => {
-      let performanceReports = await db['localdb'].performanceReport.bulkCreate([
+    .then(async data => {
+      data.recipients = await db['localdb'].recipients.bulkCreate([
         {
-          averageCollectionDay: "32",
-          annualBillingObjective: "50000",
-          monthlyBillingObjective: "2000",
-          annualBillingNumber: "4500",
-          monthlyBillingNumber: "125",
-          projectedBonus: "750"
-        },
-        {
-          averageCollectionDay: "32",
-          annualBillingObjective: "40000",
-          monthlyBillingObjective: "3000",
-          annualBillingNumber: "7500",
-          monthlyBillingNumber: "333",
-          projectedBonus: "750"
-        }
-      ]);
-      return performanceReports;
-    })
-    .then(async () => {
-      let recipients = await db['localdb'].recipients.bulkCreate([
-        {
+          employeeId: 26631,
           name: "Charles-André Caron",
           email: "charles-andre@benoit-cote.com"
         },
         {
+          employeeId: 22769,
           name: "France Coté",
           email: "france@benoit-cote.com"
         },
         {
+          employeeId: 29470,
           name: "Hilal El Ayoubi",
           email: "hilal@benoit-cote.com"
         },
         {
+          employeeId: 26628,
           name: "Ibrahim Tamer",
           email: "ibrahim@benoit-cote.com"
         },
         {
+          employeeId: 41830,
           name: "Irina Kostko",
           email: "irina@benoit-cote.com"
         },
         {
+          employeeId: 31106,
           name: "Ismaël Coulibaly",
           email: "ismael@benoit-cote.com"
         },
         {
+          employeeId: 25706,
           name: "Marc Benoît",
           email: "marc@benoit-cote.com"
         },
         {
-          name: "Mailyne Séïde",
+          employeeId: 42381,
+          name: "Marilyne Séïde",
           email: "marilyne@benoit-cote.com"
         },
         {
+          employeeId: 20037,
           name: "Martin Roy",
           email: "martin@benoit-cote.com"
         },
         {
+          employeeId: 41930,
           name: "Mathieu Audet",
           email: "ma@benoit-cote.com"
         },
         {
+          employeeId: 20303,
           name: "Mathieu Miron",
           email: "mathieu@benoit-cote.com"
         },
         {
+          employeeId: 26629,
           name: "Michel Sofia",
           email: "michel@benoit-cote.com"
         },
         {
+          employeeId: 28658,
           name: "Philip Conrad",
           email: "phil@benoit-cote.com"
         },
         {
+          employeeId: 42410,
           name: "Sabrina Lavoie",
           email: "slavoie@benoit-cote.com"
         },
         {
+          employeeId: 38192,
           name: "Suzanne Antal",
           email: "suzanne@benoit-cote.com"
         }
       ]);
-      return recipients;
+      return data;
     })
-    .then(async (recipients) => {
-      let reportTypes = await db['localdb'].reportTypes.create({
+    .then(async (data) => {
+      data.reportTypes = await db['localdb'].reportTypes.create({
         reportTypeName: 'Monthly Employee Performance Report',
         frequency: 0
       });
-      return { reportTypes: reportTypes, recipients: recipients };
+      return data;
     })
     .then(async data => {
       let reportTypeRecipients = [];
+      let billingNumbers = [];
       for (let i = 0; i < data.recipients.length; i++) {
         reportTypeRecipients.push({
           report_type_id: data.reportTypes.reportTypeId,
           recipient_id: data.recipients[i].recipientId
         });
+
+        let billingObject = {
+          employee_id: data.recipients[i].employeeId,
+          objectivesId: null,
+          year: 2020,
+          january: Math.random() * (40000 - 20000) + 20000,
+          february: Math.random() * (40000 - 20000) + 20000,
+          march: Math.random() * (40000 - 20000) + 20000,
+          april: Math.random() * (40000 - 20000) + 20000,
+          may: Math.random() * (40000 - 20000) + 20000,
+          june: Math.random() * (40000 - 20000) + 20000,
+          july: Math.random() * (40000 - 20000) + 20000,
+          august: Math.random() * (40000 - 20000) + 20000,
+          september: Math.random() * (40000 - 20000) + 20000,
+          october: Math.random() * (40000 - 20000) + 20000,
+          november: Math.random() * (40000 - 20000) + 20000,
+          december: Math.random() * (40000 - 20000) + 20000
+        }
+        billingObject.total = 0;
+        Object.keys(billingObject).forEach((value, index) => {
+          if (index > 2) {
+            billingObject.total += billingObject[value]
+          }
+        })
+
+        let billingActual = {
+          employee_id: data.recipients[i].employeeId,
+          objectivesId: data.recipients.length * 2 - (data.recipients.length * 2 - i) + i + 1,
+          year: 2020,
+          january: Math.random() * (40000 - 20000) + 20000,
+          february: Math.random() * (40000 - 20000) + 20000,
+          march: Math.random() * (40000 - 20000) + 20000,
+          april: Math.random() * (40000 - 20000) + 20000,
+          may: Math.random() * (40000 - 20000) + 20000,
+          june: Math.random() * (40000 - 20000) + 20000,
+          july: Math.random() * (40000 - 20000) + 20000,
+          august: Math.random() * (40000 - 20000) + 20000,
+          september: Math.random() * (40000 - 20000) + 20000,
+          october: Math.random() * (40000 - 20000) + 20000,
+          november: Math.random() * (40000 - 20000) + 20000,
+          december: Math.random() * (40000 - 20000) + 20000
+        }
+        billingActual.total = 0;
+        Object.keys(billingActual).forEach((value, index) => {
+          if (index > 2) {
+            billingActual.total += billingActual[value]
+          }
+        })
+        billingNumbers.push(billingObject)
+        billingNumbers.push(billingActual)
       }
       await db['localdb'].reportTypeRecipients.bulkCreate(reportTypeRecipients);
+      data.billingNumbers = await db['localdb'].billingNumbers.bulkCreate(billingNumbers)
+      return data
+    })
+    .then(async data => {
+      await db['localdb'].performanceReports.bulkCreate([{
+        name: 'MyFirstReportCool',
+        projectedBonus: 20384.09,
+        user_user_id: data.users[2].userId,
+        report_type_id: data.reportTypes.reportTypeId,
+        recipient_id: data.recipients[10].recipientId,
+        billing_actual_numbers: data.billingNumbers[1].id,
+        billing_obj_numbers: data.billingNumbers[1].objectivesId
+      },
+      {
+        name: 'MyFirstReportCool2',
+        projectedBonus: 20384.09,
+        user_user_id: data.users[2].userId,
+        report_type_id: data.reportTypes.reportTypeId,
+        recipient_id: data.recipients[10].recipientId,
+        billing_actual_numbers: data.billingNumbers[19].id,
+        billing_obj_numbers: data.billingNumbers[19].objectivesId
+      },
+      {
+        name: 'MyFirstReportCool2',
+        projectedBonus: 20384.09,
+        user_user_id: data.users[2].userId,
+        report_type_id: data.reportTypes.reportTypeId,
+        recipient_id: data.recipients[10].recipientId,
+        billing_actual_numbers: data.billingNumbers[19].id,
+        billing_obj_numbers: data.billingNumbers[19].objectivesId
+      },
+      {
+        name: 'MyFirstReportCool2',
+        projectedBonus: 20384.09,
+        user_user_id: data.users[3].userId,
+        report_type_id: data.reportTypes.reportTypeId,
+        recipient_id: data.recipients[1].recipientId,
+        billing_actual_numbers: data.billingNumbers[3].id,
+        billing_obj_numbers: data.billingNumbers[3].objectivesId
+      },
+      {
+        name: 'MyFirstReportCool2',
+        projectedBonus: 20384.09,
+        user_user_id: data.users[3].userId,
+        report_type_id: data.reportTypes.reportTypeId,
+        recipient_id: data.recipients[1].recipientId,
+        billing_actual_numbers: data.billingNumbers[3].id,
+        billing_obj_numbers: data.billingNumbers[3].objectivesId
+      },
+      {
+        name: 'MyFirstReportCool2',
+        projectedBonus: 20384.09,
+        user_user_id: data.users[2].userId,
+        report_type_id: data.reportTypes.reportTypeId,
+        recipient_id: data.recipients[10].recipientId,
+        billing_actual_numbers: data.billingNumbers[19].id,
+        billing_obj_numbers: data.billingNumbers[19].objectivesId
+      },
+      {
+        name: 'MyFirstReportCool2',
+        projectedBonus: 20384.09,
+        user_user_id: data.users[2].userId,
+        report_type_id: data.reportTypes.reportTypeId,
+        recipient_id: data.recipients[10].recipientId,
+        billing_actual_numbers: data.billingNumbers[19].id,
+        billing_obj_numbers: data.billingNumbers[19].objectivesId
+      },
+      {
+        name: 'MyFirstReportCool2',
+        projectedBonus: 20384.09,
+        user_user_id: data.users[2].userId,
+        report_type_id: data.reportTypes.reportTypeId,
+        recipient_id: data.recipients[10].recipientId,
+        billing_actual_numbers: data.billingNumbers[19].id,
+        billing_obj_numbers: data.billingNumbers[19].objectivesId
+      },
+      {
+        name: 'MyFirstReportCool2',
+        projectedBonus: 20384.09,
+        user_user_id: data.users[2].userId,
+        report_type_id: data.reportTypes.reportTypeId,
+        recipient_id: data.recipients[10].recipientId,
+        billing_actual_numbers: data.billingNumbers[19].id,
+        billing_obj_numbers: data.billingNumbers[19].objectivesId
+      },
+      {
+        name: 'MyFirstReportCool2',
+        projectedBonus: 20384.09,
+        user_user_id: data.users[2].userId,
+        report_type_id: data.reportTypes.reportTypeId,
+        recipient_id: data.recipients[10].recipientId,
+        billing_actual_numbers: data.billingNumbers[19].id,
+        billing_obj_numbers: data.billingNumbers[19].objectivesId
+      },
+      {
+        name: 'MyFirstReportCool2',
+        projectedBonus: 20384.09,
+        user_user_id: data.users[2].userId,
+        report_type_id: data.reportTypes.reportTypeId,
+        recipient_id: data.recipients[10].recipientId,
+        billing_actual_numbers: data.billingNumbers[19].id,
+        billing_obj_numbers: data.billingNumbers[19].objectivesId
+      },
+      {
+        name: 'MyFirstReportCool2',
+        projectedBonus: 20384.09,
+        user_user_id: data.users[2].userId,
+        report_type_id: data.reportTypes.reportTypeId,
+        recipient_id: data.recipients[10].recipientId,
+        billing_actual_numbers: data.billingNumbers[19].id,
+        billing_obj_numbers: data.billingNumbers[19].objectivesId
+      },
+      {
+        name: 'MyFirstReportCool2',
+        projectedBonus: 20384.09,
+        user_user_id: data.users[2].userId,
+        report_type_id: data.reportTypes.reportTypeId,
+        recipient_id: data.recipients[10].recipientId,
+        billing_actual_numbers: data.billingNumbers[19].id,
+        billing_obj_numbers: data.billingNumbers[19].objectivesId
+      }])
     })
     .catch((err) => {
-      console.log(err.message);
+      console.log(err);
     });
 }
 

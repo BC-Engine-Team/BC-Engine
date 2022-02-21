@@ -74,10 +74,11 @@ exports.deleteChartReport = async (req, res) => {
         });
 }
 
-exports.getPerformanceReportsOfAllUsers = async (req, res) => {
+exports.getPerformanceReports = async (req, res) => {
     if (!req.user || !req.user.userId || req.user.userId === "" || req.user.userId === undefined)
         return res.status(400).send({ message: "Content cannot be empty." });
-    await reportService.getPerformanceReportWhenConnectedAsAdmin(req.user.userId)
+
+    await reportService.getPerformanceReports()
         .then(async response => {
             if (response) {
                 return res.send(response);
@@ -89,13 +90,35 @@ exports.getPerformanceReportsOfAllUsers = async (req, res) => {
         });
 }
 
+exports.getPerformanceReportsByUserId = async (req, res) => {
+    if (!req.user || !req.user.userId || req.user.userId === "" || req.user.userId === undefined)
+        return res.status(400).send({ message: "Content cannot be empty." });
+
+    let regexUUIDStr = /^[0-9a-fA-F]{8}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{12}$/
+    let regexUUID = new RegExp(regexUUIDStr)
+
+    if (!regexUUID.test(req.params.userId) || req.params.userId !== req.user.userId)
+        return res.status(400).send({ message: 'Invalid userId.' })
+
+    await reportService.getPerformanceReportsByUserId(req.params.userId)
+        .then(async response => {
+            if (response) {
+                return res.send(response)
+            }
+            return res.status(500).send({ message: 'The data could not be fetched.' })
+        })
+        .catch(err => {
+            return res.status(err.status || 500).send({ message: err.message || "Malfunction in the B&C Engine." })
+        })
+}
+
 exports.createChartReportPDF = async (req, res) => {
     if (!req.body.reportid)
-    return res.status(400).send({ message: "Content cannot be empty." });
+        return res.status(400).send({ message: "Content cannot be empty." });
 
     await reportService.createChartReportPDFById(req.body.reportid)
         .then(response => {
-            if(response) {
+            if (response) {
                 return res.status(200).send(response);
             }
             return res.status(500).send({ message: "The data could not be fetched." });
@@ -106,20 +129,20 @@ exports.createChartReportPDF = async (req, res) => {
 }
 
 exports.fetchChartReportPDF = async (req, res) => {
+    if (!req.query.reportid)
+        return res.status(400).send({ message: "Content cannot be empty." });
+
     // create file path
     let filePath;
-    if(__dirname !== '/home/runner/work/BC-Engine/BC-Engine/server/controllers') {
+    if (__dirname !== '/home/runner/work/BC-Engine/BC-Engine/server/controllers') {
         filePath = `${__dirname.replace("controllers", "")}docs\\pdf_files\\chartReport-${req.query.reportid}.pdf`;
     }
     else {
         filePath = `${__dirname.replace("controllers", "")}docs/pdf_files/chartReport-${req.query.reportid}.pdf`;
     }
 
-    if (!req.query.reportid)
-    return res.status(400).send({ message: "Content cannot be empty." });
-
     await res.sendFile(filePath, {}, (err) => {
-        if(err) {
+        if (err) {
             return res.status(err.status || 500).send({ message: err.message || "File not found." });
         }
         else {
@@ -128,4 +151,3 @@ exports.fetchChartReportPDF = async (req, res) => {
         }
     });
 }
-
