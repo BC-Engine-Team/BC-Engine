@@ -20,21 +20,21 @@ const Manage = () => {
     const [confirmSaveGradingActivated, setConfirmSaveGradingActivated] = useState(false);
 
     const [clientGrading, setClientGrading] = useState({
-        maximumGradeAPlus: undefined,
-        minimumGradeAPlus: undefined,
-        averageCollectionTimeGradeAPlus: undefined,
-        maximumGradeA: undefined,
-        minimumGradeA: undefined,
-        averageCollectionTimeGradeA: undefined,
-        maximumGradeB: undefined,
-        minimumGradeB: undefined,
-        averageCollectionTimeGradeB: undefined,
-        maximumGradeC: undefined,
-        minimumGradeC: undefined,
-        averageCollectionTimeGradeC: undefined,
-        maximumGradeEPlus: undefined,
-        minimumGradeEPlus: undefined,
-        averageCollectionTimeGradeEPlus: undefined
+        maximumGradeAPlus: 0,
+        minimumGradeAPlus: 0,
+        averageCollectionTimeGradeAPlus: "",
+        maximumGradeA: 0,
+        minimumGradeA: 0,
+        averageCollectionTimeGradeA: "",
+        maximumGradeB: 0,
+        minimumGradeB: 0,
+        averageCollectionTimeGradeB: "",
+        maximumGradeC: 0,
+        minimumGradeC: 0,
+        averageCollectionTimeGradeC: "",
+        maximumGradeEPlus: 0,
+        minimumGradeEPlus: 0,
+        averageCollectionTimeGradeEPlus: ""
     })
 
 
