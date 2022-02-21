@@ -25,8 +25,16 @@
     display: flex;
     align-items: center;
     font-size: large;
-    font-weight: bold; 
-    margin-left: 180px;
+    font-weight: bold;
+    margin-left: 90px;
+    margin-top: 20px; 
+}
+
+#mainTitle3{
+    display: flex;
+    align-items: center;
+    font-size: large;
+    font-weight: bold;
     margin-top: 20px; 
 }
 
@@ -37,6 +45,14 @@
     margin-bottom: 50px;
 }
 
-.rowForm{
-    margin-top: 40px;
+.manageRowForm{
+    margin-top: 10px;
+}
+
+.manageMaximumGrade{
+    margin-left: 30px;
+}
+
+.manageAverageCollectionTime {
+    margin-left: 60px;
 }

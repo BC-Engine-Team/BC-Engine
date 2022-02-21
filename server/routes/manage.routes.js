@@ -4,5 +4,8 @@ let router = require("express").Router();
 const authService = require('../services/auth.service');
 
 
+router.get("/getClientGrading", authService.authenticateToken, manageController.getClientGradings)
 
 router.put("/modifyClientGrading", authService.authenticateToken, manageController.modifyClientGradings);
+
+module.exports = router;

@@ -19,24 +19,22 @@ const Manage = () => {
     const [clientGradingSaved, setClientGradingSaved] = useState(true);
     const [confirmSaveGradingActivated, setConfirmSaveGradingActivated] = useState(false);
 
-
     const [clientGrading, setClientGrading] = useState({
-        clientGradingId: 1,
-        maximumGradeAPlus: 0,
-        minimumGradeAPlus: 0,
-        averageCollectionTimeGradeAPlus: "",
-        maximumGradeA: 0,
-        minimumGradeA: 0,
-        averageCollectionTimeGradeA: "",
-        maximumGradeB: 0,
-        minimumGradeB: 0,
-        averageCollectionTimeGradeB: "",
-        maximumGradeC: 0,
-        minimumGradeC: 0,
-        averageCollectionTimeGradeC: "",
-        maximumGradeEPlus: 0,
-        minimumGradeEPlus: 0,
-        averageCollectionTimeGradeEPlus: ""
+        maximumGradeAPlus: undefined,
+        minimumGradeAPlus: undefined,
+        averageCollectionTimeGradeAPlus: undefined,
+        maximumGradeA: undefined,
+        minimumGradeA: undefined,
+        averageCollectionTimeGradeA: undefined,
+        maximumGradeB: undefined,
+        minimumGradeB: undefined,
+        averageCollectionTimeGradeB: undefined,
+        maximumGradeC: undefined,
+        minimumGradeC: undefined,
+        averageCollectionTimeGradeC: undefined,
+        maximumGradeEPlus: undefined,
+        minimumGradeEPlus: undefined,
+        averageCollectionTimeGradeEPlus: undefined
     })
 
 
@@ -259,6 +257,57 @@ const Manage = () => {
     }
 
 
+    const getCurrentClientGradingInformations = async () => {
+
+        let header = {
+            'authorization': "Bearer " + cookies.get("accessToken"),
+        }
+
+        Axios.get(`${process.env.REACT_APP_API}/manage/getClientGrading`, { headers: header })
+            .then((response) => {
+                if (response.status === 200 || response.status === 201) {
+
+                    console.log(response.data);
+
+                    let setValue = {
+                        maximumGradeAPlus: parseInt(response.data.maximumGradeAPlus),
+                        minimumGradeAPlus: parseInt(response.data.minimumGradeAPlus),
+                        averageCollectionTimeGradeAPlus: response.data.averageCollectionTimeGradeAPlus,
+                        maximumGradeA: parseInt(response.data.maximumGradeA),
+                        minimumGradeA: parseInt(response.data.minimumGradeA),
+                        averageCollectionTimeGradeA: response.data.averageCollectionTimeGradeA,
+                        maximumGradeB: parseInt(response.data.maximumGradeB),
+                        minimumGradeB: parseInt(response.data.minimumGradeB),
+                        averageCollectionTimeGradeB: response.data.averageCollectionTimeGradeB,
+                        maximumGradeC: parseInt(response.data.maximumGradeC),
+                        minimumGradeC: parseInt(response.data.minimumGradeC),
+                        averageCollectionTimeGradeC: response.data.averageCollectionTimeGradeC,
+                        maximumGradeEPlus: parseInt(response.data.maximumGradeEPlus),
+                        minimumGradeEPlus: parseInt(response.data.minimumGradeEPlus),
+                        averageCollectionTimeGradeEPlus: response.data.averageCollectionTimeGradeEPlus
+                    }
+
+                    setClientGrading(setValue);
+                    return;
+                }
+                alert("The response from the B&C Engine was invalid.");
+            })
+            .catch((error) => {
+                if (error.response) {
+                    if (error.response.status === 403 || error.response.status === 401) {
+                        alert("You are not authorized to perform this action.");
+                    }
+                    else {
+                        alert("Malfunction in the B&C Engine.");
+                    }
+                }
+                else if (error.request) {
+                    alert("Could not reach b&C Engine...");
+                }
+            });
+    }
+
+    
     const onSaveGradingConfirmClick = async () => {
 
         let header = {
@@ -307,10 +356,6 @@ const Manage = () => {
     }
 
 
-
-
-
-
     useEffect(() => {
         if (cookies.get("accessToken") === undefined) {
             navigate("/login")
@@ -318,8 +363,11 @@ const Manage = () => {
         else if (cookies.get("role") !== "admin") {
             navigate("/dashboard")
         }
+
+        getCurrentClientGradingInformations();
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
+
 
 
     return (
@@ -334,16 +382,19 @@ const Manage = () => {
 
                             <Row>
                                 <Col>
-                                    <Form.Label id="mainTitle">Amount Billed in the last 12 months</Form.Label>
+                                    <Form.Label id="mainTitle">Minimum</Form.Label>
                                 </Col>
                                 <Col>
-                                    <Form.Label id="mainTitle2">Average Collection days</Form.Label>
+                                    <Form.Label id="mainTitle2">Maximum</Form.Label>
+                                </Col>
+                                <Col>
+                                    <Form.Label id="mainTitle3">Average Collection days</Form.Label>
                                 </Col>
                             </Row>
 
-                            <Row class="rowForm">
+                            <Row className="manageRowForm">
                                 <Col sm={6} md={1}>
-                                    <Form.Label class="inputTitle">A+</Form.Label>
+                                    <Form.Label className="inputTitle">A+</Form.Label>
                                 </Col>
 
                                 <Col sm={6} md={3}>
@@ -363,14 +414,11 @@ const Manage = () => {
                                 </Col>
 
 
-                                <Col sm={6} md={1}>
-                                    <Form.Label class="inputTitle">To</Form.Label>
-                                </Col>
-                                
                                 
                                 <Col sm={6} md={3}>
                                     <Form.Control required
                                             id='maximumGradeA+'
+                                            className="manageMaximumGrade"
                                             size="md"
                                             type="number"
                                             placeholder="Maximum treshold"
@@ -389,17 +437,17 @@ const Manage = () => {
                                     <Form.Control required
                                         as="select"
                                         id='averageCollectionTimeA+'
+                                        className="manageAverageCollectionTime"
                                         size="md"
                                         aria-label="Average collection time"
                                         onChange={(g) => setField('averageCollectionTimeGradeAPlus', g.target.value)}
                                         value={clientGrading.averageCollectionTimeGradeAPlus}
                                         isInvalid={!!errors.averageCollectionTimeGradeAPlus}>
                                             <option value="">Select Average Collection Time</option>
-                                            <option value="30 days or less">30 days or less</option>
-                                            <option value="Between 30 and 60 days">Between 30 and 60 days</option>
-                                            <option value="Between 60 and 90 days">Between 60 and 90 days</option>
-                                            <option value="Over 90 days">Over 90 days</option>
-                                            <option value="More than 180 days">More than 180 days</option>
+                                            <option value="<30">30 days or less</option>
+                                            <option value="30-60">Between 30 and 60 days</option>
+                                            <option value="60-90">Between 60 and 90 days</option>
+                                            <option value=">90">Over 90 days</option>
                                     </Form.Control>
                                     <Form.Control.Feedback type="invalid">
                                         {errors.averageCollectionTimeGradeAPlus}
@@ -409,10 +457,10 @@ const Manage = () => {
 
                         
 
-                            <Row class="rowForm">
+                            <Row className="manageRowForm">
 
                                 <Col sm={6} md={1}>
-                                    <Form.Label class="inputTitle">A</Form.Label>
+                                    <Form.Label className="inputTitle">A</Form.Label>
                                 </Col>
 
                                 <Col sm={6} md={3}>
@@ -431,13 +479,11 @@ const Manage = () => {
                                     </Form.Control.Feedback>
                                 </Col>
                                 
-                                <Col sm={6} md={1}>
-                                    <Form.Label class="inputTitle">To</Form.Label>
-                                </Col>
 
                                 <Col sm={6} md={3}>
                                     <Form.Control required
                                             id='maximumGradeA'
+                                            className="manageMaximumGrade"
                                             size="md"
                                             type="number"
                                             placeholder="Maximum treshold"
@@ -447,7 +493,7 @@ const Manage = () => {
                                     </Form.Control>
 
                                     <Form.Control.Feedback type="invalid">
-                                    {errors.maximumGradeA}
+                                        {errors.maximumGradeA}
                                     </Form.Control.Feedback>
                                 </Col>
 
@@ -456,17 +502,17 @@ const Manage = () => {
                                     <Form.Control required
                                         as="select"
                                         id='averageCollectionTimeA'
+                                        className="manageAverageCollectionTime"
                                         size="md"
                                         aria-label="Average collection time"
                                         onChange={(g) => setField('averageCollectionTimeGradeA', g.target.value)}
                                         value={clientGrading.averageCollectionTimeGradeA}
                                         isInvalid={!!errors.averageCollectionTimeGradeA}>
                                             <option value="">Select Average Collection Time</option>
-                                            <option value="30 days or less">30 days or less</option>
-                                            <option value="Between 30 and 60 days">Between 30 and 60 days</option>
-                                            <option value="Between 60 and 90 days">Between 60 and 90 days</option>
-                                            <option value="Over 90 days">Over 90 days</option>
-                                            <option value="More than 180 days">More than 180 days</option>
+                                            <option value="<30">30 days or less</option>
+                                            <option value="30-60">Between 30 and 60 days</option>
+                                            <option value="60-90">Between 60 and 90 days</option>
+                                            <option value=">90">Over 90 days</option>
                                     </Form.Control>
                                     <Form.Control.Feedback type="invalid">
                                         {errors.averageCollectionTimeGradeA}
@@ -474,10 +520,10 @@ const Manage = () => {
                                 </Col>
                             </Row>
 
-                            <Row class="rowForm">
+                            <Row className="manageRowForm">
 
                                 <Col sm={6} md={1}>
-                                    <Form.Label class="inputTitle">B</Form.Label>
+                                    <Form.Label className="inputTitle">B</Form.Label>
                                 </Col>
 
                                 <Col sm={6} md={3}>
@@ -496,14 +542,12 @@ const Manage = () => {
                                     </Form.Control.Feedback>
                                 </Col>
                                 
-                                <Col sm={6} md={1}>
-                                    <Form.Label class="inputTitle">To</Form.Label>
-                                </Col>
 
                                 
                                 <Col sm={6} md={3}>
                                     <Form.Control required
                                             id='maximumGradeB'
+                                            className="manageMaximumGrade"
                                             size="md"
                                             type="number"
                                             placeholder="Maximum treshold"
@@ -523,17 +567,17 @@ const Manage = () => {
                                     <Form.Control required
                                         as="select"
                                         id='averageCollectionTimeB'
+                                        className="manageAverageCollectionTime"
                                         size="md"
                                         aria-label="Average collection time"
                                         onChange={(g) => setField('averageCollectionTimeGradeB', g.target.value)}
                                         value={clientGrading.averageCollectionTimeGradeB}
                                         isInvalid={!!errors.averageCollectionTimeGradeB}>
                                             <option value="">Select Average Collection Time</option>
-                                            <option value="30 days or less">30 days or less</option>
-                                            <option value="Between 30 and 60 days">Between 30 and 60 days</option>
-                                            <option value="Between 60 and 90 days">Between 60 and 90 days</option>
-                                            <option value="Over 90 days">Over 90 days</option>
-                                            <option value="More than 180 days">More than 180 days</option>
+                                            <option value="<30">30 days or less</option>
+                                            <option value="30-60">Between 30 and 60 days</option>
+                                            <option value="60-90">Between 60 and 90 days</option>
+                                            <option value=">90">Over 90 days</option>
                                     </Form.Control>
                                     <Form.Control.Feedback type="invalid">
                                         {errors.averageCollectionTimeGradeB}
@@ -542,10 +586,10 @@ const Manage = () => {
                             </Row>
 
 
-                            <Row class="rowForm">
+                            <Row className="manageRowForm">
 
                                 <Col sm={6} md={1}>
-                                    <Form.Label class="inputTitle">C</Form.Label>
+                                    <Form.Label className="inputTitle">C</Form.Label>
                                 </Col>
 
 
@@ -565,14 +609,11 @@ const Manage = () => {
                                     </Form.Control.Feedback>
                                 </Col>
 
-                                <Col sm={6} md={1}>
-                                    <Form.Label class="inputTitle">To</Form.Label>
-                                </Col>
-
 
                                 <Col sm={6} md={3}>
                                     <Form.Control required
                                             id='maximumGradeC'
+                                            className="manageMaximumGrade"
                                             size="md"
                                             type="number"
                                             placeholder="Maximum treshold"
@@ -591,17 +632,17 @@ const Manage = () => {
                                     <Form.Control required
                                         as="select"
                                         id='averageCollectionTimeC'
+                                        className="manageAverageCollectionTime"
                                         size="md"
                                         aria-label="Average collection time"
                                         onChange={(g) => setField('averageCollectionTimeGradeC', g.target.value)}
                                         value={clientGrading.averageCollectionTimeGradeC}
                                         isInvalid={!!errors.averageCollectionTimeGradeC}>
                                             <option value="">Select Average Collection Time</option>
-                                            <option value="30 days or less">30 days or less</option>
-                                            <option value="Between 30 and 60 days">Between 30 and 60 days</option>
-                                            <option value="Between 60 and 90 days">Between 60 and 90 days</option>
-                                            <option value="Over 90 days">Over 90 days</option>
-                                            <option value="More than 180 days">More than 180 days</option>
+                                            <option value="<30">30 days or less</option>
+                                            <option value="30-60">Between 30 and 60 days</option>
+                                            <option value="60-90">Between 60 and 90 days</option>
+                                            <option value=">90">Over 90 days</option>
                                     </Form.Control>
                                     <Form.Control.Feedback type="invalid">
                                         {errors.averageCollectionTimeGradeC}
@@ -610,9 +651,9 @@ const Manage = () => {
                             </Row>
 
 
-                            <Row class="rowForm">
+                            <Row className="manageRowForm">
                                 <Col sm={6} md={1}>
-                                    <Form.Label class="inputTitle">E+</Form.Label>
+                                    <Form.Label className="inputTitle">E+</Form.Label>
                                 </Col>
 
                                 <Col sm={6} md={3}>
@@ -632,14 +673,12 @@ const Manage = () => {
                                 </Col>
 
 
-                                <Col sm={6} md={1}>
-                                    <Form.Label class="inputTitle">To</Form.Label>
-                                </Col>
 
                                 
                                 <Col sm={6} md={3}>
                                     <Form.Control required
                                             id='maximumGradeE+'
+                                            className="manageMaximumGrade"
                                             size="md"
                                             type="number"
                                             placeholder="Maximum treshold"
@@ -658,17 +697,17 @@ const Manage = () => {
                                     <Form.Control required
                                         as="select"
                                         id='averageCollectionTimeE+'
+                                        className="manageAverageCollectionTime"
                                         size="md"
                                         aria-label="Average collection time"
                                         onChange={(g) => setField('averageCollectionTimeGradeEPlus', g.target.value)}
                                         value={clientGrading.averageCollectionTimeGradeEPlus}
                                         isInvalid={!!errors.averageCollectionTimeGradeEPlus}>
                                             <option value="">Select Average Collection Time</option>
-                                            <option value="30 days or less">30 days or less</option>
-                                            <option value="Between 30 and 60 days">Between 30 and 60 days</option>
-                                            <option value="Between 60 and 90 days">Between 60 and 90 days</option>
-                                            <option value="Over 90 days">Over 90 days</option>
-                                            <option value="More than 180 days">More than 180 days</option>
+                                            <option value="<30">30 days or less</option>
+                                            <option value="30-60">Between 30 and 60 days</option>
+                                            <option value="60-90">Between 60 and 90 days</option>
+                                            <option value=">90">Over 90 days</option>
                                     </Form.Control>
                                     <Form.Control.Feedback type="invalid">
                                         {errors.averageCollectionTimeGradeEPlus}

@@ -2,6 +2,20 @@ const { response } = require('express');
 const manageService = require('../services/manage.service');
 
 
+exports.getClientGradings = async (req, res) => {
+    await manageService.getClientGradings()
+        .then(async response => {
+            if (response) {
+                return res.send(response);
+            }
+            return res.status(500).send({ message: "The data could not be fetched." });
+        })
+        .catch(async err => {
+            return res.status(err.status || 500).send({ message: err.message || "Malfunction in the B&C Engine." });
+        });
+}
+
+
 exports.modifyClientGradings = async (req, res) => {
     if (req.user.role !== "admin") return res.status(403).send();
 
