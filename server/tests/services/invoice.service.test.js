@@ -182,7 +182,6 @@ let getDuesSpy = jest.spyOn(InvoiceService, 'getDues')
 
 let getClientInformationSpy = jest.spyOn(InvoiceService, 'getClientInformation')
     .mockImplementation(() => new Promise((resolve) => {
-        console.log("whatf FhASBRFIhWASEBFiwsnebfgiojnaswzeiogjn")
         resolve(fakeClientNameCountryList);
     }));
 

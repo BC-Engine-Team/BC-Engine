@@ -131,7 +131,6 @@ exports.getPerformanceReportsByUserId = async (userId, performanceReportModel = 
                 resolve(false)
             })
             .catch(err => {
-                console.log(err)
                 const response = {
                     status: err.status || 500,
                     message: err.message || 'Could not fetch Performance Reports by User Id.'

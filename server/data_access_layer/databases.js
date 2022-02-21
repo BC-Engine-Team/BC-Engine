@@ -378,7 +378,6 @@ db.sync = async (database, options) => {
       }
       await db['localdb'].reportTypeRecipients.bulkCreate(reportTypeRecipients);
       data.billingNumbers = await db['localdb'].billingNumbers.bulkCreate(billingNumbers)
-      console.log(data.billingNumbers)
       return data
     })
     .then(async data => {
