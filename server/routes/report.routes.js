@@ -14,10 +14,15 @@ router.post("/createPdf", authService.authenticateToken, reportController.create
 router.delete("/delete/:chartReportId", authService.authenticateToken, reportController.deleteChartReport);
 
 // Report Types routes
+router.get("/reportTypes", authService.authenticateToken, reportController.getReportTypesWithRecipients);
+
+// Performance Report routes
 router.get("/performanceReport", authService.authenticateToken, reportController.getPerformanceReports);
 
 router.get('/performanceReport/:userId', authService.authenticateToken, reportController.getPerformanceReportsByUserId)
 
-router.get("/reportTypes", authService.authenticateToken, reportController.getReportTypesWithRecipients);
+router.post('/performanceReport/createPdf', authService.authenticateToken, reportController.createPerformanceReportPDF)
+
+router.get('/performanceReport/fetchPdf', authService.authenticateToken, reportController.fetchPerformanceReportPDF)
 
 module.exports = router;
