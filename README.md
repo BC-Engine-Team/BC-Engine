@@ -65,4 +65,4 @@ The application might not be running at the time that you wish to access it so p
 ## Super Linter
 
 Super Linter is being used to establish good coding practices and prevent duplicates and formatting errors.
-[![GitHub Super-Linter](https://github.com/<OWNER>/<REPOSITORY>/workflows/Lint%20Code%20Base/badge.svg)](https://github.com/marketplace/actions/super-linter)
+[GitHub Super-Linter](https://github.com/marketplace/actions/super-linter)
