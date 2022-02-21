@@ -8,7 +8,8 @@ module.exports = (localdb, Sequelize) => {
         },
         name: {
             field: 'chart_report_name',
-            type: Sequelize.STRING
+            type: Sequelize.STRING,
+            allowNull: false
         },
         startDate: {
             field: 'chart_report_start',
