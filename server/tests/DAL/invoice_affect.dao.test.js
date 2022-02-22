@@ -204,7 +204,7 @@ describe("Test Invoice Affect DAO", () => {
                         "FROM BOSCO_INVOICE_AFFECT BIA, INVOICE_HEADER IH  ",
                         "LEFT OUTER JOIN [Bosco reduction].[dbo].NAME_CONNECTION NC ON NC.CONNECTION_ID=1 AND NC.CONNECTION_NAME_ID=CONVERT(nvarchar, IH.ACTOR_ID) ",
                         "LEFT OUTER JOIN [Bosco reduction].[dbo].NAME_QUALITY NQ1 ON NQ1.NAME_ID=NC.NAME_ID AND NQ1.QUALITY_TYPE_ID=5  ",
-                        "LEFT OUTER JOIN [Bosco reduction].[dbo].NAME_QUALITY NQ2  ON NQ2.NAME_ID=NC.NAME_ID  AND NQ2.QUALITY_TYPE_ID=3 ",
+                        "LEFT OUTER JOIN [Bosco reduction].[dbo].NAME_QUALITY NQ2  ON NQ2.NAME_ID=NC.NAME_ID  AND NQ2.QUALITY_TYPE_ID=3  ",
                         "LEFT OUTER JOIN [Bosco reduction].[dbo].ACCOUNTING_CLIENT AC ON AC.TRANSACTION_REF=CONVERT(NVARCHAR,IH.INVOICE_ID) ",
                         ", [Bosco reduction].[dbo].NAME N ",
                         "WHERE IH.INVOICE_TYPE in (1,4) AND IH.INVOICE_PREVIEW=0 AND IH.INVOCIE_DATE BETWEEN ? AND ? ",
@@ -259,7 +259,7 @@ describe("Test Invoice Affect DAO", () => {
                         "WHERE IH.INVOICE_TYPE in (1,4) AND IH.INVOICE_PREVIEW=0 AND IH.INVOCIE_DATE BETWEEN ? AND ? ",
                         "AND BIA.INVOICE_ID=IH.INVOICE_ID AND BIA.AFFECT_ACCOUNT LIKE '%1200%'  AND NQ1.DROPDOWN_CODE=?  AND NQ2.DROPDOWN_CODE=? ",
                         " AND DATEDIFF(day, IH.INVOCIE_DATE, AC.CLEARING_LAST_TRANSACTION)>=30 ",
-                        "AND DATEDIFF(day, IH.INVOCIE_DATE, AC.CLEARING_LAST_TRANSACTION)<60",
+                        "AND DATEDIFF(day, IH.INVOCIE_DATE, AC.CLEARING_LAST_TRANSACTION)<60 ",
                         " AND N.NAME_ID=NC.NAME_ID AND N.LEGAL_COUNTRY_CODE=? "),
                     replacements: [startDate, endDate, employeeId, clientType, countryCode]
                 };
@@ -284,7 +284,7 @@ describe("Test Invoice Affect DAO", () => {
                         "WHERE IH.INVOICE_TYPE in (1,4) AND IH.INVOICE_PREVIEW=0 AND IH.INVOCIE_DATE BETWEEN ? AND ? ",
                         "AND BIA.INVOICE_ID=IH.INVOICE_ID AND BIA.AFFECT_ACCOUNT LIKE '%1200%'  AND NQ1.DROPDOWN_CODE=?  AND NQ2.DROPDOWN_CODE=? ",
                         " AND DATEDIFF(day, IH.INVOCIE_DATE, AC.CLEARING_LAST_TRANSACTION)>=60 ",
-                        "AND DATEDIFF(day, IH.INVOCIE_DATE, AC.CLEARING_LAST_TRANSACTION)<=90",
+                        "AND DATEDIFF(day, IH.INVOCIE_DATE, AC.CLEARING_LAST_TRANSACTION)<=90 ",
                         " AND N.NAME_ID=NC.NAME_ID AND N.LEGAL_COUNTRY_CODE=? "),
                     replacements: [startDate, endDate, employeeId, clientType, countryCode]
                 };
@@ -371,6 +371,7 @@ describe("Test Invoice Affect DAO", () => {
                     queryString: "".concat("SELECT IH.INVOCIE_DATE, IH.ACTOR_ID, BIA.AFFECT_AMOUNT ",
                         "FROM BOSCO_INVOICE_AFFECT BIA, INVOICE_HEADER IH  ",
                         "LEFT OUTER JOIN [Bosco reduction].[dbo].NAME_CONNECTION NC ON NC.CONNECTION_ID=1 AND NC.CONNECTION_NAME_ID=CONVERT(nvarchar, IH.ACTOR_ID) ",
+                        " LEFT OUTER JOIN [Bosco reduction].[dbo].ACCOUNTING_CLIENT AC ON AC.TRANSACTION_REF=CONVERT(NVARCHAR,IH.INVOICE_ID) ",
                         ", [Bosco reduction].[dbo].NAME N ",
                         "WHERE IH.INVOICE_TYPE in (1,4) AND IH.INVOICE_PREVIEW=0 AND IH.INVOCIE_DATE BETWEEN ? AND ? ",
                         "AND BIA.INVOICE_ID=IH.INVOICE_ID AND BIA.AFFECT_ACCOUNT LIKE '%1200%' ",
