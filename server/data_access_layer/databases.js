@@ -39,6 +39,7 @@ db['localdb'].recipients = require('./models/localdb/recipient.model')(db['local
 db['localdb'].reportTypeRecipients = require('./models/localdb/report_type_recipient.model')(db['localdb'], Sequelize.DataTypes)
 db['localdb'].billingNumbers = require('./models/localdb/billing_numbers.model')(db['localdb'], Sequelize.DataTypes)
 db['localdb'].performanceReports = require('./models/localdb/performance_report.model')(db['localdb'], Sequelize.DataTypes)
+db['localdb'].clientGradingData = require('./models/localdb/client_grading.model')(db['localdb'], Sequelize.DataTypes)
 
 // Configure relationships for localdb models
 db['localdb'].chartReports.belongsTo(db['localdb'].users, {
@@ -316,6 +317,26 @@ db.sync = async (database, options) => {
         frequency: 0
       });
       return data;
+    })
+    .then(async () => {
+      await db[database].clientGradingData.create({
+        clientGradingId: 1,
+        maximumGradeAPlus: 300000,
+        minimumGradeAPlus: 50000.01,
+        averageCollectionTimeGradeAPlus: "<30",
+        maximumGradeA: 50000,
+        minimumGradeA: 0,
+        averageCollectionTimeGradeA: "<30",
+        maximumGradeB: 50000,
+        minimumGradeB: 0,
+        averageCollectionTimeGradeB: "30-60",
+        maximumGradeC: 50000,
+        minimumGradeC: 0,
+        averageCollectionTimeGradeC: "60-90",
+        maximumGradeEPlus: 50000,
+        minimumGradeEPlus: 0,
+        averageCollectionTimeGradeEPlus: ">90"
+      });
     })
     .then(async data => {
       let reportTypeRecipients = [];
