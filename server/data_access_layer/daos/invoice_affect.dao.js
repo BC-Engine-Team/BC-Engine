@@ -28,7 +28,6 @@ exports.getInvoicesByDate = async (startDate, endDate, employeeId = undefined, c
             resolve(false);
         }
         catch (err) {
-            console.log(err)
             const response = {
                 status: err.status || 500,
                 message: err.message || "Could not fetch invoices."
