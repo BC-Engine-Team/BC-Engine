@@ -74,9 +74,10 @@ module.exports = (performanceReportInfo, billingNumbers, chartReportInfo, chartR
         let str = "";
         let counter = 0;
         let counterCompare = 0;
-        let labelCompare = "";
+        chartReportData
 
         for (let i = 0; i < chartReportData.length; i++) {
+            let labelCompare = "";
 
             if (counter === 5)
                 counter = 0;
@@ -89,6 +90,7 @@ module.exports = (performanceReportInfo, billingNumbers, chartReportInfo, chartR
             console.log(chartReportData[i].employee)
             console.log()
             if (parseInt(chartReportData[i].employee) !== -1) {
+                console.log(chartReportData[i].employee)
                 labelCompare = " - emp";
             }
 
