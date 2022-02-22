@@ -1,5 +1,13 @@
+.loadingChartReport {
+    height: 36px;
+    align-items: center;
+    display: flex;
+    margin: 0 4px;
+    padding: 0 6px;
+}
+
 #reportTypesTable {
-    width: 100%
+    width: 100%;
 }
 
 #reportRecipientList {
@@ -19,6 +27,11 @@
 
 .container-reportsManagement {
     width: 40%;
+    height: 36rem;
+}
+
+.report-management-card {
+    height: 32rem;
 }
 
 .container-reportsTable-employee {
@@ -30,9 +43,18 @@
     float: left;
 }
 
+.reports-table-card {
+    max-height: 32rem;
+    overflow-x: hidden;
+}
+
 .container-chartReports {
     width: 100%;
     float: left;
+}
+
+.performance-table-columns {
+    text-align: center;
 }
 
 h4 {

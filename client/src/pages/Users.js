@@ -113,7 +113,7 @@ const Users = () => {
         Axios.delete(`${process.env.REACT_APP_API}/users/delete/${email}`, { headers: header, data: data })
             .then((response) => {
                 if (response.data === true) {
-                    console.log("User deleted successfully!");
+                    alert("User deleted successfully!");
                 }
 
                 setDeleteButtonActivated(false);
@@ -150,14 +150,14 @@ const Users = () => {
             .catch((error) => {
                 if (error.response) {
                     if (error.response.status === 403 || error.response.status === 401) {
-                        console.log("You are not authorized to perform this action.");
+                        alert("You are not authorized to perform this action.");
                     }
                     else {
-                        console.log("Could not reach b&C Engine...");
+                        alert("Could not reach b&C Engine...");
                     }
                 }
                 else if (error.request) {
-                    console.log("Could not reach b&C Engine...");
+                    alert("Could not reach b&C Engine...");
                 }
             });
     }

@@ -256,7 +256,8 @@ const Dashboard = () => {
                 employeeId: parseInt(criteria.employee1.id) === -1 ? undefined : criteria.employee1.id,
                 clientType: criteria.clientType === "Any" ? undefined : criteria.clientType,
                 countryCode: parseInt(criteria.country.id) === -1 ? undefined : criteria.country.id,
-                countryLabel: parseInt(criteria.country.id) === -1 ? undefined : criteria.country.name
+                countryLabel: parseInt(criteria.country.id) === -1 ? undefined : criteria.country.name,
+                ageOfAccount: criteria.ageOfAccount === "All" ? undefined : criteria.ageOfAccount
             };
 
             if (c === 1) {
@@ -311,7 +312,7 @@ const Dashboard = () => {
                         });
 
                         colorCounter++;
-                        if (colorCounter === colors.length - 1) colorCounter = 0;
+                        if (colorCounter === colors.length) colorCounter = 0;
                     }
 
                     for (let i = 0; i < res.data[0].table.length; i++) {
@@ -723,6 +724,22 @@ const Dashboard = () => {
                                 </InputGroup>
                             </Row>
 
+                            <Row>
+                                <FormLabel htmlFor="ageOfAccountCriteriaDashboard" className="mt-2">{t('dashboard.criteria.labels.Age')}</FormLabel>
+                                <InputGroup className="mb-2">
+                                    <Form.Select id="ageOfAccountCriteriaDashboard" onChange={(e) => {
+                                        setField('ageOfAccount', e.target.value);
+                                    }}>
+                                        <option key={0} value={"All"}>{t('dashboard.criteria.ageOfAccount.All')}</option>
+                                        <option key={1} value={"<30"}>{t('dashboard.criteria.ageOfAccount.DueCurrent')}</option>
+                                        <option key={2} value={"30-60"}>{t('dashboard.criteria.ageOfAccount.Due1Month')}</option>
+                                        <option key={3} value={"60-90"}>{t('dashboard.criteria.ageOfAccount.Due2Month')}</option>
+                                        <option key={4} value={">90"}>{t('dashboard.criteria.ageOfAccount.Due3Month')}</option>
+
+                                    </Form.Select>
+                                </InputGroup>
+                            </Row>
+
                             <Row className='mt-2'>
                                 <Col sm={6} md={6} className="pe-1">
                                     <Button
@@ -756,8 +773,8 @@ const Dashboard = () => {
                                     </Button>
                                 </Col>
                             </Row>
-                        </div>
-                    </div>
+                        </div >
+                    </div >
                     <div className="container-chart">
                         <div className="card shadow my-3 mx-3 p-2 pt-3">
                             {chartData &&
@@ -860,8 +877,8 @@ const Dashboard = () => {
                             </ButtonGroup>
                         </div>
                     </div>
-                </div>
-            </div>
+                </div >
+            </div >
             <ConfirmationPopup
                 open={confirmSaveActivated}
                 prompt={t('dashboard.criteria.SaveConfirmPrompt')}

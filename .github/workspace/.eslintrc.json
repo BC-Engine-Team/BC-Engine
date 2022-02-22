@@ -1,0 +1,18 @@
+{
+  "parser": "@babel/eslint-parser",
+  "plugins": [
+    "react",
+    "react-hooks"
+  ],
+  "extends": [
+    "eslint:recommended"
+  ],
+  "rules": {
+    "react-hooks/exhaustive-deps": "warn"
+  },
+  "parserOptions": {
+    "ecmaVersion": 8,
+    "requireConfigFile": false,
+    "sourceType":"module"
+  }
+}

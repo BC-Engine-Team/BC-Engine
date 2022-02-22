@@ -5,12 +5,13 @@ import { useTranslation } from 'react-i18next';
 import Axios from 'axios';
 
 import { Button, Table, Form, ListGroup, ListGroupItem } from 'react-bootstrap'
-import '../styles/reportsPage.css';
+import { Oval } from 'react-loader-spinner'
 
 import NavB from '../components/NavB'
-import ConfirmationPopup from '../components/ConfirmationPopup'
 import DeleteButton from '../components/DeleteButton'
-import { BiExport } from "react-icons/bi";
+import ExportButton from '../components/ExportButton'
+import ConfirmationPopup from '../components/ConfirmationPopup'
+import '../styles/reportsPage.css'
 
 const Reports = () => {
     const { t } = useTranslation();
@@ -18,9 +19,12 @@ const Reports = () => {
 
     const cookies = new Cookies();
     const malfunctionError = t('error.Malfunction');
-    const notFoundError = t('error.NotFound')
+    const notFoundError = t('error.NotFound');
 
     let role = cookies.get("role");
+
+    const [pdfLoading, setPdfLoading] = useState(false);
+    const [currentPdfLoading, setCurrentPdfLoading] = useState();
 
     const [chartReportId, setChartReportId] = useState("");
     const [chartReportName, setChartReportName] = useState("");
@@ -39,6 +43,12 @@ const Reports = () => {
         accountType: ""
     }]);
 
+    const [performanceReports, setPerformanceReports] = useState([{
+        name: '',
+        createdAt: '',
+        recipient: ''
+    }]);
+
     const [reportTypes, setReportTypes] = useState([]);
     const [selectedReportType, setSelectedReportType] = useState({});
     const [showReportsManagement, setShowReportsManagement] = useState({
@@ -46,6 +56,73 @@ const Reports = () => {
         employee: "container-reportsTable-employee",
         admin: "container-reportsTable"
     });
+
+    const createAndDownloadPDF = (ReportId) => {
+        setPdfLoading(true);
+        setCurrentPdfLoading(ReportId);
+
+        let header = {
+            'authorization': "Bearer " + cookies.get("accessToken"),
+        }
+
+        let param = {
+            reportid: ReportId
+        }
+
+        Axios.defaults.withCredentials = true;
+
+        Axios.post(`${process.env.REACT_APP_API}/reports/createPdf`, param, { headers: header })
+            .then((response) => {
+                if (response.data === true) {
+                    Axios.get(`${process.env.REACT_APP_API}/reports/fetchPdf`, { params: param, headers: header, responseType: 'arraybuffer' })
+                        .then((res) => {
+                            const pdfBlob = new Blob([res.data], { type: 'application/pdf' });
+
+                            const url = URL.createObjectURL(pdfBlob);
+
+                            var element = document.createElement('a');
+                            document.body.appendChild(element);
+                            element.style = "display: none";
+                            element.href = url;
+                            element.download = `ChartReport-${ReportId}`;
+                            element.click();
+                            document.body.removeChild(element);
+                            setPdfLoading(false);
+                        })
+                        .catch((error) => {
+                            setPdfLoading(false);
+                            if (error.response) {
+                                if (error.response.status === 403 || error.response.status === 401) {
+                                    alert("You are not authorized to perform this action.");
+                                }
+                                else {
+                                    alert("Could not fetch pdf file...");
+                                }
+                            }
+                            else if (error.request) {
+                                alert("Could not fetch pdf file...");
+                            }
+                        });
+                }
+                else {
+                    alert("Could not fetch pdf file...");
+                }
+            })
+            .catch((error) => {
+                setPdfLoading(false);
+                if (error.response) {
+                    if (error.response.status === 403 || error.response.status === 401) {
+                        alert("You are not authorized to perform this action.");
+                    }
+                    else {
+                        alert("Could not generate pdf file...");
+                    }
+                }
+                else if (error.request) {
+                    alert("Could not fetch Chart Report...");
+                }
+            });
+    }
 
     const handleRefresh = async () => {
         await getChartReports();
@@ -55,13 +132,50 @@ const Reports = () => {
                 isAdmin: true
             });
             await getReportTypesAndRecipients();
+
+        }
+        await getPerformanceReports();
+    }
+
+    const getPerformanceReports = async () => {
+        let header = {
+            'authorization': "Bearer " + cookies.get("accessToken")
+        }
+        let url = `${process.env.REACT_APP_API}/reports/performanceReport`
+
+        if (role !== 'admin') {
+            url = url.concat(`/${cookies.get('userId')}`)
         }
 
+        Axios.defaults.withCredentials = true;
+
+        await Axios.get(url, { headers: header })
+            .then((response) => {
+                if (response.data) {
+                    setPerformanceReports(response.data);
+                    return;
+                }
+                alert("The response from the B&C Engine was invalid.");
+            })
+            .catch((error) => {
+                if (error.response) {
+                    if (error.response.status === 403 || error.response.status === 401) {
+                        alert("You are not authorized to perform this action.");
+                    }
+                    else {
+                        alert("Malfunction in the B&C Engine.");
+                    }
+                }
+                else if (error.request) {
+                    alert("Could not reach b&C Engine...");
+                }
+            });
     }
+
 
     const getReportTypesAndRecipients = async () => {
         let header = {
-            'authorization': "Bearer " + cookies.get("accessToken"),
+            'authorization': "Bearer " + cookies.get("accessToken")
         }
 
         Axios.defaults.withCredentials = true;
@@ -69,7 +183,6 @@ const Reports = () => {
         await Axios.get(`${process.env.REACT_APP_API}/reports/reportTypes`, { headers: header })
             .then((response) => {
                 if (response.data) {
-                    console.log(response.data)
                     setReportTypes(response.data);
                     setSelectedReportType(response.data[0]);
                     return;
@@ -157,6 +270,7 @@ const Reports = () => {
         setDeleteButtonActivated(false);
     };
 
+
     useEffect(() => {
         if (cookies.get("accessToken") === undefined) {
             navigate("/login");
@@ -170,35 +284,63 @@ const Reports = () => {
     return (
         <div>
             <NavB />
-            <div className=' mainContainer mainDiv'>
+            <div className='mainContainer mainDiv'>
                 <div className='justify-content-center main'>
                     <div className={showReportsManagement.isAdmin ?
                         showReportsManagement.admin :
                         showReportsManagement.employee} >
-                        <div className='card shadow my-3 mx-3' >
+                        <div className='card shadow my-3 mx-3 reports-table-card' >
                             <h4 className="text-center bg-light">{t('reports.reports.Title')}</h4>
                             <Table responsive hover id='reportTypesTable'>
                                 <thead className='bg-light'>
                                     <tr key="0">
-                                        <th>{t('reports.reports.NameLabel')}</th>
-                                        <th>{t('reports.reports.EmployeeLabel')}</th>
-                                        <th>{t('reports.reports.DateLabel')}</th>
-                                        <th className='text-center'>Actions</th>
+                                        <th className='performance-table-columns'>{t('reports.reports.NameLabel')}</th>
+                                        <th className='performance-table-columns'>{t('reports.reports.DateLabel')}</th>
+                                        <th className='performance-table-columns'>{t('reports.reports.EmployeeLabel')}</th>
+                                        <th className='performance-table-columns'>Actions</th>
                                     </tr>
                                 </thead>
-
                                 <tbody>
+                                    {performanceReports.map((p) => {
+                                        return (
+                                            <tr key={p.performanceReportId}>
+                                                <td className='performance-table-columns'>{p.name}</td>
+                                                <td className='performance-table-columns'>{p.createdAt.toString()}</td>
+                                                <td className='performance-table-columns'>{p.recipient}</td>
+                                                <td className="py-1">
+                                                    <div className="d-flex justify-content-center">
+                                                        {pdfLoading
+                                                            ?
+                                                            p.performanceReportId !== currentPdfLoading
+                                                                ?
+                                                                <ExportButton id={p.performanceReportId} iconColor={{ color: '#666' }} styles={{ pointerEvents: 'none' }} />
+                                                                :
+                                                                <span className='loadingChartReport align-self-center'>
+                                                                    <Oval
+                                                                        height="22"
+                                                                        width="22"
+                                                                        color='black'
+                                                                        ariaLabel='loading' />
+                                                                </span>
 
+                                                            :
+                                                            <ExportButton id={p.performanceReportId} onExport={() => createAndDownloadPDF(p.performanceReportId)} />
+                                                        }
+                                                    </div >
+                                                </td >
+                                            </tr>
+                                        )
+                                    })}
                                 </tbody>
                             </Table>
                         </div>
                     </div>
                     {role === "admin" ?
                         <div className='container-reportsManagement'>
-                            <div className='card shadow my-3 mx-3 px-3 py-2'>
+                            <div className='card shadow my-3 mx-3 px-3 py-2 report-management-card'>
                                 <h3 className='text-center'>{t('reports.reportsManagement.Title')}</h3>
                                 <Form.Group className="my-2" controlId="floatingModifyReportType">
-                                    <Form.Label>{t('reports.reportsManagement.reportType.Title')}</Form.Label>
+                                    <Form.Label key='reportsManagementTitle'>{t('reports.reportsManagement.reportType.Title')}</Form.Label>
                                     <Form.Select required
                                         id='reportTypeSelect'
                                         size="sm"
@@ -289,8 +431,23 @@ const Reports = () => {
                                                 <td>{r.endDate.toString()}</td>
                                                 <td className="py-1">
                                                     <div className="d-flex justify-content-center">
+                                                        {pdfLoading
+                                                            ?
+                                                            r.chartReportId !== currentPdfLoading
+                                                                ?
+                                                                <ExportButton id={r.chartReportId} iconColor={{ color: '#666' }} styles={{ pointerEvents: 'none' }} />
+                                                                :
+                                                                <span className='loadingChartReport align-self-center'>
+                                                                    <Oval
+                                                                        height="22"
+                                                                        width="22"
+                                                                        color='black'
+                                                                        ariaLabel='loading' />
+                                                                </span>
 
-                                                        <BiExport size={"1.7rem"} className="pt-1" />
+                                                            :
+                                                            <ExportButton id={r.chartReportId} onExport={() => createAndDownloadPDF(r.chartReportId)} />
+                                                        }
                                                         <DeleteButton onDelete={() => handleDeleteChartReport(r.chartReportId, r.name)} />
                                                     </div >
                                                 </td >

@@ -1,11 +1,10 @@
 const database = require('../databases')['mssql_bosco']
-const databases = require('../databases');
 const { QueryTypes } = require('sequelize');
 
-exports.getTransactionsStatByYearMonth = async (yearMonthList, employeeId = undefined, clientType = undefined, countryLabel = undefined, db = database) => {
+exports.getTransactionsStatByYearMonth = async (yearMonthList, employeeId = undefined, clientType = undefined, countryLabel = undefined, ageOfAccount = undefined, db = database) => {
     return new Promise(async (resolve, reject) => {
         try {
-            let query = this.prepareDuesQuery(yearMonthList, employeeId, clientType, countryLabel);
+            let query = this.prepareDuesQuery(yearMonthList, employeeId, clientType, countryLabel, ageOfAccount);
 
             const data = await db.query(query.queryString, {
                 replacements: query.replacements,
@@ -38,7 +37,7 @@ exports.getTransactionsStatByYearMonth = async (yearMonthList, employeeId = unde
     })
 }
 
-exports.prepareDuesQuery = (yearMonthList, employeeId, clientType, countryLabel) => {
+exports.prepareDuesQuery = (yearMonthList, employeeId, clientType, countryLabel, ageOfAccount) => {
     let query = {
         queryString: "SELECT ACS.DUE_CURRENT, ACS.DUE_1_MONTH, ACS.DUE_2_MONTH, ACS.DUE_3_MONTH, ACS.YEAR_MONTH ",
         replacements: [yearMonthList]
@@ -76,6 +75,25 @@ exports.prepareDuesQuery = (yearMonthList, employeeId, clientType, countryLabel)
         fromString = fromString.concat(", ACCOUNTING_NAME AN ");
         whereString = whereString.concat(" AND ACS.ACC_NAME_ID=AN.ACC_NAME_ID AND AN.ACC_NAME_COUNTRY=? ");
         query.replacements.push(countryLabel);
+    }
+
+    if (ageOfAccount !== undefined) {
+        switch (ageOfAccount) {
+            case "<30":
+                query.queryString = "SELECT ACS.DUE_CURRENT, 0 as 'DUE_1_MONTH', 0 as 'DUE_2_MONTH', 0 as 'DUE_3_MONTH', ACS.YEAR_MONTH ";
+                break;
+            case "30-60":
+                query.queryString = "SELECT 0 as 'DUE_CURRENT', ACS.DUE_1_MONTH, 0 as 'DUE_2_MONTH', 0 as 'DUE_3_MONTH', ACS.YEAR_MONTH ";
+                break;
+            case "60-90":
+                query.queryString = "SELECT 0 as 'DUE_CURRENT', 0 as 'DUE_1_MONTH', ACS.DUE_2_MONTH, 0 as 'DUE_3_MONTH', ACS.YEAR_MONTH ";
+                break;
+            case ">90":
+                query.queryString = "SELECT 0 as 'DUE_CURRENT', 0 as 'DUE_1_MONTH', 0 as 'DUE_2_MONTH', ACS.DUE_3_MONTH, ACS.YEAR_MONTH ";
+                break;
+            default:
+                query.queryString = query.queryString;
+        }
     }
 
     query.queryString = query.queryString.concat(fromString, whereString);

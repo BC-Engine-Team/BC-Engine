@@ -182,7 +182,6 @@ let getDuesSpy = jest.spyOn(InvoiceService, 'getDues')
 
 let getClientInformationSpy = jest.spyOn(InvoiceService, 'getClientInformation')
     .mockImplementation(() => new Promise((resolve) => {
-        console.log("whatf FhASBRFIhWASEBFiwsnebfgiojnaswzeiogjn")
         resolve(fakeClientNameCountryList);
     }));
 
@@ -238,7 +237,7 @@ describe("Test Invoice Service", () => {
                 // assert
                 expect(response).toEqual(fakeExpectedGetAverageResponse);
                 expect(getDuesSpy).toBeCalledTimes(1);
-                expect(getDuesSpy).toBeCalledWith(yearMonthList, undefined, undefined, undefined);
+                expect(getDuesSpy).toBeCalledWith(yearMonthList, undefined, undefined, undefined, undefined);
             });
 
             it("IS1.1.3 - should respond with error thrown by getDues", async () => {
@@ -391,7 +390,7 @@ describe("Test Invoice Service", () => {
                 // assert
                 expect(response).toEqual(expectedList);
                 expect(transacStatDaoSpy).toHaveBeenCalledTimes(1);
-                expect(transacStatDaoSpy).toHaveBeenCalledWith(yearMonthList, undefined, undefined, undefined);
+                expect(transacStatDaoSpy).toHaveBeenCalledWith(yearMonthList, undefined, undefined, undefined, undefined);
             });
 
             it("IS2.1.2 - when dao throws unspecified error status and message, should reject with default status and message ", async () => {
@@ -452,7 +451,7 @@ describe("Test Invoice Service", () => {
 
                 // assert
                 expect(response).toEqual(expectedList);
-                expect(transacStatDaoSpy).toHaveBeenCalledWith(yearMonthList, employeeId, undefined, undefined);
+                expect(transacStatDaoSpy).toHaveBeenCalledWith(yearMonthList, employeeId, undefined, undefined, undefined);
             });
         });
 
@@ -485,7 +484,7 @@ describe("Test Invoice Service", () => {
 
                 // assert
                 expect(response).toEqual(expectedList);
-                expect(transacStatDaoSpy).toHaveBeenCalledWith(yearMonthList, undefined, undefined, countryName);
+                expect(transacStatDaoSpy).toHaveBeenCalledWith(yearMonthList, undefined, undefined, countryName, undefined);
             });
         });
 
@@ -520,7 +519,7 @@ describe("Test Invoice Service", () => {
 
                 // assert
                 expect(response).toEqual(expectedList);
-                expect(transacStatDaoSpy).toHaveBeenCalledWith(yearMonthList, employeeId, undefined, countryName);
+                expect(transacStatDaoSpy).toHaveBeenCalledWith(yearMonthList, employeeId, undefined, countryName, undefined);
             });
         });
     });
@@ -556,7 +555,7 @@ describe("Test Invoice Service", () => {
 
                 // assert
                 expect(response).toEqual(expectedResponse);
-                expect(invoiceAffectDaoSpy).toHaveBeenCalledWith(startDateStr, endDateStr, undefined, undefined, undefined);
+                expect(invoiceAffectDaoSpy).toHaveBeenCalledWith(startDateStr, endDateStr, undefined, undefined, undefined, undefined);
             });
 
             it("IS3.1.2 - when dao throws error with specified status and message, should reject with specified status and message", async () => {
@@ -641,7 +640,7 @@ describe("Test Invoice Service", () => {
                 // assert
                 expect(response).toEqual(expectedResponse);
                 expect(invoiceAffectDaoSpy).toHaveBeenCalledTimes(1);
-                expect(invoiceAffectDaoSpy).toHaveBeenCalledWith(startDateStr, endDateStr, employeeId, undefined, undefined);
+                expect(invoiceAffectDaoSpy).toHaveBeenCalledWith(startDateStr, endDateStr, employeeId, undefined, undefined, undefined);
             });
         });
         describe("IS3.3 - given a valid start and end date str, yearMonthList and country", () => {
@@ -681,7 +680,7 @@ describe("Test Invoice Service", () => {
                 // assert
                 expect(response).toEqual(expectedResponse);
                 expect(invoiceAffectDaoSpy).toHaveBeenCalledTimes(1);
-                expect(invoiceAffectDaoSpy).toHaveBeenCalledWith(startDateStr, endDateStr, undefined, undefined, countryCode);
+                expect(invoiceAffectDaoSpy).toHaveBeenCalledWith(startDateStr, endDateStr, undefined, undefined, countryCode, undefined);
             });
         });
 
@@ -724,7 +723,7 @@ describe("Test Invoice Service", () => {
                 // assert
                 expect(response).toEqual(expectedResponse);
                 expect(invoiceAffectDaoSpy).toHaveBeenCalledTimes(1);
-                expect(invoiceAffectDaoSpy).toHaveBeenCalledWith(startDateStr, endDateStr, employeeId, undefined, countryCode);
+                expect(invoiceAffectDaoSpy).toHaveBeenCalledWith(startDateStr, endDateStr, employeeId, undefined, countryCode, undefined);
             });
         });
     });

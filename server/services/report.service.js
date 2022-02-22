@@ -1,6 +1,10 @@
 const ChartReportDao = require("../data_access_layer/daos/chart_report.dao");
 const ReportDao = require("../data_access_layer/daos/report.dao");
 
+const pdf = require('html-pdf');
+const pdfTemplate = require("../docs/chartReportPDF");
+require("../../config.js");
+
 // Chart Report Related functions
 exports.getChartReportsByUserId = async (userId) => {
     return new Promise(async (resolve, reject) => {
@@ -16,7 +20,7 @@ exports.getChartReportsByUserId = async (userId) => {
                     message: err.message || "Could not fetch data."
                 };
                 reject(response);
-            })
+            });
     });
 }
 
@@ -61,7 +65,7 @@ exports.createChartReportData = async (createdChartReport, data) => {
         let preparedData = [];
 
         for (let i = 0; i < data.length; i++) {
-            let isEmpFiltered = data[i].label.toString().split(" - ").at(-1) === "emp";
+            let isEmpFiltered = data[i].label.toString().split(" - ")[1] === "emp";
             let year = parseInt(data[i].label.toString().split(" - ")[0]);
             let set = {
                 chart_report_id: createdChartReport.chartReportId,
@@ -152,6 +156,45 @@ exports.deleteChartReportById = async (chartReportId) => {
 }
 
 
+// Performance Report functions
+exports.getPerformanceReports = async () => {
+    return new Promise(async (resolve, reject) => {
+        await ReportDao.getPerformanceReports()
+            .then(async data => {
+                if (data) {
+                    resolve(data);
+                }
+                resolve(false);
+            }).catch(async err => {
+                const response = {
+                    status: err.status || 500,
+                    message: err.message || "Could not fetch data."
+                };
+                reject(response);
+            });
+    });
+}
+
+exports.getPerformanceReportsByUserId = async (userId) => {
+    return new Promise(async (resolve, reject) => {
+        await ReportDao.getPerformanceReportsByUserId(userId)
+            .then(async data => {
+                if (data) {
+                    resolve(data)
+                }
+                resolve(false)
+            })
+            .catch(err => {
+                const response = {
+                    status: err.status || 500,
+                    message: err.message || 'Could not fetch data.'
+                }
+                reject(response)
+            })
+    })
+}
+
+
 // Reports Types related functions
 exports.getReportTypesWithRecipients = async () => {
     return new Promise(async (resolve, reject) => {
@@ -235,3 +278,85 @@ exports.getRecipients = async () => {
     });
 }
 
+// Chart Report PDF Generation related functions
+exports.createChartReportPDFById = async (reportId) => {
+    let averagesList = [];
+
+    let filePath;
+    if(__dirname !== '/home/runner/work/BC-Engine/BC-Engine/server/services') {
+        filePath = `${__dirname.replace("services", "")}docs\\pdf_files\\chartReport-${reportId}.pdf`;
+    }
+    else {
+        filePath = `${__dirname.replace("services", "")}docs/pdf_files/chartReport-${reportId}.pdf`;
+    }
+
+    return new Promise(async (resolve, reject) => {
+        ChartReportDao.getChartReportById(reportId)
+            .then(async data => {
+                if (data) {
+                    data = data.dataValues
+
+                    await this.getChartReportPDFAverages(reportId)
+                    .then(async (dataAvg) => {
+                        if(dataAvg)
+                            averagesList = dataAvg;
+                        else
+                            resolve(false);
+                    }).then(() => {
+                        pdf.create(pdfTemplate(data, averagesList), {format: "letter"})
+                        .toFile(filePath, () => {
+                            resolve(true);
+                        });
+                    }).catch(err => {
+                        reject(err);
+                    });
+                }
+                else
+                    resolve(false);
+            })
+            .catch(err => {
+                const response = {
+                    status: err.status || 500,
+                    message: err.message || "Malfunction in the B&C Engine."
+                }
+                reject(response);
+            });
+    });
+}
+
+exports.getChartReportPDFAverages = async (reportId) => {
+    return new Promise(async (resolve, reject) => {
+        ChartReportDao.getDataForChartReport(reportId)
+        .then(data => {
+            let averagesList = [];
+            if (data) {
+                for(let i = 0; i < data.length; i++) {
+                    let avgObject = {
+                        year: data[i].year,
+                        employee: data[i].employee,
+                        data: [
+                            data[i].january,
+                            data[i].february,
+                            data[i].march,
+                            data[i].april,
+                            data[i].may,
+                            data[i].june,
+                            data[i].july,
+                            data[i].august,
+                            data[i].september,
+                            data[i].october,
+                            data[i].november,
+                            data[i].december,
+                        ]
+                    }
+                    averagesList.push(avgObject);
+                }
+                resolve(averagesList);
+            }
+            resolve(false);
+        })
+        .catch(err => {
+            reject(err);
+        });
+    });
+}

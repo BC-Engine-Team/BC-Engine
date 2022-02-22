@@ -4,7 +4,8 @@ const { sequelize,
     checkPropertyExists
 } = require('sequelize-test-helpers');
 
-const [UserModel, ChartReportModel] = require('../../data_access_layer/models/localdb/localdb.model')(sequelize, dataTypes);
+const databases = require('../../data_access_layer/databases')
+const ChartReportModel = require('../../data_access_layer/models/localdb/chart_report.model')(sequelize, dataTypes);
 const ChartReportDAO = require('../../data_access_layer/daos/chart_report.dao');
 
 let returnedChartReports = [
@@ -40,27 +41,78 @@ let returnedChartReports = [
     }
 ];
 
+let returnedOneChartReport = [
+    {
+        chartReportId: 'fakeUUID1',
+        name: 'CR1',
+        startDate: '2019-12-01',
+        endDate: '2020-12-01',
+        employee1Id: 12345,
+        employee1Name: 'France Cote',
+        employee2Id: null,
+        employee2Name: null,
+        country: 'Canada',
+        clientType: 'Corr',
+        ageOfAccount: 'All',
+        accountType: 'Receivable',
+        user_user_id: 'fakeUserId'
+    }
+];
+
+let returnedChartData = [
+    {
+        dataValues: {
+            year: 2018,
+            employee: -1,
+            data: [
+                0,     0,     0,  0,
+                0,     0,     0,  0,
+            91.65, 83.36, 88.35, 89
+            ]
+        }
+    },
+    {
+        dataValues: {
+            year: 2019,
+            employee: -1,
+            data: [
+            84.12, 87.92, 93.05,
+            99.39, 96.37,     0,
+                0,     0,     0,
+                0,     0,     0
+            ]
+        }
+    }
+];
+
 let SequelizeMock = require('sequelize-mock');
 const dbMock = new SequelizeMock();
 var ChartReportMock = dbMock.define('chart_reports', returnedChartReports);
-
+var ChartReportDataMock = dbMock.define('chart_reports_data', returnedChartReports);
 
 describe("Test Chart Report DAO", () => {
-    const instance = new ChartReportModel();
+    const ChartReport = new ChartReportModel();
+
 
     afterEach(() => {
         ChartReportMock.$queryInterface.$clearResults();
+        ChartReportDataMock.$queryInterface.$clearResults();
     })
 
     beforeEach(() => {
         ChartReportMock.$queryInterface.$clearResults();
+        ChartReportDataMock.$queryInterface.$clearResults();
+
     })
 
     // testing the chart report model properties
     checkModelName(ChartReportModel)('chart_reports');
+
     ['chartReportId', 'name', 'startDate', 'endDate', 'employee1Id', 'employee1Name',
         'employee2Id', 'employee2Name', 'country', 'clientType', 'ageOfAccount', 'accountType']
-        .forEach(checkPropertyExists(instance));
+        .forEach(checkPropertyExists(ChartReport));
+
+
 
     describe("CRD1 - getChartReportsByUserId", () => {
         describe("CRD1.1 - given a userId", () => {
@@ -372,6 +424,139 @@ describe("Test Chart Report DAO", () => {
                 // act and assert
                 expect(ChartReportDAO.deleteChartReportById("fakeUUID", fakeChartReportModel))
                     .rejects.toEqual(expectedResponse);
+            });
+        });
+    });
+
+    describe("CRD5 - getChartReportById", () => {
+        describe("CRD5.1 - given a ReportId", () => {
+            it("CRD5.1.1 - should return one chart report", async () => {
+                // arrange
+                ChartReportMock.$queryInterface.$useHandler(function (query, queryOptions, done) {
+                    return Promise.resolve(returnedOneChartReport);
+                });
+
+                // act and assert
+                await expect(ChartReportDAO.getChartReportById('fakeUUID1', ChartReportMock)).resolves
+                    .toEqual(returnedOneChartReport);
+            });
+
+            it("CRD5.1.2 - should resolve false when Model cant fetch data", async () => {
+                // arrange
+                ChartReportMock.$queryInterface.$useHandler(function (query, queryOptions, done) {
+                    return Promise.resolve(false);
+                });
+
+                // act and assert
+                await expect(ChartReportDAO.getChartReportById('fakeUUID1', ChartReportMock)).resolves
+                    .toEqual(false);
+            });
+
+            it("CRD5.1.3 - should reject error when Model throws error with defined status and message", async () => {
+                // arrange
+                let expectedError = {
+                    status: 404,
+                    message: "Error."
+                };
+                ChartReportMock.$queryInterface.$useHandler(function (query, queryOptions, done) {
+                    return Promise.reject(expectedError);
+                });
+
+                // act and assert
+                await expect(ChartReportDAO.getChartReportById('fakeUUID1', ChartReportMock)).rejects
+                    .toEqual(expectedError);
+            });
+
+            it("CRD5.1.4 - should reject error with 500 status and predefined message when model does not define them", async () => {
+                // arrange
+                let expectedError = {
+                    status: 500,
+                    message: "Could not fetch data."
+                };
+                ChartReportMock.$queryInterface.$useHandler(function (query, queryOptions, done) {
+                    return Promise.reject({});
+                });
+
+                // act and assert
+                await expect(ChartReportDAO.getChartReportById('fakeUUID1', ChartReportMock)).rejects
+                    .toEqual(expectedError);
+            });
+        });
+    });
+
+    describe("CRD6 - getDataForChartReport", () => {
+        let expectedChartData = [
+            {
+                year: 2018,
+                employee: -1,
+                data: [
+                      0,     0,     0,  0,
+                      0,     0,     0,  0,
+                  91.65, 83.36, 88.35, 89
+                ]
+            },
+            {
+                year: 2019,
+                employee: -1,
+                data: [
+                  84.12, 87.92, 93.05,
+                  99.39, 96.37,     0,
+                      0,     0,     0,
+                      0,     0,     0
+                ]
+            }
+        ]
+        describe("CRD6.1 - given a ReportId", () => {
+            it("CRD6.1.1 - should return a list of chart report data", async () => {
+                // arrange
+                ChartReportDataMock.$queryInterface.$useHandler(function (query, queryOptions, done) {
+                    return Promise.resolve(returnedChartData);
+                });
+
+                // act and assert
+                await expect(ChartReportDAO.getDataForChartReport('fakeUUID1', ChartReportDataMock)).resolves
+                    .toEqual(expectedChartData);
+            });
+
+            it("CRD6.1.2 - should resolve false when Model cant fetch data", async () => {
+                // arrange
+                ChartReportDataMock.$queryInterface.$useHandler(function (query, queryOptions, done) {
+                    return Promise.resolve(false);
+                });
+
+                // act and assert
+                await expect(ChartReportDAO.getDataForChartReport('fakeUUID1', ChartReportDataMock)).resolves
+                    .toEqual(false);
+            });
+
+            it("CRD6.1.3 - should reject error when Model throws error with defined status and message", async () => {
+                // arrange
+                let expectedError = {
+                    status: 404,
+                    message: "Error."
+                };
+                ChartReportDataMock.$queryInterface.$useHandler(function (query, queryOptions, done) {
+                    return Promise.reject(expectedError);
+                });
+
+                // act and assert
+                await expect(ChartReportDAO.getDataForChartReport('fakeUUID1', ChartReportDataMock)).rejects
+                    .toEqual(expectedError);
+            });
+
+            it("CRD6.1.4 - should reject error with 500 status and predefined message when model does not define them", async () => {
+                // arrange
+                let expectedError = {
+                    status: 500,
+                    message: "Could not fetch data."
+                };
+                ChartReportDataMock.$queryInterface.$useHandler(function (query, queryOptions, done) {
+                    return Promise.reject({});
+                });
+
+                // act and assert
+                await expect(ChartReportDAO.getDataForChartReport('fakeUUID1', ChartReportDataMock)).rejects
+                    .toEqual(expectedError);
             });
         });
     });

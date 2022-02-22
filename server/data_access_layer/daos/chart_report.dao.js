@@ -2,7 +2,7 @@ const databases = require("../databases");
 const ChartReportModel = databases['localdb'].chartReports;
 const ChartReportDataModel = databases['localdb'].chartReportsData;
 
-
+// Chart Report Related functions
 exports.getChartReportsByUserId = async (userId, chartReportModel = ChartReportModel) => {
     return new Promise((resolve, reject) => {
         chartReportModel.findAll({
@@ -23,7 +23,6 @@ exports.getChartReportsByUserId = async (userId, chartReportModel = ChartReportM
                 };
                 reject(response);
             });
-
     });
 };
 
@@ -77,7 +76,59 @@ exports.createDataForChartReport = async (chartReportId, data, chartReportDataMo
                     message: err.message || "Could not create data."
                 }
                 reject(response);
-            })
+            });
+    });
+}
+
+exports.getChartReportById = async (chartReportId, chartReportModel = ChartReportModel) => {
+    return new Promise((resolve, reject) => {
+        chartReportModel.findOne({
+            where: {
+                chart_report_id: chartReportId
+            }
+        })
+        .then(async data => {
+            if (data) {
+                resolve(data);
+            }
+            resolve(false);
+        })
+        .catch(async err => {
+            const response = {
+                status: err.status || 500,
+                message: err.message || "Could not fetch data."
+            };
+            reject(response);
+        });
+    });
+}
+
+exports.getDataForChartReport = async (chartReportId, chartReportDataModel = ChartReportDataModel) => {
+    return new Promise((resolve, reject) => {
+        chartReportDataModel.findAll({
+            where: {
+                chart_report_id: chartReportId
+            }
+        })
+        .then(async data => {
+            if(data) {
+                if (data.length !== 0) {
+                    let returnData = [];
+                    for (let i = 0; i < data.length; i++) {
+                        returnData.push(data[i].dataValues);
+                    }
+                    resolve(returnData)
+                }
+            }
+            resolve(false)
+        })
+        .catch(async err => {
+            const response = {
+                status: err.status || 500,
+                message: err.message || "Could not fetch data."
+            }
+            reject(response);
+        });
     });
 }
 
