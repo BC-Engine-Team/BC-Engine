@@ -116,21 +116,21 @@ db.sync = async (database, options) => {
     .then(async () => {
       await db[database].clientGradingData.create({
         clientGradingId: 1,
-        maximumGradeAPlus: 50000,
-        minimumGradeAPlus: 45000,
-        averageCollectionTimeGradeAPlus: "30 days or less",
-        maximumGradeA: 44999,
-        minimumGradeA: 25000,
-        averageCollectionTimeGradeA: "30 days or less",
-        maximumGradeB: 24999,
-        minimumGradeB: 15000,
-        averageCollectionTimeGradeB: "30 days or less",
-        maximumGradeC: 14999,
-        minimumGradeC: 9000,
-        averageCollectionTimeGradeC: "30 days or less",
-        maximumGradeEPlus: 8999,
-        minimumGradeEPlus: 500,
-        averageCollectionTimeGradeEPlus: "30 days or less"
+        maximumGradeAPlus: 300000,
+        minimumGradeAPlus: 50000.01,
+        averageCollectionTimeGradeAPlus: "<30",
+        maximumGradeA: 50000,
+        minimumGradeA: 0,
+        averageCollectionTimeGradeA: "<30",
+        maximumGradeB: 50000,
+        minimumGradeB: 0,
+        averageCollectionTimeGradeB: "30-60",
+        maximumGradeC: 50000,
+        minimumGradeC: 0,
+        averageCollectionTimeGradeC: "60-90",
+        maximumGradeEPlus: 50000,
+        minimumGradeEPlus: 0,
+        averageCollectionTimeGradeEPlus: ">90"
       });
     })
     .then(async () => {
