@@ -3,6 +3,8 @@ const manageService = require('../services/manage.service');
 
 
 exports.getClientGradings = async (req, res) => {
+    if (req.user.role !== "admin") return res.status(403).send();
+
     await manageService.getClientGradings()
         .then(async response => {
             if (response) {
@@ -59,7 +61,7 @@ exports.modifyClientGradings = async (req, res) => {
     await manageService.modifyClientGradings(clientGradingGroup)
         .then(async response => {
             if(response) {
-                res.send(response);
+                return res.send(response);
             }
             return res.status(500).send({ message: "The data could not be modified"});
         })

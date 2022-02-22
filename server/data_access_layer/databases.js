@@ -318,26 +318,6 @@ db.sync = async (database, options) => {
       });
       return data;
     })
-    .then(async () => {
-      await db[database].clientGradingData.create({
-        clientGradingId: 1,
-        maximumGradeAPlus: 300000,
-        minimumGradeAPlus: 50000.01,
-        averageCollectionTimeGradeAPlus: "<30",
-        maximumGradeA: 50000,
-        minimumGradeA: 0,
-        averageCollectionTimeGradeA: "<30",
-        maximumGradeB: 50000,
-        minimumGradeB: 0,
-        averageCollectionTimeGradeB: "30-60",
-        maximumGradeC: 50000,
-        minimumGradeC: 0,
-        averageCollectionTimeGradeC: "60-90",
-        maximumGradeEPlus: 50000,
-        minimumGradeEPlus: 0,
-        averageCollectionTimeGradeEPlus: ">90"
-      });
-    })
     .then(async data => {
       let reportTypeRecipients = [];
       let billingNumbers = [];
@@ -519,6 +499,26 @@ db.sync = async (database, options) => {
         billing_actual_numbers: data.billingNumbers[19].id,
         billing_obj_numbers: data.billingNumbers[19].objectivesId
       }])
+    })
+    .then(async () => {
+      await db[database].clientGradingData.create({
+        clientGradingId: 1,
+        maximumGradeAPlus: 300000,
+        minimumGradeAPlus: 50000.01,
+        averageCollectionTimeGradeAPlus: "<30",
+        maximumGradeA: 50000,
+        minimumGradeA: 0,
+        averageCollectionTimeGradeA: "<30",
+        maximumGradeB: 50000,
+        minimumGradeB: 0,
+        averageCollectionTimeGradeB: "30-60",
+        maximumGradeC: 50000,
+        minimumGradeC: 0,
+        averageCollectionTimeGradeC: "60-90",
+        maximumGradeEPlus: 50000,
+        minimumGradeEPlus: 0,
+        averageCollectionTimeGradeEPlus: ">90"
+      });
     })
     .catch((err) => {
       console.log(err);

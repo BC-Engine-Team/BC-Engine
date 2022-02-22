@@ -26,7 +26,12 @@ exports.modifyClientGradings = async (clientGradingGroup) => {
     return new Promise((resolve, reject) => {
         ClientGradingDAO.updateClientGrading(clientGradingGroup)
             .then(async data => {
-                if(data) resolve(data);
+                if(data) {
+
+                    console.log(data);
+                    //modifyGradingOfAllClients(data);
+                    resolve(data);
+                }
                 resolve(false);
             })
             .catch(err => {
@@ -38,6 +43,7 @@ exports.modifyClientGradings = async (clientGradingGroup) => {
             });
     }); 
 }
+
 
 // exports.modifyGradingOfAllClients = async(clientGradingGroup) => {
 //     return new Promise((resolve, reject) => {
