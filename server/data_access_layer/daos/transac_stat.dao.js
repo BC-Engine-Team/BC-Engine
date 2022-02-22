@@ -1,7 +1,7 @@
 const database = require('../databases')['mssql_bosco'];
 const { QueryTypes } = require('sequelize');
 
-exports.getTransactionsStatByYearMonth = async (yearMonthList, employeeId = undefined, clientType = undefined, countryLabel = undefined, ageOfAccount = undefined, accountType = 'Receivables', db = database) => {
+exports.getTransactionsStatByYearMonth = async (yearMonthList, employeeId = undefined, clientType = undefined, countryLabel = undefined, ageOfAccount = undefined, accountType = undefined, db = database) => {
     return new Promise(async (resolve, reject) => {
         try {
             let query = this.prepareDuesQuery(yearMonthList, employeeId, clientType, countryLabel, ageOfAccount, accountType);
@@ -96,7 +96,7 @@ exports.prepareDuesQuery = (yearMonthList, employeeId, clientType, countryLabel,
         }
     }
 
-    if(accountType !== 'Receivables') {
+    if(accountType !== undefined) {
         whereString = whereString.concat(" AND ACS.CONNECTION_ID=7 ");
     }
     else {

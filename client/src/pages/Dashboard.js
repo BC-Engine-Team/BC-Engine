@@ -259,7 +259,7 @@ const Dashboard = () => {
                 countryCode: parseInt(criteria.country.id) === -1 ? undefined : criteria.country.id,
                 countryLabel: parseInt(criteria.country.id) === -1 ? undefined : criteria.country.name,
                 ageOfAccount: criteria.ageOfAccount === "All" ? undefined : criteria.ageOfAccount,
-                accountType: criteria.accountType
+                accountType: criteria.accountType === 'Receivables' ? undefined : criteria.accountType
             };
 
             if (c === 1) {

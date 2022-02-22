@@ -3,7 +3,7 @@ const InvoiceAffectDao = require("../data_access_layer/daos/invoice_affect.dao")
 const ClientDao = require("../data_access_layer/daos/name.dao");
 const CountryDao = require("../data_access_layer/daos/country.dao");
 
-exports.getAverages = async (startDateStr, endDateStr, employeeId = undefined, clientType = undefined, countryLabel = undefined, countryCode = undefined, ageOfAccount = undefined, accountType = 'Receivables') => {
+exports.getAverages = async (startDateStr, endDateStr, employeeId = undefined, clientType = undefined, countryLabel = undefined, countryCode = undefined, ageOfAccount = undefined, accountType = undefined) => {
     return new Promise(async (resolve, reject) => {
         // List to hold the final response
         let returnData = [];
@@ -109,7 +109,7 @@ exports.getClientInformation = async (clientIDList) => {
     });
 }
 
-exports.getDues = async (yearMonthList, employeeId = undefined, clientType = undefined, countryLabel = undefined, ageOfAccount = undefined, accountType = 'Receivables') => {
+exports.getDues = async (yearMonthList, employeeId = undefined, clientType = undefined, countryLabel = undefined, ageOfAccount = undefined, accountType = undefined) => {
     return new Promise(async (resolve, reject) => {
         let totalDuesList = [];
 
@@ -142,8 +142,7 @@ exports.getDues = async (yearMonthList, employeeId = undefined, clientType = und
     });
 }
 
-exports.getBilled = async (startDateStr, endDateStr, yearMonthList, employeeId = undefined, clientType = undefined, countryCode = undefined, ageOfAccount = undefined, accountType = 'Receivables') => {
-
+exports.getBilled = async (startDateStr, endDateStr, yearMonthList, employeeId = undefined, clientType = undefined, countryCode = undefined, ageOfAccount = undefined, accountType = undefined) => {
     let startDate = new Date(parseInt(startDateStr.substring(5, 7)) + " " + parseInt(startDateStr.substring(8)) + " " + parseInt(startDateStr.substring(0, 4)));
     let endDate = new Date(parseInt(endDateStr.substring(5, 7)) + " " + parseInt(endDateStr.substring(8)) + " " + parseInt(endDateStr.substring(0, 4)));
     endDate.setMonth(endDate.getMonth() - (yearMonthList.length - 1));

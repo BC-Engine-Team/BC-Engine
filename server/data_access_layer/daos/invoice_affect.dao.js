@@ -1,7 +1,7 @@
 const database = require('../databases')['mssql_pat']
 const { QueryTypes } = require('sequelize');
 
-exports.getInvoicesByDate = async (startDate, endDate, employeeId = undefined, clientType = undefined, countryCode = undefined, ageOfAccount = undefined, accountType = 'Receivables', db = database) => {
+exports.getInvoicesByDate = async (startDate, endDate, employeeId = undefined, clientType = undefined, countryCode = undefined, ageOfAccount = undefined, accountType = undefined, db = database) => {
     return new Promise(async (resolve, reject) => {
         try {
             let query = this.prepareBilledQuery(startDate, endDate, employeeId, clientType, countryCode, ageOfAccount, accountType);
@@ -22,11 +22,13 @@ exports.getInvoicesByDate = async (startDate, endDate, employeeId = undefined, c
                         amount: e['AFFECT_AMOUNT']
                     });
                 });
+                
                 resolve(returnData);
             }
             resolve(false);
         }
         catch (err) {
+            console.log(err)
             const response = {
                 status: err.status || 500,
                 message: err.message || "Could not fetch invoices."
@@ -42,7 +44,7 @@ exports.prepareBilledQuery = (startDate, endDate, employeeId, clientType, countr
         replacements: [startDate, endDate]
     };
 
-    let fromString = "FROM  BOSCO_INVOICE_AFFECT BIA, INVOICE_HEADER IH ";
+    let fromString = "FROM BOSCO_INVOICE_AFFECT BIA, INVOICE_HEADER IH ";
     let whereString = "WHERE IH.INVOICE_TYPE in (1,4) AND IH.INVOICE_PREVIEW=0 AND IH.INVOCIE_DATE BETWEEN ? AND ? AND BIA.INVOICE_ID=IH.INVOICE_ID AND BIA.AFFECT_ACCOUNT LIKE '%1200%' ";
 
     if (employeeId !== undefined) {
@@ -89,6 +91,9 @@ exports.prepareBilledQuery = (startDate, endDate, employeeId, clientType, countr
     }
 
     if (countryCode !== undefined) {
+        fromString = fromString.includes("LEFT OUTER JOIN [Bosco reduction].[dbo].NAME_CONNECTION NC ON NC.CONNECTION_ID=1 AND NC.CONNECTION_NAME_ID=CONVERT(nvarchar, IH.ACTOR_ID)") ?
+            fromString : fromString.concat(" LEFT OUTER JOIN [Bosco reduction].[dbo].NAME_CONNECTION NC ON NC.CONNECTION_ID=1 AND NC.CONNECTION_NAME_ID=CONVERT(nvarchar, IH.ACTOR_ID) ");
+
         fromString = fromString.includes("LEFT OUTER JOIN [Bosco reduction].[dbo].ACCOUNTING_CLIENT AC ON AC.TRANSACTION_REF=CONVERT(NVARCHAR,IH.INVOICE_ID)") ?
             fromString : fromString = fromString.concat(" LEFT OUTER JOIN [Bosco reduction].[dbo].ACCOUNTING_CLIENT AC ON AC.TRANSACTION_REF=CONVERT(NVARCHAR,IH.INVOICE_ID) ");
 
@@ -97,15 +102,31 @@ exports.prepareBilledQuery = (startDate, endDate, employeeId, clientType, countr
         query.replacements.push(countryCode);
     }
 
-    if(accountType !== 'Receivables') {
-        fromString = fromString.concat("LEFT OUTER JOIN [Bosco reduction].[dbo].NAME_CONNECTION NC ON NC.CONNECTION_ID = 1 AND",
-    "NC.CONNECTION_NAME_ID = CONVERT(nvarchar, IH.ACTOR_ID)",
-    "LEFT OUTER JOIN [Bosco reduction].[dbo].NAME_QUALITY NQ");
-    }
-    else {
-        fromString = fromString.concat("LEFT OUTER JOIN [Bosco reduction].[dbo].NAME_CONNECTION NC ON NC.CONNECTION_ID = 1 AND",
-    "NC.CONNECTION_NAME_ID = CONVERT(nvarchar, IH.ACTOR_ID)",
-    "LEFT OUTER JOIN [Bosco reduction].[dbo].NAME_QUALITY NQ");
+    // account Type Payables
+    if(accountType !== undefined) {
+        
+        // base query replacements
+        query.queryString = "SELECT AC.TRANSACTION_DATE AS INVOCIE_DATE, IH.ACTOR_ID, AC.TRANSACTION_AMOUNT AS AFFECT_AMOUNT ";
+
+        fromString = fromString.replace("FROM BOSCO_INVOICE_AFFECT BIA, INVOICE_HEADER IH", 
+                           "FROM [Bosco reduction].[dbo].ACCOUNTING_CLIENT AC, [Patricia reduction].[dbo].EXTERNAL_COSTS_HEAD IH");
+
+        whereString = whereString.replace("WHERE IH.INVOICE_TYPE in (1,4) AND IH.INVOICE_PREVIEW=0 AND IH.INVOCIE_DATE BETWEEN ? AND ? AND BIA.INVOICE_ID=IH.INVOICE_ID AND BIA.AFFECT_ACCOUNT LIKE '%1200%'",
+                            "WHERE AC.CONNECTION_ID=7 AND AC.TRANSACTION_TYPE_ID=0 AND AC.TRANSACTION_DATE BETWEEN ? AND ? AND AC.TRANSACTION_REF=CONVERT(NVARCHAR,IH.EXTERNAL_INVOICE_REMARK)")
+    
+        // ageOfAccount query replacements
+        if (ageOfAccount !== undefined) {
+            fromString = fromString.includes(" LEFT OUTER JOIN [Bosco reduction].[dbo].ACCOUNTING_CLIENT AC ON AC.TRANSACTION_REF=CONVERT(NVARCHAR,IH.INVOICE_ID) ") ?
+                fromString.replace(" LEFT OUTER JOIN [Bosco reduction].[dbo].ACCOUNTING_CLIENT AC ON AC.TRANSACTION_REF=CONVERT(NVARCHAR,IH.INVOICE_ID) ", "") : fromString
+
+            whereString = whereString.replaceAll("IH.INVOCIE_DATE", "AC.TRANSACTION_DATE")
+        }
+
+        // country query replacements
+        if(countryCode !== undefined) {
+            fromString = fromString.includes(" LEFT OUTER JOIN [Bosco reduction].[dbo].ACCOUNTING_CLIENT AC ON AC.TRANSACTION_REF=CONVERT(NVARCHAR,IH.INVOICE_ID) ") ?
+                fromString.replace(" LEFT OUTER JOIN [Bosco reduction].[dbo].ACCOUNTING_CLIENT AC ON AC.TRANSACTION_REF=CONVERT(NVARCHAR,IH.INVOICE_ID) ", "") : fromString
+        }  
     }
     
     query.queryString = query.queryString.concat(fromString, whereString);
