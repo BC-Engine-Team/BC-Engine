@@ -115,8 +115,7 @@ exports.prepareBilledQuery = (startDate, endDate, employeeId, clientType, countr
     
         // ageOfAccount query replacements
         if (ageOfAccount !== undefined) {
-            fromString = fromString.includes(" LEFT OUTER JOIN [Bosco reduction].[dbo].ACCOUNTING_CLIENT AC ON AC.TRANSACTION_REF=CONVERT(NVARCHAR,IH.INVOICE_ID) ") ?
-                fromString.replace(" LEFT OUTER JOIN [Bosco reduction].[dbo].ACCOUNTING_CLIENT AC ON AC.TRANSACTION_REF=CONVERT(NVARCHAR,IH.INVOICE_ID) ", "") : fromString
+            fromString = fromString.replace(" LEFT OUTER JOIN [Bosco reduction].[dbo].ACCOUNTING_CLIENT AC ON AC.TRANSACTION_REF=CONVERT(NVARCHAR,IH.INVOICE_ID) ", "")
 
             whereString = whereString.replaceAll("IH.INVOCIE_DATE", "AC.TRANSACTION_DATE")
         }

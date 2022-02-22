@@ -825,7 +825,7 @@ describe("Test Report Controller", () => {
                 };
                 reportServiceSpy = jest.spyOn(ReportService, 'createChartReportPDFById')
                     .mockImplementation(async () => {
-                        await Promise.reject(expectedResponse);
+                        await Promise.reject({status: "", message: ""});
                     });
 
                 // act

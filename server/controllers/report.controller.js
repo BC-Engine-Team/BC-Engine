@@ -120,7 +120,7 @@ exports.fetchChartReportPDF = async (req, res) => {
 
     await res.sendFile(filePath, {}, (err) => {
         if(err) {
-            return res.status(err.status || 500).send({ message: err.message || "File not found." });
+            return res.status(err.status).send({ message: err.message });
         }
         else {
             fs.unlinkSync(filePath);
