@@ -44,7 +44,7 @@ db['localdb'].performanceReports = require('./models/localdb/performance_report.
 db['localdb'].chartReports.belongsTo(db['localdb'].users, {
   foreignKey: {
     name: 'user_user_id',
-    allowNull: false,
+    allowNull: true
   },
   onDelete: 'CASCADE'
 })
@@ -120,6 +120,15 @@ db['localdb'].performanceReports.belongsTo(db['localdb'].recipients, {
   }
 })
 
+db['localdb'].performanceReports.belongsTo(db['localdb'].chartReports, {
+  foreignKey: {
+    name: 'chart_report_id',
+    allowNull: false
+  }
+})
+
+
+
 
 // patricia database tables
 db['mssql_pat'].employees = require("./models/mssql_pat/employee.model")(db['mssql_pat'], Sequelize.DataTypes);
@@ -185,7 +194,7 @@ db.sync = async (database, options) => {
       return data
     })
     .then(async (data) => {
-      await db[database].chartReports.bulkCreate([
+      data.chartReports = await db[database].chartReports.bulkCreate([
         {
           name: 'CR1',
           startDate: new Date(2019, 11, 1),
@@ -226,6 +235,20 @@ db.sync = async (database, options) => {
           ageOfAccount: '<30',
           accountType: 'Payable',
           user_user_id: data.users[1].userId
+        },
+        {
+          name: 'CRForPerformanceReportMathieu',
+          startDate: new Date(2020, 4, 1),
+          endDate: new Date(2021, 4, 1),
+          employee1Id: 20303,
+          employee1Name: 'Mathieu Miron',
+          employee2Id: -1,
+          employee2Name: 'All',
+          countryId: '-1',
+          country: 'All',
+          clientType: 'All',
+          ageOfAccount: 'All',
+          accountType: 'Receivable'
         }
       ]);
       return data;
@@ -329,11 +352,7 @@ db.sync = async (database, options) => {
         let billingObject = {
           employee_id: data.recipients[i].employeeId,
           objectivesId: null,
-          year: 2020,
-          january: Math.random() * (40000 - 20000) + 20000,
-          february: Math.random() * (40000 - 20000) + 20000,
-          march: Math.random() * (40000 - 20000) + 20000,
-          april: Math.random() * (40000 - 20000) + 20000,
+          year: 2021,
           may: Math.random() * (40000 - 20000) + 20000,
           june: Math.random() * (40000 - 20000) + 20000,
           july: Math.random() * (40000 - 20000) + 20000,
@@ -341,7 +360,11 @@ db.sync = async (database, options) => {
           september: Math.random() * (40000 - 20000) + 20000,
           october: Math.random() * (40000 - 20000) + 20000,
           november: Math.random() * (40000 - 20000) + 20000,
-          december: Math.random() * (40000 - 20000) + 20000
+          december: Math.random() * (40000 - 20000) + 20000,
+          january: Math.random() * (40000 - 20000) + 20000,
+          february: Math.random() * (40000 - 20000) + 20000,
+          march: Math.random() * (40000 - 20000) + 20000,
+          april: Math.random() * (40000 - 20000) + 20000
         }
         billingObject.total = 0;
         Object.keys(billingObject).forEach((value, index) => {
@@ -353,11 +376,7 @@ db.sync = async (database, options) => {
         let billingActual = {
           employee_id: data.recipients[i].employeeId,
           objectivesId: data.recipients.length * 2 - (data.recipients.length * 2 - i) + i + 1,
-          year: 2020,
-          january: Math.random() * (40000 - 20000) + 20000,
-          february: Math.random() * (40000 - 20000) + 20000,
-          march: Math.random() * (40000 - 20000) + 20000,
-          april: Math.random() * (40000 - 20000) + 20000,
+          year: 2021,
           may: Math.random() * (40000 - 20000) + 20000,
           june: Math.random() * (40000 - 20000) + 20000,
           july: Math.random() * (40000 - 20000) + 20000,
@@ -365,7 +384,11 @@ db.sync = async (database, options) => {
           september: Math.random() * (40000 - 20000) + 20000,
           october: Math.random() * (40000 - 20000) + 20000,
           november: Math.random() * (40000 - 20000) + 20000,
-          december: Math.random() * (40000 - 20000) + 20000
+          december: Math.random() * (40000 - 20000) + 20000,
+          january: Math.random() * (40000 - 20000) + 20000,
+          february: Math.random() * (40000 - 20000) + 20000,
+          march: Math.random() * (40000 - 20000) + 20000,
+          april: Math.random() * (40000 - 20000) + 20000
         }
         billingActual.total = 0;
         Object.keys(billingActual).forEach((value, index) => {
@@ -381,123 +404,168 @@ db.sync = async (database, options) => {
       return data
     })
     .then(async data => {
-      await db['localdb'].performanceReports.bulkCreate([{
-        name: 'MyFirstReportCool',
-        projectedBonus: 20384.09,
-        user_user_id: data.users[2].userId,
-        report_type_id: data.reportTypes.reportTypeId,
-        recipient_id: data.recipients[10].recipientId,
-        billing_actual_numbers: data.billingNumbers[1].id,
-        billing_obj_numbers: data.billingNumbers[1].objectivesId
-      },
-      {
-        name: 'MyFirstReportCool2',
-        projectedBonus: 20384.09,
-        user_user_id: data.users[2].userId,
-        report_type_id: data.reportTypes.reportTypeId,
-        recipient_id: data.recipients[10].recipientId,
-        billing_actual_numbers: data.billingNumbers[19].id,
-        billing_obj_numbers: data.billingNumbers[19].objectivesId
-      },
-      {
-        name: 'MyFirstReportCool2',
-        projectedBonus: 20384.09,
-        user_user_id: data.users[2].userId,
-        report_type_id: data.reportTypes.reportTypeId,
-        recipient_id: data.recipients[10].recipientId,
-        billing_actual_numbers: data.billingNumbers[19].id,
-        billing_obj_numbers: data.billingNumbers[19].objectivesId
-      },
-      {
-        name: 'MyFirstReportCool2',
-        projectedBonus: 20384.09,
-        user_user_id: data.users[3].userId,
-        report_type_id: data.reportTypes.reportTypeId,
-        recipient_id: data.recipients[1].recipientId,
-        billing_actual_numbers: data.billingNumbers[3].id,
-        billing_obj_numbers: data.billingNumbers[3].objectivesId
-      },
-      {
-        name: 'MyFirstReportCool2',
-        projectedBonus: 20384.09,
-        user_user_id: data.users[3].userId,
-        report_type_id: data.reportTypes.reportTypeId,
-        recipient_id: data.recipients[1].recipientId,
-        billing_actual_numbers: data.billingNumbers[3].id,
-        billing_obj_numbers: data.billingNumbers[3].objectivesId
-      },
-      {
-        name: 'MyFirstReportCool2',
-        projectedBonus: 20384.09,
-        user_user_id: data.users[2].userId,
-        report_type_id: data.reportTypes.reportTypeId,
-        recipient_id: data.recipients[10].recipientId,
-        billing_actual_numbers: data.billingNumbers[19].id,
-        billing_obj_numbers: data.billingNumbers[19].objectivesId
-      },
-      {
-        name: 'MyFirstReportCool2',
-        projectedBonus: 20384.09,
-        user_user_id: data.users[2].userId,
-        report_type_id: data.reportTypes.reportTypeId,
-        recipient_id: data.recipients[10].recipientId,
-        billing_actual_numbers: data.billingNumbers[19].id,
-        billing_obj_numbers: data.billingNumbers[19].objectivesId
-      },
-      {
-        name: 'MyFirstReportCool2',
-        projectedBonus: 20384.09,
-        user_user_id: data.users[2].userId,
-        report_type_id: data.reportTypes.reportTypeId,
-        recipient_id: data.recipients[10].recipientId,
-        billing_actual_numbers: data.billingNumbers[19].id,
-        billing_obj_numbers: data.billingNumbers[19].objectivesId
-      },
-      {
-        name: 'MyFirstReportCool2',
-        projectedBonus: 20384.09,
-        user_user_id: data.users[2].userId,
-        report_type_id: data.reportTypes.reportTypeId,
-        recipient_id: data.recipients[10].recipientId,
-        billing_actual_numbers: data.billingNumbers[19].id,
-        billing_obj_numbers: data.billingNumbers[19].objectivesId
-      },
-      {
-        name: 'MyFirstReportCool2',
-        projectedBonus: 20384.09,
-        user_user_id: data.users[2].userId,
-        report_type_id: data.reportTypes.reportTypeId,
-        recipient_id: data.recipients[10].recipientId,
-        billing_actual_numbers: data.billingNumbers[19].id,
-        billing_obj_numbers: data.billingNumbers[19].objectivesId
-      },
-      {
-        name: 'MyFirstReportCool2',
-        projectedBonus: 20384.09,
-        user_user_id: data.users[2].userId,
-        report_type_id: data.reportTypes.reportTypeId,
-        recipient_id: data.recipients[10].recipientId,
-        billing_actual_numbers: data.billingNumbers[19].id,
-        billing_obj_numbers: data.billingNumbers[19].objectivesId
-      },
-      {
-        name: 'MyFirstReportCool2',
-        projectedBonus: 20384.09,
-        user_user_id: data.users[2].userId,
-        report_type_id: data.reportTypes.reportTypeId,
-        recipient_id: data.recipients[10].recipientId,
-        billing_actual_numbers: data.billingNumbers[19].id,
-        billing_obj_numbers: data.billingNumbers[19].objectivesId
-      },
-      {
-        name: 'MyFirstReportCool2',
-        projectedBonus: 20384.09,
-        user_user_id: data.users[2].userId,
-        report_type_id: data.reportTypes.reportTypeId,
-        recipient_id: data.recipients[10].recipientId,
-        billing_actual_numbers: data.billingNumbers[19].id,
-        billing_obj_numbers: data.billingNumbers[19].objectivesId
-      }])
+      data.performanceReports = await db['localdb'].performanceReports.bulkCreate([
+        {
+          name: 'TheultimateTest',
+          chart_report_id: data.chartReports[3].chartReportId,
+          projectedBonus: 20384.09,
+          user_user_id: data.users[2].userId,
+          report_type_id: data.reportTypes.reportTypeId,
+          recipient_id: data.recipients[10].recipientId,
+          billing_actual_numbers: data.billingNumbers[1].id,
+          billing_obj_numbers: data.billingNumbers[1].objectivesId,
+
+        },
+        {
+          name: 'MyFirstReportCool2',
+          chart_report_id: data.chartReports[2].chartReportId,
+          projectedBonus: 20384.09,
+          user_user_id: data.users[3].userId,
+          report_type_id: data.reportTypes.reportTypeId,
+          recipient_id: data.recipients[1].recipientId,
+          billing_actual_numbers: data.billingNumbers[3].id,
+          billing_obj_numbers: data.billingNumbers[3].objectivesId
+        },
+        {
+          name: 'MyFirstReportCool2',
+          chart_report_id: data.chartReports[2].chartReportId,
+          projectedBonus: 20384.09,
+          user_user_id: data.users[3].userId,
+          report_type_id: data.reportTypes.reportTypeId,
+          recipient_id: data.recipients[1].recipientId,
+          billing_actual_numbers: data.billingNumbers[3].id,
+          billing_obj_numbers: data.billingNumbers[3].objectivesId
+        },
+        {
+          name: 'MyFirstReportCool2',
+          chart_report_id: data.chartReports[2].chartReportId,
+          projectedBonus: 20384.09,
+          user_user_id: data.users[2].userId,
+          report_type_id: data.reportTypes.reportTypeId,
+          recipient_id: data.recipients[10].recipientId,
+          billing_actual_numbers: data.billingNumbers[19].id,
+          billing_obj_numbers: data.billingNumbers[19].objectivesId
+        },
+        {
+          name: 'MyFirstReportCool2',
+          chart_report_id: data.chartReports[2].chartReportId,
+          projectedBonus: 20384.09,
+          user_user_id: data.users[2].userId,
+          report_type_id: data.reportTypes.reportTypeId,
+          recipient_id: data.recipients[10].recipientId,
+          billing_actual_numbers: data.billingNumbers[19].id,
+          billing_obj_numbers: data.billingNumbers[19].objectivesId
+        },
+        {
+          name: 'MyFirstReportCool2',
+          chart_report_id: data.chartReports[2].chartReportId,
+          projectedBonus: 20384.09,
+          user_user_id: data.users[2].userId,
+          report_type_id: data.reportTypes.reportTypeId,
+          recipient_id: data.recipients[10].recipientId,
+          billing_actual_numbers: data.billingNumbers[19].id,
+          billing_obj_numbers: data.billingNumbers[19].objectivesId
+        },
+        {
+          name: 'MyFirstReportCool2',
+          chart_report_id: data.chartReports[2].chartReportId,
+          projectedBonus: 20384.09,
+          user_user_id: data.users[2].userId,
+          report_type_id: data.reportTypes.reportTypeId,
+          recipient_id: data.recipients[10].recipientId,
+          billing_actual_numbers: data.billingNumbers[19].id,
+          billing_obj_numbers: data.billingNumbers[19].objectivesId
+        },
+        {
+          name: 'MyFirstReportCool2',
+          chart_report_id: data.chartReports[2].chartReportId,
+          projectedBonus: 20384.09,
+          user_user_id: data.users[2].userId,
+          report_type_id: data.reportTypes.reportTypeId,
+          recipient_id: data.recipients[10].recipientId,
+          billing_actual_numbers: data.billingNumbers[19].id,
+          billing_obj_numbers: data.billingNumbers[19].objectivesId
+        },
+        {
+          name: 'MyFirstReportCool2',
+          chart_report_id: data.chartReports[2].chartReportId,
+          projectedBonus: 20384.09,
+          user_user_id: data.users[2].userId,
+          report_type_id: data.reportTypes.reportTypeId,
+          recipient_id: data.recipients[10].recipientId,
+          billing_actual_numbers: data.billingNumbers[19].id,
+          billing_obj_numbers: data.billingNumbers[19].objectivesId
+        },
+        {
+          name: 'MyFirstReportCool2',
+          chart_report_id: data.chartReports[2].chartReportId,
+          projectedBonus: 20384.09,
+          user_user_id: data.users[2].userId,
+          report_type_id: data.reportTypes.reportTypeId,
+          recipient_id: data.recipients[10].recipientId,
+          billing_actual_numbers: data.billingNumbers[19].id,
+          billing_obj_numbers: data.billingNumbers[19].objectivesId
+        },
+        {
+          name: 'MyFirstReportCool2',
+          chart_report_id: data.chartReports[2].chartReportId,
+          projectedBonus: 20384.09,
+          user_user_id: data.users[2].userId,
+          report_type_id: data.reportTypes.reportTypeId,
+          recipient_id: data.recipients[10].recipientId,
+          billing_actual_numbers: data.billingNumbers[19].id,
+          billing_obj_numbers: data.billingNumbers[19].objectivesId
+        }
+      ])
+      return data
+    })
+    .then(async data => {
+      data.chartReportsData = await db['localdb'].chartReportsData.bulkCreate([
+        {
+          chart_report_id: data.chartReports[3].chartReportId,
+          year: 2020,
+          employee: data.chartReports[3].employee1Id,
+          may: Math.random() * (100 - 5) + 5,
+          june: Math.random() * (100 - 5) + 5,
+          july: Math.random() * (100 - 5) + 5,
+          august: Math.random() * (100 - 5) + 5,
+          september: Math.random() * (100 - 5) + 5,
+          october: Math.random() * (100 - 5) + 5,
+          november: Math.random() * (100 - 5) + 5,
+          december: Math.random() * (100 - 5) + 5
+        },
+        {
+          chart_report_id: data.chartReports[3].chartReportId,
+          year: 2021,
+          employee: data.chartReports[3].employee1Id,
+          january: Math.random() * (100 - 5) + 5,
+          february: Math.random() * (100 - 5) + 5,
+          march: Math.random() * (100 - 5) + 5,
+          april: Math.random() * (100 - 5) + 5,
+        },
+        {
+          chart_report_id: data.chartReports[3].chartReportId,
+          year: 2020,
+          employee: data.chartReports[3].employee2Id,
+          may: Math.random() * (100 - 5) + 5,
+          june: Math.random() * (100 - 5) + 5,
+          july: Math.random() * (100 - 5) + 5,
+          august: Math.random() * (100 - 5) + 5,
+          september: Math.random() * (100 - 5) + 5,
+          october: Math.random() * (100 - 5) + 5,
+          november: Math.random() * (100 - 5) + 5,
+          december: Math.random() * (100 - 5) + 5
+        },
+        {
+          chart_report_id: data.chartReports[3].chartReportId,
+          year: 2021,
+          employee: data.chartReports[3].employee2Id,
+          january: Math.random() * (100 - 5) + 5,
+          february: Math.random() * (100 - 5) + 5,
+          march: Math.random() * (100 - 5) + 5,
+          april: Math.random() * (100 - 5) + 5,
+        }
+      ])
     })
     .catch((err) => {
       console.log(err);

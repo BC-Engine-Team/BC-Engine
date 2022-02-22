@@ -113,10 +113,10 @@ exports.getPerformanceReportsByUserId = async (req, res) => {
 }
 
 exports.createChartReportPDF = async (req, res) => {
-    if (!req.body.reportid)
+    if (!req.body.reportId)
         return res.status(400).send({ message: "Content cannot be empty." });
 
-    await reportService.createChartReportPDFById(req.body.reportid)
+    await reportService.createChartReportPDFById(req.body.reportId)
         .then(response => {
             if (response) {
                 return res.status(200).send(response);
@@ -129,16 +129,56 @@ exports.createChartReportPDF = async (req, res) => {
 }
 
 exports.fetchChartReportPDF = async (req, res) => {
-    if (!req.query.reportid)
+    if (!req.query.reportId)
         return res.status(400).send({ message: "Content cannot be empty." });
 
     // create file path
     let filePath;
     if (__dirname !== '/home/runner/work/BC-Engine/BC-Engine/server/controllers') {
-        filePath = `${__dirname.replace("controllers", "")}docs\\pdf_files\\chartReport-${req.query.reportid}.pdf`;
+        filePath = `${__dirname.replace("controllers", "")}docs\\pdf_files\\chartReport-${req.query.reportId}.pdf`;
     }
     else {
-        filePath = `${__dirname.replace("controllers", "")}docs/pdf_files/chartReport-${req.query.reportid}.pdf`;
+        filePath = `${__dirname.replace("controllers", "")}docs/pdf_files/chartReport-${req.query.reportId}.pdf`;
+    }
+
+    await res.sendFile(filePath, {}, (err) => {
+        if (err) {
+            return res.status(err.status || 500).send({ message: err.message || "File not found." });
+        }
+        else {
+            fs.unlinkSync(filePath);
+            return res.status(200)
+        }
+    });
+}
+
+exports.createPerformanceReportPDF = async (req, res) => {
+    if (!req.body.reportId)
+        return res.status(400).send({ message: "Content cannot be empty." });
+
+    await reportService.createPerformanceReportPDFByPerformanceReportId(req.body.reportId)
+        .then(response => {
+            if (response) {
+                return res.status(200).send(response);
+            }
+            return res.status(500).send({ message: "The data could not be created." });
+        })
+        .catch(err => {
+            return res.status(err.status || 500).send({ message: err.message || "Malfunction in the B&C Engine." });
+        });
+}
+
+exports.fetchPerformanceReportPDF = async (req, res) => {
+    if (!req.query.reportId)
+        return res.status(400).send({ message: "Content cannot be empty." });
+
+    // create file path
+    let filePath;
+    if (__dirname !== '/home/runner/work/BC-Engine/BC-Engine/server/controllers') {
+        filePath = `${__dirname.replace("controllers", "")}docs\\pdf_files\\performanceReport-${req.query.reportId}.pdf`;
+    }
+    else {
+        filePath = `${__dirname.replace("controllers", "")}docs/pdf_files/performanceReport-${req.query.reportId}.pdf`;
     }
 
     await res.sendFile(filePath, {}, (err) => {

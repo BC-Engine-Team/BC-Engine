@@ -21,5 +21,9 @@ router.get("/performanceReport", authService.authenticateToken, reportController
 
 router.get('/performanceReport/:userId', authService.authenticateToken, reportController.getPerformanceReportsByUserId)
 
+router.post('/createPerformanceReportPdf', authService.authenticateToken, reportController.createPerformanceReportPDF)
+
+router.get('/fetchPerformanceReportPdf', authService.authenticateToken, reportController.fetchPerformanceReportPDF)
+
 
 module.exports = router;

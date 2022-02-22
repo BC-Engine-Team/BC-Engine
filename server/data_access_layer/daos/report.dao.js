@@ -3,7 +3,10 @@ const ReportTypeModel = databases['localdb'].reportTypes;
 const RecipientsModel = databases['localdb'].recipients;
 const ReportTypeRecipientsModel = databases['localdb'].reportTypeRecipients;
 const PerformanceReportModel = databases['localdb'].performanceReports;
+const ChartReportModel = databases['localdb'].chartReports
+const BillingNumbersModel = databases['localdb'].billingNumbers
 
+// Report Types related functions
 exports.getReportTypesWithRecipientIds = async (reportTypesModel = ReportTypeModel, reportTypeRecipients = ReportTypeRecipientsModel) => {
     return new Promise((resolve, reject) => {
         reportTypesModel.findAll()
@@ -79,7 +82,59 @@ exports.getRecipients = async (recipientsModel = RecipientsModel) => {
 }
 
 
-// Reports Types related functions
+// Performance Reports  related functions
+
+exports.getPerformanceReportById = async (reportId, performanceReportModel = PerformanceReportModel) => {
+    return new Promise((resolve, reject) => {
+        performanceReportModel.findOne({
+            where: {
+                performanceReportId: reportId
+            },
+            include: [
+                {
+                    model: ChartReportModel, attributes: ['name',
+                        'createdAt', 'updatedAt', 'employee2Name',
+                        'employee1Name', 'ageOfAccount', 'accountType',
+                        'country', 'clientType', 'startDate', 'endDate']
+                },
+                { model: BillingNumbersModel, attributes: ['may', 'june'] }
+            ]
+        })
+            .then(async data => {
+                if (data) {
+                    let returnData = {
+                        chartReportId: data.dataValues.chart_report_id,
+                        performanceReportInfo: {
+                            performanceReportId: data.dataValues.performanceReportId,
+                            name: data.dataValues.name,
+                            createdAt: data.dataValues.createdAt,
+                            updatedAt: data.dataValues.updatedAt
+                        },
+                        billingnumbers: {
+                            actual: [],
+                            objective: []
+                        },
+                        chartReportInfo: {
+                            name: data.chart_report.dataValues.name,
+                            employee1Name: data.chart_report.dataValues.employee1Name,
+                            employee2Name: data.chart_report.dataValues.employee2Name,
+                            ageOfAccount: data.chart_report.dataValues.ageOfAccount,
+                            accountType: data.chart_report.dataValues.accountType,
+                            country: data.chart_report.dataValues.country,
+                            startDate: data.chart_report.dataValues.startDate,
+                            endDate: data.chart_report.dataValues.endDate,
+                            createdAt: data.chart_report.dataValues.createdAt,
+                            updatedAt: data.dataValues.chart_report.dataValues.updatedAt
+                        }
+                    }
+                    resolve(returnData)
+                }
+                else
+                    resolve(false)
+            })
+    })
+}
+
 exports.getPerformanceReports = async (performanceReportModel = PerformanceReportModel) => {
     return new Promise((resolve, reject) => {
         performanceReportModel.findAll({
