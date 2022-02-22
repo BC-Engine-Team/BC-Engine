@@ -5,33 +5,39 @@ const { sequelize,
     checkPropertyExists
 } = require('sequelize-test-helpers');
 
-const [UserModel, ChartReportModel, ChartReportDataModel, PerformanceReportModel,  ReportTypeModel, RecipientModel, ReportTypeRecipientModel] = require('../../data_access_layer/models/localdb/localdb.model')(sequelize, dataTypes);
+const databases = require('../../data_access_layer/databases')
+const PerformanceReportModel = require('../../data_access_layer/models/localdb/performance_report.model')(sequelize, dataTypes);
+const ReportTypeModel = require('../../data_access_layer/models/localdb/report_type.model')(sequelize, dataTypes);
+const RecipientModel = require('../../data_access_layer/models/localdb/recipient.model')(sequelize, dataTypes);
+const ReportTypeRecipientModel = require('../../data_access_layer/models/localdb/report_type_recipient.model')(sequelize, dataTypes);
 const ReportDAO = require('../../data_access_layer/daos/report.dao');
 
 
 
 let returnedPerformanceReports = [
     {
-        performanceReportId: "PerformanceUUID",
-        employeeId: 1,
-        averageCollectionDay: "35",
-        annualBillingObjective: "4500",
-        monthlyBillingObjective: "300",
-        annualBillingNumber: "200",
-        monthlyBillingNumber: "300",
-        projectedBonus: "650"
+        dataValues: {
+            name: 'reportName1',
+            createdAt: new Date(2020, 11, 1)
+        },
+        recipient: {
+            dataValues: {
+                name: 'recipientName1'
+            }
+        }
     },
     {
-        performanceReportId: "PerformanceUUID",
-        employeeId: 2,
-        averageCollectionDay: "35",
-        annualBillingObjective: "4500",
-        monthlyBillingObjective: "300",
-        annualBillingNumber: "200",
-        monthlyBillingNumber: "300",
-        projectedBonus: "650"
+        dataValues: {
+            name: 'reportName2',
+            createdAt: new Date(2020, 11, 1)
+        },
+        recipient: {
+            dataValues: {
+                name: 'recipientName2'
+            }
+        }
     }
-] 
+]
 
 let SequelizeMock = require('sequelize-mock');
 const dbMock = new SequelizeMock();
@@ -47,7 +53,7 @@ describe("Test Report Related Models", () => {
     checkModelName(RecipientModel)('recipients');
     checkModelName(ReportTypeRecipientModel)('report_type_recipients');
 
-    ['performanceReportId', 'employeeId', 'averageCollectionDay', 'annualBillingObjective', 'monthlyBillingObjective', 'annualBillingNumber', 'monthlyBillingNumber', 'projectedBonus']
+    ['performanceReportId', 'name', 'projectedBonus']
         .forEach(checkPropertyExists(PerformanceInstance));
 
     ['reportTypeId', 'reportTypeName', 'frequency']
@@ -365,42 +371,53 @@ describe("Test Report DAO", () => {
 
 
 
-    describe("CRD5 - getPerformanceReportsWhenConnectedAsAdmin", () => {
-        const PerformanceReport = new PerformanceReportModel(); 
+    describe("RD3 - getPerformanceReports", () => {
 
         afterEach(() => {
             PerformanceReportMock.$queryInterface.$clearResults();
         })
-        
+
         beforeEach(() => {
             PerformanceReportMock.$queryInterface.$clearResults();
         })
 
 
-        describe("CRD5.1 - given a userId", () => {
-            it("CRD5.1.1 - should return list of performance reports", async () => {
+        describe("RD3.1 - given a userId", () => {
+            it("RD3.1.1 - should return list of performance reports", async () => {
                 // arrange
                 PerformanceReportMock.$queryInterface.$useHandler(function (query, queryOptions, done) {
                     return Promise.resolve(returnedPerformanceReports);
                 });
+                let expectedResponse = [
+                    {
+                        name: returnedPerformanceReports[0].dataValues.name,
+                        createdAt: '2020-12-01',
+                        recipient: returnedPerformanceReports[0].recipient.dataValues.name
+                    },
+                    {
+                        name: returnedPerformanceReports[1].dataValues.name,
+                        createdAt: '2020-12-01',
+                        recipient: returnedPerformanceReports[1].recipient.dataValues.name
+                    }
+                ]
 
                 // act and assert
-                await expect(ReportDAO.getPerformanceReportsWhenConnectedAsAdmin('fakeUserId', PerformanceReportMock)).resolves
-                    .toEqual(returnedPerformanceReports);
+                await expect(ReportDAO.getPerformanceReports(PerformanceReportMock)).resolves
+                    .toEqual(expectedResponse);
             });
 
-            it("CRD5.1.2 - should resolve false when Model cant fetch data", async () => {
+            it("RD3.1.2 - should resolve false when Model cant fetch data", async () => {
                 // arrange
                 PerformanceReportMock.$queryInterface.$useHandler(function (query, queryOptions, done) {
                     return Promise.resolve(false);
                 });
 
                 // act and assert
-                await expect(ReportDAO.getPerformanceReportsWhenConnectedAsAdmin('fakeUserId', PerformanceReportMock)).resolves
+                await expect(ReportDAO.getPerformanceReports(PerformanceReportMock)).resolves
                     .toEqual(false);
             });
 
-            it("CRD5.1.3 - should reject error when Model throws error with defined status and message", async () => {
+            it("RD3.1.3 - should reject error when Model throws error with defined status and message", async () => {
                 // arrange
                 let expectedError = {
                     status: 404,
@@ -411,11 +428,11 @@ describe("Test Report DAO", () => {
                 });
 
                 // act and assert
-                await expect(ReportDAO.getPerformanceReportsWhenConnectedAsAdmin('fakeUserId', PerformanceReportMock)).rejects
+                await expect(ReportDAO.getPerformanceReports(PerformanceReportMock)).rejects
                     .toEqual(expectedError);
             });
 
-            it("CRD1.1.4 - should reject error with 500 status and predefined message when model does not define them", async () => {
+            it("RD3.1.4 - should reject error with 500 status and predefined message when model does not define them", async () => {
                 // arrange
                 let expectedError = {
                     status: 500,
@@ -426,9 +443,89 @@ describe("Test Report DAO", () => {
                 });
 
                 // act and assert
-                await expect(ReportDAO.getPerformanceReportsWhenConnectedAsAdmin('fakeUserId', PerformanceReportMock)).rejects
+                await expect(ReportDAO.getPerformanceReports(PerformanceReportMock)).rejects
                     .toEqual(expectedError);
             });
         });
     });
+
+    describe('RD4 - getPerformanceReportsByUserId', () => {
+        let userId = '6075fbef-62fb-4f83-a6f8-6921835d6689'
+        let performanceReportModelStub = {
+            findAll: () => {
+                return Promise.resolve(returnedPerformanceReports)
+            }
+        }
+
+        describe('RD4.1 - given valid response from model', () => {
+            it('RD4.1.1 - should resolve formatted list of reports', async () => {
+                // arrange
+                let expectedResponse = [
+                    {
+                        name: returnedPerformanceReports[0].dataValues.name,
+                        recipient: returnedPerformanceReports[0].recipient.dataValues.name,
+                        createdAt: '2020-12-01'
+                    },
+                    {
+                        name: returnedPerformanceReports[1].dataValues.name,
+                        recipient: returnedPerformanceReports[1].recipient.dataValues.name,
+                        createdAt: '2020-12-01'
+                    }
+                ]
+
+                // act and assert
+                await expect(ReportDAO.getPerformanceReportsByUserId(userId, performanceReportModelStub))
+                    .resolves.toEqual(expectedResponse)
+            })
+        })
+
+        describe('RD4.2 - given invalid response from model', () => {
+            it('RD4.2.1 - when model resolves false, should resolve false', async () => {
+                // arrange
+                performanceReportModelStub = {
+                    findAll: () => {
+                        return Promise.resolve(false)
+                    }
+                }
+
+                // act and assert
+                await expect(ReportDAO.getPerformanceReportsByUserId(userId, performanceReportModelStub))
+                    .resolves.toEqual(false)
+            })
+
+            it('RD4.2.2 - when model rejects specified status and message, should reject specified status and message', async () => {
+                // arrange
+                let expectedResponse= {
+                    status: 600,
+                    message: 'Error.'
+                }
+                performanceReportModelStub = {
+                    findAll: () => {
+                        return Promise.reject(expectedResponse)
+                    }
+                }
+
+                // act and assert
+                await expect(ReportDAO.getPerformanceReportsByUserId(userId, performanceReportModelStub))
+                    .rejects.toEqual(expectedResponse)
+            })
+
+            it('RD4.2.3 - when model rejects unspecified status and message, should reject default status and message', async () => {
+                // arrange
+                let expectedResponse= {
+                    status: 500,
+                    message: 'Could not fetch Performance Reports by User Id.'
+                }
+                performanceReportModelStub = {
+                    findAll: () => {
+                        return Promise.reject({})
+                    }
+                }
+
+                // act and assert
+                await expect(ReportDAO.getPerformanceReportsByUserId(userId, performanceReportModelStub))
+                    .rejects.toEqual(expectedResponse)
+            })
+        })
+    })
 });
