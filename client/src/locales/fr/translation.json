@@ -60,7 +60,8 @@
              "Employee":"Employé(e)",
              "Country":"Pays",
              "ClientType": "Type de Client",
-             "Age": "Âge de la facture"
+             "Age": "Âge de la facture",
+             "AccountType": "Type de compte"
           },
          "NamePlaceHolder": "Entrez le nom de votre Rapport Graphique",
          "LoadChartButton": "Mettre à jour le Graphique",
@@ -71,6 +72,10 @@
          "EndMonthExceedCurrentError": "Mois de fin ne peut pas être après le mois actuel.",
          "EndYearExceedError": "Année de fin ne peut pas être avant l'Année de début.",
          "SaveConfirmPrompt": "Êtes-vous certain de vouloir sauvegarder ",
+         "accountType": {
+            "Receivables": "Comptes recevables",
+            "Payables": "Comptes à payer"
+        },
          "clientType": {
             "Corr": "Correspondent",
             "Direct": "Direct",
