@@ -1,6 +1,4 @@
 module.exports = (performanceReportInfo, billingNumbers, chartReportInfo, chartReportData) => {
-    // calculate length of for loop for creating averages on the table
-    const calculatedLength = chartReportInfo.employee2Name === null ? chartReportData.length : chartReportData.length / 2
     const today = new Date();
 
     const months = [
