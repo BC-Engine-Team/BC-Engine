@@ -113,10 +113,10 @@ exports.getPerformanceReportById = async (reportId, performanceReportModel = Per
             ]
         })
             .then(async data => {
-                if (data) {
+                if (data && data.dataValues.billing_number && data.chart_report) {
                     let performanceReportInfo = data.dataValues
-                    let actualBillingNumbers = data.dataValues.billing_number.billing_number.dataValues
                     let objBillingNumbers = data.dataValues.billing_number.dataValues
+                    let actualBillingNumbers = data.dataValues.billing_number.billing_number.dataValues
                     let chartReportInfo = data.chart_report.dataValues
 
                     let returnData = {
@@ -129,13 +129,13 @@ exports.getPerformanceReportById = async (reportId, performanceReportModel = Per
                             updatedAt: performanceReportInfo.updatedAt
                         },
                         billingNumbers: {
-                            actual: (({ may, june, july, august, september, october,
+                            objective: (({ may, june, july, august, september, october,
                                 november, december, january, february, march, april, total, year }) =>
                             ({
                                 may, june, july, august, september, october, november, december,
                                 january, february, march, april, total, year
-                            }))(actualBillingNumbers),
-                            objective: objBillingNumbers
+                            }))(objBillingNumbers),
+                            actual: actualBillingNumbers
                         },
                         chartReportInfo: {
                             name: chartReportInfo.name,
@@ -151,11 +151,17 @@ exports.getPerformanceReportById = async (reportId, performanceReportModel = Per
                             updatedAt: chartReportInfo.updatedAt
                         }
                     }
-
                     resolve(returnData)
                 }
                 else
                     resolve(false)
+            })
+            .catch(err => {
+                const response = {
+                    status: err.status || 500,
+                    message: err.message || 'Could not fetch Performance Report.'
+                }
+                reject(response)
             })
     })
 }
