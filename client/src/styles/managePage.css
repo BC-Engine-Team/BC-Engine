@@ -1,5 +1,6 @@
 .container-clientGradingBrackets {
-    width: 50%;
+    width: 100%;
+    max-width: 800px;
     float: left;
 }
 
@@ -12,47 +13,20 @@
     width: "50%";
 }
 
-#mainTitle{
+.tableHeader {
     display: flex;
     align-items: center;
     font-size: large;
     font-weight: bold;
-    margin-left: 130px;  
-    margin-top: 20px; 
-}
-
-#mainTitle2{
-    display: flex;
-    align-items: center;
-    font-size: large;
-    font-weight: bold;
-    margin-left: 90px;
-    margin-top: 20px; 
-}
-
-#mainTitle3{
-    display: flex;
-    align-items: center;
-    font-size: large;
-    font-weight: bold;
-    margin-top: 20px; 
 }
 
 .inputTitle {
+    width: 100%;
     display: flex;
     font-size: x-large;
     font-weight: bold;
-    margin-bottom: 50px;
 }
 
 .manageRowForm{
     margin-top: 10px;
-}
-
-.manageMaximumGrade{
-    margin-left: 30px;
-}
-
-.manageAverageCollectionTime {
-    margin-left: 60px;
 }

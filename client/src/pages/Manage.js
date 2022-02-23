@@ -12,53 +12,139 @@ const Manage = () => {
     let navigate = useNavigate()
     const cookies = new Cookies()
     const { t } = useTranslation()
+    let counter = 0;
 
     const saveGradingBracketsText = t('gradings.ModifyClientGradingButton')
 
-    const [errors, setErrors] = useState({})
+    // const [errors, setErrors] = useState({});
+    const [errors, setErrors] = useState({
+        aPlus: {
+            maximum: null,
+            minimum: null,
+            averageCollectionTime: null
+        },
+        a: {
+            maximum: null,
+            minimum: null,
+            averageCollectionTime: null
+        },
+        b: {
+            maximum: null,
+            minimum: null,
+            averageCollectionTime: null
+        },
+        c: {
+            maximum: null,
+            minimum: null,
+            averageCollectionTime: null
+        },
+        ePlus: {
+            maximum: null,
+            minimum: null,
+            averageCollectionTime: null
+        },
+    })
     const [clientGradingSaved, setClientGradingSaved] = useState(true);
     const [confirmSaveGradingActivated, setConfirmSaveGradingActivated] = useState(false);
 
+    // const [clientGrading, setClientGrading] = useState({
+    //     maximumGradeAPlus: 0,
+    //     minimumGradeAPlus: 0,
+    //     averageCollectionTimeGradeAPlus: "",
+    //     maximumGradeA: 0,
+    //     minimumGradeA: 0,
+    //     averageCollectionTimeGradeA: "",
+    //     maximumGradeB: 0,
+    //     minimumGradeB: 0,
+    //     averageCollectionTimeGradeB: "",
+    //     maximumGradeC: 0,
+    //     minimumGradeC: 0,
+    //     averageCollectionTimeGradeC: "",
+    //     maximumGradeEPlus: 0,
+    //     minimumGradeEPlus: 0,
+    //     averageCollectionTimeGradeEPlus: ""
+    // })
+
     const [clientGrading, setClientGrading] = useState({
-        maximumGradeAPlus: 0,
-        minimumGradeAPlus: 0,
-        averageCollectionTimeGradeAPlus: "",
-        maximumGradeA: 0,
-        minimumGradeA: 0,
-        averageCollectionTimeGradeA: "",
-        maximumGradeB: 0,
-        minimumGradeB: 0,
-        averageCollectionTimeGradeB: "",
-        maximumGradeC: 0,
-        minimumGradeC: 0,
-        averageCollectionTimeGradeC: "",
-        maximumGradeEPlus: 0,
-        minimumGradeEPlus: 0,
-        averageCollectionTimeGradeEPlus: ""
-    })
+        aPlus: {
+            grade: 'A+',
+            maximum: 0,
+            minimum: 0,
+            averageCollectionTime: ""
+        },
+        a: {
+            grade: 'A',
+            maximum: 0,
+            minimum: 0,
+            averageCollectionTime: ""
+        },
+        b: {
+            grade: 'B',
+            maximum: 0,
+            minimum: 0,
+            averageCollectionTime: ""
+        },
+        c: {
+            grade: 'C',
+            maximum: 0,
+            minimum: 0,
+            averageCollectionTime: ""
+        },
+        ePlus: {
+            grade: 'E+',
+            maximum: 0,
+            minimum: 0,
+            averageCollectionTime: ""
+        },
+    });
 
-
-    const setField = (field, value) => {
+    const setField = (field, value, index) => {
         setClientGrading({
             ...clientGrading,
-            [field]: value
+            [index]: {
+                ...clientGrading[index],
+                [field]: value
+            }
+            
         })
-
-        if (!!errors[field]) {
-            setErrors({
-                ...errors,
-                [field]: null
-            });
-        }
-
         setClientGradingSaved(false);
     }
 
+    // const setField = (field, value) => {
+    //     setClientGrading({
+    //         ...clientGrading,
+    //         [field]: value
+    //     })
+
+    //     if (!!errors[field]) {
+    //         setErrors({
+    //             ...errors,
+    //             [field]: null
+    //         });
+    //     }
+
+    //     setClientGradingSaved(false);
+    // }
 
     const findGradingCriteriaErrors = () => {
-        const { maximumGradeAPlus, minimumGradeAPlus, averageCollectionTimeGradeAPlus, maximumGradeA, minimumGradeA, averageCollectionTimeGradeA,maximumGradeB, minimumGradeB, averageCollectionTimeGradeB, maximumGradeC, minimumGradeC, averageCollectionTimeGradeC, maximumGradeEPlus, minimumGradeEPlus, averageCollectionTimeGradeEPlus } = clientGrading
+        const   maximumGradeAPlus = clientGrading['Aplus'].maximum, 
+                minimumGradeAPlus = clientGrading['Aplus'].minimum, 
+                averageCollectionTimeGradeAPlus = clientGrading['Aplus'].averageCollectionTime,
+                maximumGradeA = clientGrading['A'].maximum,
+                minimumGradeA = clientGrading['A'].minimum, 
+                averageCollectionTimeGradeA = clientGrading['A'].averageCollectionTime,
+                maximumGradeB = clientGrading['B'].maximum,
+                minimumGradeB = clientGrading['B'].minimum, 
+                averageCollectionTimeGradeB = clientGrading['B'].averageCollectionTime,
+                maximumGradeC = clientGrading['C'].maximum,
+                minimumGradeC = clientGrading['C'].minimum, 
+                averageCollectionTimeGradeC = clientGrading['C'].averageCollectionTime,
+                maximumGradeEPlus = clientGrading['Eplus'].maximum,
+                minimumGradeEPlus = clientGrading['Eplus'].minimum, 
+                averageCollectionTimeGradeEPlus = clientGrading['Eplus'].averageCollectionTime
+
         let newErrors = {}
-        
+
         //maximum grade A+ errors
         if (parseInt(maximumGradeAPlus) <= parseInt(minimumGradeAPlus) 
             && parseInt(maximumGradeAPlus) <= parseInt(maximumGradeA)
@@ -69,11 +155,11 @@ const Manage = () => {
             && parseInt(maximumGradeAPlus) <= parseInt(minimumGradeC) 
             && parseInt(maximumGradeAPlus) <= parseInt(maximumGradeEPlus) 
             && parseInt(maximumGradeAPlus) <= parseInt(minimumGradeEPlus))
-            newErrors.maximumGradeAPlus = "The maximum of grade A+ is smaller or the same than one or multiple client grading below him"
+            newErrors.aPlus.maximum = "The maximum of grade A+ is smaller or the same than one or multiple client grading below him"
 
         // minimum grade A+ errors
         if (parseInt(minimumGradeAPlus) >= parseInt(maximumGradeAPlus) )
-            newErrors.minimumGradeAPlus = "The minimum of grade A+ is bigger or the same than maximum grade A+"
+            newErrors.aPlus.minimum = "The minimum of grade A+ is bigger or the same than maximum grade A+"
 
         if (parseInt(minimumGradeAPlus) <= parseInt(maximumGradeA) 
             && parseInt(minimumGradeAPlus) <= parseInt(minimumGradeA) 
@@ -83,12 +169,12 @@ const Manage = () => {
             && parseInt(minimumGradeAPlus) <= parseInt(minimumGradeC) 
             && parseInt(minimumGradeAPlus) <= parseInt(maximumGradeEPlus) 
             && parseInt(minimumGradeAPlus) <= parseInt(minimumGradeEPlus))
-            newErrors.minimumGradeAPlus = "The minimum of grade A+ is smaller or the same than one or multiple client gradings"
+            newErrors.aPlus.minimum = "The minimum of grade A+ is smaller or the same than one or multiple client gradings"
 
         // maximum grade A errors
         if (parseInt(maximumGradeA) >= parseInt(minimumGradeAPlus) 
             && parseInt(maximumGradeA) >= parseInt(maximumGradeAPlus))
-            newErrors.maximumGradeA = "The maximum of grade A is bigger or the same than the gradings above"
+            newErrors.a.maximum = "The maximum of grade A is bigger or the same than the gradings above"
 
         if (parseInt(maximumGradeA) <= parseInt(minimumGradeA) 
             && parseInt(maximumGradeA) <= parseInt(maximumGradeB) 
@@ -97,13 +183,13 @@ const Manage = () => {
             && parseInt(maximumGradeA) <= parseInt(minimumGradeC) 
             && parseInt(maximumGradeA) <= parseInt(maximumGradeEPlus) 
             && parseInt(maximumGradeA) <= parseInt(minimumGradeEPlus))
-            newErrors.maximumGradeA = "The maximum of grade A is smaller or the same than one or multiple client gradings below"
+            newErrors.a.maximum = "The maximum of grade A is smaller or the same than one or multiple client gradings below"
 
         // minimum grade A errors
         if (parseInt(minimumGradeA) >= parseInt(maximumGradeA) 
             && parseInt(minimumGradeA) >= parseInt(minimumGradeAPlus)
             && parseInt(minimumGradeA) >= parseInt(maximumGradeAPlus))
-            newErrors.minimumGradeA = "The minimum of grade A is bigger or the same than the gradings above"
+            newErrors.a.minimum = "The minimum of grade A is bigger or the same than the gradings above"
 
         if (parseInt(minimumGradeA) <= parseInt(maximumGradeB) 
             && parseInt(minimumGradeA) <= parseInt(minimumGradeB) 
@@ -111,21 +197,21 @@ const Manage = () => {
             && parseInt(minimumGradeA) <= parseInt(minimumGradeC) 
             && parseInt(minimumGradeA) <= parseInt(maximumGradeEPlus) 
             && parseInt(minimumGradeA) <= parseInt(minimumGradeEPlus))
-            newErrors.minimumGradeA = "The minimum of grade A is smaller or the same than one or multiple client gradings below"
+            newErrors.a.minimum = "The minimum of grade A is smaller or the same than one or multiple client gradings below"
 
         // maximum grade B errors
         if (parseInt(maximumGradeB) >= parseInt(minimumGradeA) 
             && parseInt(maximumGradeB) >= parseInt(maximumGradeA) 
             && parseInt(maximumGradeB) >= parseInt(minimumGradeAPlus)
             && parseInt(maximumGradeB) >= parseInt(maximumGradeAPlus))
-            newErrors.maximumGradeB = "The maximum of grade B is bigger or the same than the gradings above"
+            newErrors.b.maximum = "The maximum of grade B is bigger or the same than the gradings above"
 
         if (parseInt(maximumGradeB) <= parseInt(minimumGradeB) 
             && parseInt(maximumGradeB) <= parseInt(maximumGradeC) 
             && parseInt(maximumGradeB) <= parseInt(minimumGradeC) 
             && parseInt(maximumGradeB) <= parseInt(maximumGradeEPlus) 
             && parseInt(maximumGradeB) <= parseInt(minimumGradeEPlus))
-            newErrors.maximumGradeB = "The maximum of grade B is smaller or the same than one or multiple client gradings below"
+            newErrors.b.maximum = "The maximum of grade B is smaller or the same than one or multiple client gradings below"
 
         // minimum grade B errors
         if (parseInt(minimumGradeB) >= parseInt(maximumGradeB) 
@@ -133,13 +219,13 @@ const Manage = () => {
             && parseInt(minimumGradeB) >= parseInt(maximumGradeA) 
             && parseInt(minimumGradeB) >= parseInt(minimumGradeAPlus)
             && parseInt(minimumGradeB) >= parseInt(maximumGradeAPlus))
-            newErrors.minimumGradeB = "The minimum of grade B is bigger or the same than the gradings above"
+            newErrors.b.minimum = "The minimum of grade B is bigger or the same than the gradings above"
 
         if (parseInt(minimumGradeB) <= parseInt(maximumGradeC) 
             && parseInt(minimumGradeB) <= parseInt(minimumGradeC) 
             && parseInt(minimumGradeB) <= parseInt(maximumGradeEPlus) 
             && parseInt(minimumGradeB) <= parseInt(minimumGradeEPlus))
-            newErrors.minimumGradeB = "The minimum of grade B is smaller or the same than one or multiple client gradings below"
+            newErrors.b.minimum = "The minimum of grade B is smaller or the same than one or multiple client gradings below"
         
         //maximum grade C errors
         if (parseInt(maximumGradeC) >= parseInt(minimumGradeB)
@@ -148,12 +234,12 @@ const Manage = () => {
             && parseInt(maximumGradeC) >= parseInt(maximumGradeA) 
             && parseInt(maximumGradeC) >= parseInt(minimumGradeAPlus)
             && parseInt(maximumGradeC) >= parseInt(maximumGradeAPlus))
-            newErrors.maximumGradeC = "The maximum of grade C is bigger or the same than the gradings above"
+            newErrors.c.maximum = "The maximum of grade C is bigger or the same than the gradings above"
 
         if (parseInt(maximumGradeC) <= parseInt(minimumGradeC) 
             && parseInt(maximumGradeC) <= parseInt(maximumGradeEPlus) 
             && parseInt(maximumGradeC) <= parseInt(minimumGradeEPlus))
-            newErrors.maximumGradeC = "The maximum of grade C is smaller or the same than one or multiple client gradings below"
+            newErrors.c.maximum = "The maximum of grade C is smaller or the same than one or multiple client gradings below"
 
         //minimum grade C errors
         if (parseInt(minimumGradeC) >= parseInt(maximumGradeC)
@@ -163,11 +249,11 @@ const Manage = () => {
             && parseInt(minimumGradeC) >= parseInt(maximumGradeA) 
             && parseInt(minimumGradeC) >= parseInt(minimumGradeAPlus)
             && parseInt(minimumGradeC) >= parseInt(maximumGradeAPlus))
-            newErrors.minimumGradeC = "The minimum of grade C is bigger or the same than the gradings above"
+            newErrors.c.minimum = "The minimum of grade C is bigger or the same than the gradings above"
 
         if (parseInt(minimumGradeC) <= parseInt(maximumGradeEPlus) 
             && parseInt(minimumGradeC) <= parseInt(minimumGradeEPlus))
-            newErrors.minimumGradeC = "The minimum of grade C is smaller or the same than one or multiple client gradings below"
+            newErrors.c.minimum = "The minimum of grade C is smaller or the same than one or multiple client gradings below"
 
         //maximum grade E+ errors
         if (parseInt(maximumGradeEPlus) >= parseInt(minimumGradeC)
@@ -178,10 +264,10 @@ const Manage = () => {
             && parseInt(maximumGradeEPlus) >= parseInt(maximumGradeA) 
             && parseInt(maximumGradeEPlus) >= parseInt(minimumGradeAPlus)
             && parseInt(maximumGradeEPlus) >= parseInt(maximumGradeAPlus))
-            newErrors.maximumGradeEPlus = "The maximum of grade E+ is bigger or the same than the gradings above"
+            newErrors.ePlus.maximum = "The maximum of grade E+ is bigger or the same than the gradings above"
 
         if (parseInt(maximumGradeEPlus) <= parseInt(minimumGradeEPlus))
-            newErrors.maximumGradeEPlus = "The maximum of grade E+ is smaller or the same than one or multiple client gradings below"
+            newErrors.ePlus.maximum = "The maximum of grade E+ is smaller or the same than one or multiple client gradings below"
         
         //minimum grade E+ errors
         if (parseInt(minimumGradeEPlus) >= parseInt(maximumGradeEPlus)
@@ -193,51 +279,233 @@ const Manage = () => {
             && parseInt(minimumGradeEPlus) >= parseInt(maximumGradeA) 
             && parseInt(minimumGradeEPlus) >= parseInt(minimumGradeAPlus)
             && parseInt(minimumGradeEPlus) >= parseInt(maximumGradeAPlus))
-            newErrors.minimumGradeEPlus = "The minimum of grade E+ is bigger or the same than the gradings above"
+            newErrors.ePlus.minimum = "The minimum of grade E+ is bigger or the same than the gradings above"
 
 
         //if no option is selected in average collection time
         if (averageCollectionTimeGradeAPlus === "")
-            newErrors.averageCollectionTimeGradeAPlus = "Please select an option"
+            newErrors.aPlus.averageCollectionTime = "Please select an option"
 
         if (averageCollectionTimeGradeA === "")
-            newErrors.averageCollectionTimeGradeA = "Please select an option"
+            newErrors.a.averageCollectionTime = "Please select an option"
 
         if (averageCollectionTimeGradeB === "")
-            newErrors.averageCollectionTimeGradeB = "Please select an option"
+            newErrors.b.averageCollectionTime = "Please select an option"
 
         if (averageCollectionTimeGradeC === "")
-            newErrors.averageCollectionTimeGradeC = "Please select an option"
+            newErrors.c.averageCollectionTime = "Please select an option"
 
         if (averageCollectionTimeGradeEPlus === "")
-            newErrors.averageCollectionTimeGradeEPlus = "Please select an option"
+            newErrors.ePlus.averageCollectionTime = "Please select an option"
 
         //if there are no entries on the numbering
-
         if(maximumGradeAPlus === 0)
-            newErrors.maximumGradeAPlus = "Please enter a number"
+            newErrors.a.maximum = "Please enter a number"
         if(minimumGradeAPlus === 0)
-            newErrors.minimumGradeAPlus = "Please enter a number"
+            newErrors.a.minimum = "Please enter a number"
         if(maximumGradeA === 0)
-            newErrors.maximumGradeA = "Please enter a number"
+            newErrors.a.maximum = "Please enter a number"
         if(minimumGradeA === 0)
-            newErrors.minimumGradeA = "Please enter a number"
+            newErrors.a.minimum = "Please enter a number"
         if(maximumGradeB === 0)
-            newErrors.maximumGradeB = "Please enter a number"
+            newErrors.b.maximum = "Please enter a number"
         if(minimumGradeB === 0)
-            newErrors.minimumGradeB = "Please enter a number"
+            newErrors.b.minimum = "Please enter a number"
         if(maximumGradeC === 0)
-            newErrors.maximumGradeC = "Please enter a number"
+            newErrors.c.maximum = "Please enter a number"
         if(minimumGradeC === 0)
-            newErrors.minimumGradeC = "Please enter a number"
+            newErrors.c.minimum = "Please enter a number"
         if(maximumGradeEPlus === 0)
-            newErrors.maximumGradeEPlus = "Please enter a number"
+            newErrors.ePlus.maximum = "Please enter a number"
         if(minimumGradeEPlus === 0)
-            newErrors.minimumGradeEPlus = "Please enter a number"
+            newErrors.ePlus.minimum = "Please enter a number"
 
         return newErrors
     };
+   
 
+    // const findGradingCriteriaErrors = () => {
+    //     const { maximumGradeAPlus, minimumGradeAPlus, averageCollectionTimeGradeAPlus, maximumGradeA, minimumGradeA, averageCollectionTimeGradeA,maximumGradeB, minimumGradeB, averageCollectionTimeGradeB, maximumGradeC, minimumGradeC, averageCollectionTimeGradeC, maximumGradeEPlus, minimumGradeEPlus, averageCollectionTimeGradeEPlus } = clientGrading
+    //     let newErrors = {}
+
+    //     //maximum grade A+ errors
+    //     if (parseInt(maximumGradeAPlus) <= parseInt(minimumGradeAPlus) 
+    //         && parseInt(maximumGradeAPlus) <= parseInt(maximumGradeA)
+    //         && parseInt(maximumGradeAPlus) <= parseInt(minimumGradeA)
+    //         && parseInt(maximumGradeAPlus) <= parseInt(maximumGradeB) 
+    //         && parseInt(maximumGradeAPlus) <= parseInt(minimumGradeB) 
+    //         && parseInt(maximumGradeAPlus) <= parseInt(maximumGradeC) 
+    //         && parseInt(maximumGradeAPlus) <= parseInt(minimumGradeC) 
+    //         && parseInt(maximumGradeAPlus) <= parseInt(maximumGradeEPlus) 
+    //         && parseInt(maximumGradeAPlus) <= parseInt(minimumGradeEPlus))
+    //         newErrors.maximumGradeAPlus = "The maximum of grade A+ is smaller or the same than one or multiple client grading below him"
+
+    //     // minimum grade A+ errors
+    //     if (parseInt(minimumGradeAPlus) >= parseInt(maximumGradeAPlus) )
+    //         newErrors.minimumGradeAPlus = "The minimum of grade A+ is bigger or the same than maximum grade A+"
+
+    //     if (parseInt(minimumGradeAPlus) <= parseInt(maximumGradeA) 
+    //         && parseInt(minimumGradeAPlus) <= parseInt(minimumGradeA) 
+    //         && parseInt(minimumGradeAPlus) <= parseInt(maximumGradeB) 
+    //         && parseInt(minimumGradeAPlus) <= parseInt(minimumGradeB) 
+    //         && parseInt(minimumGradeAPlus) <= parseInt(maximumGradeC) 
+    //         && parseInt(minimumGradeAPlus) <= parseInt(minimumGradeC) 
+    //         && parseInt(minimumGradeAPlus) <= parseInt(maximumGradeEPlus) 
+    //         && parseInt(minimumGradeAPlus) <= parseInt(minimumGradeEPlus))
+    //         newErrors.minimumGradeAPlus = "The minimum of grade A+ is smaller or the same than one or multiple client gradings"
+
+    //     // maximum grade A errors
+    //     if (parseInt(maximumGradeA) >= parseInt(minimumGradeAPlus) 
+    //         && parseInt(maximumGradeA) >= parseInt(maximumGradeAPlus))
+    //         newErrors.maximumGradeA = "The maximum of grade A is bigger or the same than the gradings above"
+
+    //     if (parseInt(maximumGradeA) <= parseInt(minimumGradeA) 
+    //         && parseInt(maximumGradeA) <= parseInt(maximumGradeB) 
+    //         && parseInt(maximumGradeA) <= parseInt(minimumGradeB) 
+    //         && parseInt(maximumGradeA) <= parseInt(maximumGradeC) 
+    //         && parseInt(maximumGradeA) <= parseInt(minimumGradeC) 
+    //         && parseInt(maximumGradeA) <= parseInt(maximumGradeEPlus) 
+    //         && parseInt(maximumGradeA) <= parseInt(minimumGradeEPlus))
+    //         newErrors.maximumGradeA = "The maximum of grade A is smaller or the same than one or multiple client gradings below"
+
+    //     // minimum grade A errors
+    //     if (parseInt(minimumGradeA) >= parseInt(maximumGradeA) 
+    //         && parseInt(minimumGradeA) >= parseInt(minimumGradeAPlus)
+    //         && parseInt(minimumGradeA) >= parseInt(maximumGradeAPlus))
+    //         newErrors.minimumGradeA = "The minimum of grade A is bigger or the same than the gradings above"
+
+    //     if (parseInt(minimumGradeA) <= parseInt(maximumGradeB) 
+    //         && parseInt(minimumGradeA) <= parseInt(minimumGradeB) 
+    //         && parseInt(minimumGradeA) <= parseInt(maximumGradeC) 
+    //         && parseInt(minimumGradeA) <= parseInt(minimumGradeC) 
+    //         && parseInt(minimumGradeA) <= parseInt(maximumGradeEPlus) 
+    //         && parseInt(minimumGradeA) <= parseInt(minimumGradeEPlus))
+    //         newErrors.minimumGradeA = "The minimum of grade A is smaller or the same than one or multiple client gradings below"
+
+    //     // maximum grade B errors
+    //     if (parseInt(maximumGradeB) >= parseInt(minimumGradeA) 
+    //         && parseInt(maximumGradeB) >= parseInt(maximumGradeA) 
+    //         && parseInt(maximumGradeB) >= parseInt(minimumGradeAPlus)
+    //         && parseInt(maximumGradeB) >= parseInt(maximumGradeAPlus))
+    //         newErrors.maximumGradeB = "The maximum of grade B is bigger or the same than the gradings above"
+
+    //     if (parseInt(maximumGradeB) <= parseInt(minimumGradeB) 
+    //         && parseInt(maximumGradeB) <= parseInt(maximumGradeC) 
+    //         && parseInt(maximumGradeB) <= parseInt(minimumGradeC) 
+    //         && parseInt(maximumGradeB) <= parseInt(maximumGradeEPlus) 
+    //         && parseInt(maximumGradeB) <= parseInt(minimumGradeEPlus))
+    //         newErrors.maximumGradeB = "The maximum of grade B is smaller or the same than one or multiple client gradings below"
+
+    //     // minimum grade B errors
+    //     if (parseInt(minimumGradeB) >= parseInt(maximumGradeB) 
+    //         && parseInt(minimumGradeB) >= parseInt(minimumGradeA) 
+    //         && parseInt(minimumGradeB) >= parseInt(maximumGradeA) 
+    //         && parseInt(minimumGradeB) >= parseInt(minimumGradeAPlus)
+    //         && parseInt(minimumGradeB) >= parseInt(maximumGradeAPlus))
+    //         newErrors.minimumGradeB = "The minimum of grade B is bigger or the same than the gradings above"
+
+    //     if (parseInt(minimumGradeB) <= parseInt(maximumGradeC) 
+    //         && parseInt(minimumGradeB) <= parseInt(minimumGradeC) 
+    //         && parseInt(minimumGradeB) <= parseInt(maximumGradeEPlus) 
+    //         && parseInt(minimumGradeB) <= parseInt(minimumGradeEPlus))
+    //         newErrors.minimumGradeB = "The minimum of grade B is smaller or the same than one or multiple client gradings below"
+        
+    //     //maximum grade C errors
+    //     if (parseInt(maximumGradeC) >= parseInt(minimumGradeB)
+    //         && parseInt(maximumGradeC) >= parseInt(maximumGradeB) 
+    //         && parseInt(maximumGradeC) >= parseInt(minimumGradeA) 
+    //         && parseInt(maximumGradeC) >= parseInt(maximumGradeA) 
+    //         && parseInt(maximumGradeC) >= parseInt(minimumGradeAPlus)
+    //         && parseInt(maximumGradeC) >= parseInt(maximumGradeAPlus))
+    //         newErrors.maximumGradeC = "The maximum of grade C is bigger or the same than the gradings above"
+
+    //     if (parseInt(maximumGradeC) <= parseInt(minimumGradeC) 
+    //         && parseInt(maximumGradeC) <= parseInt(maximumGradeEPlus) 
+    //         && parseInt(maximumGradeC) <= parseInt(minimumGradeEPlus))
+    //         newErrors.maximumGradeC = "The maximum of grade C is smaller or the same than one or multiple client gradings below"
+
+    //     //minimum grade C errors
+    //     if (parseInt(minimumGradeC) >= parseInt(maximumGradeC)
+    //         && parseInt(minimumGradeC) >= parseInt(minimumGradeB)
+    //         && parseInt(minimumGradeC) >= parseInt(maximumGradeB) 
+    //         && parseInt(minimumGradeC) >= parseInt(minimumGradeA) 
+    //         && parseInt(minimumGradeC) >= parseInt(maximumGradeA) 
+    //         && parseInt(minimumGradeC) >= parseInt(minimumGradeAPlus)
+    //         && parseInt(minimumGradeC) >= parseInt(maximumGradeAPlus))
+    //         newErrors.minimumGradeC = "The minimum of grade C is bigger or the same than the gradings above"
+
+    //     if (parseInt(minimumGradeC) <= parseInt(maximumGradeEPlus) 
+    //         && parseInt(minimumGradeC) <= parseInt(minimumGradeEPlus))
+    //         newErrors.minimumGradeC = "The minimum of grade C is smaller or the same than one or multiple client gradings below"
+
+    //     //maximum grade E+ errors
+    //     if (parseInt(maximumGradeEPlus) >= parseInt(minimumGradeC)
+    //         && parseInt(maximumGradeEPlus) >= parseInt(maximumGradeC)
+    //         && parseInt(maximumGradeEPlus) >= parseInt(minimumGradeB)
+    //         && parseInt(maximumGradeEPlus) >= parseInt(maximumGradeB) 
+    //         && parseInt(maximumGradeEPlus) >= parseInt(minimumGradeA) 
+    //         && parseInt(maximumGradeEPlus) >= parseInt(maximumGradeA) 
+    //         && parseInt(maximumGradeEPlus) >= parseInt(minimumGradeAPlus)
+    //         && parseInt(maximumGradeEPlus) >= parseInt(maximumGradeAPlus))
+    //         newErrors.maximumGradeEPlus = "The maximum of grade E+ is bigger or the same than the gradings above"
+
+    //     if (parseInt(maximumGradeEPlus) <= parseInt(minimumGradeEPlus))
+    //         newErrors.maximumGradeEPlus = "The maximum of grade E+ is smaller or the same than one or multiple client gradings below"
+        
+    //     //minimum grade E+ errors
+    //     if (parseInt(minimumGradeEPlus) >= parseInt(maximumGradeEPlus)
+    //         && parseInt(minimumGradeEPlus) >= parseInt(minimumGradeC)
+    //         && parseInt(minimumGradeEPlus) >= parseInt(maximumGradeC)
+    //         && parseInt(minimumGradeEPlus) >= parseInt(minimumGradeB)
+    //         && parseInt(minimumGradeEPlus) >= parseInt(maximumGradeB) 
+    //         && parseInt(minimumGradeEPlus) >= parseInt(minimumGradeA) 
+    //         && parseInt(minimumGradeEPlus) >= parseInt(maximumGradeA) 
+    //         && parseInt(minimumGradeEPlus) >= parseInt(minimumGradeAPlus)
+    //         && parseInt(minimumGradeEPlus) >= parseInt(maximumGradeAPlus))
+    //         newErrors.minimumGradeEPlus = "The minimum of grade E+ is bigger or the same than the gradings above"
+
+
+    //     //if no option is selected in average collection time
+    //     if (averageCollectionTimeGradeAPlus === "")
+    //         newErrors.averageCollectionTimeGradeAPlus = "Please select an option"
+
+    //     if (averageCollectionTimeGradeA === "")
+    //         newErrors.averageCollectionTimeGradeA = "Please select an option"
+
+    //     if (averageCollectionTimeGradeB === "")
+    //         newErrors.averageCollectionTimeGradeB = "Please select an option"
+
+    //     if (averageCollectionTimeGradeC === "")
+    //         newErrors.averageCollectionTimeGradeC = "Please select an option"
+
+    //     if (averageCollectionTimeGradeEPlus === "")
+    //         newErrors.averageCollectionTimeGradeEPlus = "Please select an option"
+
+    //     //if there are no entries on the numbering
+
+    //     if(maximumGradeAPlus === 0)
+    //         newErrors.maximumGradeAPlus = "Please enter a number"
+    //     if(minimumGradeAPlus === 0)
+    //         newErrors.minimumGradeAPlus = "Please enter a number"
+    //     if(maximumGradeA === 0)
+    //         newErrors.maximumGradeA = "Please enter a number"
+    //     if(minimumGradeA === 0)
+    //         newErrors.minimumGradeA = "Please enter a number"
+    //     if(maximumGradeB === 0)
+    //         newErrors.maximumGradeB = "Please enter a number"
+    //     if(minimumGradeB === 0)
+    //         newErrors.minimumGradeB = "Please enter a number"
+    //     if(maximumGradeC === 0)
+    //         newErrors.maximumGradeC = "Please enter a number"
+    //     if(minimumGradeC === 0)
+    //         newErrors.minimumGradeC = "Please enter a number"
+    //     if(maximumGradeEPlus === 0)
+    //         newErrors.maximumGradeEPlus = "Please enter a number"
+    //     if(minimumGradeEPlus === 0)
+    //         newErrors.minimumGradeEPlus = "Please enter a number"
+
+    //     return newErrors
+    // };
 
     const handleSaveGradingBrackets = async (event) => {
         event.preventDefault()
@@ -256,7 +524,6 @@ const Manage = () => {
         setConfirmSaveGradingActivated(true)
     }
 
-
     const getCurrentClientGradingInformations = async () => {
 
         let header = {
@@ -267,25 +534,59 @@ const Manage = () => {
             .then((response) => {
                 if (response.status === 200 || response.status === 201) {
 
-                    console.log(response.data);
+                    // console.log(response.data);
+
+                    // let setValue = {
+                    //     maximumGradeAPlus: parseInt(response.data.maximumGradeAPlus),
+                    //     minimumGradeAPlus: parseInt(response.data.minimumGradeAPlus),
+                    //     averageCollectionTimeGradeAPlus: response.data.averageCollectionTimeGradeAPlus,
+                    //     maximumGradeA: parseInt(response.data.maximumGradeA),
+                    //     minimumGradeA: parseInt(response.data.minimumGradeA),
+                    //     averageCollectionTimeGradeA: response.data.averageCollectionTimeGradeA,
+                    //     maximumGradeB: parseInt(response.data.maximumGradeB),
+                    //     minimumGradeB: parseInt(response.data.minimumGradeB),
+                    //     averageCollectionTimeGradeB: response.data.averageCollectionTimeGradeB,
+                    //     maximumGradeC: parseInt(response.data.maximumGradeC),
+                    //     minimumGradeC: parseInt(response.data.minimumGradeC),
+                    //     averageCollectionTimeGradeC: response.data.averageCollectionTimeGradeC,
+                    //     maximumGradeEPlus: parseInt(response.data.maximumGradeEPlus),
+                    //     minimumGradeEPlus: parseInt(response.data.minimumGradeEPlus),
+                    //     averageCollectionTimeGradeEPlus: response.data.averageCollectionTimeGradeEPlus
+                    // }
 
                     let setValue = {
-                        maximumGradeAPlus: parseInt(response.data.maximumGradeAPlus),
-                        minimumGradeAPlus: parseInt(response.data.minimumGradeAPlus),
-                        averageCollectionTimeGradeAPlus: response.data.averageCollectionTimeGradeAPlus,
-                        maximumGradeA: parseInt(response.data.maximumGradeA),
-                        minimumGradeA: parseInt(response.data.minimumGradeA),
-                        averageCollectionTimeGradeA: response.data.averageCollectionTimeGradeA,
-                        maximumGradeB: parseInt(response.data.maximumGradeB),
-                        minimumGradeB: parseInt(response.data.minimumGradeB),
-                        averageCollectionTimeGradeB: response.data.averageCollectionTimeGradeB,
-                        maximumGradeC: parseInt(response.data.maximumGradeC),
-                        minimumGradeC: parseInt(response.data.minimumGradeC),
-                        averageCollectionTimeGradeC: response.data.averageCollectionTimeGradeC,
-                        maximumGradeEPlus: parseInt(response.data.maximumGradeEPlus),
-                        minimumGradeEPlus: parseInt(response.data.minimumGradeEPlus),
-                        averageCollectionTimeGradeEPlus: response.data.averageCollectionTimeGradeEPlus
+                        aPlus: {
+                            grade: 'A+',
+                            maximum: parseInt(response.data.maximumGradeAPlus),
+                            minimum: parseInt(response.data.minimumGradeAPlus),
+                            averageCollectionTime: response.data.averageCollectionTimeGradeAPlus
+                        },
+                        a: {
+                            grade: 'A',
+                            maximum: parseInt(response.data.maximumGradeA),
+                            minimum: parseInt(response.data.minimumGradeA),
+                            averageCollectionTime: response.data.averageCollectionTimeGradeA
+                        },
+                        b: {
+                            grade: 'B',
+                            maximum: parseInt(response.data.maximumGradeB),
+                            minimum: parseInt(response.data.minimumGradeB),
+                            averageCollectionTime: response.data.averageCollectionTimeGradeB,
+                        },
+                        c: {
+                            grade: 'C',
+                            maximum: parseInt(response.data.maximumGradeC),
+                            minimum: parseInt(response.data.minimumGradeC),
+                            averageCollectionTime: ""
+                        },
+                        ePlus: {
+                            grade: 'E+',
+                            maximum: parseInt(response.data.maximumGradeEPlus),
+                            minimum: parseInt(response.data.minimumGradeEPlus),
+                            averageCollectionTime: response.data.averageCollectionTimeGradeEPlus
+                        },
                     }
+                    
 
                     setClientGrading(setValue);
                     return;
@@ -315,22 +616,40 @@ const Manage = () => {
         }
 
         let data = {
-            maximumGradeAPlus: clientGrading.maximumGradeAPlus,
-            minimumGradeAPlus: clientGrading.minimumGradeAPlus,
-            averageCollectionTimeGradeAPlus: clientGrading.averageCollectionTimeGradeAPlus,
-            maximumGradeA: clientGrading.maximumGradeA,
-            minimumGradeA: clientGrading.minimumGradeA,
-            averageCollectionTimeGradeA: clientGrading.averageCollectionTimeGradeA,
-            maximumGradeB: clientGrading.maximumGradeB,
-            minimumGradeB: clientGrading.minimumGradeB,
-            averageCollectionTimeGradeB: clientGrading.averageCollectionTimeGradeB,
-            maximumGradeC: clientGrading.maximumGradeC,
-            minimumGradeC: clientGrading.minimumGradeC,
-            averageCollectionTimeGradeC: clientGrading.averageCollectionTimeGradeC,
-            maximumGradeEPlus: clientGrading.maximumGradeEPlus,
-            minimumGradeEPlus: clientGrading.minimumGradeEPlus,
-            averageCollectionTimeGradeEPlus: clientGrading.averageCollectionTimeGradeEPlus
+            maximumGradeAPlus: clientGrading.aPlus.maximum,
+            minimumGradeAPlus: clientGrading.aPlus.minimum,
+            averageCollectionTimeGradeAPlus: clientGrading.aPlus.averageCollectionTime,
+            maximumGradeA: clientGrading.a.maximum,
+            minimumGradeA: clientGrading.a.minimum,
+            averageCollectionTimeGradeA: clientGrading.a.averageCollectionTime,
+            maximumGradeB: clientGrading.b.maximum,
+            minimumGradeB: clientGrading.b.minimum,
+            averageCollectionTimeGradeB: clientGrading.b.averageCollectionTime,
+            maximumGradeC: clientGrading.c.maximum,
+            minimumGradeC: clientGrading.c.minimum,
+            averageCollectionTimeGradeC: clientGrading.c.averageCollectionTime,
+            maximumGradeEPlus: clientGrading.ePlus.maximum,
+            minimumGradeEPlus: clientGrading.ePlus.minimum,
+            averageCollectionTimeGradeEPlus: clientGrading.ePlus.averageCollectionTime,
         }
+
+        // let data = {
+        //     maximumGradeAPlus: clientGrading.maximumGradeAPlus,
+        //     minimumGradeAPlus: clientGrading.minimumGradeAPlus,
+        //     averageCollectionTimeGradeAPlus: clientGrading.averageCollectionTimeGradeAPlus,
+        //     maximumGradeA: clientGrading.maximumGradeA,
+        //     minimumGradeA: clientGrading.minimumGradeA,
+        //     averageCollectionTimeGradeA: clientGrading.averageCollectionTimeGradeA,
+        //     maximumGradeB: clientGrading.maximumGradeB,
+        //     minimumGradeB: clientGrading.minimumGradeB,
+        //     averageCollectionTimeGradeB: clientGrading.averageCollectionTimeGradeB,
+        //     maximumGradeC: clientGrading.maximumGradeC,
+        //     minimumGradeC: clientGrading.minimumGradeC,
+        //     averageCollectionTimeGradeC: clientGrading.averageCollectionTimeGradeC,
+        //     maximumGradeEPlus: clientGrading.maximumGradeEPlus,
+        //     minimumGradeEPlus: clientGrading.minimumGradeEPlus,
+        //     averageCollectionTimeGradeEPlus: clientGrading.averageCollectionTimeGradeEPlus
+        // }
 
         Axios.put(`${process.env.REACT_APP_API}/manage/modifyClientGrading`, data, { headers: header })
             .then((response) => {
@@ -373,360 +692,428 @@ const Manage = () => {
     return (
         <div>
             <NavB />
-            <div className='justify-content-center mainContainer'>
-                <div className='container-clientGradingBrackets'>
-                    <div className='card shadow my-3 mx-3 px-3 py2'>
-                        <h3 className="text-center">{t('manage.clientGrading.Title')}</h3>
-                        <Form.Group className="my-2">
+            <div className='d-block'>
+                <div className="justify-content-center d-flex">
+                    <div className='container-clientGradingBrackets'>
+                        <div className='card shadow my-3 mx-3 px-3 py2'>
+                            <h3 className="text-center">{t('manage.clientGrading.Title')}</h3>
+                            <Form.Group className="my-2">
+                                
+                                <Row>
+                                    <Col sm={6} md={1} />
+                                    <Col sm={6} md={3}>
+                                        <Form.Label className='tableHeader'>Minimum</Form.Label>
+                                    </Col>
+                                    <Col sm={6} md={3}>
+                                        <Form.Label className='tableHeader'>Maximum</Form.Label>
+                                    </Col>
+                                    <Col sm={6} md={5}>
+                                        <Form.Label className='tableHeader'>Average Collection days</Form.Label>
+                                    </Col>
+                                </Row>
+
+                                {Object.keys(clientGrading).map((key, index) => {
+                                    counter++
+                                    if(counter > 5)
+                                        counter = 0;
+                                    return (
+                                        <Row className="manageRowForm">
+                                            <Col sm={6} md={1}>
+                                                <Form.Label className="inputTitle">{clientGrading[key].grade}</Form.Label>
+                                            </Col>
+
+                                            <Col sm={6} md={3}>
+                                                <Form.Control required
+                                                        id={'minimumGrade' + key.grade}
+                                                        size="md"
+                                                        type="number"
+                                                        placeholder="Minimum treshold"
+                                                        onChange={(g) => setField('minimum', g.target.value, key)}
+                                                        value={clientGrading[key].minimum}
+                                                        isInvalid={!!errors.minimumGradeAPlus}>
+                                                </Form.Control>
+
+                                                <Form.Control.Feedback type="invalid">
+                                                    {errors.minimumGradeAPlus}
+                                                </Form.Control.Feedback>
+                                            </Col>
+
+                                            <Col sm={6} md={3}>
+                                                <Form.Control required
+                                                        id={'maximumGrade' + clientGrading[key].grade}
+                                                        className="manageMaximumGrade"
+                                                        size="md"
+                                                        type="number"
+                                                        placeholder="Maximum treshold"
+                                                        onChange={(g) => setField('maximum', g.target.value, key)}
+                                                        value={clientGrading[key].maximum}
+                                                        isInvalid={!!errors.maximumGradeAPlus}>
+                                                </Form.Control>
+
+                                                <Form.Control.Feedback type="invalid">
+                                                    {errors.maximumGradeAPlus}
+                                                </Form.Control.Feedback>
+                                            </Col>
+
+                                            <Col sm={6} md={5}>
+                                                <Form.Select required
+                                                    id={'averageCollectionTime' + clientGrading[key].grade}
+                                                    className="manageAverageCollectionTime"
+                                                    size="md"
+                                                    aria-label="Average collection time"
+                                                    onChange={(g) => setField('averageCollectionTimeGrade', g.target.value, key)}
+                                                    value={clientGrading[key].averageCollectionTimeGrade}
+                                                    isInvalid={!!errors.averageCollectionTimeGradeAPlus}>
+                                                        <option key={()=>{return counter.toString()+"1"}} value="">Select Average Collection Time</option>
+                                                        <option key={()=>{return counter.toString()+"2"}} value="<30">30 days or less</option>
+                                                        <option key={()=>{return counter.toString()+"3"}} value="30-60">Between 30 and 60 days</option>
+                                                        <option key={()=>{return counter.toString()+"4"}} value="60-90">Between 60 and 90 days</option>
+                                                        <option key={()=>{return counter.toString()+"5"}} value=">90">Over 90 days</option>
+                                                </Form.Select>
+                                                <Form.Control.Feedback type="invalid">
+                                                    {errors.averageCollectionTimeGradeAPlus}
+                                                </Form.Control.Feedback>
+                                            </Col>
+                                        </Row>
+                                    )
+                                })}
+
+                                {/* <Row className="manageRowForm">
+                                    <Col sm={6} md={1}>
+                                        <Form.Label className="inputTitle">A+</Form.Label>
+                                    </Col>
+
+                                    <Col sm={6} md={3}>
+                                        <Form.Control required
+                                                id='minimumGradeA+'
+                                                size="md"
+                                                type="number"
+                                                placeholder="Minimum treshold"
+                                                onChange={(g) => setField('minimumGradeAPlus', g.target.value)}
+                                                value={clientGrading.minimumGradeAPlus}
+                                                isInvalid={!!errors.minimumGradeAPlus}>
+                                        </Form.Control>
+
+                                        <Form.Control.Feedback type="invalid">
+                                            {errors.minimumGradeAPlus}
+                                        </Form.Control.Feedback>
+                                    </Col>
+
+
+                                    
+                                    <Col sm={6} md={3}>
+                                        <Form.Control required
+                                                id='maximumGradeA+'
+                                                className="manageMaximumGrade"
+                                                size="md"
+                                                type="number"
+                                                placeholder="Maximum treshold"
+                                                onChange={(g) => setField('maximumGradeAPlus', g.target.value)}
+                                                value={clientGrading.maximumGradeAPlus}
+                                                isInvalid={!!errors.maximumGradeAPlus}>
+                                        </Form.Control>
+
+                                        <Form.Control.Feedback type="invalid">
+                                            {errors.maximumGradeAPlus}
+                                        </Form.Control.Feedback>
+                                    </Col>
+
+
+                                    <Col sm={6} md={4}>
+                                        <Form.Control required
+                                            as="select"
+                                            id='averageCollectionTimeA+'
+                                            className="manageAverageCollectionTime"
+                                            size="md"
+                                            aria-label="Average collection time"
+                                            onChange={(g) => setField('averageCollectionTimeGradeAPlus', g.target.value)}
+                                            value={clientGrading.averageCollectionTimeGradeAPlus}
+                                            isInvalid={!!errors.averageCollectionTimeGradeAPlus}>
+                                                <option value="">Select Average Collection Time</option>
+                                                <option value="<30">30 days or less</option>
+                                                <option value="30-60">Between 30 and 60 days</option>
+                                                <option value="60-90">Between 60 and 90 days</option>
+                                                <option value=">90">Over 90 days</option>
+                                        </Form.Control>
+                                        <Form.Control.Feedback type="invalid">
+                                            {errors.averageCollectionTimeGradeAPlus}
+                                        </Form.Control.Feedback>
+                                    </Col>
+                                </Row>
+
                             
 
-                            <Row>
-                                <Col>
-                                    <Form.Label id="mainTitle">Minimum</Form.Label>
-                                </Col>
-                                <Col>
-                                    <Form.Label id="mainTitle2">Maximum</Form.Label>
-                                </Col>
-                                <Col>
-                                    <Form.Label id="mainTitle3">Average Collection days</Form.Label>
-                                </Col>
-                            </Row>
+                                <Row className="manageRowForm">
 
-                            <Row className="manageRowForm">
-                                <Col sm={6} md={1}>
-                                    <Form.Label className="inputTitle">A+</Form.Label>
-                                </Col>
+                                    <Col sm={6} md={1}>
+                                        <Form.Label className="inputTitle">A</Form.Label>
+                                    </Col>
 
-                                <Col sm={6} md={3}>
-                                    <Form.Control required
-                                            id='minimumGradeA+'
+                                    <Col sm={6} md={3}>
+                                        <Form.Control required
+                                                id='minimumGradeA'
+                                                size="md"
+                                                type="number"
+                                                placeholder="Minimum treshold"
+                                                onChange={(g) => setField('minimumGradeA', g.target.value)}
+                                                value={clientGrading.minimumGradeA}
+                                                isInvalid={!!errors.minimumGradeA}>
+                                        </Form.Control>
+
+                                        <Form.Control.Feedback type="invalid">
+                                            {errors.minimumGradeA}
+                                        </Form.Control.Feedback>
+                                    </Col>
+                                    
+
+                                    <Col sm={6} md={3}>
+                                        <Form.Control required
+                                                id='maximumGradeA'
+                                                className="manageMaximumGrade"
+                                                size="md"
+                                                type="number"
+                                                placeholder="Maximum treshold"
+                                                onChange={(g) => setField('maximumGradeA', g.target.value)}
+                                                value={clientGrading.maximumGradeA}
+                                                isInvalid={!!errors.maximumGradeA}>
+                                        </Form.Control>
+
+                                        <Form.Control.Feedback type="invalid">
+                                            {errors.maximumGradeA}
+                                        </Form.Control.Feedback>
+                                    </Col>
+
+
+                                    <Col sm={6} md={4}>
+                                        <Form.Control required
+                                            as="select"
+                                            id='averageCollectionTimeA'
+                                            className="manageAverageCollectionTime"
                                             size="md"
-                                            type="number"
-                                            placeholder="Minimum treshold"
-                                            onChange={(g) => setField('minimumGradeAPlus', g.target.value)}
-                                            value={clientGrading.minimumGradeAPlus}
-                                            isInvalid={!!errors.minimumGradeAPlus}>
-                                    </Form.Control>
+                                            aria-label="Average collection time"
+                                            onChange={(g) => setField('averageCollectionTimeGradeA', g.target.value)}
+                                            value={clientGrading.averageCollectionTimeGradeA}
+                                            isInvalid={!!errors.averageCollectionTimeGradeA}>
+                                                <option value="">Select Average Collection Time</option>
+                                                <option value="<30">30 days or less</option>
+                                                <option value="30-60">Between 30 and 60 days</option>
+                                                <option value="60-90">Between 60 and 90 days</option>
+                                                <option value=">90">Over 90 days</option>
+                                        </Form.Control>
+                                        <Form.Control.Feedback type="invalid">
+                                            {errors.averageCollectionTimeGradeA}
+                                        </Form.Control.Feedback>
+                                    </Col>
+                                </Row>
 
-                                    <Form.Control.Feedback type="invalid">
-                                        {errors.minimumGradeAPlus}
-                                    </Form.Control.Feedback>
-                                </Col>
+                                <Row className="manageRowForm">
+
+                                    <Col sm={6} md={1}>
+                                        <Form.Label className="inputTitle">B</Form.Label>
+                                    </Col>
+
+                                    <Col sm={6} md={3}>
+                                        <Form.Control required
+                                                id='minimumGradeB'
+                                                size="md"
+                                                type="number"
+                                                placeholder="Minimum treshold"
+                                                onChange={(g) => setField('minimumGradeB', g.target.value)}
+                                                value={clientGrading.minimumGradeB}
+                                                isInvalid={!!errors.minimumGradeB}>
+                                        </Form.Control>
+
+                                        <Form.Control.Feedback type="invalid">
+                                            {errors.minimumGradeB}
+                                        </Form.Control.Feedback>
+                                    </Col>
+                                    
+
+                                    
+                                    <Col sm={6} md={3}>
+                                        <Form.Control required
+                                                id='maximumGradeB'
+                                                className="manageMaximumGrade"
+                                                size="md"
+                                                type="number"
+                                                placeholder="Maximum treshold"
+                                                onChange={(g) => setField('maximumGradeB', g.target.value)}
+                                                value={clientGrading.maximumGradeB}
+                                                isInvalid={!!errors.maximumGradeB}>
+                                        </Form.Control>
+
+                                        <Form.Control.Feedback type="invalid">
+                                            {errors.maximumGradeB}
+                                        </Form.Control.Feedback>
+                                    </Col>
 
 
+
+                                    <Col sm={6} md={4}>
+                                        <Form.Control required
+                                            as="select"
+                                            id='averageCollectionTimeB'
+                                            className="manageAverageCollectionTime"
+                                            size="md"
+                                            aria-label="Average collection time"
+                                            onChange={(g) => setField('averageCollectionTimeGradeB', g.target.value)}
+                                            value={clientGrading.averageCollectionTimeGradeB}
+                                            isInvalid={!!errors.averageCollectionTimeGradeB}>
+                                                <option value="">Select Average Collection Time</option>
+                                                <option value="<30">30 days or less</option>
+                                                <option value="30-60">Between 30 and 60 days</option>
+                                                <option value="60-90">Between 60 and 90 days</option>
+                                                <option value=">90">Over 90 days</option>
+                                        </Form.Control>
+                                        <Form.Control.Feedback type="invalid">
+                                            {errors.averageCollectionTimeGradeB}
+                                        </Form.Control.Feedback>
+                                    </Col>
+                                </Row>
+
+
+                                <Row className="manageRowForm">
+
+                                    <Col sm={6} md={1}>
+                                        <Form.Label className="inputTitle">C</Form.Label>
+                                    </Col>
+
+
+                                    <Col sm={6} md={3}>
+                                        <Form.Control required
+                                                id='minimumGradeC'
+                                                size="md"
+                                                type="number"
+                                                placeholder="Minimum treshold"
+                                                onChange={(g) => setField('minimumGradeC', g.target.value)}
+                                                value={clientGrading.minimumGradeC}
+                                                isInvalid={!!errors.minimumGradeC}>
+                                        </Form.Control>
+
+                                        <Form.Control.Feedback type="invalid">
+                                            {errors.minimumGradeC}
+                                        </Form.Control.Feedback>
+                                    </Col>
+
+
+                                    <Col sm={6} md={3}>
+                                        <Form.Control required
+                                                id='maximumGradeC'
+                                                className="manageMaximumGrade"
+                                                size="md"
+                                                type="number"
+                                                placeholder="Maximum treshold"
+                                                onChange={(g) => setField('maximumGradeC', g.target.value)}
+                                                value={clientGrading.maximumGradeC}
+                                                isInvalid={!!errors.maximumGradeC}>
+                                        </Form.Control>
+
+                                        <Form.Control.Feedback type="invalid">
+                                            {errors.maximumGradeC}
+                                        </Form.Control.Feedback>
+                                    </Col>
+
+
+                                    <Col sm={6} md={4}>
+                                        <Form.Control required
+                                            as="select"
+                                            id='averageCollectionTimeC'
+                                            className="manageAverageCollectionTime"
+                                            size="md"
+                                            aria-label="Average collection time"
+                                            onChange={(g) => setField('averageCollectionTimeGradeC', g.target.value)}
+                                            value={clientGrading.averageCollectionTimeGradeC}
+                                            isInvalid={!!errors.averageCollectionTimeGradeC}>
+                                                <option value="">Select Average Collection Time</option>
+                                                <option value="<30">30 days or less</option>
+                                                <option value="30-60">Between 30 and 60 days</option>
+                                                <option value="60-90">Between 60 and 90 days</option>
+                                                <option value=">90">Over 90 days</option>
+                                        </Form.Control>
+                                        <Form.Control.Feedback type="invalid">
+                                            {errors.averageCollectionTimeGradeC}
+                                        </Form.Control.Feedback>
+                                    </Col>
+                                </Row>
+
+
+                                <Row className="manageRowForm">
+                                    <Col sm={6} md={1}>
+                                        <Form.Label className="inputTitle">E+</Form.Label>
+                                    </Col>
+
+                                    <Col sm={6} md={3}>
+                                        <Form.Control required
+                                                id='minimumGradeE+'
+                                                size="md"
+                                                type="number"
+                                                placeholder="Minimum treshold"
+                                                onChange={(g) => setField('minimumGradeEPlus', g.target.value)}
+                                                value={clientGrading.minimumGradeEPlus}
+                                                isInvalid={!!errors.minimumGradeEPlus}>
+                                        </Form.Control>
+
+                                        <Form.Control.Feedback type="invalid">
+                                            {errors.minimumGradeEPlus}
+                                        </Form.Control.Feedback>
+                                    </Col>
+
+
+
+                                    
+                                    <Col sm={6} md={3}>
+                                        <Form.Control required
+                                                id='maximumGradeE+'
+                                                className="manageMaximumGrade"
+                                                size="md"
+                                                type="number"
+                                                placeholder="Maximum treshold"
+                                                onChange={(g) => setField('maximumGradeEPlus', g.target.value)}
+                                                value={clientGrading.maximumGradeEPlus}
+                                                isInvalid={!!errors.maximumGradeEPlus}>
+                                        </Form.Control>
+
+                                        <Form.Control.Feedback type="invalid">
+                                            {errors.maximumGradeEPlus}
+                                        </Form.Control.Feedback>
+                                    </Col>
+
+
+                                    <Col sm={6} md={4}>
+                                        <Form.Control required
+                                            as="select"
+                                            id='averageCollectionTimeE+'
+                                            className="manageAverageCollectionTime"
+                                            size="md"
+                                            aria-label="Average collection time"
+                                            onChange={(g) => setField('averageCollectionTimeGradeEPlus', g.target.value)}
+                                            value={clientGrading.averageCollectionTimeGradeEPlus}
+                                            isInvalid={!!errors.averageCollectionTimeGradeEPlus}>
+                                                <option value="">Select Average Collection Time</option>
+                                                <option value="<30">30 days or less</option>
+                                                <option value="30-60">Between 30 and 60 days</option>
+                                                <option value="60-90">Between 60 and 90 days</option>
+                                                <option value=">90">Over 90 days</option>
+                                        </Form.Control>
+                                        <Form.Control.Feedback type="invalid">
+                                            {errors.averageCollectionTimeGradeEPlus}
+                                        </Form.Control.Feedback>
+                                    </Col>
+                                </Row> */}
                                 
-                                <Col sm={6} md={3}>
-                                    <Form.Control required
-                                            id='maximumGradeA+'
-                                            className="manageMaximumGrade"
-                                            size="md"
-                                            type="number"
-                                            placeholder="Maximum treshold"
-                                            onChange={(g) => setField('maximumGradeAPlus', g.target.value)}
-                                            value={clientGrading.maximumGradeAPlus}
-                                            isInvalid={!!errors.maximumGradeAPlus}>
-                                    </Form.Control>
-
-                                    <Form.Control.Feedback type="invalid">
-                                        {errors.maximumGradeAPlus}
-                                    </Form.Control.Feedback>
-                                </Col>
-
-
-                                <Col sm={6} md={4}>
-                                    <Form.Control required
-                                        as="select"
-                                        id='averageCollectionTimeA+'
-                                        className="manageAverageCollectionTime"
-                                        size="md"
-                                        aria-label="Average collection time"
-                                        onChange={(g) => setField('averageCollectionTimeGradeAPlus', g.target.value)}
-                                        value={clientGrading.averageCollectionTimeGradeAPlus}
-                                        isInvalid={!!errors.averageCollectionTimeGradeAPlus}>
-                                            <option value="">Select Average Collection Time</option>
-                                            <option value="<30">30 days or less</option>
-                                            <option value="30-60">Between 30 and 60 days</option>
-                                            <option value="60-90">Between 60 and 90 days</option>
-                                            <option value=">90">Over 90 days</option>
-                                    </Form.Control>
-                                    <Form.Control.Feedback type="invalid">
-                                        {errors.averageCollectionTimeGradeAPlus}
-                                    </Form.Control.Feedback>
-                                </Col>
-                            </Row>
-
-                        
-
-                            <Row className="manageRowForm">
-
-                                <Col sm={6} md={1}>
-                                    <Form.Label className="inputTitle">A</Form.Label>
-                                </Col>
-
-                                <Col sm={6} md={3}>
-                                    <Form.Control required
-                                            id='minimumGradeA'
-                                            size="md"
-                                            type="number"
-                                            placeholder="Minimum treshold"
-                                            onChange={(g) => setField('minimumGradeA', g.target.value)}
-                                            value={clientGrading.minimumGradeA}
-                                            isInvalid={!!errors.minimumGradeA}>
-                                    </Form.Control>
-
-                                    <Form.Control.Feedback type="invalid">
-                                        {errors.minimumGradeA}
-                                    </Form.Control.Feedback>
-                                </Col>
-                                
-
-                                <Col sm={6} md={3}>
-                                    <Form.Control required
-                                            id='maximumGradeA'
-                                            className="manageMaximumGrade"
-                                            size="md"
-                                            type="number"
-                                            placeholder="Maximum treshold"
-                                            onChange={(g) => setField('maximumGradeA', g.target.value)}
-                                            value={clientGrading.maximumGradeA}
-                                            isInvalid={!!errors.maximumGradeA}>
-                                    </Form.Control>
-
-                                    <Form.Control.Feedback type="invalid">
-                                        {errors.maximumGradeA}
-                                    </Form.Control.Feedback>
-                                </Col>
-
-
-                                <Col sm={6} md={4}>
-                                    <Form.Control required
-                                        as="select"
-                                        id='averageCollectionTimeA'
-                                        className="manageAverageCollectionTime"
-                                        size="md"
-                                        aria-label="Average collection time"
-                                        onChange={(g) => setField('averageCollectionTimeGradeA', g.target.value)}
-                                        value={clientGrading.averageCollectionTimeGradeA}
-                                        isInvalid={!!errors.averageCollectionTimeGradeA}>
-                                            <option value="">Select Average Collection Time</option>
-                                            <option value="<30">30 days or less</option>
-                                            <option value="30-60">Between 30 and 60 days</option>
-                                            <option value="60-90">Between 60 and 90 days</option>
-                                            <option value=">90">Over 90 days</option>
-                                    </Form.Control>
-                                    <Form.Control.Feedback type="invalid">
-                                        {errors.averageCollectionTimeGradeA}
-                                    </Form.Control.Feedback>
-                                </Col>
-                            </Row>
-
-                            <Row className="manageRowForm">
-
-                                <Col sm={6} md={1}>
-                                    <Form.Label className="inputTitle">B</Form.Label>
-                                </Col>
-
-                                <Col sm={6} md={3}>
-                                    <Form.Control required
-                                            id='minimumGradeB'
-                                            size="md"
-                                            type="number"
-                                            placeholder="Minimum treshold"
-                                            onChange={(g) => setField('minimumGradeB', g.target.value)}
-                                            value={clientGrading.minimumGradeB}
-                                            isInvalid={!!errors.minimumGradeB}>
-                                    </Form.Control>
-
-                                    <Form.Control.Feedback type="invalid">
-                                        {errors.minimumGradeB}
-                                    </Form.Control.Feedback>
-                                </Col>
-                                
-
-                                
-                                <Col sm={6} md={3}>
-                                    <Form.Control required
-                                            id='maximumGradeB'
-                                            className="manageMaximumGrade"
-                                            size="md"
-                                            type="number"
-                                            placeholder="Maximum treshold"
-                                            onChange={(g) => setField('maximumGradeB', g.target.value)}
-                                            value={clientGrading.maximumGradeB}
-                                            isInvalid={!!errors.maximumGradeB}>
-                                    </Form.Control>
-
-                                    <Form.Control.Feedback type="invalid">
-                                        {errors.maximumGradeB}
-                                    </Form.Control.Feedback>
-                                </Col>
-
-
-
-                                <Col sm={6} md={4}>
-                                    <Form.Control required
-                                        as="select"
-                                        id='averageCollectionTimeB'
-                                        className="manageAverageCollectionTime"
-                                        size="md"
-                                        aria-label="Average collection time"
-                                        onChange={(g) => setField('averageCollectionTimeGradeB', g.target.value)}
-                                        value={clientGrading.averageCollectionTimeGradeB}
-                                        isInvalid={!!errors.averageCollectionTimeGradeB}>
-                                            <option value="">Select Average Collection Time</option>
-                                            <option value="<30">30 days or less</option>
-                                            <option value="30-60">Between 30 and 60 days</option>
-                                            <option value="60-90">Between 60 and 90 days</option>
-                                            <option value=">90">Over 90 days</option>
-                                    </Form.Control>
-                                    <Form.Control.Feedback type="invalid">
-                                        {errors.averageCollectionTimeGradeB}
-                                    </Form.Control.Feedback>
-                                </Col>
-                            </Row>
-
-
-                            <Row className="manageRowForm">
-
-                                <Col sm={6} md={1}>
-                                    <Form.Label className="inputTitle">C</Form.Label>
-                                </Col>
-
-
-                                <Col sm={6} md={3}>
-                                    <Form.Control required
-                                            id='minimumGradeC'
-                                            size="md"
-                                            type="number"
-                                            placeholder="Minimum treshold"
-                                            onChange={(g) => setField('minimumGradeC', g.target.value)}
-                                            value={clientGrading.minimumGradeC}
-                                            isInvalid={!!errors.minimumGradeC}>
-                                    </Form.Control>
-
-                                    <Form.Control.Feedback type="invalid">
-                                        {errors.minimumGradeC}
-                                    </Form.Control.Feedback>
-                                </Col>
-
-
-                                <Col sm={6} md={3}>
-                                    <Form.Control required
-                                            id='maximumGradeC'
-                                            className="manageMaximumGrade"
-                                            size="md"
-                                            type="number"
-                                            placeholder="Maximum treshold"
-                                            onChange={(g) => setField('maximumGradeC', g.target.value)}
-                                            value={clientGrading.maximumGradeC}
-                                            isInvalid={!!errors.maximumGradeC}>
-                                    </Form.Control>
-
-                                    <Form.Control.Feedback type="invalid">
-                                        {errors.maximumGradeC}
-                                    </Form.Control.Feedback>
-                                </Col>
-
-
-                                <Col sm={6} md={4}>
-                                    <Form.Control required
-                                        as="select"
-                                        id='averageCollectionTimeC'
-                                        className="manageAverageCollectionTime"
-                                        size="md"
-                                        aria-label="Average collection time"
-                                        onChange={(g) => setField('averageCollectionTimeGradeC', g.target.value)}
-                                        value={clientGrading.averageCollectionTimeGradeC}
-                                        isInvalid={!!errors.averageCollectionTimeGradeC}>
-                                            <option value="">Select Average Collection Time</option>
-                                            <option value="<30">30 days or less</option>
-                                            <option value="30-60">Between 30 and 60 days</option>
-                                            <option value="60-90">Between 60 and 90 days</option>
-                                            <option value=">90">Over 90 days</option>
-                                    </Form.Control>
-                                    <Form.Control.Feedback type="invalid">
-                                        {errors.averageCollectionTimeGradeC}
-                                    </Form.Control.Feedback>
-                                </Col>
-                            </Row>
-
-
-                            <Row className="manageRowForm">
-                                <Col sm={6} md={1}>
-                                    <Form.Label className="inputTitle">E+</Form.Label>
-                                </Col>
-
-                                <Col sm={6} md={3}>
-                                    <Form.Control required
-                                            id='minimumGradeE+'
-                                            size="md"
-                                            type="number"
-                                            placeholder="Minimum treshold"
-                                            onChange={(g) => setField('minimumGradeEPlus', g.target.value)}
-                                            value={clientGrading.minimumGradeEPlus}
-                                            isInvalid={!!errors.minimumGradeEPlus}>
-                                    </Form.Control>
-
-                                    <Form.Control.Feedback type="invalid">
-                                        {errors.minimumGradeEPlus}
-                                    </Form.Control.Feedback>
-                                </Col>
-
-
-
-                                
-                                <Col sm={6} md={3}>
-                                    <Form.Control required
-                                            id='maximumGradeE+'
-                                            className="manageMaximumGrade"
-                                            size="md"
-                                            type="number"
-                                            placeholder="Maximum treshold"
-                                            onChange={(g) => setField('maximumGradeEPlus', g.target.value)}
-                                            value={clientGrading.maximumGradeEPlus}
-                                            isInvalid={!!errors.maximumGradeEPlus}>
-                                    </Form.Control>
-
-                                    <Form.Control.Feedback type="invalid">
-                                        {errors.maximumGradeEPlus}
-                                    </Form.Control.Feedback>
-                                </Col>
-
-
-                                <Col sm={6} md={4}>
-                                    <Form.Control required
-                                        as="select"
-                                        id='averageCollectionTimeE+'
-                                        className="manageAverageCollectionTime"
-                                        size="md"
-                                        aria-label="Average collection time"
-                                        onChange={(g) => setField('averageCollectionTimeGradeEPlus', g.target.value)}
-                                        value={clientGrading.averageCollectionTimeGradeEPlus}
-                                        isInvalid={!!errors.averageCollectionTimeGradeEPlus}>
-                                            <option value="">Select Average Collection Time</option>
-                                            <option value="<30">30 days or less</option>
-                                            <option value="30-60">Between 30 and 60 days</option>
-                                            <option value="60-90">Between 60 and 90 days</option>
-                                            <option value=">90">Over 90 days</option>
-                                    </Form.Control>
-                                    <Form.Control.Feedback type="invalid">
-                                        {errors.averageCollectionTimeGradeEPlus}
-                                    </Form.Control.Feedback>
-                                </Col>
-                            </Row>
-                            
-                            <Row className='mt-2'>
-                                <Col md={12}>
-                                    <Button
-                                        id='saveGradingBracketsButton'
-                                        className='my-2 w-100 d-flex justify-content-center'
-                                        onClick={handleSaveGradingBrackets}
-                                        variant='primary'>
-                                        {saveGradingBracketsText}
-                                    </Button>
-                                </Col>
-                            </Row>
-                        </Form.Group>
+                                <Row className='mt-2'>
+                                    <Col md={12}>
+                                        <Button
+                                            id='saveGradingBracketsButton'
+                                            className='my-2 w-100 d-flex justify-content-center'
+                                            onClick={handleSaveGradingBrackets}
+                                            variant='primary'>
+                                            {saveGradingBracketsText}
+                                        </Button>
+                                    </Col>
+                                </Row>
+                            </Form.Group>
+                        </div>
                     </div>
                 </div>
             </div>
