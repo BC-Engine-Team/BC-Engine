@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useLayoutEffect } from 'react';
 import { useNavigate } from 'react-router';
 import { Form, Table, InputGroup, FormControl, FormLabel, Button, ButtonGroup, OverlayTrigger, DropdownButton, Dropdown, Tooltip as ToolTipBootstrap, FormCheck, Col, Row } from 'react-bootstrap';
 import ConfirmationPopup from '../components/ConfirmationPopup';
@@ -93,7 +93,7 @@ const Dashboard = () => {
     const earliestYear = 2009;
     const [authorized, setAuthorized] = useState(false);
     const [clientNameCountry, setClientNameCountry] = useState([{ name: "", country: "", clientgrading: "" }]);
-
+    const [chartHeight, setChartHeight] = useState(0);
 
     // Criteria
     const [employeeSelect, setEmployeeSelect] = useState([]);
@@ -505,17 +505,30 @@ const Dashboard = () => {
         setNavClicked(true)
     }
 
+    const getChartHeight = () => {
+        if(document.getElementById("chartCriteriaCard").getBoundingClientRect().height !== chartHeight)
+            setChartHeight(document.getElementById("chartCriteriaCard").getBoundingClientRect().height)
+        
+        if(window.innerWidth <= 1000) {
+            console.log(window.innerWidth)
+            setChartHeight('600px')
+        }
+    }
+
     useEffect(() => {
+        setChartHeight(document.getElementById("chartCriteriaCard").getBoundingClientRect().height)
+        window.addEventListener("resize", getChartHeight);
+
         if (cookies.get("accessToken") === undefined) {
             navigate("/login");
         }
 
         initCriteria();
         chart();
+        
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
-
 
     return (
         <div>
@@ -524,7 +537,7 @@ const Dashboard = () => {
             <div className='mainContainer mainDiv'>
                 <div className="justify-content-center main">
                     <div className="container-criteria">
-                        <div className="card shadow my-3 mx-3 px-3 py-2">
+                        <div id="chartCriteriaCard" className="card shadow my-3 mx-3 px-3 py-2">
                             <h3 className="text-center">{t('dashboard.criteria.Title')}</h3>
 
                             <InputGroup className="my-2" >
@@ -756,7 +769,7 @@ const Dashboard = () => {
                             </Row>
 
                             <Row className='mt-2'>
-                                <Col sm={6} md={6} className="pe-1">
+                                <Col sm={6} md={6} className="criteriaButtons pe-1">
                                     <Button
                                         id='loadChartButton'
                                         onClick={loadChartData}
@@ -777,7 +790,7 @@ const Dashboard = () => {
                                         {loadChartButtonText}
                                     </Button>
                                 </Col>
-                                <Col sm={6} md={6} className="ps-1">
+                                <Col sm={6} md={6} className="criteriaButtons ps-1">
                                     <Button
                                         id='saveChartButton'
                                         onClick={handleSaveChartReport}
@@ -791,9 +804,10 @@ const Dashboard = () => {
                         </div >
                     </div >
                     <div className="container-chart">
-                        <div className="card shadow my-3 mx-3 p-2 pt-3">
+                        <div className="card shadow my-3 mx-3 p-2 pt-3" style={{"height": chartHeight}}>
                             {chartData &&
                                 <Bar
+                                    width='auto'
                                     id='chart'
                                     data={{
                                         labels: months,
