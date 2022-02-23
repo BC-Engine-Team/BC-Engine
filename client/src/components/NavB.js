@@ -95,6 +95,7 @@ const NavB = (props) => {
         else
             setFrenchNav('md');
 
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [lngs])
 
     //For Login page navBar

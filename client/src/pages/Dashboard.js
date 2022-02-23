@@ -1,4 +1,4 @@
-import { useEffect, useState, useLayoutEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { Form, Table, InputGroup, FormControl, FormLabel, Button, ButtonGroup, OverlayTrigger, DropdownButton, Dropdown, Tooltip as ToolTipBootstrap, FormCheck, Col, Row } from 'react-bootstrap';
 import ConfirmationPopup from '../components/ConfirmationPopup';
@@ -510,7 +510,6 @@ const Dashboard = () => {
             setChartHeight(document.getElementById("chartCriteriaCard").getBoundingClientRect().height)
         
         if(window.innerWidth <= 1000) {
-            console.log(window.innerWidth)
             setChartHeight('600px')
         }
     }
