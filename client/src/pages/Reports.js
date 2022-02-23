@@ -414,7 +414,8 @@ const Reports = () => {
                                         <th>
                                             <div className="d-flex justify-content-center">
                                                 <Button
-                                                    className="btn py-0 shadow-sm border">
+                                                    className="btn py-0 shadow-sm border"
+                                                    onClick={() => navigate("/dashboard")}>
                                                     {t('reports.chartReports.CreateButton')}
                                                 </Button>
                                             </div>
