@@ -50,6 +50,15 @@ input, select, button{
   position: relative;
 }
 
+.dropdown-menu {
+  min-width: 24px;
+  left: -10px !important;
+}
+
+.dropdown-item {
+  padding: 0.25rem 0.5rem !important;
+}
+
 .navBrandLogin {
   float: none;
   position: absolute;
