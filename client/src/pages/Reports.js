@@ -307,7 +307,7 @@ const Reports = () => {
                                 <tbody>
                                     {performanceReports.map((p) => {
                                         return (
-                                            <tr key={p.performanceReportId}>
+                                            <tr key={p.performanceReportId} id={p.performanceReportId}>
                                                 <td className='performance-table-columns'>{p.name}</td>
                                                 <td className='performance-table-columns'>{p.createdAt.toString()}</td>
                                                 <td className='performance-table-columns'>{p.recipient}</td>

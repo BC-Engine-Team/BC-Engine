@@ -101,13 +101,6 @@ db['localdb'].performanceReports.belongsTo(db['localdb'].reportTypes, {
 
 db['localdb'].performanceReports.belongsTo(db['localdb'].billingNumbers, {
   foreignKey: {
-    name: 'billing_actual_numbers',
-    allowNull: false
-  }
-})
-
-db['localdb'].performanceReports.belongsTo(db['localdb'].billingNumbers, {
-  foreignKey: {
     name: 'billing_obj_numbers',
     allowNull: false
   }
@@ -258,77 +251,92 @@ db.sync = async (database, options) => {
         {
           employeeId: 26631,
           name: "Charles-André Caron",
-          email: "charles-andre@benoit-cote.com"
+          email: "charles-andre@benoit-cote.com",
+          bonusPercent: 0.357
         },
         {
           employeeId: 22769,
           name: "France Coté",
-          email: "france@benoit-cote.com"
+          email: "france@benoit-cote.com",
+          bonusPercent: 0.59
         },
         {
           employeeId: 29470,
           name: "Hilal El Ayoubi",
-          email: "hilal@benoit-cote.com"
+          email: "hilal@benoit-cote.com",
+          bonusPercent: 0.65
         },
         {
           employeeId: 26628,
           name: "Ibrahim Tamer",
-          email: "ibrahim@benoit-cote.com"
+          email: "ibrahim@benoit-cote.com",
+          bonusPercent: 0.59
         },
         {
           employeeId: 41830,
           name: "Irina Kostko",
-          email: "irina@benoit-cote.com"
+          email: "irina@benoit-cote.com",
+          bonusPercent: 0.10
         },
         {
           employeeId: 31106,
           name: "Ismaël Coulibaly",
-          email: "ismael@benoit-cote.com"
+          email: "ismael@benoit-cote.com",
+          bonusPercent: 0.40
         },
         {
           employeeId: 25706,
           name: "Marc Benoît",
-          email: "marc@benoit-cote.com"
+          email: "marc@benoit-cote.com",
+          bonusPercent: 0.59
         },
         {
           employeeId: 42381,
           name: "Marilyne Séïde",
-          email: "marilyne@benoit-cote.com"
+          email: "marilyne@benoit-cote.com",
+          bonusPercent: 0.10
         },
         {
           employeeId: 20037,
           name: "Martin Roy",
-          email: "martin@benoit-cote.com"
+          email: "martin@benoit-cote.com",
+          bonusPercent: 0.10
         },
         {
           employeeId: 41930,
           name: "Mathieu Audet",
-          email: "ma@benoit-cote.com"
+          email: "ma@benoit-cote.com",
+          bonusPercent: 0.50
         },
         {
           employeeId: 20303,
           name: "Mathieu Miron",
-          email: "mathieu@benoit-cote.com"
+          email: "mathieu@benoit-cote.com",
+          bonusPercent: 0.526
         },
         {
           employeeId: 26629,
           name: "Michel Sofia",
-          email: "michel@benoit-cote.com"
+          email: "michel@benoit-cote.com",
+          bonusPercent: 0.50
         },
         {
           employeeId: 28658,
           name: "Philip Conrad",
-          email: "phil@benoit-cote.com"
+          email: "phil@benoit-cote.com",
+          bonusPercent: 0.50
         },
         {
           employeeId: 42410,
           name: "Sabrina Lavoie",
-          email: "slavoie@benoit-cote.com"
+          email: "slavoie@benoit-cote.com",
+          bonusPercent: 0.10
         },
         {
           employeeId: 38192,
           name: "Suzanne Antal",
-          email: "suzanne@benoit-cote.com"
+          email: "suzanne@benoit-cote.com",
+          bonusPercent: 0.3817
         }
       ]);
       return data;
@@ -404,16 +412,16 @@ db.sync = async (database, options) => {
       return data
     })
     .then(async data => {
+      console.log(data.billingNumbers[20].dataValues.id)
       data.performanceReports = await db['localdb'].performanceReports.bulkCreate([
         {
-          name: 'TheultimateTest',
+          name: 'TheUltimateTest',
           chart_report_id: data.chartReports[3].chartReportId,
-          projectedBonus: 20384.09,
+          projectedBonus: 2000,
           user_user_id: data.users[2].userId,
           report_type_id: data.reportTypes.reportTypeId,
           recipient_id: data.recipients[10].recipientId,
-          billing_actual_numbers: data.billingNumbers[1].id,
-          billing_obj_numbers: data.billingNumbers[1].objectivesId,
+          billing_obj_numbers: data.billingNumbers[20].dataValues.id
 
         },
         {
@@ -423,8 +431,7 @@ db.sync = async (database, options) => {
           user_user_id: data.users[3].userId,
           report_type_id: data.reportTypes.reportTypeId,
           recipient_id: data.recipients[1].recipientId,
-          billing_actual_numbers: data.billingNumbers[3].id,
-          billing_obj_numbers: data.billingNumbers[3].objectivesId
+          billing_obj_numbers: data.billingNumbers[2].dataValues.id
         },
         {
           name: 'MyFirstReportCool2',
@@ -433,8 +440,7 @@ db.sync = async (database, options) => {
           user_user_id: data.users[3].userId,
           report_type_id: data.reportTypes.reportTypeId,
           recipient_id: data.recipients[1].recipientId,
-          billing_actual_numbers: data.billingNumbers[3].id,
-          billing_obj_numbers: data.billingNumbers[3].objectivesId
+          billing_obj_numbers: data.billingNumbers[2].dataValues.id
         },
         {
           name: 'MyFirstReportCool2',
@@ -443,8 +449,7 @@ db.sync = async (database, options) => {
           user_user_id: data.users[2].userId,
           report_type_id: data.reportTypes.reportTypeId,
           recipient_id: data.recipients[10].recipientId,
-          billing_actual_numbers: data.billingNumbers[19].id,
-          billing_obj_numbers: data.billingNumbers[19].objectivesId
+          billing_obj_numbers: data.billingNumbers[20].dataValues.id
         },
         {
           name: 'MyFirstReportCool2',
@@ -453,8 +458,7 @@ db.sync = async (database, options) => {
           user_user_id: data.users[2].userId,
           report_type_id: data.reportTypes.reportTypeId,
           recipient_id: data.recipients[10].recipientId,
-          billing_actual_numbers: data.billingNumbers[19].id,
-          billing_obj_numbers: data.billingNumbers[19].objectivesId
+          billing_obj_numbers: data.billingNumbers[20].dataValues.id
         },
         {
           name: 'MyFirstReportCool2',
@@ -463,8 +467,7 @@ db.sync = async (database, options) => {
           user_user_id: data.users[2].userId,
           report_type_id: data.reportTypes.reportTypeId,
           recipient_id: data.recipients[10].recipientId,
-          billing_actual_numbers: data.billingNumbers[19].id,
-          billing_obj_numbers: data.billingNumbers[19].objectivesId
+          billing_obj_numbers: data.billingNumbers[20].dataValues.id
         },
         {
           name: 'MyFirstReportCool2',
@@ -473,8 +476,7 @@ db.sync = async (database, options) => {
           user_user_id: data.users[2].userId,
           report_type_id: data.reportTypes.reportTypeId,
           recipient_id: data.recipients[10].recipientId,
-          billing_actual_numbers: data.billingNumbers[19].id,
-          billing_obj_numbers: data.billingNumbers[19].objectivesId
+          billing_obj_numbers: data.billingNumbers[20].dataValues.id
         },
         {
           name: 'MyFirstReportCool2',
@@ -483,8 +485,7 @@ db.sync = async (database, options) => {
           user_user_id: data.users[2].userId,
           report_type_id: data.reportTypes.reportTypeId,
           recipient_id: data.recipients[10].recipientId,
-          billing_actual_numbers: data.billingNumbers[19].id,
-          billing_obj_numbers: data.billingNumbers[19].objectivesId
+          billing_obj_numbers: data.billingNumbers[20].dataValues.id
         },
         {
           name: 'MyFirstReportCool2',
@@ -493,8 +494,7 @@ db.sync = async (database, options) => {
           user_user_id: data.users[2].userId,
           report_type_id: data.reportTypes.reportTypeId,
           recipient_id: data.recipients[10].recipientId,
-          billing_actual_numbers: data.billingNumbers[19].id,
-          billing_obj_numbers: data.billingNumbers[19].objectivesId
+          billing_obj_numbers: data.billingNumbers[20].dataValues.id
         },
         {
           name: 'MyFirstReportCool2',
@@ -503,8 +503,7 @@ db.sync = async (database, options) => {
           user_user_id: data.users[2].userId,
           report_type_id: data.reportTypes.reportTypeId,
           recipient_id: data.recipients[10].recipientId,
-          billing_actual_numbers: data.billingNumbers[19].id,
-          billing_obj_numbers: data.billingNumbers[19].objectivesId
+          billing_obj_numbers: data.billingNumbers[20].dataValues.id
         },
         {
           name: 'MyFirstReportCool2',
@@ -513,8 +512,7 @@ db.sync = async (database, options) => {
           user_user_id: data.users[2].userId,
           report_type_id: data.reportTypes.reportTypeId,
           recipient_id: data.recipients[10].recipientId,
-          billing_actual_numbers: data.billingNumbers[19].id,
-          billing_obj_numbers: data.billingNumbers[19].objectivesId
+          billing_obj_numbers: data.billingNumbers[20].dataValues.id
         }
       ])
       return data

@@ -74,7 +74,6 @@ module.exports = (performanceReportInfo, billingNumbers, chartReportInfo, chartR
         let str = "";
         let counter = 0;
         let counterCompare = 0;
-        chartReportData
 
         for (let i = 0; i < chartReportData.length; i++) {
             let labelCompare = "";
@@ -85,12 +84,7 @@ module.exports = (performanceReportInfo, billingNumbers, chartReportInfo, chartR
             if (counterCompare === 5)
                 counterCompare = 0;
 
-
-            console.log()
-            console.log(chartReportData[i].employee)
-            console.log()
             if (parseInt(chartReportData[i].employee) !== -1) {
-                console.log(chartReportData[i].employee)
                 labelCompare = " - emp";
             }
 
@@ -122,6 +116,41 @@ module.exports = (performanceReportInfo, billingNumbers, chartReportInfo, chartR
         }
 
         return str;
+    }
+
+    const buildTableHead = (secondRow = undefined) => {
+        let str = ''
+        let start = secondRow === undefined ? 0 : 6
+        let limit = secondRow === undefined ? 6 : 12
+
+        for (let i = start; i < limit; i++) {
+            str = str.concat('<th>' + capitalizeFirstLetter(Object.keys(billingNumbers.actual)[i]) + '</th>')
+        }
+        return str
+    }
+
+    const buildTable = (secondRow = undefined) => {
+        let str = '<tr> <td><b> Actuals </b></td>'
+        let start = secondRow === undefined ? 0 : 6
+        let limit = secondRow === undefined ? 6 : 12
+
+        for (let i = start; i < limit; i++) {
+            str = str.concat('<td>' + new Intl.NumberFormat('en-CA', { style: 'currency', currency: 'CAD' }).format(billingNumbers.actual[Object.keys(billingNumbers.actual)[i]]) + '</td>')
+        }
+
+        str = str.concat('</tr><tr> <td><b> Objectives </b></td>')
+
+        for (let i = start; i < limit; i++) {
+            str = str.concat('<td>' + new Intl.NumberFormat('en-CA', { style: 'currency', currency: 'CAD' }).format(billingNumbers.objective[Object.keys(billingNumbers.objective)[i]]) + '</td>')
+        }
+
+        str = str.concat('</tr>')
+
+        return str
+    }
+
+    const capitalizeFirstLetter = (string) => {
+        return string.charAt(0).toUpperCase() + string.slice(1)
     }
 
 
@@ -159,27 +188,30 @@ module.exports = (performanceReportInfo, billingNumbers, chartReportInfo, chartR
 
                 header {
                     padding: 10px 0;
-                    margin-bottom: 30px;
                 }
 
                 #logo {
-                    text-align: center;
-                    margin-bottom: 10px;
+                    display: inline-block;
+                    float: left;
                 }
 
-                #logo picture {
-                    width: 90px;
-                }
+                
 
                 h1 {
+                    position: relative;
                     border-top: 1px solid  #5D6975;
                     border-bottom: 1px solid  #5D6975;
                     color: #5D6975;
                     font-size: 2.4em;
-                    line-height: 1.4em;
+                    line-height: 79px;
                     font-weight: normal;
                     text-align: center;
                     margin: 0 0 20px 0;
+                    vertical-align: text-top
+                }
+
+                #main-title {
+                    display: inline-block;
                 }
 
                 #chartCriteria {
@@ -204,7 +236,19 @@ module.exports = (performanceReportInfo, billingNumbers, chartReportInfo, chartR
                 #ReportInfo {
                     float: right;
                     text-align: left;
+                    height: 100%
+                    margin: 0px 50px 0px 0px;
                 }
+
+                #projected-bonus {
+                    background: #ccc;
+                    text-align: center;
+                    width: 100%;
+                    height: 100%;
+                    padding-top: 23px;
+                    padding-bottom: 23px;
+                }
+
 
                 #chartCriteria div,
                     #ReportInfo div {
@@ -221,11 +265,12 @@ module.exports = (performanceReportInfo, billingNumbers, chartReportInfo, chartR
                     color: #5D6975;
                     width: 100%;
                     position: absolute;
-                    bottom: 14px;
+                    bottom: 10px;
                     border-top: 1px solid #C1CED9;
-                    padding: 8px 0;
+                    padding: 3px 0;
                     text-align: center;
-                    line-height: 0.8em;
+                    line-height: 0.3em;
+                    font-size: 1em;
                 }
                 
                 .secondPageFooter {
@@ -245,6 +290,7 @@ module.exports = (performanceReportInfo, billingNumbers, chartReportInfo, chartR
                 }
 
                 .table {
+                    table-layout: fixed;
                     width: 100%;
                     background: #fff;
                     box-shadow: 0px 5px 12px -12px rgb(0 0 0 / 29%);
@@ -252,6 +298,11 @@ module.exports = (performanceReportInfo, billingNumbers, chartReportInfo, chartR
                     color: #212529;
                     border-collapse: collapse;
                     border: 1px solid #333 !important;
+                    border-radius: 5px;
+                }
+
+                .table-last {
+                    width: 29%;
                 }
 
                 .table thead {
@@ -261,12 +312,8 @@ module.exports = (performanceReportInfo, billingNumbers, chartReportInfo, chartR
 
                 .table thead th {
                     border: none;
-                    padding: 7px 0;
                     font-size: 12px;
                     color: #fff;
-                }
-
-                .monthColumn {
                     width: 100px;
                 }
 
@@ -281,28 +328,44 @@ module.exports = (performanceReportInfo, billingNumbers, chartReportInfo, chartR
                 }
 
                 .table tbody td {
-                    border-bottom: 1px solid #333 !important;
+                    border-right: solid 1px #333;
+                    border-left: solid 1px #333;
+                    padding-top: 10px;
+                    width: 14%;
+                }
+
+                .table tbody tr td:nth-child(even) {
+                    background: #ccc;
                 }
 
                 .tableTitle {
                     font-size: 25;
                     text-align: center;
-                    margin-top: 0.7in;
+                    margin-top: 0.3in;
+                }
+
+                canvas {
+                    margin-top: 0.3in;
                 }
             </style>
         </head>
         <body>
             <header class="clearfix">
-            <div id="logo">
-                <img src="https://i.postimg.cc/rwsyKZ34/logo.png" width="90px" height="90px">
-            </div>
-            <h1>Performance Report - ${performanceReportInfo.name}</h1>
+                <img id='logo' src="https://i.postimg.cc/rwsyKZ34/logo.png" width="80px" height="80px">
+                <h1>Performance Report - ${performanceReportInfo.name}</h1>
+                
             <div id="ReportInfo" class="clearfix">
                 <h2 class="title">Report Information</h2>
                 <div><span>Date Created</span> ${getFullDateFormatted(performanceReportInfo.createdAt)}</div>
                 <div><span>Date Last Updated</span> ${getFullDateFormatted(performanceReportInfo.updatedAt)}</div>
                 <div><span>Date Report Exported</span> ${getFullDateFormatted(today)}</div>
+                <div id='projected-bonus'>
+                    <h2 class="title">Projected Bonus</h2>
+                    <h3>${new Intl.NumberFormat('en-CA', { style: 'currency', currency: 'CAD' }).format(performanceReportInfo.projectedBonus)}</h3>
+                </div>
             </div>
+            
+            
             <div id="chartCriteria">
                 <h2 class="title" >Chart Criteria</h2>
                 <div><span>Name</span> ${chartReportInfo.name}</div>
@@ -315,13 +378,57 @@ module.exports = (performanceReportInfo, billingNumbers, chartReportInfo, chartR
                 <div><span>Country</span> ${chartReportInfo.country}</div>
                 <div><span>Client Type</span> ${chartReportInfo.clientType === "Corr" ? "Correspondant" : chartReportInfo.clientType === "All" ? "All" : "Direct"}</div>
             </div>
+
+            
+            
             </header>
             <main>
-                <canvas id="myChart" width="auto" height="200px"></canvas>
+                <div id="billingNumbersTable">
+                    <h2 class='tableTitle'>Actual Billing VS Objectives (Fiscal Year ${billingNumbers.actual.year})</h2>
+                    <table class='table'>
+                        <thead>
+                            <tr>
+                                <th></th>
+                                ${buildTableHead()}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${buildTable()}
+                        </tbody>
+                    </table>
+                    <table class='table'>
+                        <thead>
+                            <tr>
+                                <th></th>
+                                ${buildTableHead(true)}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${buildTable(true)}
+                        </tbody>
+                    </table>
+                    <table class='table table-last'>
+                        <thead>
+                            <tr>
+                                <th></th>
+                                <th>Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><b>Actual</b></td>
+                                <td>${new Intl.NumberFormat('en-CA', { style: 'currency', currency: 'CAD' }).format(billingNumbers.actual[Object.keys(billingNumbers.actual)[12]])} </td>
+                            </tr>
+                            <tr>
+                                <td><b>Objective</b></td>
+                                <td>${new Intl.NumberFormat('en-CA', { style: 'currency', currency: 'CAD' }).format(billingNumbers.objective[Object.keys(billingNumbers.objective)[12]])} </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <canvas id="myChart" width="auto" height="140px"></canvas>
             </main>
-            <div id="billingNumbers">
-            <h1>${performanceReportInfo.name}</h1>
-            </div>
+            
         </body>
         <footer>
             <p>@Copyright 2021-${today.getFullYear()}.</p>
@@ -338,13 +445,16 @@ module.exports = (performanceReportInfo, billingNumbers, chartReportInfo, chartR
                 },
                 options: {
                     devicePixelRatio: 4,
+                    animation: {
+                            duration: 0
+                    },
                     title: {
                         display: true,
                         text: 'Average Collection Days over Time',
                         fontSize: 25,
                         fontFamily: "'Arial', 'sans-serif'",
                         fontColor: 'black',
-                        fontStyle: '400'
+                        fontStyle: '400',
                     },
                     legend: {
                         display: true,

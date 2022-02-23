@@ -97,36 +97,64 @@ exports.getPerformanceReportById = async (reportId, performanceReportModel = Per
                         'employee1Name', 'ageOfAccount', 'accountType',
                         'country', 'clientType', 'startDate', 'endDate']
                 },
-                { model: BillingNumbersModel, attributes: ['may', 'june'] }
+                {
+                    model: BillingNumbersModel,
+                    attributes: ['may', 'june', 'july', 'august', 'september',
+                        'october', 'november', 'december', 'january', 'february',
+                        'march', 'april', 'total', 'year'],
+                    include: [
+                        {
+                            model: BillingNumbersModel,
+                            attributes: ['may', 'june', 'july', 'august',
+                                'september', 'october', 'november', 'december',
+                                'january', 'february', 'march', 'april', 'total', 'year']
+                        }
+                    ]
+                }
             ]
         })
             .then(async data => {
+                console.log(data)
                 if (data) {
+                    let performanceReportInfo = data.dataValues
+                    let actualBillingNumbers = data.dataValues.billing_number.billing_number.dataValues
+                    let objBillingNumbers = data.dataValues.billing_number.dataValues
+                    let chartReportInfo = data.chart_report.dataValues
+
                     let returnData = {
-                        chartReportId: data.dataValues.chart_report_id,
+                        chartReportId: performanceReportInfo.chart_report_id,
                         performanceReportInfo: {
-                            performanceReportId: data.dataValues.performanceReportId,
-                            name: data.dataValues.name,
-                            createdAt: data.dataValues.createdAt,
-                            updatedAt: data.dataValues.updatedAt
+                            performanceReportId: performanceReportInfo.performanceReportId,
+                            name: performanceReportInfo.name,
+                            projectedBonus: performanceReportInfo.projectedBonus,
+                            createdAt: performanceReportInfo.createdAt,
+                            updatedAt: performanceReportInfo.updatedAt
                         },
-                        billingnumbers: {
-                            actual: [],
-                            objective: []
+                        billingNumbers: {
+                            actual: (({ may, june, july, august, september, october,
+                                november, december, january, february, march, april, total, year }) =>
+                            ({
+                                may, june, july, august, september, october, november, december,
+                                january, february, march, april, total, year
+                            }))(actualBillingNumbers),
+                            objective: objBillingNumbers
                         },
                         chartReportInfo: {
-                            name: data.chart_report.dataValues.name,
-                            employee1Name: data.chart_report.dataValues.employee1Name,
-                            employee2Name: data.chart_report.dataValues.employee2Name,
-                            ageOfAccount: data.chart_report.dataValues.ageOfAccount,
-                            accountType: data.chart_report.dataValues.accountType,
-                            country: data.chart_report.dataValues.country,
-                            startDate: data.chart_report.dataValues.startDate,
-                            endDate: data.chart_report.dataValues.endDate,
-                            createdAt: data.chart_report.dataValues.createdAt,
-                            updatedAt: data.dataValues.chart_report.dataValues.updatedAt
+                            name: chartReportInfo.name,
+                            employee1Name: chartReportInfo.employee1Name,
+                            employee2Name: chartReportInfo.employee2Name,
+                            ageOfAccount: chartReportInfo.ageOfAccount,
+                            accountType: chartReportInfo.accountType,
+                            country: chartReportInfo.country,
+                            clientType: chartReportInfo.clientType,
+                            startDate: chartReportInfo.startDate,
+                            endDate: chartReportInfo.endDate,
+                            createdAt: chartReportInfo.createdAt,
+                            updatedAt: chartReportInfo.updatedAt
                         }
                     }
+
+                    console.log(returnData)
                     resolve(returnData)
                 }
                 else

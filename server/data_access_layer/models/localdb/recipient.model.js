@@ -18,6 +18,10 @@ module.exports = (localdb, Sequelize) => {
         email: {
             field: 'recipient_email',
             type: Sequelize.STRING
+        },
+        bonusPercent: {
+            field: 'bonus_percentage',
+            type: Sequelize.FLOAT
         }
     })
 

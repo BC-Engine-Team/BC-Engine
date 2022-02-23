@@ -161,7 +161,7 @@ exports.createPerformanceReportPDF = async (req, res) => {
             if (response) {
                 return res.status(200).send(response);
             }
-            return res.status(500).send({ message: "The data could not be created." });
+            return res.status(500).send({ message: "The PDF could not be created." });
         })
         .catch(err => {
             return res.status(err.status || 500).send({ message: err.message || "Malfunction in the B&C Engine." });
