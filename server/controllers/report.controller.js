@@ -128,30 +128,6 @@ exports.createChartReportPDF = async (req, res) => {
         });
 }
 
-exports.fetchChartReportPDF = async (req, res) => {
-    if (!req.query.reportId)
-        return res.status(400).send({ message: "Content cannot be empty." });
-
-    // create file path
-    let filePath;
-    if (__dirname !== '/home/runner/work/BC-Engine/BC-Engine/server/controllers') {
-        filePath = `${__dirname.replace("controllers", "")}docs\\pdf_files\\chartReport-${req.query.reportId}.pdf`;
-    }
-    else {
-        filePath = `${__dirname.replace("controllers", "")}docs/pdf_files/chartReport-${req.query.reportId}.pdf`;
-    }
-
-    await res.sendFile(filePath, {}, (err) => {
-        if (err) {
-            return res.status(err.status || 500).send({ message: err.message || "File not found." });
-        }
-        else {
-            fs.unlinkSync(filePath);
-            return res.status(200)
-        }
-    });
-}
-
 exports.createPerformanceReportPDF = async (req, res) => {
     if (!req.body.reportId)
         return res.status(400).send({ message: "Content cannot be empty." });
@@ -168,22 +144,24 @@ exports.createPerformanceReportPDF = async (req, res) => {
         });
 }
 
-exports.fetchPerformanceReportPDF = async (req, res) => {
-    if (!req.query.reportId)
+exports.fetchReportPDF = async (req, res) => {
+    if (!req.query.chartReportId && !req.query.performanceReportId)
         return res.status(400).send({ message: "Content cannot be empty." });
 
     // create file path
     let filePath;
+    let filePrefix = req.query.chartReportId === undefined ? 'performanceReport' : 'chartReport'
+    let fileId = req.query.chartReportId === undefined ? req.query.performanceReportId : req.query.chartReportId
     if (__dirname !== '/home/runner/work/BC-Engine/BC-Engine/server/controllers') {
-        filePath = `${__dirname.replace("controllers", "")}docs\\pdf_files\\performanceReport-${req.query.reportId}.pdf`;
+        filePath = `${__dirname.replace("controllers", "")}docs\\pdf_files\\${filePrefix}-${fileId}.pdf`;
     }
     else {
-        filePath = `${__dirname.replace("controllers", "")}docs/pdf_files/performanceReport-${req.query.reportId}.pdf`;
+        filePath = `${__dirname.replace("controllers", "")}docs/pdf_files/${filePrefix}-${fileId}.pdf`;
     }
 
     await res.sendFile(filePath, {}, (err) => {
-        if(err) {
-            return res.status(err.status).send({ message: err.message });
+        if (err) {
+            return res.status(err.status || 500).send({ message: err.message || "File not found." });
         }
         else {
             fs.unlinkSync(filePath);

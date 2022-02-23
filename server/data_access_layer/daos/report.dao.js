@@ -114,7 +114,6 @@ exports.getPerformanceReportById = async (reportId, performanceReportModel = Per
             ]
         })
             .then(async data => {
-                console.log(data)
                 if (data) {
                     let performanceReportInfo = data.dataValues
                     let actualBillingNumbers = data.dataValues.billing_number.billing_number.dataValues
@@ -154,7 +153,6 @@ exports.getPerformanceReportById = async (reportId, performanceReportModel = Per
                         }
                     }
 
-                    console.log(returnData)
                     resolve(returnData)
                 }
                 else

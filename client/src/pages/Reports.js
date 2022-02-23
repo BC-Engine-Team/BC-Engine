@@ -70,7 +70,7 @@ const Reports = () => {
         }
 
         let param = {
-            reportId: chartReportId === undefined ? performanceReportId : chartReportId
+            reportId: chartReportId === undefined ? performanceReportId : chartReportId,
         }
 
         Axios.defaults.withCredentials = true;
@@ -78,6 +78,11 @@ const Reports = () => {
         Axios.post(url, param, { headers: header })
             .then((response) => {
                 if (response.data === true) {
+                    let param = {
+                        performanceReportId: chartReportId === undefined ? performanceReportId : chartReportId,
+                        chartReportId: chartReportId === undefined ? undefined : chartReportId
+                    }
+
                     Axios.get(`${process.env.REACT_APP_API}/reports/fetchPdf`, { params: param, headers: header, responseType: 'arraybuffer' })
                         .then((res) => {
                             const pdfBlob = new Blob([res.data], { type: 'application/pdf' });

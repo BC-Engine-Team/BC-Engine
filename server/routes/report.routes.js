@@ -7,10 +7,6 @@ router.get("/chartReport", authService.authenticateToken, reportController.getCh
 
 router.post("/chartReport", authService.authenticateToken, reportController.createChartReport);
 
-router.get("/fetchPdf", authService.authenticateToken, reportController.fetchChartReportPDF);
-
-router.post("/createPdf", authService.authenticateToken, reportController.createChartReportPDF);
-
 router.delete("/delete/:chartReportId", authService.authenticateToken, reportController.deleteChartReport);
 
 // Report Types routes
@@ -21,9 +17,12 @@ router.get("/performanceReport", authService.authenticateToken, reportController
 
 router.get('/performanceReport/:userId', authService.authenticateToken, reportController.getPerformanceReportsByUserId)
 
+// Export PDF routes
 router.post('/createPerformanceReportPdf', authService.authenticateToken, reportController.createPerformanceReportPDF)
 
-router.get('/fetchPerformanceReportPdf', authService.authenticateToken, reportController.fetchPerformanceReportPDF)
+router.post("/createChartReportPdf", authService.authenticateToken, reportController.createChartReportPDF);
+
+router.get("/fetchPdf", authService.authenticateToken, reportController.fetchReportPDF);
 
 
 module.exports = router;

@@ -383,74 +383,6 @@ db.sync = async (database, options) => {
           november: 0,
           december: 0,
           chart_report_id: data.chartReports[2].chartReportId
-        },
-        {
-          year: 2020,
-          emp: 20303,
-          january: 0,
-          february: 0,
-          march: 0,
-          april: 0,
-          may: 91.66,
-          june: 93.34,
-          july: 87.39,
-          august: 60.29,
-          september: 64.84,
-          october: 71.73,
-          november: 32.3,
-          december: 70.5,
-          chart_report_id: data.chartReports[3].chartReportId
-        },
-        {
-          year: 2021,
-          emp: 20303,
-          january: 70.86,
-          february: 82.67,
-          march: 73.04,
-          april: 89.35,
-          may: 0,
-          june: 0,
-          july: 0,
-          august: 0,
-          september: 0,
-          october: 0,
-          november: 0,
-          december: 0,
-          chart_report_id: data.chartReports[3].chartReportId
-        },
-        {
-          year: 2020,
-          emp: -1,
-          january: 0,
-          february: 0,
-          march: 0,
-          april: 0,
-          may: 41.66,
-          june: 83.34,
-          july: 97.39,
-          august: 70.29,
-          september: 94.84,
-          october: 86.73,
-          november: 43.3,
-          december: 90.5,
-          chart_report_id: data.chartReports[3].chartReportId
-        },
-        {
-          year: 2021,
-          emp: -1,
-          january: 73.86,
-          february: 86.67,
-          march: 33.04,
-          april: 69.35,
-          may: 0,
-          june: 0,
-          july: 0,
-          august: 0,
-          september: 0,
-          october: 0,
-          november: 0,
-          december: 0,
-          chart_report_id: data.chartReports[3].chartReportId
         }
       ]);
       return data;
@@ -621,7 +553,6 @@ db.sync = async (database, options) => {
       return data
     })
     .then(async data => {
-      console.log(data.billingNumbers[20].dataValues.id)
       data.performanceReports = await db['localdb'].performanceReports.bulkCreate([
         {
           name: 'TheUltimateTest',

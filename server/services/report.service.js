@@ -280,7 +280,7 @@ exports.getRecipients = async () => {
 }
 
 
-// Performance Report PDF Generation related functions
+// Report PDF Generation related functions
 exports.createPerformanceReportPDFByPerformanceReportId = async (reportId) => {
     let averagesList = [];
 
@@ -325,7 +325,6 @@ exports.createPerformanceReportPDFByPerformanceReportId = async (reportId) => {
     })
 }
 
-// Chart Report PDF Generation related functions
 exports.createChartReportPDFById = async (reportId) => {
     let averagesList = [];
 

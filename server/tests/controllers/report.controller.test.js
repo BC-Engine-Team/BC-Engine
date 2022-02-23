@@ -757,7 +757,8 @@ describe("Test Report Controller", () => {
 
     describe("RC5 - createChartReportPDF", () => {
         describe("RC5.1 - given a valid reportId", () => {
-            const fakeReportId = 54564564654;
+            const fakeReportId = '4a13932c-c3af-4541-bcc9-d3c3dd002ee2';
+            let validReq = { reportId: fakeReportId }
             it("RC5.1.1 - should return valid response 'true' with 200 status", async () => {
                 // arrange
                 reportServiceSpy = jest.spyOn(ReportService, 'createChartReportPDFById')
@@ -766,8 +767,8 @@ describe("Test Report Controller", () => {
                     }));
 
                 // act
-                const response = await request.post(`/api/reports/createPdf`)
-                    .send({ reportid: fakeReportId });
+                const response = await request.post(`/api/reports/createChartReportPdf`)
+                    .send(validReq);
 
                 // assert
                 expect(response.status).toBe(200);
@@ -785,8 +786,8 @@ describe("Test Report Controller", () => {
                     }));
 
                 // act
-                const response = await request.post(`/api/reports/createPdf`)
-                    .send({ reportid: fakeReportId });
+                const response = await request.post(`/api/reports/createChartReportPdf`)
+                    .send(validReq);
 
                 // assert
                 expect(response.status).toBe(500);
@@ -808,8 +809,8 @@ describe("Test Report Controller", () => {
                     });
 
                 // act
-                const response = await request.post(`/api/reports/createPdf`)
-                    .send({ reportid: fakeReportId });
+                const response = await request.post(`/api/reports/createChartReportPdf`)
+                    .send(validReq);
 
                 // assert
                 expect(response.status).toBe(expectedResponse.status);
@@ -827,12 +828,12 @@ describe("Test Report Controller", () => {
                 };
                 reportServiceSpy = jest.spyOn(ReportService, 'createChartReportPDFById')
                     .mockImplementation(async () => {
-                        await Promise.reject({status: "", message: ""});
+                        await Promise.reject({ status: "", message: "" });
                     });
 
                 // act
-                const response = await request.post(`/api/reports/createPdf`)
-                    .send({ reportid: fakeReportId });
+                const response = await request.post(`/api/reports/createChartReportPdf`)
+                    .send(validReq);
 
                 // assert
                 expect(response.status).toBe(expectedResponse.status);
@@ -848,7 +849,110 @@ describe("Test Report Controller", () => {
                 let expectedError = { message: "Content cannot be empty." }
 
                 // act
-                const response = await request.post(`/api/reports/createPdf`);
+                const response = await request.post(`/api/reports/createChartReportPdf`);
+
+                // assert
+                expect(response.status).toBe(400);
+                expect(response.body).toEqual(expectedError);
+            });
+        });
+    });
+
+    describe("RC9 - createPerformanceReportPDF", () => {
+        describe("RC9.1 - given a valid reportId", () => {
+            const fakeReportId = '4a13932c-c3af-4541-bcc9-d3c3dd002ee2';
+            let validReq = { reportId: fakeReportId }
+            it("RC9.1.1 - should return valid response 'true' with 200 status", async () => {
+                // arrange
+                reportServiceSpy = jest.spyOn(ReportService, 'createPerformanceReportPDFByPerformanceReportId')
+                    .mockImplementation(() => new Promise((resolve) => {
+                        resolve(true);
+                    }));
+
+                // act
+                const response = await request.post(`/api/reports/createPerformanceReportPdf`)
+                    .send(validReq);
+
+                // assert
+                expect(response.status).toBe(200);
+                expect(response.text).toEqual('true');
+                expect(reportServiceSpy).toHaveBeenCalledTimes(1);
+            });
+
+            it("RC9.1.2 - when service resolves false, should return 500 and message", async () => {
+                // arrange
+                let expectedResponse = { message: "The PDF could not be created." };
+
+                reportServiceSpy = jest.spyOn(ReportService, 'createPerformanceReportPDFByPerformanceReportId')
+                    .mockImplementation(() => new Promise((resolve) => {
+                        resolve(false);
+                    }));
+
+                // act
+                const response = await request.post(`/api/reports/createPerformanceReportPdf`)
+                    .send(validReq);
+
+                // assert
+                expect(response.status).toBe(500);
+                expect(response.body).toEqual(expectedResponse);
+                expect(reportServiceSpy).toHaveBeenCalledTimes(1);
+                expect(authSpy).toHaveBeenCalledTimes(1);
+            });
+
+            it("RC9.1.3 - when service throws error with specified status and message, should respond with specified status and message", async () => {
+                // arrange
+                let expectedResponse = {
+                    status: 600,
+                    message: "Random error"
+                };
+
+                reportServiceSpy = jest.spyOn(ReportService, 'createPerformanceReportPDFByPerformanceReportId')
+                    .mockImplementation(async () => {
+                        await Promise.reject(expectedResponse);
+                    });
+
+                // act
+                const response = await request.post(`/api/reports/createPerformanceReportPdf`)
+                    .send(validReq);
+
+                // assert
+                expect(response.status).toBe(expectedResponse.status);
+                expect(response.body.message).toEqual(expectedResponse.message);
+                expect(reportServiceSpy).toHaveBeenCalledTimes(1);
+                expect(authSpy).toHaveBeenCalledTimes(1);
+            });
+
+
+            it("RC9.1.4 - when service throws error with unspecified status and message, should respond with 500 and default message", async () => {
+                // arrange
+                let expectedResponse = {
+                    status: 500,
+                    message: "Malfunction in the B&C Engine."
+                };
+                reportServiceSpy = jest.spyOn(ReportService, 'createPerformanceReportPDFByPerformanceReportId')
+                    .mockImplementation(async () => {
+                        await Promise.reject({ status: "", message: "" });
+                    });
+
+                // act
+                const response = await request.post(`/api/reports/createPerformanceReportPdf`)
+                    .send(validReq);
+
+                // assert
+                expect(response.status).toBe(expectedResponse.status);
+                expect(response.body.message).toEqual(expectedResponse.message);
+                expect(reportServiceSpy).toHaveBeenCalledTimes(1);
+                expect(authSpy).toHaveBeenCalledTimes(1);
+            });
+        });
+
+        describe("RC9.2 - given no reportId", () => {
+            it("RC9.2.1 - should return with status 400 and predefined error message", async () => {
+                // arrange 
+                let expectedError = { message: "Content cannot be empty." }
+
+                // act
+                const response = await request.post(`/api/reports/createPerformanceReportPdf`);
 
                 // assert
                 expect(response.status).toBe(400);
@@ -876,7 +980,7 @@ describe("Test Report Controller", () => {
                 await new Promise((r) => setTimeout(r, 2000));
 
                 // act
-                const response = await request.get(`/api/reports/fetchPdf?reportid=${fakeReportId}`);
+                const response = await request.get(`/api/reports/fetchPdf?chartReportId=${fakeReportId}`);
 
                 // assert
                 expect(response.status).toBe(200);
@@ -890,7 +994,7 @@ describe("Test Report Controller", () => {
                 };
 
                 // act
-                const response = await request.get(`/api/reports/fetchPdf?reportid=${fakeReportId}`);
+                const response = await request.get(`/api/reports/fetchPdf?chartReportId=${fakeReportId}`);
 
                 // assert
                 expect(response.status).toBe(expectedResponse.status);
