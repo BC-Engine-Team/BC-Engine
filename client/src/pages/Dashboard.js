@@ -41,20 +41,6 @@ const Dashboard = () => {
     const chartTitle = t('dashboard.chart.Title');
     const chartXLabel = t('dashboard.chart.XAxisLabel');
     const chartYLabel = t('dashboard.chart.YAxisLabel');
-    const months = [
-        t('dashboard.chart.months.Jan'),
-        t('dashboard.chart.months.Feb'),
-        t('dashboard.chart.months.Mar'),
-        t('dashboard.chart.months.Apr'),
-        t('dashboard.chart.months.May'),
-        t('dashboard.chart.months.Jun'),
-        t('dashboard.chart.months.Jul'),
-        t('dashboard.chart.months.Aug'),
-        t('dashboard.chart.months.Sep'),
-        t('dashboard.chart.months.Oct'),
-        t('dashboard.chart.months.Nov'),
-        t('dashboard.chart.months.Dec')
-    ];
     const chartFallbackLegendLabel = t('dashboard.chart.FallbackLegendLabel');
 
     let colors = [
@@ -94,7 +80,6 @@ const Dashboard = () => {
     const [authorized, setAuthorized] = useState(false);
     const [clientNameCountry, setClientNameCountry] = useState([{ name: "", country: "", clientgrading: "" }]);
 
-
     // Criteria
     const [employeeSelect, setEmployeeSelect] = useState([]);
     const [compareEmployeeChecked, setCompareEmployeeChecked] = useState(false);
@@ -122,10 +107,7 @@ const Dashboard = () => {
         accountType: 'Receivable',
     });
     const [errors, setErrors] = useState({});
-
     const [yearList, setYearList] = useState([]);
-    const [monthList, setMonthList] = useState([]);
-
     const [countries, setCountries] = useState([{ countryCode: "", countryLabel: "" }]);
 
     const setField = (field, value) => {
@@ -369,7 +351,6 @@ const Dashboard = () => {
             yearList.push(i);
         }
         setYearList(yearList);
-        setMonthList(months);
 
         countrySelectBox();
 
@@ -493,7 +474,6 @@ const Dashboard = () => {
         }
     };
 
-
     // handle clicks to other pages when unsaved work on Chart Report
     const handleNavClick = async (whereTo) => {
         setPageToNavigateTo("/" + whereTo.split("/").at(-1));
@@ -513,7 +493,6 @@ const Dashboard = () => {
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
-
 
     return (
         <div>
@@ -573,11 +552,18 @@ const Dashboard = () => {
                                             onChange={(e) => setField('startMonth', e.target.value)}
                                             value={criteria.startMonth}
                                             isInvalid={!!errors.startMonth}>
-
-                                            {monthList.map((m, i) => {
-                                                return (<option key={i} value={i}>{m}</option>);
-                                            })}
-
+                                                <option key={0} value={0}>{t('dashboard.chart.months.Jan')}</option>
+                                                <option key={1} value={1}>{t('dashboard.chart.months.Feb')}</option>
+                                                <option key={2} value={2}>{t('dashboard.chart.months.Mar')}</option>
+                                                <option key={3} value={3}>{t('dashboard.chart.months.Apr')}</option>
+                                                <option key={4} value={4}>{t('dashboard.chart.months.May')}</option>
+                                                <option key={5} value={5}>{t('dashboard.chart.months.Jun')}</option>
+                                                <option key={6} value={6}>{t('dashboard.chart.months.Jul')}</option>
+                                                <option key={7} value={7}>{t('dashboard.chart.months.Aug')}</option>
+                                                <option key={8} value={8}>{t('dashboard.chart.months.Sep')}</option>
+                                                <option key={9} value={9}>{t('dashboard.chart.months.Oct')}</option>
+                                                <option key={10} value={10}>{t('dashboard.chart.months.Nov')}</option>
+                                                <option key={11} value={11}>{t('dashboard.chart.months.Dec')}</option>
                                         </Form.Select>
 
                                         <Form.Control.Feedback type="invalid">
@@ -618,10 +604,18 @@ const Dashboard = () => {
                                             onChange={(e) => setField('endMonth', e.target.value)}
                                             value={criteria.endMonth}
                                             isInvalid={!!errors.endMonth}>
-
-                                            {monthList.map((m, i) => {
-                                                return (<option key={i} value={i}>{m}</option>);
-                                            })}
+                                                <option key={0} value={0}>{t('dashboard.chart.months.Jan')}</option>
+                                                <option key={1} value={1}>{t('dashboard.chart.months.Feb')}</option>
+                                                <option key={2} value={2}>{t('dashboard.chart.months.Mar')}</option>
+                                                <option key={3} value={3}>{t('dashboard.chart.months.Apr')}</option>
+                                                <option key={4} value={4}>{t('dashboard.chart.months.May')}</option>
+                                                <option key={5} value={5}>{t('dashboard.chart.months.Jun')}</option>
+                                                <option key={6} value={6}>{t('dashboard.chart.months.Jul')}</option>
+                                                <option key={7} value={7}>{t('dashboard.chart.months.Aug')}</option>
+                                                <option key={8} value={8}>{t('dashboard.chart.months.Sep')}</option>
+                                                <option key={9} value={9}>{t('dashboard.chart.months.Oct')}</option>
+                                                <option key={10} value={10}>{t('dashboard.chart.months.Nov')}</option>
+                                                <option key={11} value={11}>{t('dashboard.chart.months.Dec')}</option>
                                         </Form.Select>
 
                                         <Form.Control.Feedback type="invalid">
@@ -630,7 +624,6 @@ const Dashboard = () => {
                                     </Col>
                                 </Row>
                             </Form.Group>
-
 
                             <Row>
                                 <FormLabel htmlFor="countryCriteriaDashboard" className="mt-2">{t('dashboard.criteria.labels.Country')}</FormLabel>
@@ -781,7 +774,20 @@ const Dashboard = () => {
                                 <Bar
                                     id='chart'
                                     data={{
-                                        labels: months,
+                                        labels: [
+                                            t('dashboard.chart.months.Jan'),
+                                            t('dashboard.chart.months.Feb'),
+                                            t('dashboard.chart.months.Mar'),
+                                            t('dashboard.chart.months.Apr'),
+                                            t('dashboard.chart.months.May'),
+                                            t('dashboard.chart.months.Jun'),
+                                            t('dashboard.chart.months.Jul'),
+                                            t('dashboard.chart.months.Aug'),
+                                            t('dashboard.chart.months.Sep'),
+                                            t('dashboard.chart.months.Oct'),
+                                            t('dashboard.chart.months.Nov'),
+                                            t('dashboard.chart.months.Dec')
+                                        ],
                                         datasets: chartData.length === 0 || authorized === false ? fallbackChartData : chartData
                                     }}
                                     options={{

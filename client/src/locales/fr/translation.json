@@ -110,7 +110,7 @@
          "AverageCollectionDays": "MOYENNE DES JOURS DE COLLECTION",
          "AmountOwed": "MONTANT DÛ",
          "AmountDue": "MONTANT À RECEVOIR",
-         "ClientGrading": "GRADE DU CLIENT",
+         "ClientGrading": "NOTE DU CLIENT",
          "CurrentStatus": "STATUS ACTUEL"
        },
        "dropdownButtonTable":{
@@ -121,7 +121,28 @@
        }
     },
     "manage": {
-       "table": {
+      "gradingTable":{
+         "Title": "Notes des clients",
+         "AverageTitle": "Moyennes de jours de collection",
+         "MinPlaceholder": "Seuil minimal",
+         "MaxPlaceholder": "Seuil maximal",
+         "Button": "Modifier la note du client",
+         "averagesSelect": {
+            "Default": "Selectionnez un temps de collection moyen",
+            "Less30": "30 jours ou moins",
+            "Between30And60": "Entre 30 et 60 jours",
+            "Between60And90": "Entre 60 et 90 jours",
+            "Over90": "Plus de 90 jours"
+        },
+         "error" : {
+            "Higher": "Doit être plus grand que les notes plus élevées.",
+            "Lower": "Doit être plus petit que les note plus basses.",
+            "Min": "Le minimum doit être plus petit que le maximum.",
+            "Dropdown": "Veuillez selectionner un option.",
+            "NoNum": "Veuillez entrer un chiffre."
+         }
+       },
+       "employeeTable": {
           "Title": "Liste des employés",
           "Name": "NOM",
           "Email": "COURIEL",
@@ -187,9 +208,6 @@
          "Title":"Êtes-vous sur de vouloir supprimer ",
          "Confirmation": "Rapport effacé avec succès"
       }
-    },
-    "gradings":{
-      "ModifyClientGradingButton": "Modifier le grade du client"
     },
     "form": {
        "Password": "Mot de passe",
