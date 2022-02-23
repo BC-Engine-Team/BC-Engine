@@ -8,9 +8,17 @@
   float: left;
 }
 
-.container-table {
-  width: 75%;
-  float: left;
+.container-table .card {
+  width: calc(100% -10px);
+  max-width: 2100px;
+}
+
+.criteriaButtons .ps-1 {
+  padding-right: 2px !important;
+}
+
+.criteriaButtons .pe-1 {
+  padding-left: 2px !important;
 }
 
 .chart {
@@ -38,5 +46,9 @@
   .container-criteria,
   .container-table{
     width: 100%;
+  }
+  .criteriaButtons {
+    padding-right: calc(var(--bs-gutter-x) * .5) !important;
+    padding-left: calc(var(--bs-gutter-x) * .5) !important;
   }
 }
