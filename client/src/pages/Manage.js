@@ -12,10 +12,11 @@ const Manage = () => {
     let navigate = useNavigate()
     const cookies = new Cookies()
     const { t } = useTranslation()
-    let counter = 0;
 
     const [errors, setErrors] = useState({ aPlus: {}, a: {}, b: {}, c: {}, ePlus: {} })
     const [clientGradingSaved, setClientGradingSaved] = useState(true);
+    const [minTitle, setMinTitle] = useState('Minimum');
+    const [maxTitle, setMaxTitle] = useState('Maximum');
     const [confirmSaveGradingActivated, setConfirmSaveGradingActivated] = useState(false);
     const [clientGrading, setClientGrading] = useState({
         aPlus: {
@@ -394,7 +395,21 @@ const Manage = () => {
         setConfirmSaveGradingActivated(false);
     }
 
+    const changeMaxMinTitle = () => {
+        if (window.innerWidth <= 400) {
+            setMaxTitle('Max')
+            setMinTitle('Min')
+        }
+        else if(window.innerWidth > 400) {
+            setMaxTitle('Maximum')
+            setMinTitle('Minimum')
+        }
+    }
+
     useEffect(() => {
+        changeMaxMinTitle();
+        window.addEventListener("resize", changeMaxMinTitle);
+
         if (cookies.get("accessToken") === undefined) {
             navigate("/login")
         }
@@ -419,76 +434,76 @@ const Manage = () => {
                                 <Row className="mb-2">
                                     <Col xs={1}/>
                                     <Col xs={3} className='tableHeader'>
-                                        <Form.Label>{window.innerWidth <= 400 ? "Min" : "Minimum"}</Form.Label>
+                                        <Form.Label>{minTitle}</Form.Label>
                                     </Col>
                                     <Col xs={3} className='tableHeader'>
-                                        <Form.Label>{window.innerWidth <= 400 ? "Max" : "Maximum"}</Form.Label>
+                                        <Form.Label>{maxTitle}</Form.Label>
                                     </Col>
                                     <Col xs={5} className='tableHeader'>
                                         <Form.Label className="text-center">{t('manage.gradingTable.AverageTitle')}</Form.Label>
                                     </Col>
                                 </Row>
 
-                                {Object.keys(clientGrading).map((key) => {
-                                    counter++
-                                    if(counter > 5)
-                                        counter = 0;
+                                {Object.keys(clientGrading).map((k) => {
                                     return (
-                                        <Row className="mb-4">
+                                        <Row key={clientGrading[k].grade} className="mb-4">
                                             <Col xs={1} className="manageColTitleForm">
-                                                <Form.Label className="inputTitle">{clientGrading[key].grade}</Form.Label>
+                                                <Form.Label className="inputTitle">{clientGrading[k].grade}</Form.Label>
                                             </Col>
 
                                             <Col xs={3} className="manageColForm">
                                                 <Form.Control required
-                                                        id={'minimumGrade' + key.grade}
+                                                        id={'minimumGrade' + clientGrading[k].grade}
+                                                        key={'minimumGrade' + clientGrading[k].grade}
                                                         size="md"
                                                         type="number"
                                                         placeholder={t('manage.gradingTable.MinPlaceholder')}
-                                                        onChange={(g) => setField('minimum', g.target.value, key)}
-                                                        value={clientGrading[key].minimum}
-                                                        isInvalid={!!errors[key].minimum}>
+                                                        onChange={(g) => setField('minimum', g.target.value, k)}
+                                                        value={clientGrading[k].minimum}
+                                                        isInvalid={!!errors[k].minimum}>
                                                 </Form.Control>
 
                                                 <Form.Control.Feedback type="invalid">
-                                                    {getErrorName(errors[key].minimum)}
+                                                    {getErrorName(errors[k].minimum)}
                                                 </Form.Control.Feedback>
                                             </Col>
 
                                             <Col xs={3} className="manageColForm">
                                                 <Form.Control required
-                                                        id={'maximumGrade' + clientGrading[key].grade}
+                                                        id={'maximumGrade' + clientGrading[k].grade}
+                                                        key={'maximumGrade' + clientGrading[k].grade}
                                                         className="manageMaximumGrade"
                                                         size="md"
                                                         type="number"
                                                         placeholder={t('manage.gradingTable.MaxPlaceholder')}
-                                                        onChange={(g) => setField('maximum', g.target.value, key)}
-                                                        value={clientGrading[key].maximum}
-                                                        isInvalid={!!errors[key].maximum}>
+                                                        onChange={(g) => setField('maximum', g.target.value, k)}
+                                                        value={clientGrading[k].maximum}
+                                                        isInvalid={!!errors[k].maximum}>
                                                 </Form.Control>
 
                                                 <Form.Control.Feedback type="invalid">
-                                                    {getErrorName(errors[key].maximum)}
+                                                    {getErrorName(errors[k].maximum)}
                                                 </Form.Control.Feedback>
                                             </Col>
 
                                             <Col xs={5} className="manageColForm">
                                                 <Form.Select required
-                                                    id={'averageCollectionTime' + clientGrading[key].grade}
+                                                    id={'averageCollectionTime' + clientGrading[k].grade}
+                                                    key={'averageCollectionTime' + clientGrading[k].grade}
                                                     className="manageAverageCollectionTime"
                                                     size="md"
                                                     aria-label="Average collection time"
-                                                    onChange={(g) => setField('averageCollectionTime', g.target.value, key)}
-                                                    value={clientGrading[key].averageCollectionTime}
-                                                    isInvalid={!!errors[key].averageCollectionTime}>
-                                                        <option key={()=>{return counter.toString()+"1"}} value="">{t('manage.gradingTable.averagesSelect.Default')}</option>
-                                                        <option key={()=>{return counter.toString()+"2"}} value="<30">{t('manage.gradingTable.averagesSelect.Less30')}</option>
-                                                        <option key={()=>{return counter.toString()+"3"}} value="30-60">{t('manage.gradingTable.averagesSelect.Between30And60')}</option>
-                                                        <option key={()=>{return counter.toString()+"4"}} value="60-90">{t('manage.gradingTable.averagesSelect.Between60And90')}</option>
-                                                        <option key={()=>{return counter.toString()+"5"}} value=">90">{t('manage.gradingTable.averagesSelect.Over90')}</option>
+                                                    onChange={(g) => setField('averageCollectionTime', g.target.value, k)}
+                                                    value={clientGrading[k].averageCollectionTime}
+                                                    isInvalid={!!errors[k].averageCollectionTime}>
+                                                        <option key={clientGrading[k].grade + "-1"} id={clientGrading[k].grade + "-1"} value="">{t('manage.gradingTable.averagesSelect.Default')}</option>
+                                                        <option key={clientGrading[k].grade + "-2"} id={clientGrading[k].grade + "-2"} value="<30">{t('manage.gradingTable.averagesSelect.Less30')}</option>
+                                                        <option key={clientGrading[k].grade + "-3"} id={clientGrading[k].grade + "-3"} value="30-60">{t('manage.gradingTable.averagesSelect.Between30And60')}</option>
+                                                        <option key={clientGrading[k].grade + "-4"} id={clientGrading[k].grade + "-4"} value="60-90">{t('manage.gradingTable.averagesSelect.Between60And90')}</option>
+                                                        <option key={clientGrading[k].grade + "-5"} id={clientGrading[k].grade + "-5"} value=">90">{t('manage.gradingTable.averagesSelect.Over90')}</option>
                                                 </Form.Select>
                                                 <Form.Control.Feedback type="invalid">
-                                                    {getErrorName(errors[key].averageCollectionTime)}
+                                                    {getErrorName(errors[k].averageCollectionTime)}
                                                 </Form.Control.Feedback>
                                             </Col>
                                         </Row>

@@ -28,10 +28,6 @@
     font-weight: bold;
 }
 
-.manageRowForm{
-    margin-top: 10px;
-}
-
 @media screen and (max-width: 440px) {
     .inputTitle {
         font-size: larger;
