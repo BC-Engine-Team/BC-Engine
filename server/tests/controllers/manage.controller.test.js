@@ -224,7 +224,7 @@ describe("Test Manage Controller", () => {
                 // act
                 const response = await request.put("/api/manage/modifyClientGrading").send(expectedResponse);
                 
-
+                    
                 // assert
                 expect(response.status).toBe(200);
                 expect(manageServiceSpy).toHaveBeenCalledTimes(1);
