@@ -121,7 +121,28 @@
         }
     },
     "manage":{
-        "table":{
+        "gradingTable":{
+            "Title": "Client Grading Brackets",
+            "AverageTitle": "Average Collection Days",
+            "MinPlaceholder": "Minimum threshold",
+            "MaxPlaceholder": "Maximum threshold",
+            "Button": "Modify client grading",
+            "averagesSelect": {
+                "Default": "Select Average Collection Time",
+                "Less30": "30 days or less",
+                "Between30And60": "Between 30 and 60 days",
+                "Between60And90": "Between 60 and 90 days",
+                "Over90": "Over 90 days"
+            },
+            "error" : {
+                "Higher": "Needs to be higher than the lower grading brackets.",
+                "Lower": "Needs to be lower than the higher grading brackets.",
+                "Min": "The minimum needs be lower then the maximum.",
+                "Dropdown": "Please select an option.",
+                "NoNum": "Please enter a number."
+            }
+        },
+        "employeeTable":{
             "Title":"Employee List",
             "Name":"NAME",
             "Email":"EMAIL",
@@ -131,10 +152,6 @@
                 "Type2":"Subordinate"
             },
             "ViewButton":"View Subordinates"
-        },
-        "clientGrading": {
-            "Title": "Client Grading Brackets"
-
         }
     },
     "reports":{
@@ -192,9 +209,6 @@
             "Confirmation": "Report deleted successfully"
         }
 
-    },
-    "gradings":{
-      "ModifyClientGradingButton": "Modify Client Grading"
     },
     "form":{
         "Password":"Password",

@@ -1,5 +1,6 @@
 .container-clientGradingBrackets {
-    width: 50%;
+    width: 100%;
+    max-width: 800px;
     float: left;
 }
 
@@ -12,47 +13,42 @@
     width: "50%";
 }
 
-#mainTitle{
+.tableHeader {
     display: flex;
     align-items: center;
+    justify-content: center;
     font-size: large;
     font-weight: bold;
-    margin-left: 130px;  
-    margin-top: 20px; 
-}
-
-#mainTitle2{
-    display: flex;
-    align-items: center;
-    font-size: large;
-    font-weight: bold;
-    margin-left: 90px;
-    margin-top: 20px; 
-}
-
-#mainTitle3{
-    display: flex;
-    align-items: center;
-    font-size: large;
-    font-weight: bold;
-    margin-top: 20px; 
 }
 
 .inputTitle {
+    width: 100%;
     display: flex;
     font-size: x-large;
     font-weight: bold;
-    margin-bottom: 50px;
 }
 
-.manageRowForm{
-    margin-top: 10px;
+@media screen and (max-width: 440px) {
+    .inputTitle {
+        font-size: larger;
+    }
+
+    .tableHeader {
+        font-size: medium;
+    }
 }
 
-.manageMaximumGrade{
-    margin-left: 30px;
-}
+@media screen and (max-width: 400px) {
+    .col-3, .col-5 {
+        padding-left: 4px !important;
+        padding-right: 4px !important;
+    }
 
-.manageAverageCollectionTime {
-    margin-left: 60px;
+    .col-3 {
+        width: 23%;
+    }
+
+    .col-1 {
+        width: 12.333333333%;
+    }
 }
