@@ -119,41 +119,5 @@ describe("Test Manage Controller", () => {
             expect(ManageServiceSpy).toHaveBeenCalledTimes(1);
             expect(authSpy).toHaveBeenCalledTimes(1);
         });
-
-        // it("MC1.3 - should return error with default message and status", async () => {
-        //     //arrange
-        //     let expectedResponse = {
-        //         status: 500,
-        //         message: "Could not fetch clients."
-        //     };
-
-        //     invoiceAffectDaoSpy = jest.spyOn(InvoiceAffectDao, 'findAllClients')
-        //     .mockImplementation(() => new Promise((resolve, reject) => {
-        //         reject({message: "", status: ""});
-        //     }));
-
-        //     // act and assert
-        //     await expect(ManageService.getAllClients()).rejects
-        //         .toEqual(expectedResponse)
-        //     expect(invoiceAffectDaoSpy).toBeCalledTimes(1);
-        // });
-
-        // it("MC1.4 - should return error with specified message and status", async () => {
-        //     //arrange
-        //     let expectedResponse = {
-        //         status: 600,
-        //         message: "Error."
-        //     };
-
-        //     invoiceAffectDaoSpy = jest.spyOn(InvoiceAffectDao, 'findAllClients')
-        //     .mockImplementation(() => new Promise((resolve, reject) => {
-        //         reject(expectedResponse);
-        //     }));
-
-        //     // act and assert
-        //     await expect(ManageService.getAllClients()).rejects
-        //         .toEqual(expectedResponse)
-        //     expect(invoiceAffectDaoSpy).toBeCalledTimes(1);
-        // });
     });
 });
