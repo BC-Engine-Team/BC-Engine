@@ -4,7 +4,8 @@ const { QueryTypes } = require('sequelize');
 exports.findAllClients = async (date, db = database) => {
     return new Promise(async (resolve, reject) => {
         try {
-            let queryString = "".concat("SELECT DISTINCT NC.NAME_ID,",
+            let queryString = "".concat(
+                "SELECT DISTINCT NC.NAME_ID,",
                 " ISNULL(N.NAME_1,'')+ISNULL(' '+N.NAME_2,'')+ISNULL(' '+N.NAME_3,'') as NAME,",
                 " C.COUNTRY_LABEL,",
                 " NQ.DROPDOWN_CODE",
@@ -31,7 +32,6 @@ exports.findAllClients = async (date, db = database) => {
                 }
             );
             if (data) {
-                console.log(data)
                 let returnData = [];
                 data.forEach(c => {
                     returnData.push({

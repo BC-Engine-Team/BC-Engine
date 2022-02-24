@@ -11,6 +11,6 @@ exports.getClients = async (req, res) => {
         })
         .catch(err => {
             return res.status(err.status || 500)
-                .send({ message: !!err.message ? err.message : "Malfunction in the B&C Engine." });
+                .send({ message: err.message || "Malfunction in the B&C Engine." });
         });
 }

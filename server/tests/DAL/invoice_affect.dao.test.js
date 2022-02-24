@@ -20,6 +20,21 @@ let fakeInvoiceList = [
     }
 ];
 
+let fakeClientList = [
+    {
+        NAME_ID: 24505,
+        NAME: "CompanyName",
+        COUNTRY_LABEL: "Canada",
+        DROPDOWN_CODE: "A+"
+    },
+    {
+        NAME_ID: 25641,
+        NAME: "CompanyName",
+        COUNTRY_LABEL: "Canada",
+        DROPDOWN_CODE: "B"
+    },
+]
+
 describe("Test Invoice Affect DAO", () => {
     let fakeQuery = { queryString: "fakeQuery", replacements: ["fakeReplace"] };
     let prepareBilledQuerySpy = jest.spyOn(InvoiceAffectDao, 'prepareBilledQuery')
@@ -472,6 +487,86 @@ describe("Test Invoice Affect DAO", () => {
                 // assert
                 expect(response).toEqual(expectedQuery);
             });
+        });
+    });
+    describe("IAD3 - findAllClients", () => {
+        it("IAD3.1 - should return list of invoices", async () => {
+            // arrange
+            dbStub = {
+                query: () => {
+                    return fakeClientList;
+                }
+            };
+
+            let expectedResponse = [
+                {
+                    nameId: 24505,
+                    name: "CompanyName",
+                    country: "Canada",
+                    grading: "A+"
+                },
+                {
+                    nameId: 25641,
+                    name: "CompanyName",
+                    country: "Canada",
+                    grading: "B"
+                }
+            ]
+
+            // act
+            const response = await InvoiceAffectDao.findAllClients('2018-11-01', dbStub);
+
+            // assert
+            expect(response).toEqual(expectedResponse);
+        });
+
+        it("IAD3.2 - should return false when db cant fetch data", async () => {
+            // arrange
+            dbStub = {
+                query: () => {
+                    return Promise.resolve(false);
+                }
+            };
+
+            // act and assert
+            await expect(InvoiceAffectDao.findAllClients('2018-11-01', dbStub)).resolves
+                .toEqual(false);
+        });
+
+        it("IAD3.3 - when db throws error with specified status and message, should reject specified status and message", async () => {
+            // arrange
+            let expectedResponse = {
+                status: 600,
+                message: "Error."
+            };
+
+            dbStub = {
+                query: () => {
+                    return Promise.reject(expectedResponse);
+                }
+            };
+
+            // act and assert
+            await expect(InvoiceAffectDao.findAllClients('2018-11-01', dbStub))
+                .rejects.toEqual(expectedResponse);
+        });
+
+        it("IAD3.4 - when db throws error with unspecified status and message, should reject default status and message", async () => {
+            // arrange
+            let expectedResponse = {
+                status: 500,
+                message: "Could not fetch clients."
+            };
+            
+            dbStub = {
+                query: () => {
+                    return Promise.reject({});
+                }
+            };
+
+            // act and assert
+            await expect(InvoiceAffectDao.findAllClients('2018-11-01', dbStub))
+                .rejects.toEqual(expectedResponse);
         });
     });
 });

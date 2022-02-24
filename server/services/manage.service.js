@@ -4,6 +4,7 @@ exports.getAllClients = async () => {
     return new Promise(async (resolve, reject) => {
         let date = new Date
         let yearMonth = (date.getFullYear() - 2) + "-" + this.formatTimes(date.getMonth()) + "-01"
+
         await InvoiceAffectDao.findAllClients(yearMonth)
             .then(async data => {
                 if (data) resolve(data);
@@ -15,7 +16,7 @@ exports.getAllClients = async () => {
                     message: err.message || "Could not fetch clients."
                 };
                 reject(response);
-            })
+            });
     });
 }
 
