@@ -15,8 +15,7 @@ const Manage = () => {
 
     const saveGradingBracketsText = t('gradings.ModifyClientGradingButton')
 
-    const [errors, setErrors] = useState({})
-    const [clientGradingSaved, setClientGradingSaved] = useState(true);
+    const [errors, setErrors] = useState({});
     const [confirmSaveGradingActivated, setConfirmSaveGradingActivated] = useState(false);
 
     const [clientGrading, setClientGrading] = useState({
@@ -50,8 +49,6 @@ const Manage = () => {
                 [field]: null
             });
         }
-
-        setClientGradingSaved(false);
     }
 
 
@@ -216,24 +213,14 @@ const Manage = () => {
 
         if(maximumGradeAPlus === 0)
             newErrors.maximumGradeAPlus = "Please enter a number"
-        if(minimumGradeAPlus === 0)
-            newErrors.minimumGradeAPlus = "Please enter a number"
         if(maximumGradeA === 0)
             newErrors.maximumGradeA = "Please enter a number"
-        if(minimumGradeA === 0)
-            newErrors.minimumGradeA = "Please enter a number"
         if(maximumGradeB === 0)
             newErrors.maximumGradeB = "Please enter a number"
-        if(minimumGradeB === 0)
-            newErrors.minimumGradeB = "Please enter a number"
         if(maximumGradeC === 0)
             newErrors.maximumGradeC = "Please enter a number"
-        if(minimumGradeC === 0)
-            newErrors.minimumGradeC = "Please enter a number"
         if(maximumGradeEPlus === 0)
             newErrors.maximumGradeEPlus = "Please enter a number"
-        if(minimumGradeEPlus === 0)
-            newErrors.minimumGradeEPlus = "Please enter a number"
 
         return newErrors
     };
@@ -247,12 +234,6 @@ const Manage = () => {
         setErrors(newErrors)
         if (Object.keys(newErrors).length !== 0) return;
         
-        // const previouslyLoadedCriteriaStr = localStorage.getItem('dash_previous_criteria');
-        // let previouslyLoadedCriteria = JSON.parse(previouslyLoadedCriteriaStr);
-        // delete previouslyLoadedCriteria['name'];
-        // let criteriaWithoutName = Object.assign({}, criteria);
-        // delete criteriaWithoutName['name'];
-
         setConfirmSaveGradingActivated(true)
     }
 
@@ -272,19 +253,19 @@ const Manage = () => {
                     let setValue = {
                         maximumGradeAPlus: parseInt(response.data.maximumGradeAPlus),
                         minimumGradeAPlus: parseInt(response.data.minimumGradeAPlus),
-                        averageCollectionTimeGradeAPlus: response.data.averageCollectionTimeGradeAPlus,
+                        averageCollectionTimeGradeAPlus: parseInt(response.data.averageCollectionTimeGradeAPlus),
                         maximumGradeA: parseInt(response.data.maximumGradeA),
                         minimumGradeA: parseInt(response.data.minimumGradeA),
-                        averageCollectionTimeGradeA: response.data.averageCollectionTimeGradeA,
+                        averageCollectionTimeGradeA: parseInt(response.data.averageCollectionTimeGradeA),
                         maximumGradeB: parseInt(response.data.maximumGradeB),
                         minimumGradeB: parseInt(response.data.minimumGradeB),
-                        averageCollectionTimeGradeB: response.data.averageCollectionTimeGradeB,
+                        averageCollectionTimeGradeB: parseInt(response.data.averageCollectionTimeGradeB),
                         maximumGradeC: parseInt(response.data.maximumGradeC),
                         minimumGradeC: parseInt(response.data.minimumGradeC),
-                        averageCollectionTimeGradeC: response.data.averageCollectionTimeGradeC,
+                        averageCollectionTimeGradeC: parseInt(response.data.averageCollectionTimeGradeC),
                         maximumGradeEPlus: parseInt(response.data.maximumGradeEPlus),
                         minimumGradeEPlus: parseInt(response.data.minimumGradeEPlus),
-                        averageCollectionTimeGradeEPlus: response.data.averageCollectionTimeGradeEPlus
+                        averageCollectionTimeGradeEPlus: parseInt(response.data.averageCollectionTimeGradeEPlus)
                     }
 
                     setClientGrading(setValue);
@@ -335,8 +316,8 @@ const Manage = () => {
         Axios.put(`${process.env.REACT_APP_API}/manage/modifyClientGrading`, data, { headers: header })
             .then((response) => {
                 if (response.status === 200 || response.status === 201) {
-                    setClientGradingSaved(true);
                     alert("Client grading has been modified successfully!");
+                    sendNewClientGradingBracketsInCompanyDatabase(data);
                 }
             })
             .catch((error) => {
@@ -354,6 +335,34 @@ const Manage = () => {
             });
         setConfirmSaveGradingActivated(false);
     }
+
+
+    const sendNewClientGradingBracketsInCompanyDatabase = async (clientGradingGroup) => {
+        let header = {
+            'authorization': "Bearer " + cookies.get("accessToken"),
+        }
+
+        Axios.put(`${process.env.REACT_APP_API}/manage/modifyClientGradingInDatabase`, clientGradingGroup, { headers: header })
+            .then((response) => {
+                if (response.status === 200 || response.status === 201) {
+                    alert("New client grading sent to the company database!");
+                }
+            })
+            .catch((error) => {
+                if (error.response) {
+                    if (error.response.status === 403 || error.response.status === 401) {
+                        navigate("/login");
+                        alert("You are not authorized to perform this action.");
+                    }
+                    else {
+                        alert("Malfunction in the B&C Engine.");
+                    }
+                } else if (error.request) {
+                    alert("Could not reach the B&C Engine.");
+                }
+            });
+    }
+
 
 
     useEffect(() => {
@@ -444,10 +453,10 @@ const Manage = () => {
                                         value={clientGrading.averageCollectionTimeGradeAPlus}
                                         isInvalid={!!errors.averageCollectionTimeGradeAPlus}>
                                             <option value="">Select Average Collection Time</option>
-                                            <option value="<30">30 days or less</option>
-                                            <option value="30-60">Between 30 and 60 days</option>
-                                            <option value="60-90">Between 60 and 90 days</option>
-                                            <option value=">90">Over 90 days</option>
+                                            <option value={30}>30 days or less</option>
+                                            <option value={60}>Between 30 and 60 days</option>
+                                            <option value={90}>Between 60 and 90 days</option>
+                                            <option value={0}>Over 90 days</option>
                                     </Form.Control>
                                     <Form.Control.Feedback type="invalid">
                                         {errors.averageCollectionTimeGradeAPlus}
@@ -509,10 +518,10 @@ const Manage = () => {
                                         value={clientGrading.averageCollectionTimeGradeA}
                                         isInvalid={!!errors.averageCollectionTimeGradeA}>
                                             <option value="">Select Average Collection Time</option>
-                                            <option value="<30">30 days or less</option>
-                                            <option value="30-60">Between 30 and 60 days</option>
-                                            <option value="60-90">Between 60 and 90 days</option>
-                                            <option value=">90">Over 90 days</option>
+                                            <option value={30}>30 days or less</option>
+                                            <option value={60}>Between 30 and 60 days</option>
+                                            <option value={90}>Between 60 and 90 days</option>
+                                            <option value={0}>Over 90 days</option>
                                     </Form.Control>
                                     <Form.Control.Feedback type="invalid">
                                         {errors.averageCollectionTimeGradeA}
@@ -574,10 +583,10 @@ const Manage = () => {
                                         value={clientGrading.averageCollectionTimeGradeB}
                                         isInvalid={!!errors.averageCollectionTimeGradeB}>
                                             <option value="">Select Average Collection Time</option>
-                                            <option value="<30">30 days or less</option>
-                                            <option value="30-60">Between 30 and 60 days</option>
-                                            <option value="60-90">Between 60 and 90 days</option>
-                                            <option value=">90">Over 90 days</option>
+                                            <option value={30}>30 days or less</option>
+                                            <option value={60}>Between 30 and 60 days</option>
+                                            <option value={90}>Between 60 and 90 days</option>
+                                            <option value={0}>Over 90 days</option>
                                     </Form.Control>
                                     <Form.Control.Feedback type="invalid">
                                         {errors.averageCollectionTimeGradeB}
@@ -639,10 +648,10 @@ const Manage = () => {
                                         value={clientGrading.averageCollectionTimeGradeC}
                                         isInvalid={!!errors.averageCollectionTimeGradeC}>
                                             <option value="">Select Average Collection Time</option>
-                                            <option value="<30">30 days or less</option>
-                                            <option value="30-60">Between 30 and 60 days</option>
-                                            <option value="60-90">Between 60 and 90 days</option>
-                                            <option value=">90">Over 90 days</option>
+                                            <option value={30}>30 days or less</option>
+                                            <option value={60}>Between 30 and 60 days</option>
+                                            <option value={90}>Between 60 and 90 days</option>
+                                            <option value={0}>Over 90 days</option>
                                     </Form.Control>
                                     <Form.Control.Feedback type="invalid">
                                         {errors.averageCollectionTimeGradeC}
@@ -704,10 +713,10 @@ const Manage = () => {
                                         value={clientGrading.averageCollectionTimeGradeEPlus}
                                         isInvalid={!!errors.averageCollectionTimeGradeEPlus}>
                                             <option value="">Select Average Collection Time</option>
-                                            <option value="<30">30 days or less</option>
-                                            <option value="30-60">Between 30 and 60 days</option>
-                                            <option value="60-90">Between 60 and 90 days</option>
-                                            <option value=">90">Over 90 days</option>
+                                            <option value={30}>30 days or less</option>
+                                            <option value={60}>Between 30 and 60 days</option>
+                                            <option value={90}>Between 60 and 90 days</option>
+                                            <option value={0}>Over 90 days</option>
                                     </Form.Control>
                                     <Form.Control.Feedback type="invalid">
                                         {errors.averageCollectionTimeGradeEPlus}

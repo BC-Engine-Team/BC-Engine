@@ -505,19 +505,19 @@ db.sync = async (database, options) => {
         clientGradingId: 1,
         maximumGradeAPlus: 300000,
         minimumGradeAPlus: 50000.01,
-        averageCollectionTimeGradeAPlus: "<30",
+        averageCollectionTimeGradeAPlus: 30,
         maximumGradeA: 50000,
         minimumGradeA: 0,
-        averageCollectionTimeGradeA: "<30",
+        averageCollectionTimeGradeA: 30,
         maximumGradeB: 50000,
         minimumGradeB: 0,
-        averageCollectionTimeGradeB: "30-60",
+        averageCollectionTimeGradeB: 60,
         maximumGradeC: 50000,
         minimumGradeC: 0,
-        averageCollectionTimeGradeC: "60-90",
+        averageCollectionTimeGradeC: 90,
         maximumGradeEPlus: 50000,
         minimumGradeEPlus: 0,
-        averageCollectionTimeGradeEPlus: ">90"
+        averageCollectionTimeGradeEPlus: 0
       });
     })
     .catch((err) => {

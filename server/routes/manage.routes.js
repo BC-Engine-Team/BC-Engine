@@ -8,4 +8,6 @@ router.get("/getClientGrading", authService.authenticateToken, manageController.
 
 router.put("/modifyClientGrading", authService.authenticateToken, manageController.modifyClientGradings);
 
+router.put("/modifyClientGradingInDatabase", authService.authenticateToken, manageController.sendNewClientGradingInDatabase);
+
 module.exports = router;

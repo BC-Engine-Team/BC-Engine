@@ -19,8 +19,8 @@ module.exports = (localdb, Sequelize) => {
         },
         averageCollectionTimeGradeAPlus: {
             field: 'average_collection_time_a_plus',
-            type: Sequelize.STRING,
-            defaultValue: null
+            type: Sequelize.INTEGER,
+            defaultValue: 0
         },
         maximumGradeA: {
             field: 'maximum_grade_a',
@@ -34,8 +34,8 @@ module.exports = (localdb, Sequelize) => {
         }, 
         averageCollectionTimeGradeA: {
             field: 'average_collection_time_a',
-            type: Sequelize.STRING,
-            defaultValue: null
+            type: Sequelize.INTEGER,
+            defaultValue: 0
         },
         maximumGradeB: {
             field: 'maximum_grade_b',
@@ -49,8 +49,8 @@ module.exports = (localdb, Sequelize) => {
         },
         averageCollectionTimeGradeB: {
             field: 'average_collection_time_b',
-            type: Sequelize.STRING,
-            defaultValue: null
+            type: Sequelize.INTEGER,
+            defaultValue: 0
         },
         maximumGradeC: {
             field: 'maximum_grade_c',
@@ -64,8 +64,8 @@ module.exports = (localdb, Sequelize) => {
         },
         averageCollectionTimeGradeC: {
             field: 'average_collection_time_c',
-            type: Sequelize.STRING,
-            defaultValue: null
+            type: Sequelize.INTEGER,
+            defaultValue: 0
         },
         maximumGradeEPlus: {
             field: 'maximum_grade_e_plus',
@@ -79,8 +79,8 @@ module.exports = (localdb, Sequelize) => {
         },
         averageCollectionTimeGradeEPlus: {
             field: 'average_collection_time_e_plus',
-            type: Sequelize.STRING,
-            defaultValue: null
+            type: Sequelize.INTEGER,
+            defaultValue: 0
         }
     });
 

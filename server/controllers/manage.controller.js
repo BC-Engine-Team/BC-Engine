@@ -69,3 +69,38 @@ exports.modifyClientGradings = async (req, res) => {
             return res.status(err.status || 500).send({ message: err.message });
         });
 }
+
+
+exports.sendNewClientGradingInDatabase = async (req, res) => {
+    if (req.user.role !== "admin") return res.status(403).send();
+
+
+    let clientGradingGroup = {
+        maximumGradeAPlus: req.body.maximumGradeAPlus,
+        minimumGradeAPlus: req.body.minimumGradeAPlus,
+        averageCollectionTimeGradeAPlus: req.body.averageCollectionTimeGradeAPlus,
+        maximumGradeA: req.body.maximumGradeA,
+        minimumGradeA: req.body.minimumGradeA,
+        averageCollectionTimeGradeA: req.body.averageCollectionTimeGradeA,
+        maximumGradeB: req.body.maximumGradeB,
+        minimumGradeB: req.body.minimumGradeB,
+        averageCollectionTimeGradeB: req.body.averageCollectionTimeGradeB,
+        maximumGradeC: req.body.maximumGradeC,
+        minimumGradeC: req.body.minimumGradeC,
+        averageCollectionTimeGradeC: req.body.averageCollectionTimeGradeC,
+        maximumGradeEPlus: req.body.maximumGradeEPlus,
+        minimumGradeEPlus: req.body.minimumGradeEPlus,
+        averageCollectionTimeGradeEPlus: req.body.averageCollectionTimeGradeEPlus
+    }
+
+    await manageService.sendNewClientGradingInDatabase(clientGradingGroup)
+        .then(async response => {
+            if(response) {
+                return res.send(response);
+            }
+            return res.status(500).send({ message: "The data could not be modified"});
+        })
+        .catch(async err => {
+            return res.status(err.status || 500).send({ message: err.message });
+        });
+}
