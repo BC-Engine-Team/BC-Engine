@@ -22,10 +22,9 @@ const Manage = () => {
             
             a = a.grading;
             b = b.grading;
-
-            var weight = { '+': -1 },
-                aa = a.split(/(?=[+])/),
-                bb = b.split(/(?=[+])/);
+            var weight = { '+': -1, '-': 1 },
+                aa = a.split(/(?=[+-])/),
+                bb = b.split(/(?=[+-])/);
 
             if (!isSorted) {
                 setIsSorted(true)
@@ -39,7 +38,8 @@ const Manage = () => {
                 || aa[0].localeCompare(bb[0])
                 || (weight[bb[1]] || 0) - (weight[aa[1]] || 0);
             }
-        }))
+        }
+        ))
     }
 
     const clientTable = () => {
@@ -51,15 +51,7 @@ const Manage = () => {
 
         Axios.get(`${process.env.REACT_APP_API}/manage/clients`, { headers: header })
             .then((response) => {
-                // Temp function to fix grade E issue in front end when sorting
-                let data = []
-                for(let i = 0; i < response.data.length; i++) {
-                    if(response.data[i].grading === 'E')
-                    response.data[i].grading = "E+"
-                    
-                    data.push(response.data[i])
-                }
-                setClientsList(data);
+                setClientsList(response.data);
             })
             .catch((error) => {
                 if (error.response) {
