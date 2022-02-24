@@ -189,16 +189,7 @@ exports.sendNewClientGradingInDatabase = async (clientGradingGroup) => {
         }
 
         
-        
-        console.log(listOfClientsWithGradeAPlus);
-        console.log(listOfClientsWithGradeA);
-        console.log(listOfClientsWithGradeB);
-        console.log(listOfClientsWithGradeC);
-        console.log(listOfClientsWithGradeEPlus);
-
-
         //modify the grading for each clients
-
         if (listOfClientsWithGradeAPlus.length > 0){
             await this.changeClientGradingToAPlus(listOfClientsWithGradeAPlus)
                 .then(async data => {
@@ -331,7 +322,7 @@ exports.createDelimitationForCollectionDaysForEachGrading = async (gradeAPlusCol
                 gradeAPlusDelimitation.minimum = 61;
                 gradeAPlusDelimitation.maximum = 90;
                 break;
-            case '0': 
+            case '1': 
                 gradeAPlusDelimitation.minimum = 91;
                 gradeAPlusDelimitation.maximum = Number.MAX_SAFE_INTEGER;
                 break;
@@ -350,7 +341,7 @@ exports.createDelimitationForCollectionDaysForEachGrading = async (gradeAPlusCol
                 gradeADelimitation.minimum = 61;
                 gradeADelimitation.maximum = 90;
                 break;
-            case '0': 
+            case '1': 
                 gradeADelimitation.minimum = 91;
                 gradeADelimitation.maximum = Number.MAX_SAFE_INTEGER;
                 break;
@@ -369,7 +360,7 @@ exports.createDelimitationForCollectionDaysForEachGrading = async (gradeAPlusCol
                 gradeBDelimitation.minimum = 61;
                 gradeBDelimitation.maximum = 90;
                 break;
-            case '0': 
+            case '1': 
                 gradeBDelimitation.minimum = 91;
                 gradeBDelimitation.maximum = Number.MAX_SAFE_INTEGER;
                 break;
@@ -388,7 +379,7 @@ exports.createDelimitationForCollectionDaysForEachGrading = async (gradeAPlusCol
                 gradeCDelimitation.minimum = 61;
                 gradeCDelimitation.maximum = 90;
                 break;
-            case '0': 
+            case '1': 
                 gradeCDelimitation.minimum = 91;
                 gradeCDelimitation.maximum = Number.MAX_SAFE_INTEGER;
                 break;
@@ -407,7 +398,7 @@ exports.createDelimitationForCollectionDaysForEachGrading = async (gradeAPlusCol
                 gradeEPlusDelimitation.minimum = 61;
                 gradeEPlusDelimitation.maximum = 90;
                 break;
-            case '0': 
+            case '1': 
                 gradeEPlusDelimitation.minimum = 91;
                 gradeEPlusDelimitation.maximum = Number.MAX_SAFE_INTEGER;
                 break;

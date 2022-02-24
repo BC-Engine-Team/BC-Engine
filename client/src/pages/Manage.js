@@ -23,31 +23,31 @@ const Manage = () => {
             grade: 'A+',
             maximum: 0,
             minimum: 0,
-            averageCollectionTime: ""
+            averageCollectionTime: 0
         },
         a: {
             grade: 'A',
             maximum: 0,
             minimum: 0,
-            averageCollectionTime: ""
+            averageCollectionTime: 0
         },
         b: {
             grade: 'B',
             maximum: 0,
             minimum: 0,
-            averageCollectionTime: ""
+            averageCollectionTime: 0
         },
         c: {
             grade: 'C',
             maximum: 0,
             minimum: 0,
-            averageCollectionTime: ""
+            averageCollectionTime: 0
         },
         ePlus: {
             grade: 'E+',
             maximum: 0,
             minimum: 0,
-            averageCollectionTime: ""
+            averageCollectionTime: 0
         }
     });
 
@@ -73,7 +73,7 @@ const Manage = () => {
     }
 
     const findGradingCriteriaErrors = () => {
-        const errorHiger = 0
+        const errorHigher = 0
         const errorLower = 1
         const errorMin = 2
         const errorDropdown = 3
@@ -91,7 +91,7 @@ const Manage = () => {
             && parseInt(clientGrading.aPlus.maximum) <= parseInt(clientGrading.c.minimum) 
             && parseInt(clientGrading.aPlus.maximum) <= parseInt(clientGrading.ePlus.maximum) 
             && parseInt(clientGrading.aPlus.maximum) <= parseInt(clientGrading.ePlus.minimum))
-                newErrors.aPlus.maximum = errorHiger
+                newErrors.aPlus.maximum = errorHigher
         // A
         if (parseInt(clientGrading.a.maximum) <= parseInt(clientGrading.b.maximum) 
             && parseInt(clientGrading.a.maximum) <= parseInt(clientGrading.b.minimum) 
@@ -99,17 +99,17 @@ const Manage = () => {
             && parseInt(clientGrading.a.maximum) <= parseInt(clientGrading.c.minimum) 
             && parseInt(clientGrading.a.maximum) <= parseInt(clientGrading.ePlus.maximum) 
             && parseInt(clientGrading.a.maximum) <= parseInt(clientGrading.ePlus.minimum))
-                newErrors.a.maximum = errorHiger
+                newErrors.a.maximum = errorHigher
         // B
         if (parseInt(clientGrading.b.maximum) <= parseInt(clientGrading.c.maximum) 
             && parseInt(clientGrading.b.maximum) <= parseInt(clientGrading.c.minimum) 
             && parseInt(clientGrading.b.maximum) <= parseInt(clientGrading.ePlus.maximum) 
             && parseInt(clientGrading.b.maximum) <= parseInt(clientGrading.ePlus.minimum))
-                newErrors.b.maximum = errorHiger
+                newErrors.b.maximum = errorHigher
         // C   
         if (parseInt(clientGrading.c.maximum) <= parseInt(clientGrading.ePlus.maximum) 
             && parseInt(clientGrading.c.maximum) <= parseInt(clientGrading.ePlus.minimum))
-                newErrors.c.maximum = errorHiger
+                newErrors.c.maximum = errorHigher
 
         // Maximum higer than the higer grading brackets error
         // A
@@ -197,17 +197,17 @@ const Manage = () => {
             && parseInt(clientGrading.a.minimum) <= parseInt(clientGrading.c.minimum) 
             && parseInt(clientGrading.a.minimum) <= parseInt(clientGrading.ePlus.maximum) 
             && parseInt(clientGrading.a.minimum) <= parseInt(clientGrading.ePlus.minimum))
-                newErrors.a.minimum = errorHiger
+                newErrors.a.minimum = errorHigher
         // B
         if (parseInt(clientGrading.b.minimum) <= parseInt(clientGrading.c.maximum) 
             && parseInt(clientGrading.b.minimum) <= parseInt(clientGrading.c.minimum) 
             && parseInt(clientGrading.b.minimum) <= parseInt(clientGrading.ePlus.maximum) 
             && parseInt(clientGrading.b.minimum) <= parseInt(clientGrading.ePlus.minimum))
-                newErrors.b.minimum = errorHiger
+                newErrors.b.minimum = errorHigher
         // C
         if (parseInt(clientGrading.c.minimum) <= parseInt(clientGrading.ePlus.maximum) 
             && parseInt(clientGrading.c.minimum) <= parseInt(clientGrading.ePlus.minimum))
-                newErrors.c.minimum = errorHiger
+                newErrors.c.minimum = errorHigher
 
 
         // No option is selected in average collection time error
@@ -225,24 +225,14 @@ const Manage = () => {
         // No entries on the numbering
         if(clientGrading.aPlus.maximum === 0)
             newErrors.a.maximum = errorNoNum
-        if(clientGrading.aPlus.minimum === 0)
-            newErrors.a.minimum = errorNoNum
         if(clientGrading.a.maximum === 0)
             newErrors.a.maximum = errorNoNum
-        if(clientGrading.a.minimum === 0)
-            newErrors.a.minimum = errorNoNum
         if(clientGrading.b.maximum === 0)
             newErrors.b.maximum = errorNoNum
-        if(clientGrading.b.minimum === 0)
-            newErrors.b.minimum = errorNoNum
         if(clientGrading.c.maximum === 0)
             newErrors.c.maximum = errorNoNum
-        if(clientGrading.c.minimum === 0)
-            newErrors.c.minimum = errorNoNum
         if(clientGrading.ePlus.maximum === 0)
             newErrors.ePlus.maximum = errorNoNum
-        if(clientGrading.ePlus.minimum === 0)
-            newErrors.ePlus.minimum = errorNoNum
 
         console.log(newErrors)
         return newErrors
@@ -266,20 +256,21 @@ const Manage = () => {
     }
 
     const handleSaveGradingBrackets = async (event) => {
-        event.preventDefault()
-        event.stopPropagation()
+        event.preventDefault();
+        event.stopPropagation();
 
-        const newErrors = findGradingCriteriaErrors()
-
-        setErrors(newErrors)
-
+        const newErrors = findGradingCriteriaErrors();
 
         let errorCount = 0;
         Object.keys(newErrors).map((k) => {
-            if(newErrors[k].length !== 0) errorCount++
+            if(newErrors[k].minimum !== undefined 
+            || newErrors[k].maximum !== undefined 
+            || newErrors[k].averageCollectionTime !== undefined) 
+                errorCount++
         })
         if(errorCount > 0) return
 
+        console.log(clientGrading);
 
         setConfirmSaveGradingActivated(true);
     }
@@ -525,11 +516,11 @@ const Manage = () => {
                                                     onChange={(g) => setField('averageCollectionTime', g.target.value, k)}
                                                     value={clientGrading[k].averageCollectionTime}
                                                     isInvalid={!!errors[k].averageCollectionTime}>
-                                                        <option key={clientGrading[k].grade + "-1"} id={clientGrading[k].grade + "-1"} value="">{t('manage.gradingTable.averagesSelect.Default')}</option>
+                                                        <option key={clientGrading[k].grade + "-1"} id={clientGrading[k].grade + "-1"} value={0}>{t('manage.gradingTable.averagesSelect.Default')}</option>
                                                         <option key={clientGrading[k].grade + "-2"} id={clientGrading[k].grade + "-2"} value={30}>{t('manage.gradingTable.averagesSelect.Less30')}</option>
                                                         <option key={clientGrading[k].grade + "-3"} id={clientGrading[k].grade + "-3"} value={60}>{t('manage.gradingTable.averagesSelect.Between30And60')}</option>
                                                         <option key={clientGrading[k].grade + "-4"} id={clientGrading[k].grade + "-4"} value={90}>{t('manage.gradingTable.averagesSelect.Between60And90')}</option>
-                                                        <option key={clientGrading[k].grade + "-5"} id={clientGrading[k].grade + "-5"} value={0}>{t('manage.gradingTable.averagesSelect.Over90')}</option>
+                                                        <option key={clientGrading[k].grade + "-5"} id={clientGrading[k].grade + "-5"} value={1}>{t('manage.gradingTable.averagesSelect.Over90')}</option>
                                                 </Form.Select>
                                                 <Form.Control.Feedback type="invalid">
                                                     {getErrorName(errors[k].averageCollectionTime)}

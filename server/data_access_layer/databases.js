@@ -517,7 +517,7 @@ db.sync = async (database, options) => {
         averageCollectionTimeGradeC: 90,
         maximumGradeEPlus: 50000,
         minimumGradeEPlus: 0,
-        averageCollectionTimeGradeEPlus: 0
+        averageCollectionTimeGradeEPlus: 1
       });
     })
     .catch((err) => {
