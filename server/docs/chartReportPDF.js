@@ -1,21 +1,24 @@
-module.exports = (data, averagesList) => {
+module.exports = (data, averagesList, language) => {
+    var langJSONfile = language === 'en' ? require('../locales/translation-en') : require('../locales/translation-fr')
+    var langJSON = JSON.parse(JSON.stringify(langJSONfile))
+
     // calculate length of for loop for creating averages on the table
     const calculatedLength = data.employee2Name === null ? averagesList.length : averagesList.length / 2
     const today = new Date();
 
     const months = [
-        "January",
-        "February",
-        "March",
-        "April",
-        "May",
-        "June",
-        "July",
-        "August",
-        "September",
-        "October",
-        "November",
-        "December"
+        langJSON.months.Jan,
+        langJSON.months.Feb,
+        langJSON.months.Mar,
+        langJSON.months.Mar,
+        langJSON.months.Apr,
+        langJSON.months.May,
+        langJSON.months.Jun,
+        langJSON.months.Jul,
+        langJSON.months.Aug,
+        langJSON.months.Sep,
+        langJSON.months.Oct,
+        langJSON.months.Nov
     ];
 
     const colors = [
@@ -185,7 +188,7 @@ module.exports = (data, averagesList) => {
             str = str.concat("<th>", averagesList[i].year, "</th>")
 
             if (i + 1 === calculatedLength || i + 1 === averagesList.length && data.employee2Name !== null) {
-                str = str.concat("<th>AVERAGE</th>")
+                str = str.concat("<th> " + langJSON.chartReport.ChartDataAverageColumn + "</th>")
             }
         }
         return str;
@@ -198,7 +201,7 @@ module.exports = (data, averagesList) => {
     <html lang="en">
         <head>
             <meta charset="utf-8">
-            <title>Chart Report - ${data.name}</title>
+            <title>${langJSON.MainTitle} - ${data.name}</title>
             <style>
                 .clearfix:after {
                     content: "";
@@ -229,20 +232,18 @@ module.exports = (data, averagesList) => {
                 }
 
                 #logo {
-                    text-align: center;
-                    margin-bottom: 10px;
-                }
-
-                #logo picture {
-                    width: 90px;
+                    display: inline-block;
+                    float: left;
+                    position: absolute;
                 }
 
                 h1 {
+                    position: relative;
                     border-top: 1px solid  #5D6975;
                     border-bottom: 1px solid  #5D6975;
                     color: #5D6975;
                     font-size: 2.4em;
-                    line-height: 1.4em;
+                    line-height: 79px;
                     font-weight: normal;
                     text-align: center;
                     margin: 0 0 20px 0;
@@ -287,20 +288,21 @@ module.exports = (data, averagesList) => {
                     color: #5D6975;
                     width: 100%;
                     position: absolute;
-                    bottom: 14px;
+                    bottom: 10px;
                     border-top: 1px solid #C1CED9;
-                    padding: 8px 0;
+                    padding: 3px 0;
                     text-align: center;
-                    line-height: 0.8em;
+                    line-height: 0.3em;
+                    font-size: 1em;
                 }
                 
                 .secondPageFooter {
                     color: #5D6975;
                     width: 100%;
                     border-top: 1px solid #C1CED9;
-                    padding: 8px 0;
+                    padding: 3px 0;
                     text-align: center;
-                    line-height: 0.8em;
+                    line-height: 0.3em;
                     margin-top: 314px;
                 }
 
@@ -359,28 +361,26 @@ module.exports = (data, averagesList) => {
         </head>
         <body>
             <header class="clearfix">
-            <div id="logo">
-                <img src="https://i.postimg.cc/rwsyKZ34/logo.png" width="90px" height="90px">
-            </div>
-            <h1>Chart Report - ${data.name}</h1>
-            <div id="ReportInfo" class="clearfix">
-                <h2 class="title">Report Information</h2>
-                <div><span>Date Created</span> ${getFullDateFormatted(data.createdAt)}</div>
-                <div><span>Date Last Updated</span> ${getFullDateFormatted(data.updatedAt)}</div>
-                <div><span>Date Report Exported</span> ${getFullDateFormatted(today)}</div>
-            </div>
-            <div id="chartCriteria">
-                <h2 class="title" >Chart Criteria</h2>
-                <div><span>Name</span> ${data.name}</div>
-                <div><span>Start Date</span> ${months[parseInt(data.startDate.substring(5, 7)) - 1]} ${data.startDate.substring(0, 4)}</div>
-                <div><span>End Date</span> ${months[parseInt(data.endDate.substring(5, 7)) - 1]} ${data.endDate.substring(0, 4)}</div>
-                <div><span>Employee</span> ${data.employee1Name}</div>
-                ${data.employee2Name !== null ? `<div><span>Compared With</span> ${data.employee2Name}</div>` : ""}
-                <div><span>Age of Account</span> ${data.ageOfAccount}</div>
-                <div><span>Account Type</span> ${data.accountType}</div>
-                <div><span>Country</span> ${data.country}</div>
-                <div><span>Client Type</span> ${data.clientType === "Corr" ? "Correspondant" : data.clientType === "All" ? "All" : "Direct"}</div>
-            </div>
+                <img id='logo' src="https://i.postimg.cc/rwsyKZ34/logo.png" width="80px" height="80px">
+                <h1>${langJSON.MainTitle} - ${data.name}</h1>
+                <div id="ReportInfo" class="clearfix">
+                    <h2 class="title">${langJSON.reportInfo.ReportInfoTitle}</h2>
+                    <div><span>${langJSON.reportInfo.DateCreated}</span> ${getFullDateFormatted(data.createdAt)}</div>
+                    <div><span>${langJSON.reportInfo.DateUpdated}</span> ${getFullDateFormatted(data.updatedAt)}</div>
+                    <div><span>${langJSON.reportInfo.DateExported}</span> ${getFullDateFormatted(today)}</div>
+                </div>
+                <div id="chartCriteria">
+                    <h2 class="title" >${langJSON.chartCriteria.ChartCriteriaTitle}</h2>
+                    <div><span>${langJSON.chartCriteria.Name}</span> ${data.name}</div>
+                    <div><span>${langJSON.chartCriteria.StartDate}</span> ${months[parseInt(data.startDate.substring(5, 7)) - 1]} ${data.startDate.substring(0, 4)}</div>
+                    <div><span>${langJSON.chartCriteria.EndDate}</span> ${months[parseInt(data.endDate.substring(5, 7)) - 1]} ${data.endDate.substring(0, 4)}</div>
+                    <div><span>${langJSON.chartCriteria.Employee}</span> ${data.employee1Name}</div>
+                    ${data.employee2Name !== null ? `<div><span>Compared With</span> ${data.employee2Name}</div>` : ""}
+                    <div><span>${langJSON.chartCriteria.Age}</span> ${data.ageOfAccount}</div>
+                    <div><span>${langJSON.chartCriteria.AccountType}</span> ${data.accountType}</div>
+                    <div><span>${langJSON.chartCriteria.Country}</span> ${data.country}</div>
+                    <div><span>${langJSON.chartCriteria.ClientType}</span> ${data.clientType === "Corr" ? langJSON.chartCriteria.Corr : data.clientType === "All" ? langJSON.chartCriteria.All : langJSON.chartCriteria.Direct}</div>
+                </div>
             </header>
             <main>
                 <canvas id="myChart" width="auto" height="200px"></canvas>
@@ -393,12 +393,11 @@ module.exports = (data, averagesList) => {
         <div style="page-break-after:always;"></div>
         <body>
             <header class="clearfix">
-            <div id="logo">
-                <img src="https://i.postimg.cc/rwsyKZ34/logo.png" width="90px" height="90px">
-            </div>
-            <h1>Chart Report - ${data.name}</h1>
+                <img id='logo' src="https://i.postimg.cc/rwsyKZ34/logo.png" width="80px" height="80px">
+                <h1>${langJSON.MainTitle} - ${data.name}</h1>
+            </header>
             <main>
-                <h2 class="tableTitle">Chart Raw Data (Days)</h2>
+                <h2 class="tableTitle">${langJSON.chartReport.ChartDataTitle}</h2>
                 <table class="table">
                     <thead>
                         <tr>
@@ -432,7 +431,7 @@ module.exports = (data, averagesList) => {
                     },
                     title: {
                         display: true,
-                        text: 'Average Collection Days over Time',
+                        text: ${"'" + langJSON.ChartTitle + "'"},
                         fontSize: 25,
                         fontFamily: "'Arial', 'sans-serif'",
                         fontColor: 'black',
@@ -449,14 +448,14 @@ module.exports = (data, averagesList) => {
                             },
                             scaleLabel: {
                                 display: true,
-                                labelString: "Days",
+                                labelString: ${"'" + langJSON.ChartYAxis + "'"},
                                 fontSize: 15
                             }
                         }],
                         xAxes: [{
                             scaleLabel: {
                                 display: true,
-                                labelString: 'Months',
+                                labelString: ${"'" + langJSON.ChartXAxis + "'"},
                                 fontSize: 15
                             }
                         }]

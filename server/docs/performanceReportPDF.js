@@ -1,19 +1,22 @@
-module.exports = (performanceReportInfo, billingNumbers, chartReportInfo, chartReportData) => {
+module.exports = (performanceReportInfo, billingNumbers, chartReportInfo, chartReportData, language) => {
+    var langJSONfile = language === 'en' ? require('../locales/translation-en') : require('../locales/translation-fr')
+    var langJSON = JSON.parse(JSON.stringify(langJSONfile))
+
     const today = new Date();
 
     const months = [
-        "January",
-        "February",
-        "March",
-        "April",
-        "May",
-        "June",
-        "July",
-        "August",
-        "September",
-        "October",
-        "November",
-        "December"
+        langJSON.months.Jan,
+        langJSON.months.Feb,
+        langJSON.months.Mar,
+        langJSON.months.Mar,
+        langJSON.months.Apr,
+        langJSON.months.May,
+        langJSON.months.Jun,
+        langJSON.months.Jul,
+        langJSON.months.Aug,
+        langJSON.months.Sep,
+        langJSON.months.Oct,
+        langJSON.months.Nov
     ];
 
     const colors = [
@@ -128,7 +131,7 @@ module.exports = (performanceReportInfo, billingNumbers, chartReportInfo, chartR
     }
 
     const buildTable = (secondRow = undefined) => {
-        let str = '<tr> <td><b> Actuals </b></td>'
+        let str = '<tr> <td><b> ' + langJSON.performanceReport.billingNumbers.Actual + ' </b></td>'
         let start = secondRow === undefined ? 0 : 6
         let limit = secondRow === undefined ? 6 : 12
 
@@ -136,7 +139,7 @@ module.exports = (performanceReportInfo, billingNumbers, chartReportInfo, chartR
             str = str.concat('<td>' + new Intl.NumberFormat('en-CA', { style: 'currency', currency: 'CAD' }).format(billingNumbers.actual[Object.keys(billingNumbers.actual)[i]]) + '</td>')
         }
 
-        str = str.concat('</tr><tr> <td><b> Objectives </b></td>')
+        str = str.concat('</tr><tr> <td><b> ' + langJSON.performanceReport.billingNumbers.Obj + ' </b></td>')
 
         for (let i = start; i < limit; i++) {
             str = str.concat('<td>' + new Intl.NumberFormat('en-CA', { style: 'currency', currency: 'CAD' }).format(billingNumbers.objective[Object.keys(billingNumbers.objective)[i]]) + '</td>')
@@ -159,7 +162,7 @@ module.exports = (performanceReportInfo, billingNumbers, chartReportInfo, chartR
     <html lang="en">
         <head>
             <meta charset="utf-8">
-            <title>Chart Report - ${chartReportInfo.name}</title>
+            <title>${langJSON.performanceReport.MainTitle} - ${performanceReportInfo.name}</title>
             <style>
                 .clearfix:after {
                     content: "";
@@ -191,6 +194,7 @@ module.exports = (performanceReportInfo, billingNumbers, chartReportInfo, chartR
                 #logo {
                     display: inline-block;
                     float: left;
+                    position: absolute;
                 }
 
                 
@@ -205,7 +209,6 @@ module.exports = (performanceReportInfo, billingNumbers, chartReportInfo, chartR
                     font-weight: normal;
                     text-align: center;
                     margin: 0 0 20px 0;
-                    vertical-align: text-top
                 }
 
                 #main-title {
@@ -350,44 +353,45 @@ module.exports = (performanceReportInfo, billingNumbers, chartReportInfo, chartR
         <body>
             <header class="clearfix">
                 <img id='logo' src="https://i.postimg.cc/rwsyKZ34/logo.png" width="80px" height="80px">
-                <h1>Performance Report - ${performanceReportInfo.name}</h1>
+                <h1>${langJSON.MainTitle} - ${performanceReportInfo.name}</h1>
                 
-            <div id="ReportInfo" class="clearfix">
-                <h2 class="title">Report Information</h2>
-                <div><span>Date Created</span> ${getFullDateFormatted(performanceReportInfo.createdAt)}</div>
-                <div><span>Date Last Updated</span> ${getFullDateFormatted(performanceReportInfo.updatedAt)}</div>
-                <div><span>Date Report Exported</span> ${getFullDateFormatted(today)}</div>
-                <div id='projected-bonus'>
-                    <h2 class="title">Projected Bonus</h2>
-                    <h3>${new Intl.NumberFormat('en-CA', { style: 'currency', currency: 'CAD' }).format(performanceReportInfo.projectedBonus)}</h3>
+                <div id="ReportInfo" class="clearfix">
+                    <h2 class="title">${langJSON.reportInfo.ReportInfoTitle}</h2>
+                    <div><span>${langJSON.reportInfo.DateCreated}</span> ${getFullDateFormatted(performanceReportInfo.createdAt)}</div>
+                    <div><span>${langJSON.reportInfo.DateUpdated}</span> ${getFullDateFormatted(performanceReportInfo.updatedAt)}</div>
+                    <div><span>${langJSON.reportInfo.DateExported}</span> ${getFullDateFormatted(today)}</div>
+                    <div id='projected-bonus'>
+                        <h2 class="title">${langJSON.performanceReport.Bonus}</h2>
+                        <h3>${new Intl.NumberFormat('en-CA', { style: 'currency', currency: 'CAD' }).format(performanceReportInfo.projectedBonus)}</h3>
+                    </div>
                 </div>
-            </div>
-            
-            
-            <div id="chartCriteria">
-                <h2 class="title" >Chart Criteria</h2>
-                <div><span>Name</span> ${chartReportInfo.name}</div>
-                <div><span>Start Date</span> ${months[parseInt(chartReportInfo.startDate.substring(5, 7)) - 1]} ${chartReportInfo.startDate.substring(0, 4)}</div>
-                <div><span>End Date</span> ${months[parseInt(chartReportInfo.endDate.substring(5, 7)) - 1]} ${chartReportInfo.endDate.substring(0, 4)}</div>
-                <div><span>Employee</span> ${chartReportInfo.employee1Name}</div>
-                ${chartReportInfo.employee2Name !== null ? `<div><span>Compared With</span> ${chartReportInfo.employee2Name}</div>` : ""}
-                <div><span>Age of Account</span> ${chartReportInfo.ageOfAccount}</div>
-                <div><span>Account Type</span> ${chartReportInfo.accountType}</div>
-                <div><span>Country</span> ${chartReportInfo.country}</div>
-                <div><span>Client Type</span> ${chartReportInfo.clientType === "Corr" ? "Correspondant" : chartReportInfo.clientType === "All" ? "All" : "Direct"}</div>
-            </div>
-
-            
-            
+                
+                <div id="chartCriteria">
+                    <h2 class="title" >${langJSON.chartCriteria.ChartCriteriaTitle}</h2>
+                    <div><span>${langJSON.chartCriteria.Name}</span> ${chartReportInfo.name}</div>
+                    <div><span>${langJSON.chartCriteria.StartDate}</span> ${months[parseInt(chartReportInfo.startDate.substring(5, 7)) - 1]} ${chartReportInfo.startDate.substring(0, 4)}</div>
+                    <div><span>${langJSON.chartCriteria.EndDate}</span> ${months[parseInt(chartReportInfo.endDate.substring(5, 7)) - 1]} ${chartReportInfo.endDate.substring(0, 4)}</div>
+                    <div><span>${langJSON.chartCriteria.Employee}</span> ${chartReportInfo.employee1Name}</div>
+                    ${chartReportInfo.employee2Name !== null ? `<div><span>${langJSON.chartCriteria.Compare}</span> ${chartReportInfo.employee2Name}</div>` : ""}
+                    <div><span>${langJSON.chartCriteria.Age}</span> ${chartReportInfo.ageOfAccount}</div>
+                    <div><span>${langJSON.chartCriteria.AccountType}</span> ${chartReportInfo.accountType}</div>
+                    <div><span>${langJSON.chartCriteria.Country}</span> ${chartReportInfo.country}</div>
+                    <div><span>${langJSON.chartCriteria.ClientType}</span> ${chartReportInfo.clientType === "Corr" ? "Correspondant" : chartReportInfo.clientType === "All" ? "All" : "Direct"}</div>
+                </div>
             </header>
             <main>
                 <div id="billingNumbersTable">
-                    <h2 class='tableTitle'>Actual Billing VS Objectives (Fiscal Year ${billingNumbers.actual.year})</h2>
+                    <h2 class='tableTitle'>${langJSON.performanceReport.billingNumbers.Title} ${billingNumbers.actual.year})</h2>
                     <table class='table'>
                         <thead>
                             <tr>
                                 <th></th>
-                                ${buildTableHead()}
+                                <th>${langJSON.months.May}</th>
+                                <th>${langJSON.months.Jun}</th>
+                                <th>${langJSON.months.Jul}</th>
+                                <th>${langJSON.months.Aug}</th>
+                                <th>${langJSON.months.Sep}</th>
+                                <th>${langJSON.months.Oct}</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -398,7 +402,12 @@ module.exports = (performanceReportInfo, billingNumbers, chartReportInfo, chartR
                         <thead>
                             <tr>
                                 <th></th>
-                                ${buildTableHead(true)}
+                                <th>${langJSON.months.Nov}</th>
+                                <th>${langJSON.months.Dec}</th>
+                                <th>${langJSON.months.Jan}</th>
+                                <th>${langJSON.months.Feb}</th>
+                                <th>${langJSON.months.Mar}</th>
+                                <th>${langJSON.months.Apr}</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -414,11 +423,11 @@ module.exports = (performanceReportInfo, billingNumbers, chartReportInfo, chartR
                         </thead>
                         <tbody>
                             <tr>
-                                <td><b>Actual</b></td>
+                                <td><b>${langJSON.performanceReport.billingNumbers.Actual}</b></td>
                                 <td>${new Intl.NumberFormat('en-CA', { style: 'currency', currency: 'CAD' }).format(billingNumbers.actual[Object.keys(billingNumbers.actual)[12]])} </td>
                             </tr>
                             <tr>
-                                <td><b>Objective</b></td>
+                                <td><b>${langJSON.performanceReport.billingNumbers.Obj}</b></td>
                                 <td>${new Intl.NumberFormat('en-CA', { style: 'currency', currency: 'CAD' }).format(billingNumbers.objective[Object.keys(billingNumbers.objective)[12]])} </td>
                             </tr>
                         </tbody>
@@ -448,7 +457,7 @@ module.exports = (performanceReportInfo, billingNumbers, chartReportInfo, chartR
                     },
                     title: {
                         display: true,
-                        text: 'Average Collection Days over Time',
+                        text: ${"'" + langJSON.ChartTitle + "'"},
                         fontSize: 25,
                         fontFamily: "'Arial', 'sans-serif'",
                         fontColor: 'black',
@@ -465,14 +474,14 @@ module.exports = (performanceReportInfo, billingNumbers, chartReportInfo, chartR
                             },
                             scaleLabel: {
                                 display: true,
-                                labelString: "Days",
+                                labelString: ${"'" + langJSON.ChartYAxis + "'"},
                                 fontSize: 15
                             }
                         }],
                         xAxes: [{
                             scaleLabel: {
                                 display: true,
-                                labelString: 'Months',
+                                labelString: ${"'" + langJSON.ChartXAxis + "'"},
                                 fontSize: 15
                             }
                         }]

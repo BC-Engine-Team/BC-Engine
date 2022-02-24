@@ -116,7 +116,7 @@ exports.createChartReportPDF = async (req, res) => {
     if (!req.body.reportId)
         return res.status(400).send({ message: "Content cannot be empty." });
 
-    await reportService.createChartReportPDFById(req.body.reportId)
+    await reportService.createChartReportPDFById(req.body.reportId, req.body.language)
         .then(response => {
             if (response) {
                 return res.status(200).send(response);
@@ -132,7 +132,7 @@ exports.createPerformanceReportPDF = async (req, res) => {
     if (!req.body.reportId)
         return res.status(400).send({ message: "Content cannot be empty." });
 
-    await reportService.createPerformanceReportPDFByPerformanceReportId(req.body.reportId)
+    await reportService.createPerformanceReportPDFByPerformanceReportId(req.body.reportId, req.body.language)
         .then(response => {
             if (response) {
                 return res.status(200).send(response);

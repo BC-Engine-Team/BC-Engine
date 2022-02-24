@@ -281,7 +281,7 @@ exports.getRecipients = async () => {
 
 
 // Report PDF Generation related functions
-exports.createPerformanceReportPDFByPerformanceReportId = async (reportId) => {
+exports.createPerformanceReportPDFByPerformanceReportId = async (reportId, language) => {
     let averagesList = [];
 
     let filePath;
@@ -304,7 +304,7 @@ exports.createPerformanceReportPDFByPerformanceReportId = async (reportId) => {
                                 resolve(false);
                         }).then(() => {
                             pdf.create(performanceReportPdfTemplate(data.performanceReportInfo,
-                                data.billingNumbers, data.chartReportInfo, averagesList), { format: "letter" })
+                                data.billingNumbers, data.chartReportInfo, averagesList, language), { format: "letter" })
                                 .toFile(filePath, () => {
                                     resolve(true);
                                 });
@@ -325,7 +325,7 @@ exports.createPerformanceReportPDFByPerformanceReportId = async (reportId) => {
     })
 }
 
-exports.createChartReportPDFById = async (reportId) => {
+exports.createChartReportPDFById = async (reportId, language) => {
     let averagesList = [];
 
     let filePath;
@@ -349,7 +349,7 @@ exports.createChartReportPDFById = async (reportId) => {
                             else
                                 resolve(false);
                         }).then(() => {
-                            pdf.create(chartReportPdfTemplate(data, averagesList), { format: "letter" })
+                            pdf.create(chartReportPdfTemplate(data, averagesList, language), { format: "letter" })
                                 .toFile(filePath, () => {
                                     resolve(true);
                                 });

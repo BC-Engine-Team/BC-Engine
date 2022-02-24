@@ -14,7 +14,7 @@ import ConfirmationPopup from '../components/ConfirmationPopup'
 import '../styles/reportsPage.css'
 
 const Reports = () => {
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
     let navigate = useNavigate();
 
     const cookies = new Cookies();
@@ -63,7 +63,7 @@ const Reports = () => {
 
         let url = `${process.env.REACT_APP_API}/reports/`
 
-        url = chartReportId === undefined ? url.concat('createPerformanceReportPdf') : url.concat('createPdf')
+        url = chartReportId === undefined ? url.concat('createPerformanceReportPdf') : url.concat('createChartReportPdf')
 
         let header = {
             'authorization': "Bearer " + cookies.get("accessToken"),
@@ -71,6 +71,7 @@ const Reports = () => {
 
         let param = {
             reportId: chartReportId === undefined ? performanceReportId : chartReportId,
+            language: i18n.language
         }
 
         Axios.defaults.withCredentials = true;
