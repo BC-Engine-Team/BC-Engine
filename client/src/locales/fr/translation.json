@@ -115,7 +115,7 @@
          "AverageCollectionDays": "MOYENNE DES JOURS DE COLLECTION",
          "AmountOwed": "MONTANT DÛ",
          "AmountDue": "MONTANT À RECEVOIR",
-         "ClientGrading": "GRADE DU CLIENT",
+         "ClientGrading": "NOTE DU CLIENT",
          "CurrentStatus": "STATUS ACTUEL"
        },
        "dropdownButtonTable":{

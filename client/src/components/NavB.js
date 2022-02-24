@@ -1,5 +1,7 @@
 import { LinkContainer } from "react-router-bootstrap"
 import logo from '../Images/logo.png'
+import french from '../Images/french.png'
+import english from '../Images/english.png'
 import { useEffect, useState } from 'react'
 import Axios from 'axios'
 import { useNavigate } from 'react-router-dom'
@@ -11,11 +13,14 @@ const NavB = (props) => {
     const [page] = useState(props);
     const cookies = new Cookies();
     const { t, i18n } = useTranslation();
+    let navigate = useNavigate();
 
     const lngs = {
         en: { nativeName: 'English' },
         fr: { nativeName: 'Français' },
-        'en-US': { nativeName: 'English' }
+        'en-US': { nativeName: 'English' },
+        'en-CA': { nativeName: 'English' },
+        'fr-CA': { nativeName: 'Français'}
     };
 
     const DashboardLabel = t('navbar.DashboardLabel');
@@ -36,21 +41,18 @@ const NavB = (props) => {
         role = cookies.get("role");
     }
 
-    Axios.defaults.withCredentials = true;
-
-    let navigate = useNavigate();
-
     const handleNavClick = (e) => {
 
         if (page.page === "dashboard") {
             e.preventDefault();
             props.handleNavClick(e.target.href);
         }
-
     }
 
     const logout = () => {
         let refreshToken = cookies.get("refreshToken");
+
+        Axios.defaults.withCredentials = true;
 
         if (refreshToken !== undefined) {
 
@@ -98,6 +100,11 @@ const NavB = (props) => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [lngs])
 
+    useEffect(() => {
+        setLanguageTitle(lngs[i18n.language].nativeName)
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [])
+
     //For Login page navBar
     if (page.page === "login") {
         return (
@@ -116,17 +123,26 @@ const NavB = (props) => {
 
                     <Nav className="ms-auto">
                         <NavDropdown title={languageTitle} id="navbar-language-dropdown-login">
-                            {Object.keys(lngs).map((lng) => (
-                                <NavDropdown.Item
-                                    id={lng}
-                                    key={lng}
-                                    onClick={() => {
-                                        i18n.changeLanguage(lng);
-                                        setLanguageTitle(lngs[lng].nativeName);
-                                    }}>
-                                    {lngs[lng].nativeName}
-                                </NavDropdown.Item>
-                            ))}
+                            {Object.keys(lngs).map((lng) => {
+                                if(lng === 'en' || lng === 'fr')
+                                    return (
+                                        <NavDropdown.Item
+                                            id={lng}
+                                            key={lng}
+                                            onClick={() => {
+                                                i18n.changeLanguage(lng);
+                                                setLanguageTitle(lngs[lng].nativeName);
+                                            }}>
+                                             {lng === 'en' 
+                                            ? 
+                                            <img src={english} alt='english_flag' width='20px' />
+                                            : 
+                                            <img src={french} alt='french_flag' width='20px' />}
+                                            {" " + lngs[lng].nativeName}
+                                        </NavDropdown.Item>
+                                    )
+                                return <></>
+                            })}
                         </NavDropdown>
                     </Nav>
                 </Container>
@@ -183,17 +199,26 @@ const NavB = (props) => {
                             </Navbar.Text>
 
                             <NavDropdown title={languageTitle} id="navbar-language-dropdown">
-                                {Object.keys(lngs).map((lng) => (
-                                    <NavDropdown.Item
-                                        id={lng}
-                                        key={lng}
-                                        onClick={() => {
-                                            i18n.changeLanguage(lng);
-                                            setLanguageTitle(lngs[lng].nativeName);
-                                        }}>
-                                        {lngs[lng].nativeName}
-                                    </NavDropdown.Item>
-                                ))}
+                                {Object.keys(lngs).map((lng) => {
+                                    if(lng === 'en' || lng === 'fr')
+                                        return (
+                                            <NavDropdown.Item
+                                                id={lng}
+                                                key={lng}
+                                                onClick={() => {
+                                                    i18n.changeLanguage(lng);
+                                                    setLanguageTitle(lngs[lng].nativeName);
+                                                }}>
+                                                {lng === 'en' 
+                                                ? 
+                                                <img src={english} alt='english_flag' width='20px' />
+                                                : 
+                                                <img src={french} alt='french_flag' width='20px' />}
+                                                {" " + lngs[lng].nativeName}
+                                            </NavDropdown.Item>
+                                        )
+                                    return <></>
+                                })}
                             </NavDropdown>
 
                             <Nav.Link id="sign_out" onClick={logout}>{SignOutLabel}</Nav.Link>
