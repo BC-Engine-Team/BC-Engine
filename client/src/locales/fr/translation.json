@@ -115,7 +115,7 @@
          "AverageCollectionDays": "MOYENNE DES JOURS DE COLLECTION",
          "AmountOwed": "MONTANT DÛ",
          "AmountDue": "MONTANT À RECEVOIR",
-         "ClientGrading": "GRADE DU CLIENT",
+         "ClientGrading": "NOTE DU CLIENT",
          "CurrentStatus": "STATUS ACTUEL"
        },
        "dropdownButtonTable":{
@@ -126,17 +126,23 @@
        }
     },
     "manage": {
-       "table": {
+       "employeeTable": {
           "Title": "Liste des employés",
-          "Name": "NOM",
-          "Email": "COURIEL",
+          "Name": "Nom",
+          "Email": "Couriel",
           "type": {
-             "Title": "TYPE",
              "Type1": "Superviseur",
              "Type2": "Subalterne"
           },
           "ViewButton": "Voir les subalternes"
-       }
+       },
+       "clientTable": {
+         "Title": "Clients par notes",
+         "Name":"Nom",
+         "Country": "Pays",
+         "ClientGrading": "Note du client",
+         "Status": "Status actuel" 
+     }
     },
     "reports": {
       "ExportButtonLabel": "Exporter",

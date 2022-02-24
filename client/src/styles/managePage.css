@@ -1,0 +1,18 @@
+.container-clientTable {
+    width: 100%;
+    max-width: 800px;
+    float: left;
+}
+
+.nameColumnTable {
+    max-width: 350px !important;
+}
+
+.countryColumnTable {
+    max-width: 100px !important;
+}
+
+.gradingSortBTN {
+    border: none;
+    height: 21px;
+}
