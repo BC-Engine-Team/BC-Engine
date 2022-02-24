@@ -1,0 +1,54 @@
+{
+    "MainTitle": "Rapport de Performance",
+    "ChartTitle": "Moyenne de Jour de Collection par Mois",
+    "ChartXAxis": "Jours",
+    "ChartYAxis": "Mois",
+    "chartCriteria": {
+        "ChartCriteriaTitle": "Filtres du graphique",
+        "Name": "Nom",
+        "StartDate": "Date de début",
+        "EndDate": "Date de fin",
+        "Employee": "Employé(e)",
+        "Compare": "Comparé avec",
+        "Age": "Âge de la facture",
+        "AccountType": "Type de Facture",
+        "Country": "Pays",
+        "ClientType": "Type de Client",
+        "Corr": "Correspondant",
+        "Direct": "Direct",
+        "All": "Tous"
+    },
+    "reportInfo": {
+        "ReportInfoTitle": "Information du Rapport",
+        "DateCreated": "Date Créée",
+        "DateUpdated": "Date Modifié",
+        "DateExported": "Date d'Exportation"
+    },
+    "months": {
+        "Jan": "Janvier",
+        "Feb": "Février",
+        "Mar": "Mars",
+        "Apr": "Avril",
+        "May": "Mai",
+        "Jun": "Juin",
+        "Jul": "Juillet",
+        "Aug": "Août",
+        "Sep": "Septembre",
+        "Oct": "Octobre",
+        "Nov": "Novembre",
+        "Dec": "Décembre"
+    },
+    "performanceReport": {
+        "Bonus": "Prime Projetée",
+        "billingNumbers": {
+            "Title": "Facturation Réelle VS Objectifs (Année Fiscale",
+            "Actual": "Réels",
+            "Obj": "Objectifs"
+        }
+        
+    },
+    "chartReport": {
+        "ChartDataTitle": "Données du Graphique (Jours)",
+        "ChartDataAverageColumn": "Moyenne"
+    }
+}

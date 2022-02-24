@@ -4,6 +4,7 @@ const { sequelize,
     checkModelName,
     checkPropertyExists
 } = require('sequelize-test-helpers');
+var { expect, jest } = require('@jest/globals');
 
 const databases = require('../../data_access_layer/databases')
 const PerformanceReportModel = require('../../data_access_layer/models/localdb/performance_report.model')(sequelize, dataTypes);
@@ -369,8 +370,6 @@ describe("Test Report DAO", () => {
         });
     });
 
-
-
     describe("RD3 - getPerformanceReports", () => {
 
         afterEach(() => {
@@ -495,7 +494,7 @@ describe("Test Report DAO", () => {
 
             it('RD4.2.2 - when model rejects specified status and message, should reject specified status and message', async () => {
                 // arrange
-                let expectedResponse= {
+                let expectedResponse = {
                     status: 600,
                     message: 'Error.'
                 }
@@ -512,7 +511,7 @@ describe("Test Report DAO", () => {
 
             it('RD4.2.3 - when model rejects unspecified status and message, should reject default status and message', async () => {
                 // arrange
-                let expectedResponse= {
+                let expectedResponse = {
                     status: 500,
                     message: 'Could not fetch Performance Reports by User Id.'
                 }
@@ -524,6 +523,206 @@ describe("Test Report DAO", () => {
 
                 // act and assert
                 await expect(ReportDAO.getPerformanceReportsByUserId(userId, performanceReportModelStub))
+                    .rejects.toEqual(expectedResponse)
+            })
+        })
+    })
+
+    describe('RD5 - getPerformanceReportById', () => {
+        let performanceReportModelStub
+        let expectedModelResponse = {
+            dataValues: {
+                chart_report_id: 'someUUid',
+                performanceReportId: 'someUUid',
+                name: 'name',
+                projectedBonus: 100,
+                createdAt: new Date(),
+                updatedAt: new Date(),
+                billing_number: {
+                    dataValues: {
+                        may: 1, june: 1, july: 1, august: 1, september: 1, october: 1,
+                        november: 1, december: 1, january: 1, february: 1, march: 1, april: 1, total: 1, year: 2020
+                    },
+                    billing_number: {
+                        dataValues: {}
+                    }
+                }
+            },
+            chart_report: {
+                dataValues: {
+                    name: 'name',
+                    employee1Name: 'name',
+                    employee2Name: 'name',
+                    ageOfAccount: 'All',
+                    accountType: 'Receivables',
+                    country: 'country',
+                    clientType: 'Direct',
+                    startDate: '2020-01-01',
+                    endDate: '2020-01-01',
+                    createdAt: new Date(),
+                    updatedAt: new Date()
+                }
+            }
+        }
+        let fakeReportId = 'c68458d5-1989-4d1e-a67d-c3a5a660694a'
+
+        describe('RD5.1 - given valid response from performanceReport model', () => {
+            it('RD5.1.1 - when all necessary values are present, should resolve performanceReportInfo with billingNumbers and chartReportInfo', async () => {
+                // arrange
+                let expectedDaoResponse = {
+                    chartReportId: expectedModelResponse.dataValues.chart_report_id,
+                    performanceReportInfo: {
+                        performanceReportId: expectedModelResponse.dataValues.performanceReportId,
+                        name: expectedModelResponse.dataValues.name,
+                        projectedBonus: expectedModelResponse.dataValues.projectedBonus,
+                        createdAt: expectedModelResponse.dataValues.createdAt,
+                        updatedAt: expectedModelResponse.dataValues.updatedAt
+                    },
+                    billingNumbers: {
+                        objective: expectedModelResponse.dataValues.billing_number.dataValues,
+                        actual: expectedModelResponse.dataValues.billing_number.billing_number.dataValues
+                    },
+                    chartReportInfo: {
+                        name: expectedModelResponse.chart_report.dataValues.name,
+                        employee1Name: expectedModelResponse.chart_report.dataValues.employee1Name,
+                        employee2Name: expectedModelResponse.chart_report.dataValues.employee2Name,
+                        ageOfAccount: expectedModelResponse.chart_report.dataValues.ageOfAccount,
+                        accountType: expectedModelResponse.chart_report.dataValues.accountType,
+                        country: expectedModelResponse.chart_report.dataValues.country,
+                        clientType: expectedModelResponse.chart_report.dataValues.clientType,
+                        startDate: expectedModelResponse.chart_report.dataValues.startDate,
+                        endDate: expectedModelResponse.chart_report.dataValues.endDate,
+                        createdAt: expectedModelResponse.chart_report.dataValues.createdAt,
+                        updatedAt: expectedModelResponse.chart_report.dataValues.updatedAt
+                    }
+                }
+                performanceReportModelStub = {
+                    findOne: () => {
+                        return Promise.resolve(expectedModelResponse)
+                    }
+                }
+
+                // act and assert
+                await expect(ReportDAO.getPerformanceReportById(fakeReportId, performanceReportModelStub)).resolves
+                    .toEqual(expectedDaoResponse)
+            })
+
+            it('RD5.1.2 - when obj billing numbers are missing, should resolve false', async () => {
+                // arrange
+                let expectedModelResponseMissingBillingNumber = {
+                    dataValues: {
+                        chart_report_id: 'someUUid',
+                        performanceReportId: 'someUUid',
+                        name: 'name',
+                        projectedBonus: 100,
+                        createdAt: new Date(),
+                        updatedAt: new Date()
+                    },
+                    chart_report: {
+                        dataValues: {
+                            name: 'name',
+                            employee1Name: 'name',
+                            employee2Name: 'name',
+                            ageOfAccount: 'All',
+                            accountType: 'Receivables',
+                            country: 'country',
+                            clientType: 'Direct',
+                            startDate: '2020-01-01',
+                            endDate: '2020-01-01',
+                            createdAt: new Date(),
+                            updatedAt: new Date()
+                        }
+                    }
+                }
+                performanceReportModelStub = {
+                    findOne: () => {
+                        return Promise.resolve(expectedModelResponseMissingBillingNumber)
+                    }
+                }
+
+                // act and assert
+                await expect(ReportDAO.getPerformanceReportById(fakeReportId, performanceReportModelStub))
+                    .resolves.toEqual(false)
+            })
+
+            it('RD5.1.3 - when chart_report is missing, should resolve false', async () => {
+                // arrange
+                let expectedModelResponseMissingBillingNumber = {
+                    dataValues: {
+                        chart_report_id: 'someUUid',
+                        performanceReportId: 'someUUid',
+                        name: 'name',
+                        projectedBonus: 100,
+                        createdAt: new Date(),
+                        updatedAt: new Date(),
+                        billing_number: {
+                            dataValues: {
+                                may: 1, june: 1, july: 1, august: 1, september: 1, october: 1,
+                                november: 1, december: 1, january: 1, february: 1, march: 1, april: 1, total: 1, year: 2020
+                            },
+                            billing_number: {
+                                dataValues: {}
+                            }
+                        }
+                    }
+                }
+                performanceReportModelStub = {
+                    findOne: () => {
+                        return Promise.resolve(expectedModelResponseMissingBillingNumber)
+                    }
+                }
+
+                // act and assert
+                await expect(ReportDAO.getPerformanceReportById(fakeReportId, performanceReportModelStub))
+                    .resolves.toEqual(false)
+            })
+        })
+
+        describe('RD5.2 - given invalid response from model', () => {
+            it('RD5.2.1 - when model resolves falsy value, should resolve false', async () => {
+                // arrange
+                performanceReportModelStub = {
+                    findOne: () => {
+                        return Promise.resolve(false)
+                    }
+                }
+
+                // act and assert
+                await expect(ReportDAO.getPerformanceReportById(fakeReportId, performanceReportModelStub))
+                    .resolves.toEqual(false)
+            })
+
+            it('RD5.2.2 - when model rejects specified status and message, should reject specified status and message', async () => {
+                // arrange
+                let expectedResponse = {
+                    status: 600,
+                    message: 'Error.'
+                }
+                performanceReportModelStub = {
+                    findOne: () => {
+                        return Promise.reject(expectedResponse)
+                    }
+                }
+
+                // act and assert
+                await expect(ReportDAO.getPerformanceReportById(fakeReportId, performanceReportModelStub))
+                    .rejects.toEqual(expectedResponse)
+            })
+
+            it('RD5.2.3 - when model rejects unspecified status and message, should reject default status and message', async () => {
+                // arrange
+                let expectedResponse = {
+                    status: 500,
+                    message: 'Could not fetch Performance Report.'
+                }
+                performanceReportModelStub = {
+                    findOne: () => {
+                        return Promise.reject({})
+                    }
+                }
+
+                // act and assert
+                await expect(ReportDAO.getPerformanceReportById(fakeReportId, performanceReportModelStub))
                     .rejects.toEqual(expectedResponse)
             })
         })

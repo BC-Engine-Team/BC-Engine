@@ -87,19 +87,19 @@ exports.getChartReportById = async (chartReportId, chartReportModel = ChartRepor
                 chart_report_id: chartReportId
             }
         })
-        .then(async data => {
-            if (data) {
-                resolve(data);
-            }
-            resolve(false);
-        })
-        .catch(async err => {
-            const response = {
-                status: err.status || 500,
-                message: err.message || "Could not fetch data."
-            };
-            reject(response);
-        });
+            .then(async data => {
+                if (data) {
+                    resolve(data);
+                }
+                resolve(false);
+            })
+            .catch(async err => {
+                const response = {
+                    status: err.status || 500,
+                    message: err.message || "Could not fetch data."
+                };
+                reject(response);
+            });
     });
 }
 
@@ -110,38 +110,38 @@ exports.getDataForChartReport = async (chartReportId, chartReportDataModel = Cha
                 chart_report_id: chartReportId
             }
         })
-        .then(async data => {
-            if(data) {
-                if (data.length !== 0) {
-                    let returnData = [];
-                    for (let i = 0; i < data.length; i++) {
-                        returnData.push(data[i].dataValues);
+            .then(async data => {
+                if (data) {
+                    if (data.length !== 0) {
+                        let returnData = [];
+                        for (let i = 0; i < data.length; i++) {
+                            returnData.push(data[i].dataValues);
+                        }
+                        resolve(returnData)
                     }
-                    resolve(returnData)
                 }
-            }
-            resolve(false)
-        })
-        .catch(async err => {
-            const response = {
-                status: err.status || 500,
-                message: err.message || "Could not fetch data."
-            }
-            reject(response);
-        });
+                resolve(false)
+            })
+            .catch(async err => {
+                const response = {
+                    status: err.status || 500,
+                    message: err.message || "Could not fetch data."
+                }
+                reject(response);
+            });
     });
 }
 
-exports.deleteChartReportById = async(chartReportId, chartReportModel = ChartReportModel) => {
+exports.deleteChartReportById = async (chartReportId, chartReportModel = ChartReportModel) => {
     return new Promise((resolve, reject) => {
-        chartReportModel.destroy({where: {chartReportId: chartReportId}})
+        chartReportModel.destroy({ where: { chartReportId: chartReportId } })
             .then(async data => {
                 if (data) {
                     resolve("Chart report deleted successfully.");
                 }
                 resolve(false);
             })
-            .catch(err =>{
+            .catch(err => {
                 const response = {
                     status: err.status || 500,
                     message: err.message || "Could not delete data."

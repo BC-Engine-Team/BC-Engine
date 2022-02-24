@@ -1,0 +1,54 @@
+{
+    "MainTitle": "Performance Report",
+    "ChartTitle": "Average Collection Days over Time",
+    "ChartXAxis": "Days",
+    "ChartYAxis": "Months",
+    "chartCriteria": {
+        "ChartCriteriaTitle": "Chart Criteria",
+        "Name": "Name",
+        "StartDate": "Start Date",
+        "EndDate": "End Date",
+        "Employee": "Employee",
+        "Compare": "Compared With",
+        "Age": "Age of Account",
+        "AccountType": "Account Type",
+        "Country": "Country",
+        "ClientType": "Client Type",
+        "Corr": "Correspondent",
+        "Direct": "Direct",
+        "All": "All"
+    },
+    "reportInfo": {
+        "ReportInfoTitle": "Report Information",
+        "DateCreated": "Date Created",
+        "DateUpdated": "Date Last Updated",
+        "DateExported": "Date Report Exported"
+    },
+    "months": {
+        "Jan": "January",
+        "Feb": "February",
+        "Mar": "March",
+        "Apr": "April",
+        "May": "May",
+        "Jun": "June",
+        "Jul": "July",
+        "Aug": "August",
+        "Sep": "September",
+        "Oct": "October",
+        "Nov": "November",
+        "Dec": "December"
+    },
+    "performanceReport": {
+        "Bonus": "Projected Bonus",
+        "billingNumbers": {
+            "Title": "Actual Billing VS Objectives (Fiscal Year",
+            "Actual": "Actuals",
+            "Obj": "Objectives"
+        }
+        
+    },
+    "chartReport": {
+        "ChartDataTitle": "Chart Raw Data (Days)",
+        "ChartDataAverageColumn": "Average"
+    }
+}
