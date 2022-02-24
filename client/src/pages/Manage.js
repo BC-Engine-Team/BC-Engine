@@ -272,9 +272,16 @@ const Manage = () => {
         const newErrors = findGradingCriteriaErrors()
 
         setErrors(newErrors)
-        if (Object.keys(newErrors).length !== 0) return;
 
-        setConfirmSaveGradingActivated(true)
+
+        let errorCount = 0;
+        Object.keys(newErrors).map((k) => {
+            if(newErrors[k].length !== 0) errorCount++
+        })
+        if(errorCount > 0) return
+
+
+        setConfirmSaveGradingActivated(true);
     }
 
     const getCurrentClientGradingInformations = async () => {
@@ -456,10 +463,10 @@ const Manage = () => {
                                 <Row className="mb-2">
                                     <Col xs={1}/>
                                     <Col xs={3} className='tableHeader'>
-                                        <Form.Label>{minTitle}</Form.Label>
+                                        <Form.Label>{minTitle} ($)</Form.Label>
                                     </Col>
                                     <Col xs={3} className='tableHeader'>
-                                        <Form.Label>{maxTitle}</Form.Label>
+                                        <Form.Label>{maxTitle} ($)</Form.Label>
                                     </Col>
                                     <Col xs={5} className='tableHeader'>
                                         <Form.Label className="text-center">{t('manage.gradingTable.AverageTitle')}</Form.Label>

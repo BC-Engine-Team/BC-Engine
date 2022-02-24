@@ -1,5 +1,6 @@
 const databases = require("../data_access_layer/databases");
 const ClientGradingDAO = require("../data_access_layer/daos/client_grading.dao");
+const NameDAO = require("../data_access_layer/daos/name.dao");
 const Op = databases.Sequelize.Op;
 
 
@@ -273,7 +274,7 @@ exports.sendNewClientGradingInDatabase = async (clientGradingGroup) => {
 
 exports.getNameIDAndAffectAmount = async () => {
     return new Promise(async (resolve, reject) => {
-        await ClientGradingDAO.getNameIDAndAffectAmount()
+        await NameDAO.getNameIDAndAffectAmount()
             .then(async data => {
                 if (data) resolve(data);
                 resolve(false);
@@ -427,7 +428,7 @@ exports.createDelimitationForCollectionDaysForEachGrading = async (gradeAPlusCol
 
 exports.changeClientGradingToAPlus = async (listOfClientsWithGradeAPlus) => {
     return new Promise(async (resolve, reject) => {
-        await ClientGradingDAO.changeClientGradingToAPlus(listOfClientsWithGradeAPlus)
+        await NameDAO.changeClientGradingToAPlus(listOfClientsWithGradeAPlus)
             .then(async data => {
                 if (data) resolve(data);
                 resolve(false);
@@ -445,7 +446,7 @@ exports.changeClientGradingToAPlus = async (listOfClientsWithGradeAPlus) => {
 
 exports.changeClientGradingToA = async (listOfClientsWithGradeA) => {
     return new Promise(async (resolve, reject) => {
-        await ClientGradingDAO.changeClientGradingToA(listOfClientsWithGradeA)
+        await NameDAO.changeClientGradingToA(listOfClientsWithGradeA)
             .then(async data => {
                 if (data) resolve(data);
                 resolve(false);
@@ -463,7 +464,7 @@ exports.changeClientGradingToA = async (listOfClientsWithGradeA) => {
 
 exports.changeClientGradingToB = async (listOfClientsWithGradeB) => {
     return new Promise(async (resolve, reject) => {
-        await ClientGradingDAO.changeClientGradingToB(listOfClientsWithGradeB)
+        await NameDAO.changeClientGradingToB(listOfClientsWithGradeB)
             .then(async data => {
                 if (data) resolve(data);
                 resolve(false);
@@ -480,7 +481,7 @@ exports.changeClientGradingToB = async (listOfClientsWithGradeB) => {
 
 exports.changeClientGradingToC = async (listOfClientsWithGradeC) => {
     return new Promise(async (resolve, reject) => {
-        await ClientGradingDAO.changeClientGradingToC(listOfClientsWithGradeC)
+        await NameDAO.changeClientGradingToC(listOfClientsWithGradeC)
             .then(async data => {
                 if (data) resolve(data);
                 resolve(false);
@@ -498,7 +499,7 @@ exports.changeClientGradingToC = async (listOfClientsWithGradeC) => {
 
 exports.changeClientGradingToEPlus = async (listOfClientsWithGradeEPlus) => {
     return new Promise(async (resolve, reject) => {
-        await ClientGradingDAO.changeClientGradingToEPlus(listOfClientsWithGradeEPlus)
+        await NameDAO.changeClientGradingToEPlus(listOfClientsWithGradeEPlus)
             .then(async data => {
                 if (data) resolve(data);
                 resolve(false);

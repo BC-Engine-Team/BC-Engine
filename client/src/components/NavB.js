@@ -19,6 +19,7 @@ const NavB = (props) => {
         en: { nativeName: 'English' },
         fr: { nativeName: 'Français' },
         'en-US': { nativeName: 'English' },
+        'en-CA': { nativeName: 'English' },
         'fr-CA': { nativeName: 'Français'}
     };
 
