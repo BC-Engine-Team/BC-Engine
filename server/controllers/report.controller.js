@@ -1,6 +1,5 @@
 const reportService = require('../services/report.service');
 let fs = require('fs');
-require("../../config.js");
 
 exports.getChartReportsByUserId = async (req, res) => {
     if (!req.user || !req.user.userId || req.user.userId === "" || req.user.userId === undefined)

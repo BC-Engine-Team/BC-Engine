@@ -4,48 +4,15 @@
     float: left;
 }
 
-/* .container-clientGradingBrackets {
-    width: 100%;
-    max-width: 800px;
-    float: left;
+.nameColumnTable {
+    max-width: 350px !important;
 }
 
-.tableHeader {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: large;
-    font-weight: bold;
+.countryColumnTable {
+    max-width: 100px !important;
 }
 
-.inputTitle {
-    width: 100%;
-    display: flex;
-    font-size: x-large;
-    font-weight: bold;
+.gradingSortBTN {
+    border: none;
+    height: 21px;
 }
-
-@media screen and (max-width: 440px) {
-    .inputTitle {
-        font-size: larger;
-    }
-
-    .tableHeader {
-        font-size: medium;
-    }
-}
-
-@media screen and (max-width: 400px) {
-    .col-3, .col-5 {
-        padding-left: 4px !important;
-        padding-right: 4px !important;
-    }
-
-    .col-3 {
-        width: 23%;
-    }
-
-    .col-1 {
-        width: 12.333333333%;
-    }
-} */

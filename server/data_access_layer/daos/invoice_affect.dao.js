@@ -1,17 +1,28 @@
 const database = require('../databases')['mssql_pat']
 const { QueryTypes } = require('sequelize');
 
-exports.getAllClients = async (date, db = database) => {
+exports.findAllClients = async (date, db = database) => {
     return new Promise(async (resolve, reject) => {
         try {
-            let queryString = "".concat("SELECT DISTINCT NC.NAME_ID, ISNULL(N.NAME_1,'')+ISNULL(' '+N.NAME_2,'')+ISNULL(' '+N.NAME_3,'') as NAME,C.COUNTRY_LABEL, NQ.DROPDOWN_CODE as 'GRADING'",
+            let queryString = "".concat("SELECT DISTINCT NC.NAME_ID,",
+                " ISNULL(N.NAME_1,'')+ISNULL(' '+N.NAME_2,'')+ISNULL(' '+N.NAME_3,'') as NAME,",
+                " C.COUNTRY_LABEL,",
+                " NQ.DROPDOWN_CODE",
                 " FROM BOSCO_INVOICE_AFFECT BIA,",
-                " [Bosco reduction].[dbo].NAME N LEFT OUTER JOIN [Bosco reduction].[dbo].NAME_QUALITY NQ ON NQ.NAME_ID=N.NAME_ID AND NQ.QUALITY_TYPE_ID=15,",
+                " [Bosco reduction].[dbo].NAME N",
+                " LEFT OUTER JOIN [Bosco reduction].[dbo].NAME_QUALITY NQ ON NQ.NAME_ID=N.NAME_ID AND NQ.QUALITY_TYPE_ID=15,",
                 " [Bosco reduction].[dbo].COUNTRY C,",
-                " INVOICE_HEADER IH LEFT OUTER JOIN [Bosco reduction].[dbo].NAME_CONNECTION NC ON NC.CONNECTION_ID=1 AND NC.CONNECTION_NAME_ID=CONVERT(nvarchar, IH.ACTOR_ID)",
+                " INVOICE_HEADER IH",
+                " LEFT OUTER JOIN [Bosco reduction].[dbo].NAME_CONNECTION NC ON NC.CONNECTION_ID=1 AND NC.CONNECTION_NAME_ID=CONVERT(nvarchar, IH.ACTOR_ID)",
                 " LEFT OUTER JOIN [Bosco reduction].[dbo].ACCOUNTING_CLIENT AC ON AC.TRANSACTION_REF=CONVERT(NVARCHAR,IH.INVOICE_ID)",
-                " WHERE IH.INVOICE_TYPE in (1,4) AND IH.INVOICE_PREVIEW=0 AND IH.INVOCIE_DATE > ? AND BIA.INVOICE_ID=IH.INVOICE_ID AND BIA.AFFECT_ACCOUNT LIKE '%1200%'",
-                " AND C.COUNTRY_CODE=N.LEGAL_COUNTRY_CODE AND NC.NAME_ID=N.NAME_ID ORDER BY NAME");
+                " WHERE IH.INVOICE_TYPE in (1,4)",
+                " AND IH.INVOICE_PREVIEW=0",
+                " AND IH.INVOCIE_DATE > ?",
+                " AND BIA.INVOICE_ID=IH.INVOICE_ID",
+                " AND BIA.AFFECT_ACCOUNT LIKE '%1200%'",
+                " AND NQ.DROPDOWN_CODE IS NOT NULL",
+                " AND C.COUNTRY_CODE=N.LEGAL_COUNTRY_CODE",
+                " AND NC.NAME_ID=N.NAME_ID ORDER BY NAME");
 
             const data = await db.query(queryString,
                 {
@@ -20,13 +31,14 @@ exports.getAllClients = async (date, db = database) => {
                 }
             );
             if (data) {
+                console.log(data)
                 let returnData = [];
                 data.forEach(c => {
                     returnData.push({
                         nameId: c["NAME_ID"],
                         name: c["NAME"],
                         country: c["COUNTRY_LABEL"],
-                        grading: c["GRADING"] === null ? "N/A" : c["GRADING"]
+                        grading: c["DROPDOWN_CODE"]
                     });
                 });
                 resolve(returnData);
