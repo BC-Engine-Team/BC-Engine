@@ -5,6 +5,7 @@ const logger = require('morgan');
 const userRoutes = require('./routes/user.routes');
 const invoiceRoutes = require('./routes/invoice.routes');
 const reportRoutes = require('./routes/report.routes');
+const manageRoutes = requrie('./routes/manage.routes');
 require("../config.js");
 
 module.exports = (database) => {
@@ -41,6 +42,7 @@ module.exports = (database) => {
   app.use('/api/invoice', invoiceRoutes);
   app.use('/api/users', userRoutes);
   app.use('/api/reports', reportRoutes);
+  app.use('api/manage', manageRoutes)
 
   // Handles page refresh on the client side
   // (view index.hmtl and 404.html located in the client/public folder)
