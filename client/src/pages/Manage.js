@@ -285,7 +285,6 @@ const Manage = () => {
             .then((response) => {
                 if (response.status === 200 || response.status === 201) {
 
-                   console.log(response.data);
 
                     let setValue = {
                         aPlus: {

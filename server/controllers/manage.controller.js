@@ -5,10 +5,10 @@ const manageService = require('../services/manage.service');
 exports.getClientGradings = async (req, res) => {
     if (req.user.role !== "admin") return res.status(403).send();
 
-    await manageService.getClientGradings()
+    await manageService.getAllClientGradings()
         .then(async response => {
             if (response) {
-                return res.send(response);
+                return res.status(200).send(response);
             }
             return res.status(500).send({ message: "The data could not be fetched." });
         })
@@ -63,7 +63,7 @@ exports.modifyClientGradings = async (req, res) => {
             if(response) {
                 return res.send(response);
             }
-            return res.status(500).send({ message: "The data could not be modified"});
+            return res.status(500).send({ message: "The data could not be modified" });
         })
         .catch(async err => {
             return res.status(err.status || 500).send({ message: err.message });
@@ -98,7 +98,7 @@ exports.sendNewClientGradingInDatabase = async (req, res) => {
             if(response) {
                 return res.send(response);
             }
-            return res.status(500).send({ message: "The data could not be modified"});
+            return res.status(500).send({ message: "The data could not be modified" });
         })
         .catch(async err => {
             return res.status(err.status || 500).send({ message: err.message });

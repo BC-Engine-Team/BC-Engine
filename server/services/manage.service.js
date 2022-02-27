@@ -4,11 +4,11 @@ const NameDAO = require("../data_access_layer/daos/name.dao");
 const Op = databases.Sequelize.Op;
 
 
-exports.getClientGradings = async () => {
+exports.getAllClientGradings = async () => {
     return new Promise((resolve, reject) => {
         ClientGradingDAO.getClientGradings()
             .then(async data => {
-                if(data) resolve(data);
+                if (data) resolve(data)
                 resolve(false);
             })
             .catch(err => {
@@ -27,9 +27,7 @@ exports.modifyClientGradings = async (clientGradingGroup) => {
     return new Promise((resolve, reject) => {
         ClientGradingDAO.updateClientGrading(clientGradingGroup)
             .then(async data => {
-                if(data) {
-                    resolve(data);
-                }
+                if(data) resolve(data);
                 resolve(false);
             })
             .catch(err => {
@@ -84,11 +82,7 @@ exports.sendNewClientGradingInDatabase = async (clientGradingGroup) => {
                 averageCollectionDelimiters = data;
             })
             .catch(err => {
-                const response = {
-                    status: err.status || 500,
-                    message: err.message || "Could not fetch clients."
-                };
-                reject(response);
+                reject(err);
         });
 
 
@@ -97,11 +91,7 @@ exports.sendNewClientGradingInDatabase = async (clientGradingGroup) => {
             .then(async data => {
                 nameIdListWithAffectAmount = data;
             }).catch(err => {
-            const response = {
-                status: err.status || 500,
-                message: err.message || "Could not fetch clients."
-            };
-            reject(response);
+                reject(err);
         });
         
 
@@ -259,10 +249,6 @@ exports.sendNewClientGradingInDatabase = async (clientGradingGroup) => {
 }
 
 
-
-
-
-
 exports.getNameIDAndAffectAmount = async () => {
     return new Promise(async (resolve, reject) => {
         await NameDAO.getNameIDAndAffectAmount()
@@ -416,7 +402,6 @@ exports.createDelimitationForCollectionDaysForEachGrading = async (gradeAPlusCol
 }
 
 
-
 exports.changeClientGradingToAPlus = async (listOfClientsWithGradeAPlus) => {
     return new Promise(async (resolve, reject) => {
         await NameDAO.changeClientGradingToAPlus(listOfClientsWithGradeAPlus)
@@ -469,6 +454,7 @@ exports.changeClientGradingToB = async (listOfClientsWithGradeB) => {
             })
     });
 }
+
 
 exports.changeClientGradingToC = async (listOfClientsWithGradeC) => {
     return new Promise(async (resolve, reject) => {

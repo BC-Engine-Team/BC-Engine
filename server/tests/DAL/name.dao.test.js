@@ -34,6 +34,22 @@ let returnedEmployeeList = [
     }
 ];
 
+
+let fakeNameIdList = [
+    {
+        nameId: 20001,
+        affectAmount: 2000321,
+        daysToPay: 34
+    },
+    {
+        nameId: 20002,
+        affectAmount: 14000,
+        daysToPay: 7
+    }
+];
+
+
+
 let fakeClientIdList = [12345, 12346, 12347];
 
 
@@ -161,6 +177,34 @@ describe("Test Name DAO", () => {
             // act and assert
             await expect(NameDao.getAllEmployeeNames(dbStub)).rejects
                 .toEqual(new Error("Error with the db."));
+        });
+    });
+
+
+    describe("ND3 - getNameIDAndAffectAmount", () => {
+
+        let dbStub = {
+            query: () => {
+                return fakeNameIdList;
+            }
+        };
+
+        describe("ND3.1 - given valid response from db query", () => {
+            it("ND2.1.1 - should respond with list of name id with amount and days to pay", async () => {
+
+                // arrange
+                dbStub = {
+                    query: () => {
+                        return fakeNameIdList;
+                    }
+                };
+
+                // act
+                const response = await NameDao.getNameIDAndAffectAmount(dbStub);
+
+                // assert
+                expect(response).toEqual(fakeNameIdList);
+            });
         });
     });
 });
