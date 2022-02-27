@@ -3,7 +3,10 @@ const ReportTypeModel = databases['localdb'].reportTypes;
 const RecipientsModel = databases['localdb'].recipients;
 const ReportTypeRecipientsModel = databases['localdb'].reportTypeRecipients;
 const PerformanceReportModel = databases['localdb'].performanceReports;
+const ChartReportModel = databases['localdb'].chartReports
+const BillingNumbersModel = databases['localdb'].billingNumbers
 
+// Report Types related functions
 exports.getReportTypesWithRecipientIds = async (reportTypesModel = ReportTypeModel, reportTypeRecipients = ReportTypeRecipientsModel) => {
     return new Promise((resolve, reject) => {
         reportTypesModel.findAll()
@@ -79,7 +82,90 @@ exports.getRecipients = async (recipientsModel = RecipientsModel) => {
 }
 
 
-// Reports Types related functions
+// Performance Reports  related functions
+exports.getPerformanceReportById = async (reportId, performanceReportModel = PerformanceReportModel) => {
+    return new Promise((resolve, reject) => {
+        performanceReportModel.findOne({
+            where: {
+                performanceReportId: reportId
+            },
+            include: [
+                {
+                    model: ChartReportModel, attributes: ['name',
+                        'createdAt', 'updatedAt', 'employee2Name',
+                        'employee1Name', 'ageOfAccount', 'accountType',
+                        'country', 'clientType', 'startDate', 'endDate']
+                },
+                {
+                    model: BillingNumbersModel,
+                    attributes: ['may', 'june', 'july', 'august', 'september',
+                        'october', 'november', 'december', 'january', 'february',
+                        'march', 'april', 'total', 'year'],
+                    include: [
+                        {
+                            model: BillingNumbersModel,
+                            attributes: ['may', 'june', 'july', 'august',
+                                'september', 'october', 'november', 'december',
+                                'january', 'february', 'march', 'april', 'total', 'year']
+                        }
+                    ]
+                }
+            ]
+        })
+            .then(async data => {
+                if (data && data.dataValues.billing_number && data.chart_report) {
+                    let performanceReportInfo = data.dataValues
+                    let objBillingNumbers = data.dataValues.billing_number.dataValues
+                    let actualBillingNumbers = data.dataValues.billing_number.billing_number.dataValues
+                    let chartReportInfo = data.chart_report.dataValues
+
+                    let returnData = {
+                        chartReportId: performanceReportInfo.chart_report_id,
+                        performanceReportInfo: {
+                            performanceReportId: performanceReportInfo.performanceReportId,
+                            name: performanceReportInfo.name,
+                            projectedBonus: performanceReportInfo.projectedBonus,
+                            createdAt: performanceReportInfo.createdAt,
+                            updatedAt: performanceReportInfo.updatedAt
+                        },
+                        billingNumbers: {
+                            objective: (({ may, june, july, august, september, october,
+                                november, december, january, february, march, april, total, year }) =>
+                            ({
+                                may, june, july, august, september, october, november, december,
+                                january, february, march, april, total, year
+                            }))(objBillingNumbers),
+                            actual: actualBillingNumbers
+                        },
+                        chartReportInfo: {
+                            name: chartReportInfo.name,
+                            employee1Name: chartReportInfo.employee1Name,
+                            employee2Name: chartReportInfo.employee2Name,
+                            ageOfAccount: chartReportInfo.ageOfAccount,
+                            accountType: chartReportInfo.accountType,
+                            country: chartReportInfo.country,
+                            clientType: chartReportInfo.clientType,
+                            startDate: chartReportInfo.startDate,
+                            endDate: chartReportInfo.endDate,
+                            createdAt: chartReportInfo.createdAt,
+                            updatedAt: chartReportInfo.updatedAt
+                        }
+                    }
+                    resolve(returnData)
+                }
+                else
+                    resolve(false)
+            })
+            .catch(err => {
+                const response = {
+                    status: err.status || 500,
+                    message: err.message || 'Could not fetch Performance Report.'
+                }
+                reject(response)
+            })
+    })
+}
+
 exports.getPerformanceReports = async (performanceReportModel = PerformanceReportModel) => {
     return new Promise((resolve, reject) => {
         performanceReportModel.findAll({

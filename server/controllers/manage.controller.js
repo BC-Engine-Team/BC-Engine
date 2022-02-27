@@ -1,12 +1,26 @@
 const { response } = require('express');
 const manageService = require('../services/manage.service');
-
+require("../../config.js")
 
 exports.getClientGradings = async (req, res) => {
     if (req.user.role !== "admin") return res.status(403).send();
 
     await manageService.getAllClientGradings()
         .then(async response => {
+            if (response) {
+            return res.status(200).send(response);
+            }
+        return res.status(500).send({ message: "The data could not be fetched." });
+    })
+    .catch(async err => {
+        return res.status(err.status || 500).send({ message: err.message || "Malfunction in the B&C Engine." });
+    });
+}
+
+
+exports.getClients = async (req, res) => {
+    await manageService.getAllClients()
+        .then(response => {
             if (response) {
                 return res.status(200).send(response);
             }
@@ -16,7 +30,6 @@ exports.getClientGradings = async (req, res) => {
             return res.status(err.status || 500).send({ message: err.message || "Malfunction in the B&C Engine." });
         });
 }
-
 
 exports.modifyClientGradings = async (req, res) => {
     if (req.user.role !== "admin") return res.status(403).send();
@@ -100,7 +113,8 @@ exports.sendNewClientGradingInDatabase = async (req, res) => {
             }
             return res.status(500).send({ message: "The data could not be modified" });
         })
-        .catch(async err => {
-            return res.status(err.status || 500).send({ message: err.message });
+        .catch(err => {
+            return res.status(err.status || 500)
+                .send({ message: err.message || "Malfunction in the B&C Engine." });
         });
 }

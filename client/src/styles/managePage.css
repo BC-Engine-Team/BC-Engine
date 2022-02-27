@@ -1,4 +1,10 @@
-.container-clientGradingBrackets {
+.container-clientTable {
+    width: 100%;
+    max-width: 800px;
+    float: left;
+}
+
+.container-clientGradingBrackets {    
     width: 100%;
     max-width: 800px;
     float: left;
@@ -51,4 +57,17 @@
     .col-1 {
         width: 12.333333333%;
     }
+}
+
+.nameColumnTable {
+    max-width: 350px !important;
+}
+
+.countryColumnTable {
+    max-width: 100px !important;
+}
+
+.gradingSortBTN {
+    border: none;
+    height: 21px;
 }

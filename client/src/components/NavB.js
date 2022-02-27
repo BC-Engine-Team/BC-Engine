@@ -30,7 +30,8 @@ const NavB = (props) => {
     const GreetingLabel = t('navbar.Greeting');
     const SignOutLabel = t('navbar.SignOutLabel');
 
-    const [languageTitle, setLanguageTitle] = useState(lngs['en'].nativeName);
+    const [languageTitle, setLanguageTitle] = useState(lngs[i18n.language].nativeName);
+    const [frenchNav, setFrenchNav] = useState('md')
 
     let username;
     let role;
@@ -70,14 +71,14 @@ const NavB = (props) => {
                 .catch((error) => {
                     if (error.response) {
                         if (error.response.status === 403 || error.response.status === 401) {
-                            console.log(error.response.status);
+                            alert(error.response.status);
                         }
                         else {
-                            console.log("Malfunction in the B&C Engine...");
+                            alert("Malfunction in the B&C Engine...");
                         }
                     }
                     else if (error.request) {
-                        console.log("Could not reach b&C Engine...");
+                        alert("Could not reach b&C Engine...");
                     }
                 });
         }
@@ -91,7 +92,14 @@ const NavB = (props) => {
 
     useEffect(() => {
         setLanguageTitle(lngs[i18n.language].nativeName)
-    }, [])
+        if(languageTitle === 'Français')
+            setFrenchNav('lg')
+        else
+            setFrenchNav('md');
+
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [lngs])
+
 
     //For Login page navBar
     if (page.page === "login") {
@@ -129,6 +137,7 @@ const NavB = (props) => {
                                             {" " + lngs[lng].nativeName}
                                         </NavDropdown.Item>
                                     )
+                                return <></>
                             })}
                         </NavDropdown>
                     </Nav>
@@ -140,7 +149,7 @@ const NavB = (props) => {
     // When user is loged in, show app's Admin navBar
     else {
         return (
-            <Navbar variant="dark" bg="dark" expand="md" className="mb-2" collapseOnSelect>
+            <Navbar variant="dark" bg="dark" expand={frenchNav} className="mb-2" collapseOnSelect>
                 <Container fluid>
 
                     <LinkContainer to="/dashboard">
@@ -187,23 +196,24 @@ const NavB = (props) => {
 
                             <NavDropdown title={languageTitle} id="navbar-language-dropdown">
                                 {Object.keys(lngs).map((lng) => {
-                                   if(lng === 'en' || lng === 'fr')
-                                   return (
-                                        <NavDropdown.Item
-                                            id={lng}
-                                            key={lng}
-                                            onClick={() => {
-                                                i18n.changeLanguage(lng);
-                                                setLanguageTitle(lngs[lng].nativeName);
-                                            }}>
-                                            {lng === 'en' 
-                                            ? 
-                                            <img src={english} alt='english_flag' width='20px' />
-                                            : 
-                                            <img src={french} alt='french_flag' width='20px' />}
-                                            {" " + lngs[lng].nativeName}
-                                        </NavDropdown.Item>
-                                   )
+                                    if(lng === 'en' || lng === 'fr')
+                                        return (
+                                            <NavDropdown.Item
+                                                id={lng}
+                                                key={lng}
+                                                onClick={() => {
+                                                    i18n.changeLanguage(lng);
+                                                    setLanguageTitle(lngs[lng].nativeName);
+                                                }}>
+                                                {lng === 'en' 
+                                                ? 
+                                                <img src={english} alt='english_flag' width='20px' />
+                                                : 
+                                                <img src={french} alt='french_flag' width='20px' />}
+                                                {" " + lngs[lng].nativeName}
+                                            </NavDropdown.Item>
+                                        )
+                                    return <></>
                                 })}
                             </NavDropdown>
 

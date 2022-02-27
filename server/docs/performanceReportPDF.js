@@ -1,9 +1,7 @@
-module.exports = (data, averagesList, language) => {
+module.exports = (performanceReportInfo, billingNumbers, chartReportInfo, chartReportData, language) => {
     var langJSONfile = language === 'en' ? require('../locales/translation-en') : require('../locales/translation-fr')
     var langJSON = JSON.parse(JSON.stringify(langJSONfile))
 
-    // calculate length of for loop for creating averages on the table
-    const calculatedLength = data.employee2Name === null ? averagesList.length : averagesList.length / 2
     const today = new Date();
 
     const months = [
@@ -78,8 +76,7 @@ module.exports = (data, averagesList, language) => {
         let counter = 0;
         let counterCompare = 0;
 
-
-        for (let i = 0; i < averagesList.length; i++) {
+        for (let i = 0; i < chartReportData.length; i++) {
             let labelCompare = "";
 
             if (counter === 5)
@@ -88,23 +85,23 @@ module.exports = (data, averagesList, language) => {
             if (counterCompare === 5)
                 counterCompare = 0;
 
-            if (averagesList[i].employee !== -1) {
+            if (parseInt(chartReportData[i].employee) !== -1) {
                 labelCompare = " - emp";
             }
 
-            str = str.concat("{label: '", averagesList[i].year, labelCompare, "',",
+            str = str.concat("{label: '", chartReportData[i].year, labelCompare, "',",
                 "data: [");
 
-            for (let j = 0; j < averagesList[i].data.length; j++) {
-                str = str.concat(averagesList[i].data[j]);
+            for (let j = 0; j < chartReportData[i].data.length; j++) {
+                str = str.concat(chartReportData[i].data[j]);
 
-                if (j + 1 !== averagesList[i].data.length)
+                if (j + 1 !== chartReportData[i].data.length)
                     str = str.concat(",");
                 else
                     str = str.concat("],");
             }
 
-            if (averagesList[i].employee !== -1) {
+            if (chartReportData[i].employee !== -1) {
                 str = str.concat("backgroundColor: '", colors[counterCompare], "'}");
                 counterCompare++
             }
@@ -115,84 +112,48 @@ module.exports = (data, averagesList, language) => {
                 counter++
             }
 
-            if (i + 1 !== averagesList.length)
+            if (i + 1 !== chartReportData.length)
                 str = str.concat(",");
         }
 
         return str;
     }
 
-    const buildTable = () => {
-        let str = "";
+    const buildTableHead = (secondRow = undefined) => {
+        let str = ''
+        let start = secondRow === undefined ? 0 : 6
+        let limit = secondRow === undefined ? 6 : 12
 
-        for (let i = 0; i < months.length; i++) {
-            let averageNormal = 0,
-                averageCounter = 0,
-                compareAverage = 0,
-                compareAverageCounter = 0,
-                counter = 0,
-                compareCounter = 0;
-
-            // creating table row
-            str = str.concat("<tr>", "<th class='monthColumn'>", months[i], "</th>")
-
-            for (let j = 0; j < averagesList.length; j++) {
-                if (counter === 5)
-                    counter = 0;
-
-                if (compareCounter === 5)
-                    compareCounter = 0;
-
-                // creating table cell...
-                // for employee 
-                if (averagesList[j].employee !== -1) {
-                    str = str.concat("<td style='background-color:", colors[counter], "'>", averagesList[j].data[i] !== 0 ? averagesList[j].data[i] : "N/A", "</td>")
-                    counter++
-
-                    if (averagesList[j].data[i] !== 0) {
-                        averageNormal += averagesList[j].data[i];
-                        averageCounter++
-                    }
-
-                    if ((j + 1) === calculatedLength || ((j + 1) === averagesList.length && data.employee2Name !== null)) {
-                        averageNormal /= averageCounter;
-                        str = str.concat("<td style='border:1px solid #333; border-top: none; border-bottom: none;'>", averageNormal.toFixed(2), "</td>")
-                    }
-                }
-                // for All
-                else {
-                    str = str.concat("<td style='background-color:", compareColors[compareCounter], "'>", averagesList[j].data[i] !== 0 ? averagesList[j].data[i] : "N/A", "</td>")
-                    compareCounter++
-
-                    if (averagesList[j].data[i] !== 0) {
-                        compareAverage += averagesList[j].data[i];
-                        compareAverageCounter++
-                    }
-
-                    if ((j + 1) === calculatedLength) {
-                        compareAverage /= compareAverageCounter;
-                        str = str.concat("<td style='border: 1px solid #333; border-top: none; border-bottom: none;'>", compareAverage.toFixed(2), "</td>")
-                    }
-
-                }
-            }
-            str = str.concat("</tr>")
+        for (let i = start; i < limit; i++) {
+            str = str.concat('<th>' + capitalizeFirstLetter(Object.keys(billingNumbers.actual)[i]) + '</th>')
         }
-        return str;
+        return str
     }
 
-    const buildTableHead = () => {
-        let str = "";
+    const buildTable = (secondRow = undefined) => {
+        let str = '<tr> <td><b> ' + langJSON.performanceReport.billingNumbers.Actual + ' </b></td>'
+        let start = secondRow === undefined ? 0 : 6
+        let limit = secondRow === undefined ? 6 : 12
 
-        for (let i = 0; i < averagesList.length; i++) {
-            str = str.concat("<th>", averagesList[i].year, "</th>")
-
-            if (i + 1 === calculatedLength || i + 1 === averagesList.length && data.employee2Name !== null) {
-                str = str.concat("<th> " + langJSON.chartReport.ChartDataAverageColumn + "</th>")
-            }
+        for (let i = start; i < limit; i++) {
+            str = str.concat('<td>' + new Intl.NumberFormat('en-CA', { style: 'currency', currency: 'CAD' }).format(billingNumbers.actual[Object.keys(billingNumbers.actual)[i]]) + '</td>')
         }
-        return str;
+
+        str = str.concat('</tr><tr> <td><b> ' + langJSON.performanceReport.billingNumbers.Obj + ' </b></td>')
+
+        for (let i = start; i < limit; i++) {
+            str = str.concat('<td>' + new Intl.NumberFormat('en-CA', { style: 'currency', currency: 'CAD' }).format(billingNumbers.objective[Object.keys(billingNumbers.objective)[i]]) + '</td>')
+        }
+
+        str = str.concat('</tr>')
+
+        return str
     }
+
+    const capitalizeFirstLetter = (string) => {
+        return string.charAt(0).toUpperCase() + string.slice(1)
+    }
+
 
     let html =
         /*html*/
@@ -201,7 +162,7 @@ module.exports = (data, averagesList, language) => {
     <html lang="en">
         <head>
             <meta charset="utf-8">
-            <title>${langJSON.MainTitle} - ${data.name}</title>
+            <title>${langJSON.performanceReport.MainTitle} - ${performanceReportInfo.name}</title>
             <style>
                 .clearfix:after {
                     content: "";
@@ -228,7 +189,6 @@ module.exports = (data, averagesList, language) => {
 
                 header {
                     padding: 10px 0;
-                    margin-bottom: 30px;
                 }
 
                 #logo {
@@ -236,6 +196,8 @@ module.exports = (data, averagesList, language) => {
                     float: left;
                     position: absolute;
                 }
+
+                
 
                 h1 {
                     position: relative;
@@ -247,6 +209,10 @@ module.exports = (data, averagesList, language) => {
                     font-weight: normal;
                     text-align: center;
                     margin: 0 0 20px 0;
+                }
+
+                #main-title {
+                    display: inline-block;
                 }
 
                 #chartCriteria {
@@ -271,7 +237,19 @@ module.exports = (data, averagesList, language) => {
                 #ReportInfo {
                     float: right;
                     text-align: left;
+                    height: 100%
+                    margin: 0px 50px 0px 0px;
                 }
+
+                #projected-bonus {
+                    background: #ccc;
+                    text-align: center;
+                    width: 100%;
+                    height: 100%;
+                    padding-top: 23px;
+                    padding-bottom: 23px;
+                }
+
 
                 #chartCriteria div,
                     #ReportInfo div {
@@ -300,9 +278,9 @@ module.exports = (data, averagesList, language) => {
                     color: #5D6975;
                     width: 100%;
                     border-top: 1px solid #C1CED9;
-                    padding: 3px 0;
+                    padding: 8px 0;
                     text-align: center;
-                    line-height: 0.3em;
+                    line-height: 0.8em;
                     margin-top: 314px;
                 }
 
@@ -313,6 +291,7 @@ module.exports = (data, averagesList, language) => {
                 }
 
                 .table {
+                    table-layout: fixed;
                     width: 100%;
                     background: #fff;
                     box-shadow: 0px 5px 12px -12px rgb(0 0 0 / 29%);
@@ -320,6 +299,11 @@ module.exports = (data, averagesList, language) => {
                     color: #212529;
                     border-collapse: collapse;
                     border: 1px solid #333 !important;
+                    border-radius: 5px;
+                }
+
+                .table-last {
+                    width: 29%;
                 }
 
                 .table thead {
@@ -329,12 +313,8 @@ module.exports = (data, averagesList, language) => {
 
                 .table thead th {
                     border: none;
-                    padding: 7px 0;
                     font-size: 12px;
                     color: #fff;
-                }
-
-                .monthColumn {
                     width: 100px;
                 }
 
@@ -349,72 +329,118 @@ module.exports = (data, averagesList, language) => {
                 }
 
                 .table tbody td {
-                    border-bottom: 1px solid #333 !important;
+                    border-right: solid 1px #333;
+                    border-left: solid 1px #333;
+                    padding-top: 10px;
+                    width: 14%;
+                }
+
+                .table tbody tr td:nth-child(even) {
+                    background: #ccc;
                 }
 
                 .tableTitle {
                     font-size: 25;
                     text-align: center;
-                    margin-top: 0.7in;
+                    margin-top: 0.3in;
+                }
+
+                canvas {
+                    margin-top: 0.3in;
                 }
             </style>
         </head>
         <body>
             <header class="clearfix">
                 <img id='logo' src="https://i.postimg.cc/rwsyKZ34/logo.png" width="80px" height="80px">
-                <h1>${langJSON.MainTitle} - ${data.name}</h1>
+                <h1>${langJSON.MainTitle} - ${performanceReportInfo.name}</h1>
+                
                 <div id="ReportInfo" class="clearfix">
                     <h2 class="title">${langJSON.reportInfo.ReportInfoTitle}</h2>
-                    <div><span>${langJSON.reportInfo.DateCreated}</span> ${getFullDateFormatted(data.createdAt)}</div>
-                    <div><span>${langJSON.reportInfo.DateUpdated}</span> ${getFullDateFormatted(data.updatedAt)}</div>
+                    <div><span>${langJSON.reportInfo.DateCreated}</span> ${getFullDateFormatted(performanceReportInfo.createdAt)}</div>
+                    <div><span>${langJSON.reportInfo.DateUpdated}</span> ${getFullDateFormatted(performanceReportInfo.updatedAt)}</div>
                     <div><span>${langJSON.reportInfo.DateExported}</span> ${getFullDateFormatted(today)}</div>
+                    <div id='projected-bonus'>
+                        <h2 class="title">${langJSON.performanceReport.Bonus}</h2>
+                        <h3>${new Intl.NumberFormat('en-CA', { style: 'currency', currency: 'CAD' }).format(performanceReportInfo.projectedBonus)}</h3>
+                    </div>
                 </div>
+                
                 <div id="chartCriteria">
                     <h2 class="title" >${langJSON.chartCriteria.ChartCriteriaTitle}</h2>
-                    <div><span>${langJSON.chartCriteria.Name}</span> ${data.name}</div>
-                    <div><span>${langJSON.chartCriteria.StartDate}</span> ${months[parseInt(data.startDate.substring(5, 7)) - 1]} ${data.startDate.substring(0, 4)}</div>
-                    <div><span>${langJSON.chartCriteria.EndDate}</span> ${months[parseInt(data.endDate.substring(5, 7)) - 1]} ${data.endDate.substring(0, 4)}</div>
-                    <div><span>${langJSON.chartCriteria.Employee}</span> ${data.employee1Name}</div>
-                    ${data.employee2Name !== null ? `<div><span>Compared With</span> ${data.employee2Name}</div>` : ""}
-                    <div><span>${langJSON.chartCriteria.Age}</span> ${data.ageOfAccount}</div>
-                    <div><span>${langJSON.chartCriteria.AccountType}</span> ${data.accountType}</div>
-                    <div><span>${langJSON.chartCriteria.Country}</span> ${data.country}</div>
-                    <div><span>${langJSON.chartCriteria.ClientType}</span> ${data.clientType === "Corr" ? langJSON.chartCriteria.Corr : data.clientType === "All" ? langJSON.chartCriteria.All : langJSON.chartCriteria.Direct}</div>
+                    <div><span>${langJSON.chartCriteria.Name}</span> ${chartReportInfo.name}</div>
+                    <div><span>${langJSON.chartCriteria.StartDate}</span> ${months[parseInt(chartReportInfo.startDate.substring(5, 7)) - 1]} ${chartReportInfo.startDate.substring(0, 4)}</div>
+                    <div><span>${langJSON.chartCriteria.EndDate}</span> ${months[parseInt(chartReportInfo.endDate.substring(5, 7)) - 1]} ${chartReportInfo.endDate.substring(0, 4)}</div>
+                    <div><span>${langJSON.chartCriteria.Employee}</span> ${chartReportInfo.employee1Name}</div>
+                    ${chartReportInfo.employee2Name !== null ? `<div><span>${langJSON.chartCriteria.Compare}</span> ${chartReportInfo.employee2Name}</div>` : ""}
+                    <div><span>${langJSON.chartCriteria.Age}</span> ${chartReportInfo.ageOfAccount}</div>
+                    <div><span>${langJSON.chartCriteria.AccountType}</span> ${chartReportInfo.accountType}</div>
+                    <div><span>${langJSON.chartCriteria.Country}</span> ${chartReportInfo.country}</div>
+                    <div><span>${langJSON.chartCriteria.ClientType}</span> ${chartReportInfo.clientType === "Corr" ? "Correspondant" : chartReportInfo.clientType === "All" ? "All" : "Direct"}</div>
                 </div>
             </header>
             <main>
-                <canvas id="myChart" width="auto" height="200px"></canvas>
+                <div id="billingNumbersTable">
+                    <h2 class='tableTitle'>${langJSON.performanceReport.billingNumbers.Title} ${billingNumbers.actual.year})</h2>
+                    <table class='table'>
+                        <thead>
+                            <tr>
+                                <th></th>
+                                <th>${langJSON.months.May}</th>
+                                <th>${langJSON.months.Jun}</th>
+                                <th>${langJSON.months.Jul}</th>
+                                <th>${langJSON.months.Aug}</th>
+                                <th>${langJSON.months.Sep}</th>
+                                <th>${langJSON.months.Oct}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${buildTable()}
+                        </tbody>
+                    </table>
+                    <table class='table'>
+                        <thead>
+                            <tr>
+                                <th></th>
+                                <th>${langJSON.months.Nov}</th>
+                                <th>${langJSON.months.Dec}</th>
+                                <th>${langJSON.months.Jan}</th>
+                                <th>${langJSON.months.Feb}</th>
+                                <th>${langJSON.months.Mar}</th>
+                                <th>${langJSON.months.Apr}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${buildTable(true)}
+                        </tbody>
+                    </table>
+                    <table class='table table-last'>
+                        <thead>
+                            <tr>
+                                <th></th>
+                                <th>Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><b>${langJSON.performanceReport.billingNumbers.Actual}</b></td>
+                                <td>${new Intl.NumberFormat('en-CA', { style: 'currency', currency: 'CAD' }).format(billingNumbers.actual[Object.keys(billingNumbers.actual)[12]])} </td>
+                            </tr>
+                            <tr>
+                                <td><b>${langJSON.performanceReport.billingNumbers.Obj}</b></td>
+                                <td>${new Intl.NumberFormat('en-CA', { style: 'currency', currency: 'CAD' }).format(billingNumbers.objective[Object.keys(billingNumbers.objective)[12]])} </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <canvas id="myChart" width="auto" height="140px"></canvas>
             </main>
+            
         </body>
         <footer>
             <p>@Copyright 2021-${today.getFullYear()}.</p>
             <p>All rights reserved. Powered by B&C Engine.</p>
         </footer>
-        <div style="page-break-after:always;"></div>
-        <body>
-            <header class="clearfix">
-                <img id='logo' src="https://i.postimg.cc/rwsyKZ34/logo.png" width="80px" height="80px">
-                <h1>${langJSON.MainTitle} - ${data.name}</h1>
-            </header>
-            <main>
-                <h2 class="tableTitle">${langJSON.chartReport.ChartDataTitle}</h2>
-                <table class="table">
-                    <thead>
-                        <tr>
-                            <th></th>
-                            ${buildTableHead()}
-                        </tr>
-                    </thead>
-                    <tbody>
-                        ${buildTable()}
-                    </tbody>
-                </table>
-            </main>
-            <div class="secondPageFooter">
-                <p>@Copyright 2021-${today.getFullYear()}.</p>
-                <p>All rights reserved. Powered by B&C Engine.</p>
-            </div>
-        </body>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.min.js"></script>
         <script>
             const ctx = document.getElementById('myChart');
@@ -435,7 +461,7 @@ module.exports = (data, averagesList, language) => {
                         fontSize: 25,
                         fontFamily: "'Arial', 'sans-serif'",
                         fontColor: 'black',
-                        fontStyle: '400'
+                        fontStyle: '400',
                     },
                     legend: {
                         display: true,
@@ -465,5 +491,6 @@ module.exports = (data, averagesList, language) => {
         </script>
     </html>
     `
+
     return html
 }

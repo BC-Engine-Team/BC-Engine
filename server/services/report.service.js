@@ -2,7 +2,8 @@ const ChartReportDao = require("../data_access_layer/daos/chart_report.dao");
 const ReportDao = require("../data_access_layer/daos/report.dao");
 
 const pdf = require('html-pdf');
-const pdfTemplate = require("../docs/chartReportPDF");
+const chartReportPdfTemplate = require("../docs/chartReportPDF");
+const performanceReportPdfTemplate = require('../docs/performanceReportPDF')
 require("../../config.js");
 
 // Chart Report Related functions
@@ -278,12 +279,57 @@ exports.getRecipients = async () => {
     });
 }
 
-// Chart Report PDF Generation related functions
-exports.createChartReportPDFById = async (reportId) => {
+
+// Report PDF Generation related functions
+exports.createPerformanceReportPDFByPerformanceReportId = async (reportId, language) => {
     let averagesList = [];
 
     let filePath;
-    if(__dirname !== '/home/runner/work/BC-Engine/BC-Engine/server/services') {
+    if (__dirname !== '/home/runner/work/BC-Engine/BC-Engine/server/services') {
+        filePath = `${__dirname.replace("services", "")}docs\\pdf_files\\performanceReport-${reportId}.pdf`;
+    }
+    else {
+        filePath = `${__dirname.replace("services", "")}docs/pdf_files/performanceReport-${reportId}.pdf`;
+    }
+
+    return new Promise(async (resolve, reject) => {
+        ReportDao.getPerformanceReportById(reportId)
+            .then(async data => {
+                if (data) {
+                    await this.getChartReportPDFAverages(data.chartReportId)
+                        .then(async (dataAvg) => {
+                            if (dataAvg)
+                                averagesList = dataAvg;
+                            else
+                                resolve(false);
+                        }).then(() => {
+                            pdf.create(performanceReportPdfTemplate(data.performanceReportInfo,
+                                data.billingNumbers, data.chartReportInfo, averagesList, language), { format: "letter" })
+                                .toFile(filePath, () => {
+                                    resolve(true);
+                                });
+                        }).catch(err => {
+                            reject(err);
+                        });
+                }
+                else
+                    resolve(false)
+            })
+            .catch(err => {
+                const response = {
+                    status: err.status || 500,
+                    message: err.message || "Malfunction in the B&C Engine."
+                }
+                reject(response);
+            });
+    })
+}
+
+exports.createChartReportPDFById = async (reportId, language) => {
+    let averagesList = [];
+
+    let filePath;
+    if (__dirname !== '/home/runner/work/BC-Engine/BC-Engine/server/services') {
         filePath = `${__dirname.replace("services", "")}docs\\pdf_files\\chartReport-${reportId}.pdf`;
     }
     else {
@@ -297,19 +343,19 @@ exports.createChartReportPDFById = async (reportId) => {
                     data = data.dataValues
 
                     await this.getChartReportPDFAverages(reportId)
-                    .then(async (dataAvg) => {
-                        if(dataAvg)
-                            averagesList = dataAvg;
-                        else
-                            resolve(false);
-                    }).then(() => {
-                        pdf.create(pdfTemplate(data, averagesList), {format: "letter"})
-                        .toFile(filePath, () => {
-                            resolve(true);
+                        .then(async (dataAvg) => {
+                            if (dataAvg)
+                                averagesList = dataAvg;
+                            else
+                                resolve(false);
+                        }).then(() => {
+                            pdf.create(chartReportPdfTemplate(data, averagesList, language), { format: "letter" })
+                                .toFile(filePath, () => {
+                                    resolve(true);
+                                });
+                        }).catch(err => {
+                            reject(err);
                         });
-                    }).catch(err => {
-                        reject(err);
-                    });
                 }
                 else
                     resolve(false);
@@ -327,36 +373,36 @@ exports.createChartReportPDFById = async (reportId) => {
 exports.getChartReportPDFAverages = async (reportId) => {
     return new Promise(async (resolve, reject) => {
         ChartReportDao.getDataForChartReport(reportId)
-        .then(data => {
-            let averagesList = [];
-            if (data) {
-                for(let i = 0; i < data.length; i++) {
-                    let avgObject = {
-                        year: data[i].year,
-                        employee: data[i].employee,
-                        data: [
-                            data[i].january,
-                            data[i].february,
-                            data[i].march,
-                            data[i].april,
-                            data[i].may,
-                            data[i].june,
-                            data[i].july,
-                            data[i].august,
-                            data[i].september,
-                            data[i].october,
-                            data[i].november,
-                            data[i].december,
-                        ]
+            .then(data => {
+                let averagesList = [];
+                if (data) {
+                    for (let i = 0; i < data.length; i++) {
+                        let avgObject = {
+                            year: data[i].year,
+                            employee: data[i].employee,
+                            data: [
+                                data[i].january,
+                                data[i].february,
+                                data[i].march,
+                                data[i].april,
+                                data[i].may,
+                                data[i].june,
+                                data[i].july,
+                                data[i].august,
+                                data[i].september,
+                                data[i].october,
+                                data[i].november,
+                                data[i].december,
+                            ]
+                        }
+                        averagesList.push(avgObject);
                     }
-                    averagesList.push(avgObject);
+                    resolve(averagesList);
                 }
-                resolve(averagesList);
-            }
-            resolve(false);
-        })
-        .catch(err => {
-            reject(err);
-        });
+                resolve(false);
+            })
+            .catch(err => {
+                reject(err);
+            });
     });
 }

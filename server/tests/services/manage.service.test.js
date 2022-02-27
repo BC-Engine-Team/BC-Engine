@@ -1,9 +1,26 @@
 const ManageService = require('../../services/manage.service');
 const ClientGradingDAO = require("../../data_access_layer/daos/client_grading.dao");
 const NameDAO = require("../../data_access_layer/daos/name.dao");
+const InvoiceAffectDao = require("../../data_access_layer/daos/invoice_affect.dao");
 const sinon = require("sinon");
 var { expect, jest } = require('@jest/globals');
+const { afterAll } = require('jest-circus');
 
+
+let clientsList = [
+    {
+        nameId: 24505,
+        name: "CompanyName",
+        country: "Canada",
+        grading: "A+"
+    },
+    {
+        nameId: 25641,
+        name: "CompanyName",
+        country: "Canada",
+        grading: "B"
+    }
+]
 
 const expectedClientGrading = {
     dataValues: {
@@ -129,6 +146,12 @@ let changeClientGradingToCDaoSpy = jest.spyOn(NameDAO, 'changeClientGradingToC')
 let changeClientGradingToEPlusDaoSpy = jest.spyOn(NameDAO, 'changeClientGradingToEPlus')
         .mockImplementation(() => new Promise((resolve) => {
             resolve(false);
+        }));
+
+        
+let invoiceAffectDaoSpy = jest.spyOn(InvoiceAffectDao, 'findAllClients')
+        .mockImplementation(() => new Promise((resolve) => {
+            resolve(fakeClientList);
         }));
 
 //all manage service method spy
@@ -315,6 +338,74 @@ describe("Test Manage Service", () => {
                 await expect(ManageService.modifyClientGradings(expectedClientGrading)).rejects
                     .toEqual(expectedError);
             });
+        });
+    });
+    
+    describe("MS3 - getAllClients", () => {
+        it("MS3.1 - should respond with the list of clients", async () => {
+            //arrange
+            invoiceAffectDaoSpy = jest.spyOn(InvoiceAffectDao, 'findAllClients')
+            .mockImplementation(() => new Promise((resolve) => {
+                resolve(clientsList);
+            }));
+
+            // act
+            const response = await ManageService.getAllClients();
+
+            // assert
+            expect(response).toEqual(clientsList);
+            expect(invoiceAffectDaoSpy).toBeCalledTimes(1);
+        });
+
+        it("MS3.2 - should return false when no data is gotten from the database", async () => {
+            //arrange
+            invoiceAffectDaoSpy = jest.spyOn(InvoiceAffectDao, 'findAllClients')
+            .mockImplementation(() => new Promise((resolve) => {
+                resolve(false);
+            }));
+
+            // act
+            const response = await ManageService.getAllClients();
+
+            // assert
+            expect(response).toEqual(false);
+            expect(invoiceAffectDaoSpy).toBeCalledTimes(1);
+        });
+
+        it("MS3.3 - should return error with default message and status", async () => {
+            //arrange
+            let expectedResponse = {
+                status: 500,
+                message: "Could not fetch clients."
+            };
+
+            invoiceAffectDaoSpy = jest.spyOn(InvoiceAffectDao, 'findAllClients')
+            .mockImplementation(() => new Promise((resolve, reject) => {
+                reject({message: "", status: ""});
+            }));
+
+            // act and assert
+            await expect(ManageService.getAllClients()).rejects
+                .toEqual(expectedResponse)
+            expect(invoiceAffectDaoSpy).toBeCalledTimes(1);
+        });
+
+        it("MS3.4 - should return error with specified message and status", async () => {
+            //arrange
+            let expectedResponse = {
+                status: 600,
+                message: "Error."
+            };
+
+            invoiceAffectDaoSpy = jest.spyOn(InvoiceAffectDao, 'findAllClients')
+            .mockImplementation(() => new Promise((resolve, reject) => {
+                reject(expectedResponse);
+            }));
+
+            // act and assert
+            await expect(ManageService.getAllClients()).rejects
+                .toEqual(expectedResponse)
+            expect(invoiceAffectDaoSpy).toBeCalledTimes(1);
         });
     });
 });

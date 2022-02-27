@@ -62,7 +62,8 @@
                 "Employee":"Employee",
                 "Country":"Country",
                 "ClientType": "Client Type",
-                "Age": "Age of Account"
+                "Age": "Age of Account",
+                "AccountType": "Account Type"
             },
             "StartDateLabel": "Start Month",
             "EndDateLabel": "End Month",
@@ -71,6 +72,10 @@
             "EndMonthExceedCurrentError": "End Month cannot exceed current month.",
             "EndYearExceedError": "End Year cannot be before Start Year.",
             "SaveConfirmPrompt": "Are you sure you want to save ",
+            "accountType": {
+                "Receivables": "Account receivables",
+                "Payables": "Account payables"
+            },
             "clientType": {
                 "Corr": "Correspondent",
                 "Direct": "Direct",
@@ -144,14 +149,20 @@
         },
         "employeeTable":{
             "Title":"Employee List",
-            "Name":"NAME",
-            "Email":"EMAIL",
+            "Name":"Name",
+            "Email":"Email",
             "type":{
-                "Title":"TYPE",
                 "Type1":"Manager",
                 "Type2":"Subordinate"
             },
             "ViewButton":"View Subordinates"
+        },
+        "clientTable": {
+            "Title": "Clients by Grading",
+            "Name":"Name",
+            "Country": "Country",
+            "ClientGrading": "Client Grading",
+            "Status": "Current Status" 
         }
     },
     "reports":{

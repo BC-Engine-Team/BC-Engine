@@ -20,6 +20,21 @@ let fakeInvoiceList = [
     }
 ];
 
+let fakeClientList = [
+    {
+        NAME_ID: 24505,
+        NAME: "CompanyName",
+        COUNTRY_LABEL: "Canada",
+        DROPDOWN_CODE: "A+"
+    },
+    {
+        NAME_ID: 25641,
+        NAME: "CompanyName",
+        COUNTRY_LABEL: "Canada",
+        DROPDOWN_CODE: "B"
+    },
+]
+
 describe("Test Invoice Affect DAO", () => {
     let fakeQuery = { queryString: "fakeQuery", replacements: ["fakeReplace"] };
     let prepareBilledQuerySpy = jest.spyOn(InvoiceAffectDao, 'prepareBilledQuery')
@@ -31,12 +46,13 @@ describe("Test Invoice Affect DAO", () => {
         }
     };
 
-    let startDate = "2020-11-01";
-    let endDate = "2021-05-01";
-    let employeeId = 12345;
-    let clientType = "DIRECT";
-    let countryCode = "CA";
+    let startDate = "2020-11-01"
+    let endDate = "2021-05-01"
+    let employeeId = 12345
+    let clientType = "DIRECT"
+    let countryCode = "CA"
     let ageOfAccount = "<30"
+    let accountType = "Payables"
 
     describe("IAD1 - getInvoicesByDate", () => {
         describe("IAD1.1 - given valid response from db query", () => {
@@ -67,11 +83,11 @@ describe("Test Invoice Affect DAO", () => {
                 ];
 
                 // act
-                const response = await InvoiceAffectDao.getInvoicesByDate(startDate, endDate, employeeId, clientType, countryCode, ageOfAccount, dbStub);
+                const response = await InvoiceAffectDao.getInvoicesByDate(startDate, endDate, employeeId, clientType, countryCode, ageOfAccount, undefined, dbStub);
 
                 // assert
                 expect(response).toEqual(expectedResponse);
-                expect(prepareBilledQuerySpy).toHaveBeenCalledWith(startDate, endDate, employeeId, clientType, countryCode, ageOfAccount);
+                expect(prepareBilledQuerySpy).toHaveBeenCalledWith(startDate, endDate, employeeId, clientType, countryCode, ageOfAccount, undefined);
             });
         });
 
@@ -85,9 +101,9 @@ describe("Test Invoice Affect DAO", () => {
                 };
 
                 // act and assert
-                await expect(InvoiceAffectDao.getInvoicesByDate(startDate, endDate, employeeId, clientType, countryCode, ageOfAccount, dbStub)).resolves
+                await expect(InvoiceAffectDao.getInvoicesByDate(startDate, endDate, employeeId, clientType, countryCode, ageOfAccount, undefined, dbStub)).resolves
                     .toEqual(false);
-                expect(prepareBilledQuerySpy).toHaveBeenCalledWith(startDate, endDate, employeeId, clientType, countryCode, ageOfAccount);
+                expect(prepareBilledQuerySpy).toHaveBeenCalledWith(startDate, endDate, employeeId, clientType, countryCode, ageOfAccount, undefined);
             });
 
             it("IAD1.2.2 - when db throws error with specified status and message, should reject specified status and message", async () => {
@@ -103,9 +119,9 @@ describe("Test Invoice Affect DAO", () => {
                 };
 
                 // act and assert
-                await expect(InvoiceAffectDao.getInvoicesByDate(startDate, endDate, employeeId, clientType, countryCode, ageOfAccount, dbStub))
+                await expect(InvoiceAffectDao.getInvoicesByDate(startDate, endDate, employeeId, clientType, countryCode, ageOfAccount, undefined, dbStub))
                     .rejects.toEqual(expectedResponse);
-                expect(prepareBilledQuerySpy).toHaveBeenCalledWith(startDate, endDate, employeeId, clientType, countryCode, ageOfAccount);
+                expect(prepareBilledQuerySpy).toHaveBeenCalledWith(startDate, endDate, employeeId, clientType, countryCode, ageOfAccount, undefined);
             });
 
             it("IAD1.2.3 - when db throws error with unspecified status and message, should reject default status and message", async () => {
@@ -121,9 +137,9 @@ describe("Test Invoice Affect DAO", () => {
                 };
 
                 // act and assert
-                await expect(InvoiceAffectDao.getInvoicesByDate(startDate, endDate, employeeId, clientType, countryCode, ageOfAccount, dbStub))
+                await expect(InvoiceAffectDao.getInvoicesByDate(startDate, endDate, employeeId, clientType, countryCode, ageOfAccount, undefined, dbStub))
                     .rejects.toEqual(expectedResponse);
-                expect(prepareBilledQuerySpy).toHaveBeenCalledWith(startDate, endDate, employeeId, clientType, countryCode, ageOfAccount);
+                expect(prepareBilledQuerySpy).toHaveBeenCalledWith(startDate, endDate, employeeId, clientType, countryCode, ageOfAccount, undefined);
             });
         });
     });
@@ -132,7 +148,7 @@ describe("Test Invoice Affect DAO", () => {
 
         let expectedQuery = {
             queryString: "".concat("SELECT IH.INVOCIE_DATE, IH.ACTOR_ID, BIA.AFFECT_AMOUNT ",
-                "FROM  BOSCO_INVOICE_AFFECT BIA, INVOICE_HEADER IH ",
+                "FROM BOSCO_INVOICE_AFFECT BIA, INVOICE_HEADER IH ",
                 "WHERE IH.INVOICE_TYPE in (1,4) AND IH.INVOICE_PREVIEW=0 AND IH.INVOCIE_DATE BETWEEN ? AND ? ",
                 "AND BIA.INVOICE_ID=IH.INVOICE_ID AND BIA.AFFECT_ACCOUNT LIKE '%1200%' "),
             replacements: [startDate, endDate]
@@ -145,7 +161,7 @@ describe("Test Invoice Affect DAO", () => {
                 let expectedResponse = expectedQuery;
 
                 // act
-                const response = InvoiceAffectDao.prepareBilledQuery(startDate, endDate, undefined, undefined, undefined, undefined);
+                const response = InvoiceAffectDao.prepareBilledQuery(startDate, endDate, undefined, undefined, undefined, undefined, undefined);
 
                 // assert
                 expect(response).toEqual(expectedResponse);
@@ -157,7 +173,7 @@ describe("Test Invoice Affect DAO", () => {
                 // arrange
                 let expectedQuery = {
                     queryString: "".concat("SELECT IH.INVOCIE_DATE, IH.ACTOR_ID, BIA.AFFECT_AMOUNT ",
-                        "FROM  BOSCO_INVOICE_AFFECT BIA, INVOICE_HEADER IH  ",
+                        "FROM BOSCO_INVOICE_AFFECT BIA, INVOICE_HEADER IH  ",
                         "LEFT OUTER JOIN [Bosco reduction].[dbo].NAME_CONNECTION NC ON NC.CONNECTION_ID=1 AND NC.CONNECTION_NAME_ID=CONVERT(nvarchar, IH.ACTOR_ID) ",
                         "LEFT OUTER JOIN [Bosco reduction].[dbo].NAME_QUALITY NQ1 ON NQ1.NAME_ID=NC.NAME_ID AND NQ1.QUALITY_TYPE_ID=5 ",
                         "WHERE IH.INVOICE_TYPE in (1,4) AND IH.INVOICE_PREVIEW=0 AND IH.INVOCIE_DATE BETWEEN ? AND ? ",
@@ -166,7 +182,7 @@ describe("Test Invoice Affect DAO", () => {
                 };
 
                 // act
-                const response = InvoiceAffectDao.prepareBilledQuery(startDate, endDate, employeeId, undefined, undefined, undefined);
+                const response = InvoiceAffectDao.prepareBilledQuery(startDate, endDate, employeeId, undefined, undefined, undefined, undefined);
 
                 // assert
                 expect(response).toEqual(expectedQuery);
@@ -178,7 +194,7 @@ describe("Test Invoice Affect DAO", () => {
                 // arrange
                 let expectedQuery = {
                     queryString: "".concat("SELECT IH.INVOCIE_DATE, IH.ACTOR_ID, BIA.AFFECT_AMOUNT ",
-                        "FROM  BOSCO_INVOICE_AFFECT BIA, INVOICE_HEADER IH  ",
+                        "FROM BOSCO_INVOICE_AFFECT BIA, INVOICE_HEADER IH  ",
                         "LEFT OUTER JOIN [Bosco reduction].[dbo].NAME_CONNECTION NC ON NC.CONNECTION_ID=1 AND NC.CONNECTION_NAME_ID=CONVERT(nvarchar, IH.ACTOR_ID) ",
                         "LEFT OUTER JOIN [Bosco reduction].[dbo].NAME_QUALITY NQ1 ON NQ1.NAME_ID=NC.NAME_ID AND NQ1.QUALITY_TYPE_ID=5  ",
                         "LEFT OUTER JOIN [Bosco reduction].[dbo].NAME_QUALITY NQ2  ON NQ2.NAME_ID=NC.NAME_ID  AND NQ2.QUALITY_TYPE_ID=3 ",
@@ -188,7 +204,7 @@ describe("Test Invoice Affect DAO", () => {
                 };
 
                 // act
-                const response = InvoiceAffectDao.prepareBilledQuery(startDate, endDate, employeeId, clientType, undefined, undefined);
+                const response = InvoiceAffectDao.prepareBilledQuery(startDate, endDate, employeeId, clientType, undefined, undefined, undefined);
 
                 // assert
                 expect(response).toEqual(expectedQuery);
@@ -200,10 +216,11 @@ describe("Test Invoice Affect DAO", () => {
                 // arrange
                 let expectedQuery = {
                     queryString: "".concat("SELECT IH.INVOCIE_DATE, IH.ACTOR_ID, BIA.AFFECT_AMOUNT ",
-                        "FROM  BOSCO_INVOICE_AFFECT BIA, INVOICE_HEADER IH  ",
+                        "FROM BOSCO_INVOICE_AFFECT BIA, INVOICE_HEADER IH  ",
                         "LEFT OUTER JOIN [Bosco reduction].[dbo].NAME_CONNECTION NC ON NC.CONNECTION_ID=1 AND NC.CONNECTION_NAME_ID=CONVERT(nvarchar, IH.ACTOR_ID) ",
                         "LEFT OUTER JOIN [Bosco reduction].[dbo].NAME_QUALITY NQ1 ON NQ1.NAME_ID=NC.NAME_ID AND NQ1.QUALITY_TYPE_ID=5  ",
-                        "LEFT OUTER JOIN [Bosco reduction].[dbo].NAME_QUALITY NQ2  ON NQ2.NAME_ID=NC.NAME_ID  AND NQ2.QUALITY_TYPE_ID=3 ",
+                        "LEFT OUTER JOIN [Bosco reduction].[dbo].NAME_QUALITY NQ2  ON NQ2.NAME_ID=NC.NAME_ID  AND NQ2.QUALITY_TYPE_ID=3  ",
+                        "LEFT OUTER JOIN [Bosco reduction].[dbo].ACCOUNTING_CLIENT AC ON AC.TRANSACTION_REF=CONVERT(NVARCHAR,IH.INVOICE_ID) ",
                         ", [Bosco reduction].[dbo].NAME N ",
                         "WHERE IH.INVOICE_TYPE in (1,4) AND IH.INVOICE_PREVIEW=0 AND IH.INVOCIE_DATE BETWEEN ? AND ? ",
                         "AND BIA.INVOICE_ID=IH.INVOICE_ID AND BIA.AFFECT_ACCOUNT LIKE '%1200%'  AND NQ1.DROPDOWN_CODE=?  AND NQ2.DROPDOWN_CODE=? ",
@@ -212,7 +229,7 @@ describe("Test Invoice Affect DAO", () => {
                 };
 
                 // act
-                const response = InvoiceAffectDao.prepareBilledQuery(startDate, endDate, employeeId, clientType, countryCode, undefined);
+                const response = InvoiceAffectDao.prepareBilledQuery(startDate, endDate, employeeId, clientType, countryCode, undefined, undefined);
 
                 // assert
                 expect(response).toEqual(expectedQuery);
@@ -224,7 +241,7 @@ describe("Test Invoice Affect DAO", () => {
                 // arrange
                 let expectedQuery = {
                     queryString: "".concat("SELECT IH.INVOCIE_DATE, IH.ACTOR_ID, BIA.AFFECT_AMOUNT ",
-                        "FROM  BOSCO_INVOICE_AFFECT BIA, INVOICE_HEADER IH  ",
+                        "FROM BOSCO_INVOICE_AFFECT BIA, INVOICE_HEADER IH  ",
                         "LEFT OUTER JOIN [Bosco reduction].[dbo].NAME_CONNECTION NC ON NC.CONNECTION_ID=1 AND NC.CONNECTION_NAME_ID=CONVERT(nvarchar, IH.ACTOR_ID) ",
                         "LEFT OUTER JOIN [Bosco reduction].[dbo].NAME_QUALITY NQ1 ON NQ1.NAME_ID=NC.NAME_ID AND NQ1.QUALITY_TYPE_ID=5  ",
                         "LEFT OUTER JOIN [Bosco reduction].[dbo].NAME_QUALITY NQ2  ON NQ2.NAME_ID=NC.NAME_ID  AND NQ2.QUALITY_TYPE_ID=3 ",
@@ -238,7 +255,7 @@ describe("Test Invoice Affect DAO", () => {
                 };
 
                 // act
-                const response = InvoiceAffectDao.prepareBilledQuery(startDate, endDate, employeeId, clientType, countryCode, ageOfAccount);
+                const response = InvoiceAffectDao.prepareBilledQuery(startDate, endDate, employeeId, clientType, countryCode, ageOfAccount, undefined);
 
                 // assert
                 expect(response).toEqual(expectedQuery);
@@ -248,7 +265,7 @@ describe("Test Invoice Affect DAO", () => {
                 // arrange
                 let expectedQuery = {
                     queryString: "".concat("SELECT IH.INVOCIE_DATE, IH.ACTOR_ID, BIA.AFFECT_AMOUNT ",
-                        "FROM  BOSCO_INVOICE_AFFECT BIA, INVOICE_HEADER IH  ",
+                        "FROM BOSCO_INVOICE_AFFECT BIA, INVOICE_HEADER IH  ",
                         "LEFT OUTER JOIN [Bosco reduction].[dbo].NAME_CONNECTION NC ON NC.CONNECTION_ID=1 AND NC.CONNECTION_NAME_ID=CONVERT(nvarchar, IH.ACTOR_ID) ",
                         "LEFT OUTER JOIN [Bosco reduction].[dbo].NAME_QUALITY NQ1 ON NQ1.NAME_ID=NC.NAME_ID AND NQ1.QUALITY_TYPE_ID=5  ",
                         "LEFT OUTER JOIN [Bosco reduction].[dbo].NAME_QUALITY NQ2  ON NQ2.NAME_ID=NC.NAME_ID  AND NQ2.QUALITY_TYPE_ID=3 ",
@@ -257,13 +274,13 @@ describe("Test Invoice Affect DAO", () => {
                         "WHERE IH.INVOICE_TYPE in (1,4) AND IH.INVOICE_PREVIEW=0 AND IH.INVOCIE_DATE BETWEEN ? AND ? ",
                         "AND BIA.INVOICE_ID=IH.INVOICE_ID AND BIA.AFFECT_ACCOUNT LIKE '%1200%'  AND NQ1.DROPDOWN_CODE=?  AND NQ2.DROPDOWN_CODE=? ",
                         " AND DATEDIFF(day, IH.INVOCIE_DATE, AC.CLEARING_LAST_TRANSACTION)>=30 ",
-                        "AND DATEDIFF(day, IH.INVOCIE_DATE, AC.CLEARING_LAST_TRANSACTION)<60",
+                        "AND DATEDIFF(day, IH.INVOCIE_DATE, AC.CLEARING_LAST_TRANSACTION)<60 ",
                         " AND N.NAME_ID=NC.NAME_ID AND N.LEGAL_COUNTRY_CODE=? "),
                     replacements: [startDate, endDate, employeeId, clientType, countryCode]
                 };
 
                 // act
-                const response = InvoiceAffectDao.prepareBilledQuery(startDate, endDate, employeeId, clientType, countryCode, "30-60");
+                const response = InvoiceAffectDao.prepareBilledQuery(startDate, endDate, employeeId, clientType, countryCode, "30-60", undefined);
 
                 // assert
                 expect(response).toEqual(expectedQuery);
@@ -273,7 +290,7 @@ describe("Test Invoice Affect DAO", () => {
                 // arrange
                 let expectedQuery = {
                     queryString: "".concat("SELECT IH.INVOCIE_DATE, IH.ACTOR_ID, BIA.AFFECT_AMOUNT ",
-                        "FROM  BOSCO_INVOICE_AFFECT BIA, INVOICE_HEADER IH  ",
+                        "FROM BOSCO_INVOICE_AFFECT BIA, INVOICE_HEADER IH  ",
                         "LEFT OUTER JOIN [Bosco reduction].[dbo].NAME_CONNECTION NC ON NC.CONNECTION_ID=1 AND NC.CONNECTION_NAME_ID=CONVERT(nvarchar, IH.ACTOR_ID) ",
                         "LEFT OUTER JOIN [Bosco reduction].[dbo].NAME_QUALITY NQ1 ON NQ1.NAME_ID=NC.NAME_ID AND NQ1.QUALITY_TYPE_ID=5  ",
                         "LEFT OUTER JOIN [Bosco reduction].[dbo].NAME_QUALITY NQ2  ON NQ2.NAME_ID=NC.NAME_ID  AND NQ2.QUALITY_TYPE_ID=3 ",
@@ -282,13 +299,13 @@ describe("Test Invoice Affect DAO", () => {
                         "WHERE IH.INVOICE_TYPE in (1,4) AND IH.INVOICE_PREVIEW=0 AND IH.INVOCIE_DATE BETWEEN ? AND ? ",
                         "AND BIA.INVOICE_ID=IH.INVOICE_ID AND BIA.AFFECT_ACCOUNT LIKE '%1200%'  AND NQ1.DROPDOWN_CODE=?  AND NQ2.DROPDOWN_CODE=? ",
                         " AND DATEDIFF(day, IH.INVOCIE_DATE, AC.CLEARING_LAST_TRANSACTION)>=60 ",
-                        "AND DATEDIFF(day, IH.INVOCIE_DATE, AC.CLEARING_LAST_TRANSACTION)<=90",
+                        "AND DATEDIFF(day, IH.INVOCIE_DATE, AC.CLEARING_LAST_TRANSACTION)<=90 ",
                         " AND N.NAME_ID=NC.NAME_ID AND N.LEGAL_COUNTRY_CODE=? "),
                     replacements: [startDate, endDate, employeeId, clientType, countryCode]
                 };
 
                 // act
-                const response = InvoiceAffectDao.prepareBilledQuery(startDate, endDate, employeeId, clientType, countryCode, "60-90");
+                const response = InvoiceAffectDao.prepareBilledQuery(startDate, endDate, employeeId, clientType, countryCode, "60-90", undefined);
 
                 // assert
                 expect(response).toEqual(expectedQuery);
@@ -298,7 +315,7 @@ describe("Test Invoice Affect DAO", () => {
                 // arrange
                 let expectedQuery = {
                     queryString: "".concat("SELECT IH.INVOCIE_DATE, IH.ACTOR_ID, BIA.AFFECT_AMOUNT ",
-                        "FROM  BOSCO_INVOICE_AFFECT BIA, INVOICE_HEADER IH  ",
+                        "FROM BOSCO_INVOICE_AFFECT BIA, INVOICE_HEADER IH  ",
                         "LEFT OUTER JOIN [Bosco reduction].[dbo].NAME_CONNECTION NC ON NC.CONNECTION_ID=1 AND NC.CONNECTION_NAME_ID=CONVERT(nvarchar, IH.ACTOR_ID) ",
                         "LEFT OUTER JOIN [Bosco reduction].[dbo].NAME_QUALITY NQ1 ON NQ1.NAME_ID=NC.NAME_ID AND NQ1.QUALITY_TYPE_ID=5  ",
                         "LEFT OUTER JOIN [Bosco reduction].[dbo].NAME_QUALITY NQ2  ON NQ2.NAME_ID=NC.NAME_ID  AND NQ2.QUALITY_TYPE_ID=3 ",
@@ -312,7 +329,7 @@ describe("Test Invoice Affect DAO", () => {
                 };
 
                 // act
-                const response = InvoiceAffectDao.prepareBilledQuery(startDate, endDate, employeeId, clientType, countryCode, ">90");
+                const response = InvoiceAffectDao.prepareBilledQuery(startDate, endDate, employeeId, clientType, countryCode, ">90", undefined);
 
                 // assert
                 expect(response).toEqual(expectedQuery);
@@ -324,7 +341,7 @@ describe("Test Invoice Affect DAO", () => {
                 // arrange
                 let expectedQuery = {
                     queryString: "".concat("SELECT IH.INVOCIE_DATE, IH.ACTOR_ID, BIA.AFFECT_AMOUNT ",
-                        "FROM  BOSCO_INVOICE_AFFECT BIA, INVOICE_HEADER IH  ",
+                        "FROM BOSCO_INVOICE_AFFECT BIA, INVOICE_HEADER IH  ",
                         "LEFT OUTER JOIN [Bosco reduction].[dbo].NAME_CONNECTION NC ON NC.CONNECTION_ID=1 AND NC.CONNECTION_NAME_ID=CONVERT(nvarchar, IH.ACTOR_ID) ",
                         " LEFT OUTER JOIN [Bosco reduction].[dbo].ACCOUNTING_CLIENT AC ON AC.TRANSACTION_REF=CONVERT(NVARCHAR,IH.INVOICE_ID) ",
                         "WHERE IH.INVOICE_TYPE in (1,4) AND IH.INVOICE_PREVIEW=0 AND IH.INVOCIE_DATE BETWEEN ? AND ? ",
@@ -334,7 +351,7 @@ describe("Test Invoice Affect DAO", () => {
                 };
 
                 // act
-                const response = InvoiceAffectDao.prepareBilledQuery(startDate, endDate, undefined, undefined, undefined, ageOfAccount);
+                const response = InvoiceAffectDao.prepareBilledQuery(startDate, endDate, undefined, undefined, undefined, ageOfAccount, undefined);
 
                 // assert
                 expect(response).toEqual(expectedQuery);
@@ -346,7 +363,7 @@ describe("Test Invoice Affect DAO", () => {
                 // arrange
                 let expectedQuery = {
                     queryString: "".concat("SELECT IH.INVOCIE_DATE, IH.ACTOR_ID, BIA.AFFECT_AMOUNT ",
-                        "FROM  BOSCO_INVOICE_AFFECT BIA, INVOICE_HEADER IH  ",
+                        "FROM BOSCO_INVOICE_AFFECT BIA, INVOICE_HEADER IH  ",
                         "LEFT OUTER JOIN [Bosco reduction].[dbo].NAME_CONNECTION NC ON NC.CONNECTION_ID=1 AND NC.CONNECTION_NAME_ID=CONVERT(nvarchar, IH.ACTOR_ID) ",
                         " LEFT OUTER JOIN [Bosco reduction].[dbo].NAME_QUALITY NQ2  ON NQ2.NAME_ID=NC.NAME_ID  AND NQ2.QUALITY_TYPE_ID=3 ",
                         "WHERE IH.INVOICE_TYPE in (1,4) AND IH.INVOICE_PREVIEW=0 AND IH.INVOCIE_DATE BETWEEN ? AND ? ",
@@ -355,7 +372,7 @@ describe("Test Invoice Affect DAO", () => {
                 };
 
                 // act
-                const response = InvoiceAffectDao.prepareBilledQuery(startDate, endDate, undefined, clientType, undefined, undefined);
+                const response = InvoiceAffectDao.prepareBilledQuery(startDate, endDate, undefined, clientType, undefined, undefined, undefined);
 
                 // assert
                 expect(response).toEqual(expectedQuery);
@@ -367,8 +384,9 @@ describe("Test Invoice Affect DAO", () => {
                 // arrange
                 let expectedQuery = {
                     queryString: "".concat("SELECT IH.INVOCIE_DATE, IH.ACTOR_ID, BIA.AFFECT_AMOUNT ",
-                        "FROM  BOSCO_INVOICE_AFFECT BIA, INVOICE_HEADER IH  ",
+                        "FROM BOSCO_INVOICE_AFFECT BIA, INVOICE_HEADER IH  ",
                         "LEFT OUTER JOIN [Bosco reduction].[dbo].NAME_CONNECTION NC ON NC.CONNECTION_ID=1 AND NC.CONNECTION_NAME_ID=CONVERT(nvarchar, IH.ACTOR_ID) ",
+                        " LEFT OUTER JOIN [Bosco reduction].[dbo].ACCOUNTING_CLIENT AC ON AC.TRANSACTION_REF=CONVERT(NVARCHAR,IH.INVOICE_ID) ",
                         ", [Bosco reduction].[dbo].NAME N ",
                         "WHERE IH.INVOICE_TYPE in (1,4) AND IH.INVOICE_PREVIEW=0 AND IH.INVOCIE_DATE BETWEEN ? AND ? ",
                         "AND BIA.INVOICE_ID=IH.INVOICE_ID AND BIA.AFFECT_ACCOUNT LIKE '%1200%' ",
@@ -377,11 +395,178 @@ describe("Test Invoice Affect DAO", () => {
                 };
 
                 // act
-                const response = InvoiceAffectDao.prepareBilledQuery(startDate, endDate, undefined, undefined, countryCode, undefined);
+                const response = InvoiceAffectDao.prepareBilledQuery(startDate, endDate, undefined, undefined, countryCode, undefined, undefined);
 
                 // assert
                 expect(response).toEqual(expectedQuery);
             });
+        });
+
+        describe("IAD2.9 - given startDate, endDate and account type Payables but no employeeId, countryCode, ageOfAccount or clientType", () => {
+            it("IAD2.9.1 - should respond with query filtered by date and account type Payables", () => {
+                // arrange
+                let expectedQuery = {
+                    queryString: "".concat("SELECT AC.TRANSACTION_DATE AS INVOCIE_DATE, IH.ACTOR_ID, AC.TRANSACTION_AMOUNT AS AFFECT_AMOUNT ",
+                        "FROM [Bosco reduction].[dbo].ACCOUNTING_CLIENT AC, [Patricia reduction].[dbo].EXTERNAL_COSTS_HEAD IH ",
+                        "WHERE AC.CONNECTION_ID=7 AND AC.TRANSACTION_TYPE_ID=0 AND AC.TRANSACTION_DATE BETWEEN ? AND ? ",
+                        "AND AC.TRANSACTION_REF=CONVERT(NVARCHAR,IH.EXTERNAL_INVOICE_REMARK) "),
+                    replacements: [startDate, endDate]
+                };
+
+                // act
+                const response = InvoiceAffectDao.prepareBilledQuery(startDate, endDate, undefined, undefined, undefined, undefined, accountType);
+
+                // assert
+                expect(response).toEqual(expectedQuery);
+            });
+        });
+
+        describe("IAD2.10 - given startDate, endDate, ageOfAccount and account type Payables but no employeeId, countryCode or clientType,", () => {
+            it("IAD2.10.1 - should respond with query filtered by date age of the account and account type Payables", () => {
+                // arrange
+                let expectedQuery = {
+                    queryString: "".concat("SELECT AC.TRANSACTION_DATE AS INVOCIE_DATE, IH.ACTOR_ID, AC.TRANSACTION_AMOUNT AS AFFECT_AMOUNT ",
+                    "FROM [Bosco reduction].[dbo].ACCOUNTING_CLIENT AC, [Patricia reduction].[dbo].EXTERNAL_COSTS_HEAD IH ",
+                    " LEFT OUTER JOIN [Bosco reduction].[dbo].NAME_CONNECTION NC ON NC.CONNECTION_ID=1 AND NC.CONNECTION_NAME_ID=CONVERT(nvarchar, IH.ACTOR_ID) ",
+                    "WHERE AC.CONNECTION_ID=7 AND AC.TRANSACTION_TYPE_ID=0 AND AC.TRANSACTION_DATE BETWEEN ? AND ? ",
+                    "AND AC.TRANSACTION_REF=CONVERT(NVARCHAR,IH.EXTERNAL_INVOICE_REMARK) ",
+                    " AND DATEDIFF(day, AC.TRANSACTION_DATE, AC.CLEARING_LAST_TRANSACTION)<30 "),
+                    replacements: [startDate, endDate]
+                };
+
+                // act
+                const response = InvoiceAffectDao.prepareBilledQuery(startDate, endDate, undefined, undefined, undefined, ageOfAccount, accountType);
+
+                // assert
+                expect(response).toEqual(expectedQuery);
+            });
+        });
+
+        describe("IAD2.11 - given startDate, endDate, employeeId, countryCode, clientType, ageOfAccount and account type Payables", () => {
+            it("IAD2.11.1 - should respond with query filtered by date employee, country, type of client, age of the account and account type Payables", () => {
+                // arrange
+                let expectedQuery = {
+                    queryString: "".concat("SELECT AC.TRANSACTION_DATE AS INVOCIE_DATE, IH.ACTOR_ID, AC.TRANSACTION_AMOUNT AS AFFECT_AMOUNT ",
+                        "FROM [Bosco reduction].[dbo].ACCOUNTING_CLIENT AC, [Patricia reduction].[dbo].EXTERNAL_COSTS_HEAD IH ",
+                        " LEFT OUTER JOIN [Bosco reduction].[dbo].NAME_CONNECTION NC ON NC.CONNECTION_ID=1 AND NC.CONNECTION_NAME_ID=CONVERT(nvarchar, IH.ACTOR_ID) ",
+                        "LEFT OUTER JOIN [Bosco reduction].[dbo].NAME_QUALITY NQ1 ON NQ1.NAME_ID=NC.NAME_ID AND NQ1.QUALITY_TYPE_ID=5 ",
+                        " LEFT OUTER JOIN [Bosco reduction].[dbo].NAME_QUALITY NQ2  ON NQ2.NAME_ID=NC.NAME_ID  AND NQ2.QUALITY_TYPE_ID=3 ",
+                        ", [Bosco reduction].[dbo].NAME N ",
+                        "WHERE AC.CONNECTION_ID=7 AND AC.TRANSACTION_TYPE_ID=0 AND AC.TRANSACTION_DATE BETWEEN ? AND ? ",
+                        "AND AC.TRANSACTION_REF=CONVERT(NVARCHAR,IH.EXTERNAL_INVOICE_REMARK) ",
+                        " AND NQ1.DROPDOWN_CODE=?  AND NQ2.DROPDOWN_CODE=? ",
+                        " AND DATEDIFF(day, AC.TRANSACTION_DATE, AC.CLEARING_LAST_TRANSACTION)<30  AND N.NAME_ID=NC.NAME_ID AND N.LEGAL_COUNTRY_CODE=? "),
+                    replacements: [startDate, endDate, employeeId, clientType, countryCode]
+                };
+
+                // act
+                const response = InvoiceAffectDao.prepareBilledQuery(startDate, endDate, employeeId, clientType, countryCode, ageOfAccount, accountType);
+
+                // assert
+                expect(response).toEqual(expectedQuery);
+            });
+        });
+
+        describe("IAD2.12 - given startDate, endDate, countryCode and account type Payables but no employeeId, ageOfAccount or clientType", () => {
+            it("IAD2.12.1 - should respond with query filtered by date, country and account type Payables", () => {
+                // arrange
+                let expectedQuery = {
+                    queryString: "".concat("SELECT AC.TRANSACTION_DATE AS INVOCIE_DATE, IH.ACTOR_ID, AC.TRANSACTION_AMOUNT AS AFFECT_AMOUNT ",
+                        "FROM [Bosco reduction].[dbo].ACCOUNTING_CLIENT AC, [Patricia reduction].[dbo].EXTERNAL_COSTS_HEAD IH ",
+                        " LEFT OUTER JOIN [Bosco reduction].[dbo].NAME_CONNECTION NC ON NC.CONNECTION_ID=1 AND NC.CONNECTION_NAME_ID=CONVERT(nvarchar, IH.ACTOR_ID) ",
+                        ", [Bosco reduction].[dbo].NAME N ",
+                        "WHERE AC.CONNECTION_ID=7 AND AC.TRANSACTION_TYPE_ID=0 AND AC.TRANSACTION_DATE BETWEEN ? AND ? ",
+                        "AND AC.TRANSACTION_REF=CONVERT(NVARCHAR,IH.EXTERNAL_INVOICE_REMARK) ",
+                        " AND N.NAME_ID=NC.NAME_ID AND N.LEGAL_COUNTRY_CODE=? "),
+                    replacements: [startDate, endDate, countryCode]
+                };
+
+                // act
+                const response = InvoiceAffectDao.prepareBilledQuery(startDate, endDate, undefined, undefined, countryCode, undefined, accountType);
+
+                // assert
+                expect(response).toEqual(expectedQuery);
+            });
+        });
+    });
+    describe("IAD3 - findAllClients", () => {
+        it("IAD3.1 - should return list of invoices", async () => {
+            // arrange
+            dbStub = {
+                query: () => {
+                    return fakeClientList;
+                }
+            };
+
+            let expectedResponse = [
+                {
+                    nameId: 24505,
+                    name: "CompanyName",
+                    country: "Canada",
+                    grading: "A+"
+                },
+                {
+                    nameId: 25641,
+                    name: "CompanyName",
+                    country: "Canada",
+                    grading: "B"
+                }
+            ]
+
+            // act
+            const response = await InvoiceAffectDao.findAllClients('2018-11-01', dbStub);
+
+            // assert
+            expect(response).toEqual(expectedResponse);
+        });
+
+        it("IAD3.2 - should return false when db cant fetch data", async () => {
+            // arrange
+            dbStub = {
+                query: () => {
+                    return Promise.resolve(false);
+                }
+            };
+
+            // act and assert
+            await expect(InvoiceAffectDao.findAllClients('2018-11-01', dbStub)).resolves
+                .toEqual(false);
+        });
+
+        it("IAD3.3 - when db throws error with specified status and message, should reject specified status and message", async () => {
+            // arrange
+            let expectedResponse = {
+                status: 600,
+                message: "Error."
+            };
+
+            dbStub = {
+                query: () => {
+                    return Promise.reject(expectedResponse);
+                }
+            };
+
+            // act and assert
+            await expect(InvoiceAffectDao.findAllClients('2018-11-01', dbStub))
+                .rejects.toEqual(expectedResponse);
+        });
+
+        it("IAD3.4 - when db throws error with unspecified status and message, should reject default status and message", async () => {
+            // arrange
+            let expectedResponse = {
+                status: 500,
+                message: "Could not fetch clients."
+            };
+            
+            dbStub = {
+                query: () => {
+                    return Promise.reject({});
+                }
+            };
+
+            // act and assert
+            await expect(InvoiceAffectDao.findAllClients('2018-11-01', dbStub))
+                .rejects.toEqual(expectedResponse);
         });
     });
 });

@@ -14,7 +14,7 @@ import ConfirmationPopup from '../components/ConfirmationPopup'
 import '../styles/reportsPage.css'
 
 const Reports = () => {
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
     let navigate = useNavigate();
 
     const cookies = new Cookies();
@@ -57,23 +57,33 @@ const Reports = () => {
         admin: "container-reportsTable"
     });
 
-    const createAndDownloadPDF = (ReportId) => {
+    const createAndDownloadPDF = (chartReportId, performanceReportId) => {
         setPdfLoading(true);
-        setCurrentPdfLoading(ReportId);
+        setCurrentPdfLoading(chartReportId === undefined ? performanceReportId : chartReportId);
+
+        let url = `${process.env.REACT_APP_API}/reports/`
+
+        url = chartReportId === undefined ? url.concat('createPerformanceReportPdf') : url.concat('createChartReportPdf')
 
         let header = {
             'authorization': "Bearer " + cookies.get("accessToken"),
         }
 
         let param = {
-            reportid: ReportId
+            reportId: chartReportId === undefined ? performanceReportId : chartReportId,
+            language: i18n.language
         }
 
         Axios.defaults.withCredentials = true;
 
-        Axios.post(`${process.env.REACT_APP_API}/reports/createPdf`, param, { headers: header })
+        Axios.post(url, param, { headers: header })
             .then((response) => {
                 if (response.data === true) {
+                    let param = {
+                        performanceReportId: chartReportId === undefined ? performanceReportId : chartReportId,
+                        chartReportId: chartReportId === undefined ? undefined : chartReportId
+                    }
+
                     Axios.get(`${process.env.REACT_APP_API}/reports/fetchPdf`, { params: param, headers: header, responseType: 'arraybuffer' })
                         .then((res) => {
                             const pdfBlob = new Blob([res.data], { type: 'application/pdf' });
@@ -84,7 +94,7 @@ const Reports = () => {
                             document.body.appendChild(element);
                             element.style = "display: none";
                             element.href = url;
-                            element.download = `ChartReport-${ReportId}`;
+                            element.download = chartReportId === undefined ? `PerformanceReport-${performanceReportId}` : `ChartReport-${chartReportId}`;
                             element.click();
                             document.body.removeChild(element);
                             setPdfLoading(false);
@@ -303,7 +313,7 @@ const Reports = () => {
                                 <tbody>
                                     {performanceReports.map((p) => {
                                         return (
-                                            <tr key={p.performanceReportId}>
+                                            <tr key={p.performanceReportId} id={p.performanceReportId}>
                                                 <td className='performance-table-columns'>{p.name}</td>
                                                 <td className='performance-table-columns'>{p.createdAt.toString()}</td>
                                                 <td className='performance-table-columns'>{p.recipient}</td>
@@ -324,7 +334,7 @@ const Reports = () => {
                                                                 </span>
 
                                                             :
-                                                            <ExportButton id={p.performanceReportId} onExport={() => createAndDownloadPDF(p.performanceReportId)} />
+                                                            <ExportButton id={p.performanceReportId} onExport={() => createAndDownloadPDF(undefined, p.performanceReportId)} />
                                                         }
                                                     </div >
                                                 </td >
@@ -410,7 +420,8 @@ const Reports = () => {
                                         <th>
                                             <div className="d-flex justify-content-center">
                                                 <Button
-                                                    className="btn py-0 shadow-sm border">
+                                                    className="btn py-0 shadow-sm border"
+                                                    onClick={() => navigate("/dashboard")}>
                                                     {t('reports.chartReports.CreateButton')}
                                                 </Button>
                                             </div>
@@ -446,7 +457,7 @@ const Reports = () => {
                                                                 </span>
 
                                                             :
-                                                            <ExportButton id={r.chartReportId} onExport={() => createAndDownloadPDF(r.chartReportId)} />
+                                                            <ExportButton id={r.chartReportId} onExport={() => createAndDownloadPDF(r.chartReportId, undefined)} />
                                                         }
                                                         <DeleteButton onDelete={() => handleDeleteChartReport(r.chartReportId, r.name)} />
                                                     </div >

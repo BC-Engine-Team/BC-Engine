@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Form, Button, Col, Row } from 'react-bootstrap'
 import Cookies from 'universal-cookie'
@@ -6,18 +6,23 @@ import Axios from 'axios';
 import { useTranslation } from 'react-i18next'
 import ConfirmationPopup from '../components/ConfirmationPopup';
 import NavB from '../components/NavB'
+import { Table } from 'react-bootstrap'
 import '../styles/managePage.css'
+
 
 const Manage = () => {
     let navigate = useNavigate()
     const cookies = new Cookies()
     const { t } = useTranslation()
-
+    
     const [errors, setErrors] = useState({ aPlus: {}, a: {}, b: {}, c: {}, ePlus: {} })
     const [clientGradingSaved, setClientGradingSaved] = useState(true);
     const [minTitle, setMinTitle] = useState('Minimum');
     const [maxTitle, setMaxTitle] = useState('Maximum');
     const [confirmSaveGradingActivated, setConfirmSaveGradingActivated] = useState(false);
+    const [clientsList, setClientsList] = useState([{nameId: 0, name: "", country: "", grading: ""}])
+    const [isSorted, setIsSorted] = useState()
+
     const [clientGrading, setClientGrading] = useState({
         aPlus: {
             grade: 'A+',
@@ -50,6 +55,9 @@ const Manage = () => {
             averageCollectionTime: 0
         }
     });
+
+
+
 
     const setField = (field, value, index) => {
         setClientGrading({
@@ -275,7 +283,64 @@ const Manage = () => {
         setConfirmSaveGradingActivated(true);
     }
 
-    const getCurrentClientGradingInformations = async () => {
+    const sortGrading = () => {
+        setClientsList(clientsList.sort((a, b) => {
+            
+            a = a.grading;
+            b = b.grading;
+
+            var weight = { '+': -1 },
+                aa = a.split(/(?=[+])/),
+                bb = b.split(/(?=[+])/);
+
+            if (!isSorted) {
+                setIsSorted(true)
+                return aa[0][0].localeCompare(bb[0][0])
+                    || bb[0].localeCompare(aa[0])
+                    || (weight[aa[1]] || 0) - (weight[bb[1]] || 0);
+            }
+            else {
+                setIsSorted(false)
+                return bb[0][0].localeCompare(aa[0][0])
+                || aa[0].localeCompare(bb[0])
+                || (weight[bb[1]] || 0) - (weight[aa[1]] || 0);
+            }
+        }))
+    }
+
+    const clientTable = () => {
+        Axios.get(`${process.env.REACT_APP_API}/manage/clients`, { headers: header })
+            .then((response) => {
+                // Temp function to fix grade E issue in front end when sorting
+                let data = []
+                for(let i = 0; i < response.data.length; i++) {
+                    if(response.data[i].grading === 'E')
+                    response.data[i].grading = "E+"
+                    
+                    data.push(response.data[i])
+                }
+                setClientsList(data);
+            })
+            .catch((error) => {
+                if (error.response) {
+                    if (error.response.status === 403 || error.response.status === 401) {
+                        alert("You are not authorized to perform this action.");
+                    }
+                    else {
+                        alert("Malfunction in the B&C Engine.");
+                    }
+                }
+                else if (error.request) {
+                    alert("Could not reach b&C Engine...");
+                }
+            });
+    }
+
+        
+
+    const getCurrentClientGradingInformations = async () => { 
+
+        Axios.defaults.withCredentials = true;
 
         let header = {
             'authorization': "Bearer " + cookies.get("accessToken"),
@@ -323,21 +388,8 @@ const Manage = () => {
                     return;
                 }
                 alert("The response from the B&C Engine was invalid.");
-            })
-            .catch((error) => {
-                if (error.response) {
-                    if (error.response.status === 403 || error.response.status === 401) {
-                        alert("You are not authorized to perform this action.");
-                    }
-                    else {
-                        alert("Malfunction in the B&C Engine.");
-                    }
-                }
-                else if (error.request) {
-                    alert("Could not reach b&C Engine...");
-                }
-            });
-    }
+        });
+            
     
     const onSaveGradingConfirmClick = async () => {
 
@@ -425,6 +477,12 @@ const Manage = () => {
 
 
 
+    const getArrow = (sorted) => {
+        if (sorted === undefined) return '↑↓'
+        if (sorted) return '↑';
+        return '↓';
+    }
+
     useEffect(() => {
         changeMaxMinTitle();
         window.addEventListener("resize", changeMaxMinTitle);
@@ -437,120 +495,149 @@ const Manage = () => {
         }
 
         getCurrentClientGradingInformations();
+        clientTable()
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     return (
         <div>
             <NavB />
-            <div className='d-block'>
-                <div className="justify-content-center d-flex">
-                    <div className='container-clientGradingBrackets'>
-                        <div className='card shadow my-3 mx-3 px-3 py2'>
-                            <h3 className="text-center">{t('manage.gradingTable.Title')}</h3>
-                            <Form.Group className="my-2">
-                                
-                                <Row className="mb-2">
-                                    <Col xs={1}/>
-                                    <Col xs={3} className='tableHeader'>
-                                        <Form.Label>{minTitle} ($)</Form.Label>
-                                    </Col>
-                                    <Col xs={3} className='tableHeader'>
-                                        <Form.Label>{maxTitle} ($)</Form.Label>
-                                    </Col>
-                                    <Col xs={5} className='tableHeader'>
-                                        <Form.Label className="text-center">{t('manage.gradingTable.AverageTitle')}</Form.Label>
-                                    </Col>
-                                </Row>
+                <div className='d-block'>
+                    <div className="justify-content-center d-flex">
+                        <div className='container-clientGradingBrackets'>
+                            <div className='card shadow my-3 mx-3 px-3 py2'>
+                                <h3 className="text-center">{t('manage.gradingTable.Title')}</h3>
+                                <Form.Group className="my-2">
+                                    
+                                    <Row className="mb-2">
+                                        <Col xs={1}/>
+                                        <Col xs={3} className='tableHeader'>
+                                            <Form.Label>{minTitle} ($)</Form.Label>
+                                        </Col>
+                                        <Col xs={3} className='tableHeader'>
+                                            <Form.Label>{maxTitle} ($)</Form.Label>
+                                        </Col>
+                                        <Col xs={5} className='tableHeader'>
+                                            <Form.Label className="text-center">{t('manage.gradingTable.AverageTitle')}</Form.Label>
+                                        </Col>
+                                    </Row>
 
-                                {Object.keys(clientGrading).map((k) => {
-                                    return (
-                                        <Row key={clientGrading[k].grade} className="mb-4">
-                                            <Col xs={1} className="manageColTitleForm">
-                                                <Form.Label className="inputTitle">{clientGrading[k].grade}</Form.Label>
-                                            </Col>
+                                    {Object.keys(clientGrading).map((k) => {
+                                        return (
+                                            <Row key={clientGrading[k].grade} className="mb-4">
+                                                <Col xs={1} className="manageColTitleForm">
+                                                    <Form.Label className="inputTitle">{clientGrading[k].grade}</Form.Label>
+                                                </Col>
 
-                                            <Col xs={3} className="manageColForm">
-                                                <Form.Control required
-                                                        id={'minimumGrade' + clientGrading[k].grade}
-                                                        key={'minimumGrade' + clientGrading[k].grade}
+                                                <Col xs={3} className="manageColForm">
+                                                    <Form.Control required
+                                                            id={'minimumGrade' + clientGrading[k].grade}
+                                                            key={'minimumGrade' + clientGrading[k].grade}
+                                                            size="md"
+                                                            type="number"
+                                                            placeholder={t('manage.gradingTable.MinPlaceholder')}
+                                                            onChange={(g) => setField('minimum', g.target.value, k)}
+                                                            value={clientGrading[k].minimum}
+                                                            isInvalid={!!errors[k].minimum}>
+                                                    </Form.Control>
+
+                                                    <Form.Control.Feedback type="invalid">
+                                                        {getErrorName(errors[k].minimum)}
+                                                    </Form.Control.Feedback>
+                                                </Col>
+
+                                                <Col xs={3} className="manageColForm">
+                                                    <Form.Control required
+                                                            id={'maximumGrade' + clientGrading[k].grade}
+                                                            key={'maximumGrade' + clientGrading[k].grade}
+                                                            className="manageMaximumGrade"
+                                                            size="md"
+                                                            type="number"
+                                                            placeholder={t('manage.gradingTable.MaxPlaceholder')}
+                                                            onChange={(g) => setField('maximum', g.target.value, k)}
+                                                            value={clientGrading[k].maximum}
+                                                            isInvalid={!!errors[k].maximum}>
+                                                    </Form.Control>
+
+                                                    <Form.Control.Feedback type="invalid">
+                                                        {getErrorName(errors[k].maximum)}
+                                                    </Form.Control.Feedback>
+                                                </Col>
+
+                                                <Col xs={5} className="manageColForm">
+                                                    <Form.Select required
+                                                        id={'averageCollectionTime' + clientGrading[k].grade}
+                                                        key={'averageCollectionTime' + clientGrading[k].grade}
+                                                        className="manageAverageCollectionTime"
                                                         size="md"
-                                                        type="number"
-                                                        placeholder={t('manage.gradingTable.MinPlaceholder')}
-                                                        onChange={(g) => setField('minimum', g.target.value, k)}
-                                                        value={clientGrading[k].minimum}
-                                                        isInvalid={!!errors[k].minimum}>
-                                                </Form.Control>
+                                                        aria-label="Average collection time"
+                                                        onChange={(g) => setField('averageCollectionTime', g.target.value, k)}
+                                                        value={clientGrading[k].averageCollectionTime}
+                                                        isInvalid={!!errors[k].averageCollectionTime}>
+                                                            <option key={clientGrading[k].grade + "-1"} id={clientGrading[k].grade + "-1"} value={0}>{t('manage.gradingTable.averagesSelect.Default')}</option>
+                                                            <option key={clientGrading[k].grade + "-2"} id={clientGrading[k].grade + "-2"} value={30}>{t('manage.gradingTable.averagesSelect.Less30')}</option>
+                                                            <option key={clientGrading[k].grade + "-3"} id={clientGrading[k].grade + "-3"} value={60}>{t('manage.gradingTable.averagesSelect.Between30And60')}</option>
+                                                            <option key={clientGrading[k].grade + "-4"} id={clientGrading[k].grade + "-4"} value={90}>{t('manage.gradingTable.averagesSelect.Between60And90')}</option>
+                                                            <option key={clientGrading[k].grade + "-5"} id={clientGrading[k].grade + "-5"} value={1}>{t('manage.gradingTable.averagesSelect.Over90')}</option>
+                                                    </Form.Select>
+                                                    <Form.Control.Feedback type="invalid">
+                                                        {getErrorName(errors[k].averageCollectionTime)}
+                                                    </Form.Control.Feedback>
+                                                </Col>
+                                            </Row>
+                                        )
+                                    })}
 
-                                                <Form.Control.Feedback type="invalid">
-                                                    {getErrorName(errors[k].minimum)}
-                                                </Form.Control.Feedback>
-                                            </Col>
+                                    <Row className='mt-2'>
+                                        <Col md={12}>
+                                            <Button
+                                                id='saveGradingBracketsButton'
+                                                className='my-2 w-100 d-flex justify-content-center'
+                                                onClick={handleSaveGradingBrackets}
+                                                variant='primary'>
+                                                {t('manage.gradingTable.Button')}
+                                            </Button>
+                                        </Col>
+                                    </Row>
+                                </Form.Group>
+                            </div>
+                        </div>
+                    <div className='container-clientTable'>
+                        <div className="card shadow my-3 mx-3 uTable">
+                            <h4 className="text-center bg-light">{t('manage.clientTable.Title')}</h4>
+                            <Table responsive="xl" hover>
+                                <thead className='bg-light'>
+                                    <tr key="0">
+                                        <th className='nameColumnTable '>{t('manage.clientTable.Name')}</th>
+                                        <th className='countryColumnTable text-center'>{t('manage.clientTable.Country')}</th>
+                                        <th className="text-center">{t('manage.clientTable.ClientGrading')} <button className='gradingSortBTN' onClick={sortGrading}>{getArrow(isSorted)}</button></th>
+                                        <th className='text-center'>{t('manage.clientTable.Status')}</th>
+                                    </tr>
+                                </thead>
 
-                                            <Col xs={3} className="manageColForm">
-                                                <Form.Control required
-                                                        id={'maximumGrade' + clientGrading[k].grade}
-                                                        key={'maximumGrade' + clientGrading[k].grade}
-                                                        className="manageMaximumGrade"
-                                                        size="md"
-                                                        type="number"
-                                                        placeholder={t('manage.gradingTable.MaxPlaceholder')}
-                                                        onChange={(g) => setField('maximum', g.target.value, k)}
-                                                        value={clientGrading[k].maximum}
-                                                        isInvalid={!!errors[k].maximum}>
-                                                </Form.Control>
-
-                                                <Form.Control.Feedback type="invalid">
-                                                    {getErrorName(errors[k].maximum)}
-                                                </Form.Control.Feedback>
-                                            </Col>
-
-                                            <Col xs={5} className="manageColForm">
-                                                <Form.Select required
-                                                    id={'averageCollectionTime' + clientGrading[k].grade}
-                                                    key={'averageCollectionTime' + clientGrading[k].grade}
-                                                    className="manageAverageCollectionTime"
-                                                    size="md"
-                                                    aria-label="Average collection time"
-                                                    onChange={(g) => setField('averageCollectionTime', g.target.value, k)}
-                                                    value={clientGrading[k].averageCollectionTime}
-                                                    isInvalid={!!errors[k].averageCollectionTime}>
-                                                        <option key={clientGrading[k].grade + "-1"} id={clientGrading[k].grade + "-1"} value={0}>{t('manage.gradingTable.averagesSelect.Default')}</option>
-                                                        <option key={clientGrading[k].grade + "-2"} id={clientGrading[k].grade + "-2"} value={30}>{t('manage.gradingTable.averagesSelect.Less30')}</option>
-                                                        <option key={clientGrading[k].grade + "-3"} id={clientGrading[k].grade + "-3"} value={60}>{t('manage.gradingTable.averagesSelect.Between30And60')}</option>
-                                                        <option key={clientGrading[k].grade + "-4"} id={clientGrading[k].grade + "-4"} value={90}>{t('manage.gradingTable.averagesSelect.Between60And90')}</option>
-                                                        <option key={clientGrading[k].grade + "-5"} id={clientGrading[k].grade + "-5"} value={1}>{t('manage.gradingTable.averagesSelect.Over90')}</option>
-                                                </Form.Select>
-                                                <Form.Control.Feedback type="invalid">
-                                                    {getErrorName(errors[k].averageCollectionTime)}
-                                                </Form.Control.Feedback>
-                                            </Col>
-                                        </Row>
-                                    )
-                                })}
-
-                                <Row className='mt-2'>
-                                    <Col md={12}>
-                                        <Button
-                                            id='saveGradingBracketsButton'
-                                            className='my-2 w-100 d-flex justify-content-center'
-                                            onClick={handleSaveGradingBrackets}
-                                            variant='primary'>
-                                            {t('manage.gradingTable.Button')}
-                                        </Button>
-                                    </Col>
-                                </Row>
-                            </Form.Group>
+                                <tbody>
+                                    {clientsList.map((c, i) => {
+                                        return (
+                                            <tr key={i}>
+                                                <td className='nameColumnTable'>{c.name}</td>
+                                                <td className='countryColumnTable text-center'>{c.country}</td>
+                                                <td className='text-center'>{c.grading}</td>
+                                                <td className='text-center'>Active</td>
+                                            </tr>
+                                        );
+                                    })}
+                                </tbody>
+                            </Table>
                         </div>
                     </div>
                 </div>
-            </div>
-            <ConfirmationPopup
-                open={confirmSaveGradingActivated}
-                prompt={t('dashboard.criteria.SaveConfirmPrompt')}
-                onAccept={() => { onSaveGradingConfirmClick() }}
-                onClose={() => { setConfirmSaveGradingActivated(false) }}
-            />
+                    <ConfirmationPopup
+                        open={confirmSaveGradingActivated}
+                        prompt={t('dashboard.criteria.SaveConfirmPrompt')}
+                        onAccept={() => { onSaveGradingConfirmClick() }}
+                        onClose={() => { setConfirmSaveGradingActivated(false) }}
+                    />
+                </div>
         </div>
     )
 }
