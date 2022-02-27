@@ -242,7 +242,6 @@ const Manage = () => {
         if(clientGrading.ePlus.maximum === 0)
             newErrors.ePlus.maximum = errorNoNum
 
-        console.log(newErrors)
         return newErrors
     };
 
@@ -277,8 +276,6 @@ const Manage = () => {
                 errorCount++
         })
         if(errorCount > 0) return
-
-        console.log(clientGrading);
 
         setConfirmSaveGradingActivated(true);
     }
