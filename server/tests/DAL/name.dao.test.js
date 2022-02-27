@@ -179,32 +179,4 @@ describe("Test Name DAO", () => {
                 .toEqual(new Error("Error with the db."));
         });
     });
-
-
-    describe("ND3 - getNameIDAndAffectAmount", () => {
-
-        let dbStub = {
-            query: () => {
-                return fakeNameIdList;
-            }
-        };
-
-        describe("ND3.1 - given valid response from db query", () => {
-            it("ND2.1.1 - should respond with list of name id with amount and days to pay", async () => {
-
-                // arrange
-                dbStub = {
-                    query: () => {
-                        return fakeNameIdList;
-                    }
-                };
-
-                // act
-                const response = await NameDao.getNameIDAndAffectAmount(dbStub);
-
-                // assert
-                expect(response).toEqual(fakeNameIdList);
-            });
-        });
-    });
 });

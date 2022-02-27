@@ -309,6 +309,13 @@ const Manage = () => {
     }
 
     const clientTable = () => {
+
+        Axios.defaults.withCredentials = true;
+
+        let header = {
+            'authorization': "Bearer " + cookies.get("accessToken"),
+        }
+
         Axios.get(`${process.env.REACT_APP_API}/manage/clients`, { headers: header })
             .then((response) => {
                 // Temp function to fix grade E issue in front end when sorting
@@ -389,7 +396,7 @@ const Manage = () => {
                 }
                 alert("The response from the B&C Engine was invalid.");
         });
-            
+    }  
     
     const onSaveGradingConfirmClick = async () => {
 
@@ -495,7 +502,7 @@ const Manage = () => {
         }
 
         getCurrentClientGradingInformations();
-        clientTable()
+        clientTable();
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
