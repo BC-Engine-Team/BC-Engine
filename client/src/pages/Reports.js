@@ -465,7 +465,6 @@ const Reports = () => {
                                 </thead>
                                 <tbody>
                                     {chartReports.map((r, i) => {
-                                        console.log(r)
                                         return (
                                             <tr key={i} id={r.chartReportId}>
                                                 <td>{r.name}</td>
