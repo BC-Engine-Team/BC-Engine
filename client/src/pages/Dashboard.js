@@ -372,6 +372,8 @@ const Dashboard = () => {
             chart()
             setIsFirstLoad(false)
         }
+
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [criteria]);
 
     const findCriteriaErrors = () => {

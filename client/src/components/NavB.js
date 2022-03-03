@@ -141,7 +141,7 @@ const NavB = (props) => {
                                             {" " + lngs[lng].nativeName}
                                         </NavDropdown.Item>
                                     )
-                                return
+                                return null
                             })}
                         </NavDropdown>
                     </Nav>
@@ -217,7 +217,7 @@ const NavB = (props) => {
                                                 {" " + lngs[lng].nativeName}
                                             </NavDropdown.Item>
                                         )
-                                    return
+                                    return null
                                 })}
                             </NavDropdown>
 
