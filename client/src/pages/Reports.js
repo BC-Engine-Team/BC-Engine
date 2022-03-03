@@ -477,7 +477,12 @@ const Reports = () => {
                                                 <td>{r.endDate.toString()}</td>
                                                 <td className="py-1">
                                                     <div className="d-flex justify-content-center">
-                                                        <Button id={r.chartReportId} className='mx-2 loadButtonChartReport' onClick={() => loadChart(r.name, r.startDate, r.endDate, {id: r.employee1Id, name: r.employee1Name}, {id: r.employee2Id, name: r.employee2Name}, {id: r.countryId, name: r.country}, r.clientType, r.ageOfAccount, r.accountType)}>Load</Button>
+                                                        <Button 
+                                                            id={r.chartReportId} 
+                                                            className='mx-2 loadButtonChartReport'
+                                                            onClick={() => loadChart(r.name, r.startDate, r.endDate, {id: r.employee1Id, name: r.employee1Name}, {id: r.employee2Id, name: r.employee2Name}, {id: r.countryId, name: r.country}, r.clientType, r.ageOfAccount, r.accountType)}>
+                                                                {t('dashboard.criteria.LoadChartButton')}
+                                                        </Button>
                                                         {pdfLoading
                                                             ?
                                                             r.chartReportId !== currentPdfLoading
