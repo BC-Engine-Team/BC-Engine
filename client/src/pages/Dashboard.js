@@ -68,6 +68,7 @@ const Dashboard = () => {
     ];
 
     const [chartData, setChartData] = useState(fallbackChartData);
+    const [isFirstLoad, setIsFirstLoad] = useState(true)
     const [chartLoading, setChartLoading] = useState(false);
     const [confirmSaveActivated, setConfirmSaveActivated] = useState(false);
     const [chartSaved, setChartSaved] = useState(true);
@@ -85,7 +86,7 @@ const Dashboard = () => {
     const [employeeSelect, setEmployeeSelect] = useState([]);
     const [compareEmployeeChecked, setCompareEmployeeChecked] = useState(false);
 
-    const [criteria, setCriteria] = useState({
+    const emptyCriteria = {
         name: "",
         startYear: currentYear - 2,
         startMonth: 0,
@@ -106,11 +107,11 @@ const Dashboard = () => {
         clientType: "Any",
         ageOfAccount: "All",
         accountType: 'Receivables',
-    });
+    }
+    const [criteria, setCriteria] = useState(emptyCriteria);
+
     const [errors, setErrors] = useState({});
-
     const [yearList, setYearList] = useState([]);
-
     const [countries, setCountries] = useState([{ countryCode: "", countryLabel: "" }]);
 
     const setField = (field, value) => {
@@ -223,7 +224,6 @@ const Dashboard = () => {
     const chart = async (compare = false) => {
         setChartLoading(true);
         setChartData(fallbackChartData);
-        localStorage.setItem("dash_previous_criteria", JSON.stringify(criteria));
 
         let compareData = [];
         let arrayLength = 1;
@@ -360,7 +360,18 @@ const Dashboard = () => {
         countrySelectBox();
 
         createEmployeeCriteria();
-    };
+
+        const previouslyLoadedCriteriaStr = localStorage.getItem('dash_previous_criteria');
+        let previouslyLoadedCriteria = JSON.parse(previouslyLoadedCriteriaStr);
+        setCriteria(previouslyLoadedCriteria)       
+    }
+
+    useEffect(() => {
+        if(isFirstLoad && criteria !== emptyCriteria) {
+            chart()
+            setIsFirstLoad(false)
+        }
+    }, [criteria]);
 
     const findCriteriaErrors = () => {
         const { name, startYear, startMonth, endYear, endMonth } = criteria;
@@ -479,6 +490,11 @@ const Dashboard = () => {
         }
     };
 
+    const resetChartCriteria = () => {
+        localStorage.setItem("dash_previous_criteria", JSON.stringify(emptyCriteria))
+        setCriteria(emptyCriteria)
+    }
+
     // handle clicks to other pages when unsaved work on Chart Report
     const handleNavClick = async (whereTo) => {
         setPageToNavigateTo("/" + whereTo.split("/").at(-1));
@@ -505,9 +521,7 @@ const Dashboard = () => {
             navigate("/login");
         }
 
-        initCriteria();
-        chart();
-        
+        initCriteria()
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
@@ -796,6 +810,11 @@ const Dashboard = () => {
                                         variant='primary'>
                                         {saveChartButtonText}
                                     </Button>
+                                </Col>
+                            </Row>
+                            <Row>
+                                <Col>
+                                    <Button variant="secondary" className='w-100' onClick={resetChartCriteria}>Reset</Button>
                                 </Col>
                             </Row>
                         </div >

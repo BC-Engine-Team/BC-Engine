@@ -35,8 +35,11 @@ const Reports = () => {
         name: "",
         startDate: new Date(),
         endDate: new Date(),
-        employee1: "",
-        employee2: "",
+        employee1Id: "",
+        employee1Name: "",
+        employee2Id: "",
+        employee2Name: "",
+        countryId: "",
         country: "",
         clientType: "",
         ageOfAccount: "",
@@ -239,6 +242,38 @@ const Reports = () => {
             });
     };
 
+    const loadChart = (cName, startDate, endDate, emp1, emp2, country, clientType, aOAccount, accountType) => {
+        let sMonth = startDate.substring(5, 6)
+        let eMonth = endDate.substring(5, 6)
+        let sYear = startDate.substring(0, 4)
+        let eYear = endDate.substring(0, 4)
+
+        let chartCriteria = {
+            name: cName,
+            startYear: sYear,
+            startMonth: sMonth,
+            endYear: eYear,
+            endMonth: eMonth,
+            employee1: {
+                id: emp1.id,
+                name: emp1.name
+            },
+            employee2: {
+                id:  emp2.id,
+                name: emp2.name
+            },
+            country: {
+                id: country.id,
+                name: country.name
+            },
+            clientType: clientType,
+            ageOfAccount: aOAccount,
+            accountType: accountType,
+        }
+        localStorage.setItem("dash_previous_criteria", JSON.stringify(chartCriteria))
+        setTimeout(() => {navigate("/Dashboard")}, 1000);
+    }
+
     const handleDeleteChartReport = (id, chartReportName) => {
         setChartReportId(id);
         setChartReportName(chartReportName);
@@ -303,7 +338,7 @@ const Reports = () => {
                             <h4 className="text-center bg-light">{t('reports.reports.Title')}</h4>
                             <Table responsive hover id='reportTypesTable'>
                                 <thead className='bg-light'>
-                                    <tr key="0">
+                                    <tr key="-1">
                                         <th className='performance-table-columns'>{t('reports.reports.NameLabel')}</th>
                                         <th className='performance-table-columns'>{t('reports.reports.DateLabel')}</th>
                                         <th className='performance-table-columns'>{t('reports.reports.EmployeeLabel')}</th>
@@ -311,9 +346,9 @@ const Reports = () => {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {performanceReports.map((p) => {
+                                    {performanceReports.map((p, i) => {
                                         return (
-                                            <tr key={p.performanceReportId} id={p.performanceReportId}>
+                                            <tr key={i} id={p.performanceReportId}>
                                                 <td className='performance-table-columns'>{p.name}</td>
                                                 <td className='performance-table-columns'>{p.createdAt.toString()}</td>
                                                 <td className='performance-table-columns'>{p.recipient}</td>
@@ -355,9 +390,9 @@ const Reports = () => {
                                         id='reportTypeSelect'
                                         size="sm"
                                         aria-label="Default select example">
-                                        {reportTypes.map((t) => {
+                                        {reportTypes.map((t, i) => {
                                             return (
-                                                <option key={t.id} value={t.id}>
+                                                <option key={i} value={t.id}>
                                                     {t.name}
                                                 </option>)
                                         })}
@@ -429,9 +464,10 @@ const Reports = () => {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {chartReports.map(r => {
+                                    {chartReports.map((r, i) => {
+                                        console.log(r)
                                         return (
-                                            <tr key={r.chartReportId} id={r.chartReportId}>
+                                            <tr key={i} id={r.chartReportId}>
                                                 <td>{r.name}</td>
                                                 <td>{r.employee1Name}{r.employee2Name === null ? "" : ", " + r.employee2Name}</td>
                                                 <td>{r.clientType}</td>
@@ -442,6 +478,7 @@ const Reports = () => {
                                                 <td>{r.endDate.toString()}</td>
                                                 <td className="py-1">
                                                     <div className="d-flex justify-content-center">
+                                                        <Button id={r.chartReportId} className='mx-2 loadButtonChartReport' onClick={() => loadChart(r.name, r.startDate, r.endDate, {id: r.employee1Id, name: r.employee1Name}, {id: r.employee2Id, name: r.employee2Name}, {id: r.countryId, name: r.country}, r.clientType, r.ageOfAccount, r.accountType)}>Load</Button>
                                                         {pdfLoading
                                                             ?
                                                             r.chartReportId !== currentPdfLoading
