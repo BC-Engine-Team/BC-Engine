@@ -123,25 +123,25 @@ const NavB = (props) => {
 
                     <Nav className="ms-auto">
                         <NavDropdown title={languageTitle} id="navbar-language-dropdown-login">
-                            {Object.keys(lngs).map((lng) => {
+                            {Object.keys(lngs).map((lng, i) => {
                                 if(lng === 'en' || lng === 'fr')
                                     return (
                                         <NavDropdown.Item
                                             id={lng}
-                                            key={lng}
+                                            key={i}
                                             onClick={() => {
                                                 i18n.changeLanguage(lng);
                                                 setLanguageTitle(lngs[lng].nativeName);
                                             }}>
-                                             {lng === 'en' 
+                                            {lng === 'en' 
                                             ? 
-                                            <img src={english} alt='english_flag' width='20px' />
+                                            <img key={i} src={english} alt='english_flag' width='20px' />
                                             : 
-                                            <img src={french} alt='french_flag' width='20px' />}
+                                            <img key={i} src={french} alt='french_flag' width='20px' />}
                                             {" " + lngs[lng].nativeName}
                                         </NavDropdown.Item>
                                     )
-                                return <></>
+                                return null
                             })}
                         </NavDropdown>
                     </Nav>
@@ -199,25 +199,25 @@ const NavB = (props) => {
                             </Navbar.Text>
 
                             <NavDropdown title={languageTitle} id="navbar-language-dropdown">
-                                {Object.keys(lngs).map((lng) => {
+                                {Object.keys(lngs).map((lng, i) => {
                                     if(lng === 'en' || lng === 'fr')
                                         return (
                                             <NavDropdown.Item
                                                 id={lng}
-                                                key={lng}
+                                                key={i}
                                                 onClick={() => {
                                                     i18n.changeLanguage(lng);
                                                     setLanguageTitle(lngs[lng].nativeName);
                                                 }}>
                                                 {lng === 'en' 
                                                 ? 
-                                                <img src={english} alt='english_flag' width='20px' />
+                                                <img key={i} src={english} alt='english_flag' width='20px' />
                                                 : 
-                                                <img src={french} alt='french_flag' width='20px' />}
+                                                <img key={i} src={french} alt='french_flag' width='20px' />}
                                                 {" " + lngs[lng].nativeName}
                                             </NavDropdown.Item>
                                         )
-                                    return <></>
+                                    return null
                                 })}
                             </NavDropdown>
 

@@ -50,7 +50,7 @@
     },
     "dashboard": {
        "criteria": {
-         "SaveChartButton":"Sauvegarder le Graphique",
+         "SaveChartButton":"Sauvegarder",
          "CreateNewChartButton":"Créer un Graphique",
           "Title":"Filtres du graphique",
           "Compare":"Comparer l'employé selectionné avec tous les employés",
@@ -64,7 +64,8 @@
              "AccountType": "Type de compte"
           },
          "NamePlaceHolder": "Entrez le nom de votre Rapport Graphique",
-         "LoadChartButton": "Mettre à jour le Graphique",
+         "LoadChartButton": "Charger",
+         "ResetChartButton": "Réinitialiser",
          "StartDateLabel": "Mois de début",
          "EndDateLabel": "Mois de fin",
          "StartMonthExceedCurrentError": "Mois de début ne peut pas être après le mois actuel.",
