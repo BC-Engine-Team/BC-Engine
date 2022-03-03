@@ -11,6 +11,10 @@ This can be bullet point or sentence format.
 If this is a change to the UI, include before and after screenshots to show the differences.
 If this is a new UI feature, include screenshots to show reviewers what it looks like. 
 
+### Before
+
+### After
+
 ## Test Proof
 If tests were added, include a screenshot of the tests all passing.
 
