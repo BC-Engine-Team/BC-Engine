@@ -38,6 +38,7 @@ const Dashboard = () => {
     const chartReportNamePlaceHolder = t('dashboard.criteria.NamePlaceHolder');
     const loadChartButtonText = t('dashboard.criteria.LoadChartButton');
     const saveChartButtonText = t('dashboard.criteria.SaveChartButton');
+    const resetChartButtonText = t('dashboard.criteria.ResetChartButton');
     const chartTitle = t('dashboard.chart.Title');
     const chartXLabel = t('dashboard.chart.XAxisLabel');
     const chartYLabel = t('dashboard.chart.YAxisLabel');
@@ -814,7 +815,7 @@ const Dashboard = () => {
                             </Row>
                             <Row>
                                 <Col>
-                                    <Button variant="secondary" className='w-100' onClick={resetChartCriteria}>Reset</Button>
+                                    <Button variant="secondary" className='w-100' onClick={resetChartCriteria}>{resetChartButtonText}</Button>
                                 </Col>
                             </Row>
                         </div >

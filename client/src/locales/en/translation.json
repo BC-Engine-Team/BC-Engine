@@ -51,8 +51,9 @@
     "dashboard":{
         "criteria":{
             "NamePlaceHolder":"Enter Chart Report Name",
-            "LoadChartButton":"Load Chart",
-            "SaveChartButton":"Save Chart",
+            "LoadChartButton":"Load",
+            "SaveChartButton":"Save",
+            "ResetChartButton": "Reset",
             "CreateNewChartButton":"Create Chart",
             "Title":"Chart Criteria",
             "Compare":"Compare selected employee with all employees",
