@@ -328,6 +328,7 @@ const Dashboard = () => {
                     }
 
                     localStorage.setItem("dash_previous_chart_data", JSON.stringify(datasets));
+                    localStorage.setItem("dash_previous_criteria", JSON.stringify(criteria))
 
                     setClientNameCountry(clientInfoList);
                 })
@@ -416,6 +417,7 @@ const Dashboard = () => {
         delete previouslyLoadedCriteria['name'];
         let criteriaWithoutName = Object.assign({}, criteria);
         delete criteriaWithoutName['name'];
+
         if (!chartSaved && JSON.stringify(previouslyLoadedCriteria) !== JSON.stringify(criteriaWithoutName)) {
             alert("Please load the chart by clicking on the 'Load Chart' button before saving it.")
             return;
